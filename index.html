@@ -20,8 +20,11 @@ button.game-btn:hover{background:#2f8ad8;}
 .progress{background:#ddd;border-radius:10px;overflow:hidden;}
 .progress div{height:14px;background:#4cafef;}
 footer{background:#2f8ad8;color:white;text-align:center;padding:12px;}
+.kids{background:#fffbe6;}
+.kids .card{background:#fff3cc;}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -63,9 +66,9 @@ footer{background:#2f8ad8;color:white;text-align:center;padding:12px;}
 <h2>🔤 Alphabet A–Z</h2>
 <p>Escucha y repite las letras:</p>
 <div id="alphabetLetters"></div>
-<p>Juego: Selecciona la letra correcta</p>
-<button class="game-btn" onclick="checkAnswer('A')">A</button>
-<button class="game-btn" onclick="checkAnswer('B')">B</button>
+<p>Juego: Selecciona la letra correcta que escuchaste</p>
+<button class="game-btn" onclick="checkAnswer('A','alphabet')">A</button>
+<button class="game-btn" onclick="checkAnswer('B','alphabet')">B</button>
 <p id="alphabetResult"></p>
 </div>
 
@@ -73,11 +76,17 @@ footer{background:#2f8ad8;color:white;text-align:center;padding:12px;}
 <h2>👨‍👩‍👧 Family Members</h2>
 <p>Father <button onclick="speak('Father')">🔊</button> = Padre</p>
 <p>Mother <button onclick="speak('Mother')">🔊</button> = Madre</p>
+<p>Brother <button onclick="speak('Brother')">🔊</button> = Hermano</p>
+<p>Sister <button onclick="speak('Sister')">🔊</button> = Hermana</p>
 <p><b>Lectura:</b> My father and mother are happy.</p>
 <p>Juego: ¿Quién es "Father"?</p>
 <button class="game-btn" onclick="checkAnswer(true,'family')">Padre</button>
 <button class="game-btn" onclick="checkAnswer(false,'family')">Hermano</button>
 <p id="familyResult"></p>
+<p><b>Writing:</b> Escribe "Father" en inglés:</p>
+<input id="familyWrite" placeholder="Tu respuesta">
+<button onclick="checkWriting('familyWrite','Father','familyWriteResult')">Comprobar</button>
+<p id="familyWriteResult"></p>
 </div>
 
 <div class="card hidden lesson" id="questions">
@@ -88,14 +97,65 @@ footer{background:#2f8ad8;color:white;text-align:center;padding:12px;}
 <button class="game-btn" onclick="checkAnswer(true,'questions')">Where</button>
 <button class="game-btn" onclick="checkAnswer(false,'questions')">Why</button>
 <p id="questionsResult"></p>
+<p><b>Writing:</b> Escribe la pregunta "Where do you live?"</p>
+<input id="questionsWrite" placeholder="Tu respuesta">
+<button onclick="checkWriting('questionsWrite','Where do you live?','questionsWriteResult')">Comprobar</button>
+<p id="questionsWriteResult"></p>
+</div>
+
+<div class="card hidden lesson" id="toBe">
+<h2>🧠 Verb To Be</h2>
+<p>Afirmativo: I am happy</p>
+<p>Negativo: I am not sad</p>
+<p>Pregunta: Am I happy?</p>
+<p>Contracciones: I'm / You're / He's</p>
+<p>Juego: Completa I ___ happy</p>
+<button class="game-btn" onclick="checkAnswer(true,'toBe')">am</button>
+<button class="game-btn" onclick="checkAnswer(false,'toBe')">is</button>
+<p id="toBeResult"></p>
+<p><b>Writing:</b> Escribe "I am happy"</p>
+<input id="toBeWrite" placeholder="Tu respuesta">
+<button onclick="checkWriting('toBeWrite','I am happy','toBeWriteResult')">Comprobar</button>
+<p id="toBeWriteResult"></p>
+</div>
+
+<div class="card hidden lesson" id="simplePresent">
+<h2>⏰ Simple Present</h2>
+<p>I play soccer</p>
+<p>I do not play tennis</p>
+<p>Do you play soccer?</p>
+<p>Lectura: I play soccer every day.</p>
+<p>Juego: ¿Cuál es la forma correcta del verbo "do"?</p>
+<button class="game-btn" onclick="checkAnswer(true,'simplePresent')">Do</button>
+<button class="game-btn" onclick="checkAnswer(false,'simplePresent')">Did</button>
+<p id="simplePresentResult"></p>
+<p><b>Writing:</b> Escribe "I play soccer"</p>
+<input id="simplePresentWrite" placeholder="Tu respuesta">
+<button onclick="checkWriting('simplePresentWrite','I play soccer','simplePresentWriteResult')">Comprobar</button>
+<p id="simplePresentWriteResult"></p>
+</div>
+
+<div class="card hidden lesson" id="simplePast">
+<h2>⌛ Simple Past</h2>
+<p>I played soccer</p>
+<p>I did not play soccer</p>
+<p>Did you play soccer?</p>
+<p>Lectura: Yesterday I played soccer.</p>
+<p>Juego: ¿Cuál es la forma correcta del verbo "did"?</p>
+<button class="game-btn" onclick="checkAnswer(true,'simplePast')">Did</button>
+<button class="game-btn" onclick="checkAnswer(false,'simplePast')">Do</button>
+<p id="simplePastResult"></p>
+<p><b>Writing:</b> Escribe "I played soccer"</p>
+<input id="simplePastWrite" placeholder="Tu respuesta">
+<button onclick="checkWriting('simplePastWrite','I played soccer','simplePastWriteResult')">Comprobar</button>
+<p id="simplePastWriteResult"></p>
 </div>
 
 <div class="card hidden lesson" id="exam">
-<h2>📝 Examen Práctico</h2>
-<p>Pregunta: I ___ happy.</p>
-<input id="examInput" placeholder="Escribe la respuesta">
-<button onclick="checkExam()">Comprobar</button>
-<p id="examResult"></p>
+<h2>📝 Examen Completo</h2>
+<p>Responde correctamente todas las preguntas. Puedes intentar varias veces.</p>
+<div id="examQuestions"></div>
+<p id="examScore"></p>
 </div>
 
 </section>
@@ -108,6 +168,7 @@ footer{background:#2f8ad8;color:white;text-align:center;padding:12px;}
 // VARIABLES
 let score=0;
 let currentUser="";
+let attempts = [];
 
 // INICIO
 function start(){
@@ -116,10 +177,11 @@ function start(){
     if(!user){alert("Escribe tu nombre");return;}
     currentUser=user;
     score=parseInt(localStorage.getItem(user+"-score"))||0;
+    attempts = JSON.parse(localStorage.getItem(user+"-attempts")) || [];
     document.getElementById("login").classList.add("hidden");
     document.getElementById("menu").classList.remove("hidden");
     document.getElementById("progressCard").classList.remove("hidden");
-    if(mode==="kids") document.body.style.background="#fffbe6";
+    if(mode==="kids") document.body.classList.add("kids");
     buildAlphabet();
     updateProgress();
     showLesson('alphabet');
@@ -149,7 +211,7 @@ function showLesson(id){
 }
 
 // JUEGOS
-function checkAnswer(correct,id='alphabet'){
+function checkAnswer(correct,id){
     let resultId=id+'Result';
     document.getElementById(resultId).innerText=correct?"✅ Correcto":"❌ Intenta otra vez";
     if(correct){
@@ -159,21 +221,60 @@ function checkAnswer(correct,id='alphabet'){
     }
 }
 
+// WRITING
+function checkWriting(inputId,answer,resultId){
+    let userAnswer=document.getElementById(inputId).value.trim();
+    if(userAnswer.toLowerCase()===answer.toLowerCase()){
+        document.getElementById(resultId).innerText="✅ Correcto";
+        score++;
+    }else{
+        document.getElementById(resultId).innerText="❌ Intenta otra vez";
+    }
+    localStorage.setItem(currentUser+"-score",score);
+    updateProgress();
+}
+
 // PROGRESO
 function updateProgress(){
-    let percent=Math.min(score*10,100);
+    let percent=Math.min(score*5,100);
     document.getElementById("bar").style.width=percent+"%";
     document.getElementById("level").innerText=
         percent<40?"Nivel Básico":percent<70?"Nivel Intermedio":"Excelente progreso 🎉";
 }
 
-// EXAMEN
+// EXAMEN COMPLETO
+const examData=[
+    {q:"I ___ happy.",a:"am"},
+    {q:"Father in Spanish is?",a:"Padre"},
+    {q:"Where do you live?",a:"Where do you live?"},
+    {q:"Simple Past: I ___ soccer yesterday",a:"played"}
+];
+
+function loadExam(){
+    let html="";
+    examData.forEach((e,i)=>{
+        html+=`<p>${e.q}</p><input id="exam${i}"><br>`;
+    });
+    html+=`<button onclick="checkExam()">Comprobar Examen</button>`;
+    document.getElementById("examQuestions").innerHTML=html;
+}
 function checkExam(){
-    let answer=document.getElementById("examInput").value.trim().toLowerCase();
-    if(answer==="am"){
-        document.getElementById("examResult").innerText="✅ Correcto!";
-        score++;
-        localStorage.setItem(currentUser+"-score",score);
-        updateProgress();
-    }else{
-        document.getElementById("examResult").inner
+    let total=examData.length;
+    let correct=0;
+    examData.forEach((e,i)=>{
+        let ans=document.getElementById("exam"+i).value.trim().toLowerCase();
+        if(ans===e.a.toLowerCase()) correct++;
+    });
+    document.getElementById("examScore").innerText=`Tu puntuación: ${correct}/${total}`;
+    attempts.push(correct+"/"+total+" intentos");
+    localStorage.setItem(currentUser+"-attempts",JSON.stringify(attempts));
+}
+
+// CARGAR EXAMEN AL ENTRAR
+showLesson('alphabet');
+loadExam();
+
+</script>
+
+</body>
+</html>
