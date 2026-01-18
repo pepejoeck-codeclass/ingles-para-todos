@@ -2,76 +2,44 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Plataforma Inglés Para Todos</title>
+<title>Plataforma Inglés Completa</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:#eef3f9;
-}
-header{
-    background:linear-gradient(90deg,#4cafef,#2f8ad8);
-    color:white;
-    padding:20px;
-    text-align:center;
-}
-section{
-    max-width:1100px;
-    margin:auto;
-    padding:15px;
-}
-.card{
-    background:white;
-    border-radius:14px;
-    padding:20px;
-    margin-bottom:20px;
-}
-button{
-    background:#4cafef;
-    color:white;
-    border:none;
-    padding:8px 14px;
-    border-radius:6px;
-    cursor:pointer;
-    margin:4px;
-}
-button:hover{background:#2f8ad8;}
-input,select{
-    padding:8px;
-    border-radius:6px;
-    border:1px solid #ccc;
-}
-.progress{
-    background:#ddd;
-    border-radius:10px;
-    overflow:hidden;
-}
-.progress div{
-    height:14px;
-    background:#4cafef;
-}
+body{margin:0;font-family:Arial,sans-serif;background:#eef3f9;}
+header{background:linear-gradient(90deg,#4cafef,#2f8ad8);color:white;padding:20px;text-align:center;}
+nav{background:#2f8ad8;padding:10px;text-align:center;}
+nav button{margin:5px;padding:8px 12px;border-radius:6px;border:none;color:white;background:#4cafef;cursor:pointer;}
+nav button:hover{background:#1d6fc2;}
+section{max-width:1100px;margin:auto;padding:15px;}
+.card{background:white;border-radius:14px;padding:20px;margin-bottom:20px;}
 .hidden{display:none;}
-.kids{background:#fffbe6;}
-footer{
-    background:#2f8ad8;
-    color:white;
-    text-align:center;
-    padding:12px;
-}
+input,select,textarea{padding:8px;border-radius:6px;border:1px solid #ccc;width:100%;}
+button.game-btn{margin:4px;padding:6px 12px;border-radius:6px;border:none;background:#4cafef;color:white;cursor:pointer;}
+button.game-btn:hover{background:#2f8ad8;}
+.progress{background:#ddd;border-radius:10px;overflow:hidden;}
+.progress div{height:14px;background:#4cafef;}
+footer{background:#2f8ad8;color:white;text-align:center;padding:12px;}
 </style>
 </head>
-
 <body>
 
 <header>
-<h1>📘 Plataforma Inglés Para Todos</h1>
+<h1>📘 Plataforma Inglés Completa</h1>
 <p>Listening • Reading • Speaking • Writing</p>
 </header>
 
-<section>
+<nav id="menu" class="hidden">
+<button onclick="showLesson('alphabet')">Alphabet</button>
+<button onclick="showLesson('family')">Family Members</button>
+<button onclick="showLesson('questions')">Question Words</button>
+<button onclick="showLesson('toBe')">Verb To Be</button>
+<button onclick="showLesson('simplePresent')">Simple Present</button>
+<button onclick="showLesson('simplePast')">Simple Past</button>
+<button onclick="showLesson('exam')">Examen</button>
+</nav>
 
+<section>
 <!-- LOGIN -->
 <div class="card" id="login">
 <h2>👤 Usuario</h2>
@@ -83,139 +51,129 @@ footer{
 <button onclick="start()">Entrar</button>
 </div>
 
-<!-- PANEL -->
-<div id="panel" class="hidden">
-
-<div class="card">
+<!-- PROGRESO -->
+<div class="card hidden" id="progressCard">
 <h2>📊 Progreso</h2>
 <div class="progress"><div id="bar"></div></div>
 <p id="level"></p>
 </div>
 
-<!-- ALPHABET -->
-<div class="card">
+<!-- LECCIONES -->
+<div class="card hidden lesson" id="alphabet">
 <h2>🔤 Alphabet A–Z</h2>
-<p><b>Listening & Speaking:</b></p>
-<div id="alphabet"></div>
-
-<p><b>Game:</b> Listen and choose A</p>
-<button onclick="speak('A')">🔊</button><br>
-<button onclick="answer(true)">A</button>
-<button onclick="answer(false)">B</button>
-<p id="gameResult"></p>
+<p>Escucha y repite las letras:</p>
+<div id="alphabetLetters"></div>
+<p>Juego: Selecciona la letra correcta</p>
+<button class="game-btn" onclick="checkAnswer('A')">A</button>
+<button class="game-btn" onclick="checkAnswer('B')">B</button>
+<p id="alphabetResult"></p>
 </div>
 
-<!-- FAMILY -->
-<div class="card">
+<div class="card hidden lesson" id="family">
 <h2>👨‍👩‍👧 Family Members</h2>
-<p>Father 🔊 <button onclick="speak('Father')">Play</button> = Padre</p>
-<p>Mother 🔊 <button onclick="speak('Mother')">Play</button> = Madre</p>
-<p><b>Reading:</b> My father and mother are happy.</p>
-<p><b>Game:</b> Who is "Father"?</p>
-<button onclick="answer(true)">Padre</button>
-<button onclick="answer(false)">Hermano</button>
+<p>Father <button onclick="speak('Father')">🔊</button> = Padre</p>
+<p>Mother <button onclick="speak('Mother')">🔊</button> = Madre</p>
+<p><b>Lectura:</b> My father and mother are happy.</p>
+<p>Juego: ¿Quién es "Father"?</p>
+<button class="game-btn" onclick="checkAnswer(true,'family')">Padre</button>
+<button class="game-btn" onclick="checkAnswer(false,'family')">Hermano</button>
+<p id="familyResult"></p>
 </div>
 
-<!-- QUESTION WORDS -->
-<div class="card">
+<div class="card hidden lesson" id="questions">
 <h2>❓ Question Words</h2>
 <p>What / Where / When / Why / Who</p>
-<p><b>Reading:</b> Where do you live?</p>
-<p><b>Game:</b> Choose the correct word</p>
-<button onclick="answer(true)">Where</button>
-<button onclick="answer(false)">Why</button>
+<p>Lectura: Where do you live?</p>
+<p>Juego: Elige la palabra correcta</p>
+<button class="game-btn" onclick="checkAnswer(true,'questions')">Where</button>
+<button class="game-btn" onclick="checkAnswer(false,'questions')">Why</button>
+<p id="questionsResult"></p>
 </div>
 
-<!-- TO BE -->
-<div class="card">
-<h2>🧠 Verb To Be</h2>
-<p><b>Afirmativo:</b> I am happy</p>
-<p><b>Negativo:</b> I am not sad</p>
-<p><b>Pregunta:</b> Am I happy?</p>
-<p><b>Contracciones:</b> I'm / You're / He's</p>
-<p><b>Game:</b> I ___ happy</p>
-<button onclick="answer(true)">am</button>
-<button onclick="answer(false)">is</button>
-</div>
-
-<!-- SIMPLE PRESENT -->
-<div class="card">
-<h2>⏰ Simple Present</h2>
-<p>I play soccer</p>
-<p>I do not play tennis</p>
-<p>Do you play soccer?</p>
-<p><b>Reading:</b> I play soccer every day.</p>
-<button onclick="answer(true)">Do</button>
-<button onclick="answer(false)">Did</button>
-</div>
-
-<!-- SIMPLE PAST -->
-<div class="card">
-<h2>⌛ Simple Past</h2>
-<p>I played soccer</p>
-<p>I did not play soccer</p>
-<p>Did you play soccer?</p>
-<p><b>Reading:</b> Yesterday I played soccer.</p>
-<button onclick="answer(true)">Did</button>
-<button onclick="answer(false)">Do</button>
-</div>
-
+<div class="card hidden lesson" id="exam">
+<h2>📝 Examen Práctico</h2>
+<p>Pregunta: I ___ happy.</p>
+<input id="examInput" placeholder="Escribe la respuesta">
+<button onclick="checkExam()">Comprobar</button>
+<p id="examResult"></p>
 </div>
 
 </section>
 
 <footer>
-<p>© 2026 Plataforma Inglés Para Todos</p>
+<p>© 2026 Plataforma Inglés Completa</p>
 </footer>
 
 <script>
+// VARIABLES
 let score=0;
+let currentUser="";
 
+// INICIO
 function start(){
     let user=document.getElementById("username").value;
     let mode=document.getElementById("mode").value;
     if(!user){alert("Escribe tu nombre");return;}
-    localStorage.setItem("user",user);
-    localStorage.setItem("mode",mode);
+    currentUser=user;
     score=parseInt(localStorage.getItem(user+"-score"))||0;
     document.getElementById("login").classList.add("hidden");
-    document.getElementById("panel").classList.remove("hidden");
-    if(mode==="kids")document.body.classList.add("kids");
+    document.getElementById("menu").classList.remove("hidden");
+    document.getElementById("progressCard").classList.remove("hidden");
+    if(mode==="kids") document.body.style.background="#fffbe6";
     buildAlphabet();
-    update();
+    updateProgress();
+    showLesson('alphabet');
 }
 
+// ALPHABET
 function buildAlphabet(){
     let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let html="";
     for(let l of letters){
         html+=`${l} <button onclick="speak('${l}')">🔊</button> `;
     }
-    document.getElementById("alphabet").innerHTML=html;
+    document.getElementById("alphabetLetters").innerHTML=html;
 }
 
+// SPEAK
 function speak(word){
     let audio=new Audio("https://ssl.gstatic.com/dictionary/static/sounds/oxford/"+word.toLowerCase()+"--_us_1.mp3");
     audio.play();
 }
 
-function answer(correct){
-    document.getElementById("gameResult").innerText=correct?"✅ Correct":"❌ Try again";
+// MENÚ LECCIONES
+function showLesson(id){
+    let lessons=document.getElementsByClassName("lesson");
+    for(let l of lessons) l.classList.add("hidden");
+    document.getElementById(id).classList.remove("hidden");
+}
+
+// JUEGOS
+function checkAnswer(correct,id='alphabet'){
+    let resultId=id+'Result';
+    document.getElementById(resultId).innerText=correct?"✅ Correcto":"❌ Intenta otra vez";
     if(correct){
         score++;
-        let user=localStorage.getItem("user");
-        localStorage.setItem(user+"-score",score);
-        update();
+        localStorage.setItem(currentUser+"-score",score);
+        updateProgress();
     }
 }
 
-function update(){
-    let percent=Math.min(score*5,100);
+// PROGRESO
+function updateProgress(){
+    let percent=Math.min(score*10,100);
     document.getElementById("bar").style.width=percent+"%";
     document.getElementById("level").innerText=
         percent<40?"Nivel Básico":percent<70?"Nivel Intermedio":"Excelente progreso 🎉";
 }
-</script>
 
-</body>
-</html>
+// EXAMEN
+function checkExam(){
+    let answer=document.getElementById("examInput").value.trim().toLowerCase();
+    if(answer==="am"){
+        document.getElementById("examResult").innerText="✅ Correcto!";
+        score++;
+        localStorage.setItem(currentUser+"-score",score);
+        updateProgress();
+    }else{
+        document.getElementById("examResult").inner
