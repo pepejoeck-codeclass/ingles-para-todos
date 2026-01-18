@@ -396,3 +396,177 @@ function loadDashboard(){
   document.getElementById('historyList').innerHTML=html;
 }
 </script>
+<!-- LECCIONES CON JUEGOS -->
+<div class="card hidden lesson" id="alphabetLesson">
+  <h2>🔤 Alphabet A–Z</h2>
+  <p>Lectura: Las letras A–Z</p>
+  <!-- Matching -->
+  <h3>🎯 Matching</h3>
+  <div id="alphabetMatching"></div>
+  <!-- Drag & Drop -->
+  <h3>🔤 Drag & Drop</h3>
+  <div id="alphabetDragDrop"></div>
+  <!-- Listening -->
+  <h3>🎧 Listening</h3>
+  <button onclick="playWord('A')">🔊 Escuchar letra</button>
+  <button class="game-btn" onclick="checkAnswer(true,'alphabetListening')">A</button>
+  <button class="game-btn" onclick="checkAnswer(false,'alphabetListening')">B</button>
+  <p id="alphabetListeningResult"></p>
+</div>
+
+<div class="card hidden lesson" id="familyLesson">
+  <h2>👨‍👩‍👧 Family Members</h2>
+  <p>Lectura: My family members</p>
+  <h3>🎯 Matching</h3>
+  <div id="familyMatching"></div>
+  <h3>🔤 Drag & Drop</h3>
+  <div id="familyDragDrop"></div>
+  <h3>🎧 Listening</h3>
+  <button onclick="playWord('Father')">🔊 Escuchar</button>
+  <button class="game-btn" onclick="checkAnswer(true,'familyListening')">Father</button>
+  <button class="game-btn" onclick="checkAnswer(false,'familyListening')">Mother</button>
+  <p id="familyListeningResult"></p>
+</div>
+
+<!-- DASHBOARD GENERAL -->
+<div class="card hidden lesson" id="dashboardLesson">
+  <h2>📊 Dashboard de Progreso</h2>
+  <canvas id="progressChart" width="400" height="200"></canvas>
+  <h3>Historial de Intentos</h3>
+  <div id="historyList"></div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+// USUARIO
+let currentUser="";
+let scoreByTheme={};
+let history=[];
+
+// INICIO
+function start(){
+    currentUser=document.getElementById("username").value;
+    if(!currentUser){alert("Escribe tu nombre");return;}
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("menu").classList.remove("hidden");
+    document.getElementById("progressCard").classList.remove("hidden");
+
+    // Cargar historial
+    history=JSON.parse(localStorage.getItem(currentUser+"-history"))||[];
+    loadDashboard();
+
+    // Cargar juegos iniciales por tema
+    buildAlphabetMatching();
+    buildAlphabetDragDrop();
+    buildFamilyMatching();
+    buildFamilyDragDrop();
+}
+
+// MENÚ LECCIONES
+function showLesson(id){
+    let lessons=document.getElementsByClassName("lesson");
+    for(let l of lessons) l.classList.add("hidden");
+    document.getElementById(id).classList.remove("hidden");
+}
+
+// JUEGOS MATCHING Y DRAG & DROP GENERALES
+function buildAlphabetMatching(){
+    const container=document.getElementById("alphabetMatching");
+    container.innerHTML=`
+      <div draggable="true" class="dragWord" data-word="A">A</div>
+      <div draggable="true" class="dragWord" data-word="B">B</div>
+      <div class="dropZone" data-word="A">🔲</div>
+      <div class="dropZone" data-word="B">🔲</div>
+    `;
+    setupDragDrop(container,"alphabetMatching");
+}
+function buildAlphabetDragDrop(){
+    const container=document.getElementById("alphabetDragDrop");
+    container.innerHTML=`
+      <div draggable="true" class="dragLetter" data-letter="A">A</div>
+      <div draggable="true" class="dragLetter" data-letter="B">B</div>
+      <div id="dropAlphabet"></div>
+    `;
+    setupDragDrop(container,"alphabetDragDrop");
+}
+function buildFamilyMatching(){
+    const container=document.getElementById("familyMatching");
+    container.innerHTML=`
+      <div draggable="true" class="dragWord" data-word="Father">Father</div>
+      <div draggable="true" class="dragWord" data-word="Mother">Mother</div>
+      <div class="dropZone" data-word="Father">👨</div>
+      <div class="dropZone" data-word="Mother">👩</div>
+    `;
+    setupDragDrop(container,"familyMatching");
+}
+function buildFamilyDragDrop(){
+    const container=document.getElementById("familyDragDrop");
+    container.innerHTML=`
+      <div draggable="true" class="dragLetter" data-letter="Father">Father</div>
+      <div draggable="true" class="dragLetter" data-letter="Mother">Mother</div>
+      <div id="dropFamily"></div>
+    `;
+    setupDragDrop(container,"familyDragDrop");
+}
+
+// FUNCION GENERAL DRAG & DROP
+function setupDragDrop(containerId,theme){
+    const container=document.getElementById(containerId);
+    const draggables=container.querySelectorAll("[draggable]");
+    const drops=container.querySelectorAll(".dropZone, #dropAlphabet, #dropFamily");
+    draggables.forEach(d=>{
+      d.addEventListener("dragstart",e=>e.dataTransfer.setData("text",d.dataset.word||d.dataset.letter));
+    });
+    drops.forEach(drop=>{
+      drop.addEventListener("dragover",e=>e.preventDefault());
+      drop.addEventListener("drop",e=>{
+        let data=e.dataTransfer.getData("text");
+        drop.appendChild(document.querySelector(`[data-word='${data}'],[data-letter='${data}']`));
+        saveAttempt(theme,"Intento");
+        loadDashboard();
+      });
+    });
+}
+
+// SPEAK
+function playWord(word){
+    let audio=new Audio("https://ssl.gstatic.com/dictionary/static/sounds/oxford/"+word.toLowerCase()+"--_us_1.mp3");
+    audio.play();
+}
+
+// SAVE ATTEMPT
+function saveAttempt(theme,result){
+    history.push({theme,result,date:new Date().toLocaleString()});
+    localStorage.setItem(currentUser+"-history",JSON.stringify(history));
+}
+
+// DASHBOARD
+function loadDashboard(){
+    const ctx=document.getElementById("progressChart").getContext("2d");
+    let themeScores={};
+    history.forEach(h=>{
+        themeScores[h.theme]=(themeScores[h.theme]||0)+1;
+    });
+    const labels=Object.keys(themeScores);
+    const data=Object.values(themeScores);
+    if(window.myChart) window.myChart.destroy();
+    window.myChart=new Chart(ctx,{
+        type:'bar',
+        data:{
+            labels:labels,
+            datasets:[{
+                label:'Intentos por tema',
+                data:data,
+                backgroundColor:'rgba(54, 162, 235, 0.6)'
+            }]
+        },
+        options:{responsive:true,plugins:{legend:{display:false}}}
+    });
+    // Historial
+    let html="<ul>";
+    history.forEach(h=>{
+        html+=`<li>${h.date}: ${h.theme} → ${h.result}</li>`;
+    });
+    html+="</ul>";
+    document.getElementById("historyList").innerHTML=html;
+}
