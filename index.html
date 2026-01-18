@@ -1,322 +1,64 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Aprende Inglés Fácil</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #f4f6f8;
-            color: #333;
-        }
-
-        header {
-            background-color: #1e88e5;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        nav {
-            background-color: #1565c0;
-            padding: 10px;
-            text-align: center;
-        }
-
-        nav a {
-            color: white;
-            margin: 0 15px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        section {
-            padding: 30px;
-            max-width: 900px;
-            margin: auto;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-
-        button {
-            background-color: #1e88e5;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        footer {
-            background-color: #1565c0;
-            color: white;
-            text-align: center;
-            padding: 15px;
-        }
-    </style>
-</head>
-
-<body>
-
-<header>
-    <h1>Aprende Inglés Fácil</h1>
-    <p>Clases, vocabulario y práctica desde cero</p>
-</header>
-
-<nav>
-    <a href="#vocabulario">Vocabulario</a>
-    <a href="#lecciones">Lecciones</a>
-    <a href="#practica">Práctica</a>
-</nav>
-
-<section id="vocabulario">
-    <div class="card">
-        <h2>📚 Vocabulario Básico</h2>
-        <ul>
-            <li>Hello = Hola</li>
-            <li>Goodbye = Adiós</li>
-            <li>Please = Por favor</li>
-            <li>Thank you = Gracias</li>
-        </ul>
-    </div>
-</section>
-
-<section id="lecciones">
-    <div class="card">
-        <h2>🧠 Lección 1: Verb "To Be"</h2>
-        <p>I am / You are / He is / She is</p>
-        <p>Ejemplo: <strong>I am a student</strong></p>
-    </div>
-</section>
-
-<section id="practica">
-    <div class="card">
-        <h2>✍️ Práctica Rápida</h2>
-        <p>¿Cómo se dice "Yo soy feliz" en inglés?</p>
-        <button onclick="mostrarRespuesta()">Ver respuesta</button>
-        <p id="respuesta"></p>
-    </div>
-</section>
-
-<footer>
-    <p>© 2026 Aprende Inglés Fácil</p>
-</footer>
-
-<script>
-    function mostrarRespuesta() {
-        document.getElementById("respuesta").innerText = "I am happy";
-    }
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Inglés Para Todos</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body {
-            font-family: "Segoe UI", sans-serif;
-            margin: 0;
-            background-color: #f2f7ff;
-            color: #333;
-        }
-
-        header {
-            background: linear-gradient(90deg, #42a5f5, #1e88e5);
-            color: white;
-            text-align: center;
-            padding: 30px 15px;
-        }
-
-        nav {
-            background-color: #1565c0;
-            padding: 12px;
-            text-align: center;
-        }
-
-        nav a {
-            color: white;
-            margin: 0 12px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        section {
-            max-width: 1000px;
-            margin: auto;
-            padding: 25px;
-        }
-
-        h2 {
-            color: #1e88e5;
-        }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        button {
-            background-color: #1e88e5;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 15px;
-        }
-
-        button:hover {
-            background-color: #1565c0;
-        }
-
-        footer {
-            background-color: #1565c0;
-            color: white;
-            text-align: center;
-            padding: 15px;
-        }
-    </style>
-</head>
-
-<body>
-
-<header>
-    <h1>Inglés Para Todos</h1>
-    <p>Básico e Intermedio • Niños y Adultos • Gratis</p>
-</header>
-
-<nav>
-    <a href="#basico">Nivel Básico</a>
-    <a href="#intermedio">Nivel Intermedio</a>
-    <a href="#practica">Práctica</a>
-</nav>
-
-<section id="basico">
-    <div class="card">
-        <h2>📘 Nivel Básico</h2>
-        <p><strong>Saludos:</strong></p>
-        <ul>
-            <li>Hello = Hola</li>
-            <li>Good morning = Buenos días</li>
-            <li>Good night = Buenas noches</li>
-        </ul>
-
-        <p><strong>Verbo To Be:</strong></p>
-        <p>I am = Yo soy / estoy</p>
-        <p>You are = Tú eres / estás</p>
-        <p>Ejemplo: <b>I am happy</b> (Yo estoy feliz)</p>
-    </div>
-</section>
-
-<section id="intermedio">
-    <div class="card">
-        <h2>📗 Nivel Intermedio</h2>
-        <p><strong>Presente simple:</strong></p>
-        <p>I eat apples → Yo como manzanas</p>
-        <p>She plays soccer → Ella juega fútbol</p>
-
-        <p><strong>Preguntas:</strong></p>
-        <p>Do you like English?</p>
-        <p>Yes, I do / No, I don’t</p>
-    </div>
-</section>
-
-<section id="practica">
-    <div class="card">
-        <h2>✏️ Práctica</h2>
-        <p>¿Cómo se dice "Nosotros aprendemos inglés"?</p>
-        <button onclick="verRespuesta()">Ver respuesta</button>
-        <p id="respuesta" style="font-weight:bold;"></p>
-    </div>
-</section>
-
-<footer>
-    <p>© 2026 Inglés Para Todos - Aprender es divertido</p>
-</footer>
-
-<script>
-    function verRespuesta() {
-        document.getElementById("respuesta").innerText = 
-        "We learn English";
-    }
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="es">
-<head>
 <meta charset="UTF-8">
-<title>Inglés Para Todos</title>
+<title>Plataforma Inglés Para Todos</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background-color: #eef3f9;
-    margin: 0;
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#eef3f9;
 }
-
-header {
-    background: #4cafef;
-    color: white;
-    padding: 25px;
-    text-align: center;
+header{
+    background:linear-gradient(90deg,#4cafef,#2f8ad8);
+    color:white;
+    padding:20px;
+    text-align:center;
 }
-
-section {
-    max-width: 1000px;
-    margin: auto;
-    padding: 20px;
+section{
+    max-width:1100px;
+    margin:auto;
+    padding:15px;
 }
-
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
+.card{
+    background:white;
+    border-radius:14px;
+    padding:20px;
+    margin-bottom:20px;
 }
-
-button {
-    background: #4cafef;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    cursor: pointer;
+button{
+    background:#4cafef;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:6px;
+    cursor:pointer;
+    margin:4px;
 }
-
-button:hover {
-    background: #2f8ad8;
+button:hover{background:#2f8ad8;}
+input,select{
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #ccc;
 }
-
-img {
-    max-width: 100%;
-    border-radius: 10px;
+.progress{
+    background:#ddd;
+    border-radius:10px;
+    overflow:hidden;
 }
-
-footer {
-    background: #2f8ad8;
-    color: white;
-    text-align: center;
-    padding: 12px;
+.progress div{
+    height:14px;
+    background:#4cafef;
+}
+.hidden{display:none;}
+.kids{background:#fffbe6;}
+footer{
+    background:#2f8ad8;
+    color:white;
+    text-align:center;
+    padding:12px;
 }
 </style>
 </head>
@@ -324,251 +66,154 @@ footer {
 <body>
 
 <header>
-<h1>Inglés Para Todos</h1>
-<p>Aprende jugando • Básico e Intermedio • Gratis</p>
+<h1>📘 Plataforma Inglés Para Todos</h1>
+<p>Listening • Reading • Speaking • Writing</p>
 </header>
 
 <section>
 
-<div class="card">
-<h2>📘 Vocabulario con Pronunciación</h2>
-<p>Hello = Hola 
-<button onclick="play('hello')">🔊</button></p>
-
-<p>Dog = Perro 
-<button onclick="play('dog')">🔊</button></p>
-
-<img src="https://via.placeholder.com/600x250?text=Learning+English" alt="learning">
+<!-- LOGIN -->
+<div class="card" id="login">
+<h2>👤 Usuario</h2>
+<input id="username" placeholder="Tu nombre">
+<select id="mode">
+<option value="kids">Modo Niños</option>
+<option value="adult">Modo Adultos</option>
+</select>
+<button onclick="start()">Entrar</button>
 </div>
 
+<!-- PANEL -->
+<div id="panel" class="hidden">
+
 <div class="card">
-<h2>🎮 Juego: ¿Cómo se dice?</h2>
-<p>¿Cómo se dice <b>Gato</b> en inglés?</p>
-<button onclick="gameAnswer('correct')">Cat</button>
-<button onclick="gameAnswer('wrong')">Dog</button>
+<h2>📊 Progreso</h2>
+<div class="progress"><div id="bar"></div></div>
+<p id="level"></p>
+</div>
+
+<!-- ALPHABET -->
+<div class="card">
+<h2>🔤 Alphabet A–Z</h2>
+<p><b>Listening & Speaking:</b></p>
+<div id="alphabet"></div>
+
+<p><b>Game:</b> Listen and choose A</p>
+<button onclick="speak('A')">🔊</button><br>
+<button onclick="answer(true)">A</button>
+<button onclick="answer(false)">B</button>
 <p id="gameResult"></p>
 </div>
 
+<!-- FAMILY -->
 <div class="card">
-<h2>✏️ Ejercicio Interactivo</h2>
-<p>Completa la frase:</p>
-<p>I ___ happy.</p>
+<h2>👨‍👩‍👧 Family Members</h2>
+<p>Father 🔊 <button onclick="speak('Father')">Play</button> = Padre</p>
+<p>Mother 🔊 <button onclick="speak('Mother')">Play</button> = Madre</p>
+<p><b>Reading:</b> My father and mother are happy.</p>
+<p><b>Game:</b> Who is "Father"?</p>
+<button onclick="answer(true)">Padre</button>
+<button onclick="answer(false)">Hermano</button>
+</div>
 
-<button onclick="check('am')">am</button>
-<button onclick="check('is')">is</button>
+<!-- QUESTION WORDS -->
+<div class="card">
+<h2>❓ Question Words</h2>
+<p>What / Where / When / Why / Who</p>
+<p><b>Reading:</b> Where do you live?</p>
+<p><b>Game:</b> Choose the correct word</p>
+<button onclick="answer(true)">Where</button>
+<button onclick="answer(false)">Why</button>
+</div>
 
-<p id="exerciseResult"></p>
+<!-- TO BE -->
+<div class="card">
+<h2>🧠 Verb To Be</h2>
+<p><b>Afirmativo:</b> I am happy</p>
+<p><b>Negativo:</b> I am not sad</p>
+<p><b>Pregunta:</b> Am I happy?</p>
+<p><b>Contracciones:</b> I'm / You're / He's</p>
+<p><b>Game:</b> I ___ happy</p>
+<button onclick="answer(true)">am</button>
+<button onclick="answer(false)">is</button>
+</div>
+
+<!-- SIMPLE PRESENT -->
+<div class="card">
+<h2>⏰ Simple Present</h2>
+<p>I play soccer</p>
+<p>I do not play tennis</p>
+<p>Do you play soccer?</p>
+<p><b>Reading:</b> I play soccer every day.</p>
+<button onclick="answer(true)">Do</button>
+<button onclick="answer(false)">Did</button>
+</div>
+
+<!-- SIMPLE PAST -->
+<div class="card">
+<h2>⌛ Simple Past</h2>
+<p>I played soccer</p>
+<p>I did not play soccer</p>
+<p>Did you play soccer?</p>
+<p><b>Reading:</b> Yesterday I played soccer.</p>
+<button onclick="answer(true)">Did</button>
+<button onclick="answer(false)">Do</button>
+</div>
+
 </div>
 
 </section>
 
 <footer>
-<p>© 2026 Inglés Para Todos</p>
+<p>© 2026 Plataforma Inglés Para Todos</p>
 </footer>
 
 <script>
-function play(word) {
-    let audio = new Audio(
-      "https://ssl.gstatic.com/dictionary/static/sounds/oxford/" 
-      + word + "--_us_1.mp3"
-    );
+let score=0;
+
+function start(){
+    let user=document.getElementById("username").value;
+    let mode=document.getElementById("mode").value;
+    if(!user){alert("Escribe tu nombre");return;}
+    localStorage.setItem("user",user);
+    localStorage.setItem("mode",mode);
+    score=parseInt(localStorage.getItem(user+"-score"))||0;
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("panel").classList.remove("hidden");
+    if(mode==="kids")document.body.classList.add("kids");
+    buildAlphabet();
+    update();
+}
+
+function buildAlphabet(){
+    let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let html="";
+    for(let l of letters){
+        html+=`${l} <button onclick="speak('${l}')">🔊</button> `;
+    }
+    document.getElementById("alphabet").innerHTML=html;
+}
+
+function speak(word){
+    let audio=new Audio("https://ssl.gstatic.com/dictionary/static/sounds/oxford/"+word.toLowerCase()+"--_us_1.mp3");
     audio.play();
 }
 
-function gameAnswer(type) {
-    document.getElementById("gameResult").innerText =
-    type === 'correct' ? "✅ Correcto!" : "❌ Intenta otra vez";
+function answer(correct){
+    document.getElementById("gameResult").innerText=correct?"✅ Correct":"❌ Try again";
+    if(correct){
+        score++;
+        let user=localStorage.getItem("user");
+        localStorage.setItem(user+"-score",score);
+        update();
+    }
 }
 
-function check(answer) {
-    document.getElementById("exerciseResult").innerText =
-    answer === 'am' ? "🎉 Muy bien!" : "❌ Incorrecto";
-}
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Inglés Para Todos App</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: #eef3f9;
-    margin: 0;
-}
-header {
-    background: #4cafef;
-    color: white;
-    padding: 20px;
-    text-align: center;
-}
-section {
-    max-width: 1000px;
-    margin: auto;
-    padding: 15px;
-}
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-}
-button {
-    background: #4cafef;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    margin: 4px;
-    cursor: pointer;
-}
-button:hover { background: #2f8ad8; }
-.progress {
-    background: #ddd;
-    border-radius: 10px;
-    overflow: hidden;
-}
-.progress div {
-    height: 14px;
-    background: #4cafef;
-}
-footer {
-    background: #2f8ad8;
-    color: white;
-    text-align: center;
-    padding: 10px;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-<h1>Inglés Para Todos</h1>
-<p>Aprende jugando • Básico e Intermedio</p>
-</header>
-
-<section>
-
-<!-- PROGRESO -->
-<div class="card">
-<h2>📊 Tu progreso</h2>
-<div class="progress"><div id="bar"></div></div>
-<p id="levelText"></p>
-</div>
-
-<!-- VOCABULARIO -->
-<div class="card">
-<h2>📘 Vocabulario con pronunciación</h2>
-
-<p>Hello <button onclick="speak('Hello')">🔊</button>
-<button onclick="translate('Hello')">🌍</button></p>
-
-<p>Dog <button onclick="speak('Dog')">🔊</button>
-<button onclick="translate('Dog')">🌍</button></p>
-
-<p>Happy <button onclick="speak('Happy')">🔊</button>
-<button onclick="translate('Happy')">🌍</button></p>
-
-<p id="translation"></p>
-</div>
-
-<!-- JUEGO 1 -->
-<div class="card">
-<h2>🎮 Juego 1: Elige la correcta</h2>
-<p>¿Qué significa <b>Cat</b>?</p>
-<button onclick="answer(true)">Gato</button>
-<button onclick="answer(false)">Perro</button>
-<p id="game1"></p>
-</div>
-
-<!-- JUEGO 2 -->
-<div class="card">
-<h2>🎯 Juego 2: Completa</h2>
-<p>I ___ a student</p>
-<button onclick="complete(true)">am</button>
-<button onclick="complete(false)">is</button>
-<p id="game2"></p>
-</div>
-
-<!-- JUEGO 3 -->
-<div class="card">
-<h2>🧠 Juego 3: Escucha y elige</h2>
-<button onclick="speak('Apple')">🔊 Escuchar</button><br>
-<button onclick="listen(true)">Apple</button>
-<button onclick="listen(false)">Orange</button>
-<p id="game3"></p>
-</div>
-
-</section>
-
-<footer>
-<p>© 2026 Inglés Para Todos</p>
-</footer>
-
-<script>
-// ===== PROGRESO =====
-let score = localStorage.getItem("score") || 0;
-score = parseInt(score);
-updateProgress();
-
-function addPoint() {
-    score++;
-    localStorage.setItem("score", score);
-    updateProgress();
-}
-
-function updateProgress() {
-    let percent = Math.min(score * 10, 100);
-    document.getElementById("bar").style.width = percent + "%";
-    document.getElementById("levelText").innerText =
-    score < 5 ? "Nivel: Básico" :
-    score < 10 ? "Nivel: Intermedio" : "Nivel: Avanzando";
-}
-
-// ===== PRONUNCIACIÓN =====
-function speak(word) {
-    let audio = new Audio(
-      "https://ssl.gstatic.com/dictionary/static/sounds/oxford/" +
-      word.toLowerCase() + "--_us_1.mp3"
-    );
-    audio.play();
-}
-
-// ===== TRADUCCIÓN =====
-const dict = {
-    hello: "Hola",
-    dog: "Perro",
-    happy: "Feliz"
-};
-
-function translate(word) {
-    document.getElementById("translation").innerText =
-    "Traducción: " + (dict[word.toLowerCase()] || "No disponible");
-}
-
-// ===== JUEGOS =====
-function answer(correct) {
-    document.getElementById("game1").innerText =
-    correct ? "✅ Bien hecho" : "❌ Intenta otra vez";
-    if (correct) addPoint();
-}
-
-function complete(correct) {
-    document.getElementById("game2").innerText =
-    correct ? "🎉 Correcto" : "❌ Incorrecto";
-    if (correct) addPoint();
-}
-
-function listen(correct) {
-    document.getElementById("game3").innerText =
-    correct ? "👏 Excelente" : "❌ No es correcto";
-    if (correct) addPoint();
+function update(){
+    let percent=Math.min(score*5,100);
+    document.getElementById("bar").style.width=percent+"%";
+    document.getElementById("level").innerText=
+        percent<40?"Nivel Básico":percent<70?"Nivel Intermedio":"Excelente progreso 🎉";
 }
 </script>
 
