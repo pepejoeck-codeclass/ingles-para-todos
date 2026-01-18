@@ -278,3 +278,121 @@ loadExam();
 
 </body>
 </html>
+<!-- NUEVOS JUEGOS -->
+<div class="card hidden lesson" id="matching">
+  <h2>🎯 Juego Matching: Family Members</h2>
+  <p>Arrastra la palabra a la imagen correcta:</p>
+  <div style="display:flex;justify-content:space-around;">
+    <div id="wordList">
+      <div draggable="true" class="dragWord" data-word="Father">Father</div>
+      <div draggable="true" class="dragWord" data-word="Mother">Mother</div>
+      <div draggable="true" class="dragWord" data-word="Brother">Brother</div>
+      <div draggable="true" class="dragWord" data-word="Sister">Sister</div>
+    </div>
+    <div id="dropZones">
+      <div class="dropZone" data-word="Father">👨</div>
+      <div class="dropZone" data-word="Mother">👩</div>
+      <div class="dropZone" data-word="Brother">👦</div>
+      <div class="dropZone" data-word="Sister">👧</div>
+    </div>
+  </div>
+  <p id="matchingResult"></p>
+</div>
+
+<div class="card hidden lesson" id="dragDrop">
+  <h2>🔤 Juego Drag & Drop: Alphabet</h2>
+  <p>Ordena las letras A–E correctamente:</p>
+  <div id="lettersContainer">
+    <div draggable="true" class="dragLetter" data-letter="A">A</div>
+    <div draggable="true" class="dragLetter" data-letter="B">B</div>
+    <div draggable="true" class="dragLetter" data-letter="C">C</div>
+    <div draggable="true" class="dragLetter" data-letter="D">D</div>
+    <div draggable="true" class="dragLetter" data-letter="E">E</div>
+  </div>
+  <div id="dropAlphabet"></div>
+  <p id="dragDropResult"></p>
+</div>
+
+<div class="card hidden lesson" id="listeningGame">
+  <h2>🎧 Listening básico</h2>
+  <p>Escucha la palabra y selecciona la correcta:</p>
+  <button onclick="playWord('Father')">🔊 Escuchar</button>
+  <button class="game-btn" onclick="checkAnswer(true,'listeningGame')">Father</button>
+  <button class="game-btn" onclick="checkAnswer(false,'listeningGame')">Mother</button>
+  <button class="game-btn" onclick="checkAnswer(false,'listeningGame')">Brother</button>
+  <p id="listeningGameResult"></p>
+</div>
+
+<div class="card hidden" id="dashboard">
+  <h2>📊 Dashboard de progreso</h2>
+  <div id="historyList"></div>
+</div>
+
+<script>
+// --- MATCHING ---
+const dragWords = document.querySelectorAll('.dragWord');
+const dropZones = document.querySelectorAll('.dropZone');
+
+dragWords.forEach(word => {
+  word.addEventListener('dragstart', e => e.dataTransfer.setData('text', word.dataset.word));
+});
+
+dropZones.forEach(zone => {
+  zone.addEventListener('dragover', e => e.preventDefault());
+  zone.addEventListener('drop', e => {
+    let word = e.dataTransfer.getData('text');
+    if(word === zone.dataset.word){
+      zone.style.background="lightgreen";
+      document.getElementById('matchingResult').innerText="✅ Correcto!";
+      saveAttempt('matching', 'Correcto');
+    } else {
+      zone.style.background="salmon";
+      document.getElementById('matchingResult').innerText="❌ Intenta otra vez";
+      saveAttempt('matching', 'Incorrecto');
+    }
+  });
+});
+
+// --- DRAG & DROP ALPHABET ---
+const dragLetters = document.querySelectorAll('.dragLetter');
+const dropAlphabet = document.getElementById('dropAlphabet');
+dragLetters.forEach(letter=>{
+  letter.addEventListener('dragstart', e=>e.dataTransfer.setData('text',letter.dataset.letter));
+});
+dropAlphabet.addEventListener('dragover', e=>e.preventDefault());
+dropAlphabet.addEventListener('drop', e=>{
+  let l = e.dataTransfer.getData('text');
+  dropAlphabet.appendChild(document.querySelector(`[data-letter="${l}"]`));
+  // Verificar orden
+  const correctOrder=['A','B','C','D','E'];
+  const lettersInDrop = Array.from(dropAlphabet.children).map(c=>c.dataset.letter);
+  if(JSON.stringify(lettersInDrop) === JSON.stringify(correctOrder)){
+    document.getElementById('dragDropResult').innerText="✅ Correcto!";
+    saveAttempt('dragDrop', 'Correcto');
+  }
+});
+
+// --- LISTENING ---
+function playWord(word){
+  let audio=new Audio("https://ssl.gstatic.com/dictionary/static/sounds/oxford/"+word.toLowerCase()+"--_us_1.mp3");
+  audio.play();
+}
+
+// --- DASHBOARD HISTORIAL ---
+function saveAttempt(game,result){
+  let userAttempts = JSON.parse(localStorage.getItem(currentUser+"-history"))||[];
+  userAttempts.push({game,result,date:new Date().toLocaleString()});
+  localStorage.setItem(currentUser+"-history",JSON.stringify(userAttempts));
+  loadDashboard();
+}
+
+function loadDashboard(){
+  let userAttempts = JSON.parse(localStorage.getItem(currentUser+"-history"))||[];
+  let html="<ul>";
+  userAttempts.forEach(a=>{
+    html+=`<li>${a.date}: ${a.game} → ${a.result}</li>`;
+  });
+  html+="</ul>";
+  document.getElementById('historyList').innerHTML=html;
+}
+</script>
