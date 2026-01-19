@@ -32,12 +32,20 @@
       <button id="startGame">Iniciar ejercicio</button>
     </section>
 
-    <section class="card">
-      <h2>Puntaje</h2>
-      <p id="scoreText">0 puntos</p>
-      <p id="levelText">Nivel 1</p>
-    </section>
-  </main>
+    <section class="card" id="gameCard">
+  <h2 id="questionText">Pulsa para comenzar</h2>
+
+  <input
+    type="text"
+    id="answerInput"
+    placeholder="Escribe tu respuesta..."
+    style="display:none; width:100%; padding:10px; margin:10px 0;"
+  />
+
+  <button id="startGame">Iniciar ejercicio</button>
+  <button id="checkAnswer" style="display:none;">Responder</button>
+</section>
+
 
   <!-- JS -->
   <script src="js/app.js"></script>
