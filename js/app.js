@@ -1,38 +1,61 @@
 console.log("🔥 app.js cargado");
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🔥 DOM listo");
-
   const hamburger = document.getElementById("hamburger");
   const nav = document.getElementById("nav");
   const themeBtn = document.getElementById("themeToggle");
   const startBtn = document.getElementById("startGame");
 
-  console.log("Elementos:", hamburger, nav, themeBtn, startBtn);
+  const scoreText = document.getElementById("scoreText");
+  const levelText = document.getElementById("levelText");
+
+  let score = 20;
+  let level = 3;
+
+  const questions = [
+    { en: "Hello", es: "Hola" },
+    { en: "Goodbye", es: "Adiós" },
+    { en: "Please", es: "Por favor" },
+    { en: "Thank you", es: "Gracias" }
+  ];
 
   // Menú hamburguesa
   if (hamburger && nav) {
     hamburger.addEventListener("click", () => {
       nav.classList.toggle("open");
-      console.log("☰ click");
     });
   }
 
   // Tema oscuro/claro
   if (themeBtn) {
     themeBtn.addEventListener("click", () => {
-      const currentBg = document.body.style.background;
-      document.body.style.background =
-        currentBg === "black" ? "white" : "black";
-      console.log("🌙 click");
+      document.body.classList.toggle("dark");
     });
   }
 
-  // Botón ejercicio
+  // Iniciar ejercicio
   if (startBtn) {
     startBtn.addEventListener("click", () => {
-      alert("Correcto 🎉 +5 puntos");
-      console.log("🎮 click");
+      const q = questions[Math.floor(Math.random() * questions.length)];
+      const answer = prompt(`¿Cómo se dice "${q.en}" en español?`);
+
+      if (!answer) return;
+
+      if (answer.trim().toLowerCase() === q.es.toLowerCase()) {
+        score += 5;
+        alert("✅ Correcto! +5 puntos");
+      } else {
+        alert(`❌ Incorrecto. Era: ${q.es}`);
+      }
+
+      // Subir nivel cada 20 puntos
+      if (score >= level * 20) {
+        level++;
+        alert("🎉 Subiste de nivel!");
+      }
+
+      scoreText.textContent = score + " puntos";
+      levelText.textContent = "Nivel " + level;
     });
   }
 });
