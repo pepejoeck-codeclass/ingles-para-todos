@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const scoreText = document.getElementById("scoreText");
   const levelText = document.getElementById("levelText");
 
+  // 🔹 ESTADO DEL JUEGO
   let score = 20;
   let level = 3;
   let currentQuestion = null;
@@ -24,17 +25,21 @@ document.addEventListener("DOMContentLoaded", () => {
     { en: "Thank you", es: "Gracias" }
   ];
 
+  // 🔹 Inicializar UI
+  scoreText.textContent = score + " puntos";
+  levelText.textContent = "Nivel " + level;
+
   // Menú hamburguesa
   hamburger.addEventListener("click", () => {
     nav.classList.toggle("open");
   });
 
-  // Tema oscuro/claro
+  // 🌙 Tema oscuro/claro
   themeBtn.addEventListener("click", () => {
     document.body.classList.toggle("dark");
   });
 
-  // Iniciar ejercicio
+  // ▶ Iniciar ejercicio
   startBtn.addEventListener("click", () => {
     currentQuestion =
       questions[Math.floor(Math.random() * questions.length)];
@@ -49,8 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
     checkBtn.style.display = "block";
   });
 
-  // Comprobar respuesta
+  // ✅ Comprobar respuesta
   checkBtn.addEventListener("click", () => {
+    if (!currentQuestion) return;
+
     const userAnswer = answerInput.value.trim().toLowerCase();
 
     if (!userAnswer) {
@@ -65,19 +72,22 @@ document.addEventListener("DOMContentLoaded", () => {
       alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
     }
 
-    // Subir nivel cada 20 puntos
+    // 🏆 Subir nivel cada 20 puntos
     if (score >= level * 20) {
       level++;
       alert("🎉 Subiste de nivel!");
     }
 
+    // 🔄 Actualizar UI
     scoreText.textContent = score + " puntos";
     levelText.textContent = "Nivel " + level;
 
-    // Reset UI
+    // 🔄 Reset UI
     questionText.textContent = "Pulsa para comenzar";
     answerInput.style.display = "none";
     checkBtn.style.display = "none";
     startBtn.style.display = "block";
+
+    currentQuestion = null;
   });
 });
