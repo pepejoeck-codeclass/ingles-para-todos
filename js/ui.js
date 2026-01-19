@@ -2,6 +2,8 @@ export function initUI() {
   const hamburger = document.getElementById("hamburger");
   const nav = document.getElementById("nav");
 
+  console.log("UI init", hamburger, nav);
+
   hamburger.addEventListener("click", () => {
     nav.classList.toggle("open");
   });
@@ -23,4 +25,3 @@ function toggleTheme() {
   document.documentElement.setAttribute("data-theme", next);
   localStorage.setItem("theme", next);
 }
-
