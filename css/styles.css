@@ -64,10 +64,12 @@ button {
 }
 
 #nav a {
-  padding: 12px 16px;
+  padding: 14px 18px;
   text-decoration: none;
   color: #222;
+  background: #ffffff;
   border-bottom: 1px solid #eee;
+  font-weight: 500;
 }
 
 #nav a:last-child {
