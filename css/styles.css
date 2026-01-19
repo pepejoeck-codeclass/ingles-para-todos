@@ -1,1 +1,86 @@
+:root {
+  --bg: #ffffff;
+  --text: #222;
+  --primary: #2563eb;
+}
+
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --text: #f1f5f9;
+  --primary: #38bdf8;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: all 0.3s ease;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--primary);
+  color: white;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.hamburger {
+  display: none;
+  font-size: 1.5rem;
+}
+
+main {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: rgba(0,0,0,0.05);
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+  nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    right: 1rem;
+    top: 70px;
+    background: var(--primary);
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  nav.open {
+    display: flex;
+  }
+
+  .hamburger {
+    display: block;
+  }
+}
 
