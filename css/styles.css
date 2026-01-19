@@ -15,7 +15,6 @@ body {
   font-family: system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
-  transition: all 0.3s ease;
 }
 
 header {
@@ -26,6 +25,12 @@ header {
   padding: 1rem;
   background: var(--primary);
   color: white;
+  position: relative;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 
 nav {
@@ -63,6 +68,7 @@ main {
   border-radius: 12px;
 }
 
+/* 📱 MÓVIL */
 @media (max-width: 768px) {
   nav {
     display: none;
@@ -83,4 +89,3 @@ main {
     display: block;
   }
 }
-
