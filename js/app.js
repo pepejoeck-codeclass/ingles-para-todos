@@ -1,22 +1,34 @@
-import { initUI } from "./ui.js";
-import { initStorage, getScore, getLevel } from "./storage.js";
-import { initGames } from "./gameLogic.js";
-import { initI18n } from "./i18n.js";
+console.log("🔥 app.js cargado correctamente");
 
 document.addEventListener("DOMContentLoaded", () => {
-  initStorage();
-  initI18n();
-  initUI();
-  initGames();
+  console.log("🔥 DOM listo");
 
-  updateStats();
+  const hamburger = document.getElementById("hamburger");
+  const nav = document.getElementById("nav");
+  const themeBtn = document.getElementById("themeToggle");
+  const startBtn = document.getElementById("startGame");
+
+  console.log("Elementos:", hamburger, nav, themeBtn, startBtn);
+
+  if (hamburger && nav) {
+    hamburger.addEventListener("click", () => {
+      nav.classList.toggle("open");
+      console.log("☰ click");
+    });
+  }
+
+  if (themeBtn) {
+    themeBtn.addEventListener("click", () => {
+      document.body.style.background =
+        document.body.style.background === "black" ? "white" : "black";
+      console.log("🌙 click");
+    });
+  }
+
+  if (startBtn) {
+    startBtn.addEventListener("click", () => {
+      alert("Correcto 🎉 +5 puntos");
+      console.log("🎮 click");
+    });
+  }
 });
-
-function updateStats() {
-  document.getElementById("scoreText").textContent =
-    getScore() + " puntos";
-
-  document.getElementById("levelText").textContent =
-    "Nivel " + getLevel();
-}
-
