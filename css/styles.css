@@ -93,3 +93,26 @@ main {
   margin-bottom: 16px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.1);
 }
+/* ===== TEMA OSCURO ===== */
+body.dark {
+  background: #121212;
+  color: #f2f2f2;
+}
+
+body.dark header {
+  background: #1f1f1f;
+}
+
+body.dark .card {
+  background: #1e1e1e;
+  color: #f2f2f2;
+}
+
+body.dark #nav {
+  background: #1e1e1e;
+}
+
+body.dark #nav a {
+  color: #f2f2f2;
+  border-bottom: 1px solid #333;
+}
