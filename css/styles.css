@@ -50,11 +50,16 @@ button {
   position: absolute;
   top: 60px;
   right: 16px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+
   display: none;
   flex-direction: column;
+
+  min-width: 180px;   /* 👈 CLAVE */
+  z-index: 9999;      /* 👈 CLAVE */
   overflow: hidden;
 }
 
