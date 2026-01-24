@@ -1,3 +1,26 @@
+// ===== SONIDOS =====
+const soundCorrect = new Audio("assets/sounds/correct.mp3");
+const soundWrong = new Audio("assets/sounds/wrong.mp3");
+const soundLevelUp = new Audio("assets/sounds/levelup.mp3");
+
+// 🔓 Desbloquear sonidos con la primera interacción
+function unlockSounds() {
+  soundCorrect.play().then(() => {
+    soundCorrect.pause();
+    soundCorrect.currentTime = 0;
+  }).catch(() => {});
+
+  soundWrong.play().then(() => {
+    soundWrong.pause();
+    soundWrong.currentTime = 0;
+  }).catch(() => {});
+
+  soundLevelUp.play().then(() => {
+    soundLevelUp.pause();
+    soundLevelUp.currentTime = 0;
+  }).catch(() => {});
+}
+
 console.log("🔥 app.js cargado correctamente");
 
 document.addEventListener("DOMContentLoaded", () => {
