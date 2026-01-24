@@ -10,6 +10,7 @@ body {
   color: #222;
 }
 
+/* HEADER */
 header {
   background: #2b5cff;
   color: white;
@@ -33,34 +34,42 @@ button {
   font-size: 16px;
 }
 
-#hamburger {
+/* HAMBURGUESA */
+.hamburger {
   font-size: 22px;
+  background: white;
 }
 
+/* NAV */
 #nav {
   position: absolute;
   top: 60px;
   right: 16px;
   background: white;
   border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
   display: none;
   flex-direction: column;
-  min-width: 180px;
-  z-index: 9999;
+  min-width: 160px;
+  z-index: 999;
 }
 
 #nav a {
-  padding: 14px 18px;
+  padding: 12px 16px;
   text-decoration: none;
   color: #222;
   border-bottom: 1px solid #eee;
+}
+
+#nav a:last-child {
+  border-bottom: none;
 }
 
 #nav.open {
   display: flex;
 }
 
+/* CARDS */
 main {
   padding: 16px;
 }
@@ -73,7 +82,14 @@ main {
   box-shadow: 0 6px 16px rgba(0,0,0,0.1);
 }
 
-/* 🌙 MODO OSCURO */
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+/* ===== MODO OSCURO ===== */
 body.dark {
   background: #121212;
   color: #f2f2f2;
