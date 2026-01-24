@@ -5,8 +5,7 @@
   <title>Inglés Para Todos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -15,7 +14,7 @@
 
     <div class="header-buttons">
       <button id="themeToggle">🌙</button>
-      <button class="hamburger" id="hamburger">☰</button>
+      <button id="hamburger">☰</button>
     </div>
 
     <nav id="nav">
@@ -26,8 +25,7 @@
   </header>
 
   <main>
-    <!-- CARD DEL JUEGO -->
-    <section class="card" id="gameCard">
+    <section class="card">
       <h2 id="questionText">Pulsa para comenzar</h2>
 
       <input
@@ -41,12 +39,14 @@
       <button id="checkAnswer" style="display:none;">Responder</button>
     </section>
 
-    <!-- CARD DE PUNTAJE -->
     <section class="card">
       <h2>Puntaje</h2>
-      <p id="scoreText">20 puntos</p>
-      <p id="levelText">Nivel 3</p>
+      <p id="scoreText">0 puntos</p>
+      <p id="levelText">Nivel 1</p>
     </section>
   </main>
 
-  <!-- J
+  <script src="app.js"></script>
+
+</body>
+</html>
