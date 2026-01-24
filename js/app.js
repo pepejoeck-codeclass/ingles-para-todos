@@ -61,17 +61,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (userAnswer === currentQuestion.es.toLowerCase()) {
-      score += 5;
-      alert("✅ Correcto +5 puntos");
-    } else {
-      alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
-    }
+  score += 5;
+  soundCorrect.play(); // 🔊 sonido correcto
+
+  // Animación correcta
+  document.querySelector(".card").classList.add("correct");
+  setTimeout(() => {
+    document.querySelector(".card").classList.remove("correct");
+  }, 500);
+
+  alert("✅ Correcto +5 puntos");
+} else {
+  soundWrong.play(); // 🔊 sonido incorrecto
+
+  // Animación incorrecta
+  document.querySelector(".card").classList.add("wrong");
+  setTimeout(() => {
+    document.querySelector(".card").classList.remove("wrong");
+  }, 500);
+
+  alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
+}
 
     // SUBIR NIVEL CADA 20 PUNTOS
     if (score >= level * 20) {
-      level++;
-      alert("🎉 Subiste de nivel");
-    }
+  level++;
+  soundLevelUp.play(); // 🔊 subir nivel
+
+  // Animación de nivel
+  const levelCard = document.getElementById("levelText");
+  levelCard.classList.add("level-up");
+  setTimeout(() => {
+    levelCard.classList.remove("level-up");
+  }, 1000);
+
+  alert("🎉 Subiste de nivel");
+}
 
     scoreText.textContent = score + " puntos";
     levelText.textContent = "Nivel " + level;
