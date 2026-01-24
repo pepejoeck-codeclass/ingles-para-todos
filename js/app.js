@@ -1,4 +1,4 @@
-alert("🔥 app.js conectado");
+console.log("🔥 app.js cargado correctamente");
 
 document.addEventListener("DOMContentLoaded", () => {
   const hamburger = document.getElementById("hamburger");
@@ -24,17 +24,17 @@ document.addEventListener("DOMContentLoaded", () => {
     { en: "Thank you", es: "Gracias" }
   ];
 
-  // ☰ menú
+  // MENÚ
   hamburger.addEventListener("click", () => {
     nav.classList.toggle("open");
   });
 
-  // 🌙 tema
+  // TEMA OSCURO
   themeBtn.addEventListener("click", () => {
     document.body.classList.toggle("dark");
   });
 
-  // ▶ iniciar ejercicio
+  // INICIAR EJERCICIO
   startBtn.addEventListener("click", () => {
     currentQuestion =
       questions[Math.floor(Math.random() * questions.length)];
@@ -43,18 +43,20 @@ document.addEventListener("DOMContentLoaded", () => {
       `¿Cómo se dice "${currentQuestion.en}" en español?`;
 
     answerInput.value = "";
-    answerInput.style.display = "block";
     answerInput.focus();
-
-    startBtn.style.display = "none";
-    checkBtn.style.display = "block";
   });
 
-  // ✅ responder
+  // RESPONDER
   checkBtn.addEventListener("click", () => {
+    if (!currentQuestion) {
+      alert("Primero inicia un ejercicio 🙂");
+      return;
+    }
+
     const userAnswer = answerInput.value.trim().toLowerCase();
+
     if (!userAnswer) {
-      alert("Escribe una respuesta 🙂");
+      alert("Escribe una respuesta");
       return;
     }
 
@@ -65,6 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
       alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
     }
 
+    // SUBIR NIVEL CADA 20 PUNTOS
     if (score >= level * 20) {
       level++;
       alert("🎉 Subiste de nivel");
@@ -74,8 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
     levelText.textContent = "Nivel " + level;
 
     questionText.textContent = "Pulsa para comenzar";
-    answerInput.style.display = "none";
-    checkBtn.style.display = "none";
-    startBtn.style.display = "block";
+    currentQuestion = null;
   });
 });
