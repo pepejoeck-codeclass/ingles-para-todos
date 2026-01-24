@@ -112,3 +112,43 @@ body.dark #nav a {
   color: #f2f2f2;
   border-bottom: 1px solid #333;
 }
+
+/* ===== ANIMACIONES DE RESPUESTA ===== */
+
+.correct {
+  background-color: #c8f7c5 !important;
+  animation: pop 0.4s ease;
+}
+
+.wrong {
+  background-color: #f7c5c5 !important;
+  animation: shake 0.4s ease;
+}
+
+/* Animación de acierto */
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Animación de error (vibrar) */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+/* Animación subir nivel */
+.level-up {
+  animation: glow 1s ease;
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px gold; }
+  50% { box-shadow: 0 0 20px gold; }
+  100% { box-shadow: 0 0 5px gold; }
+}
+
