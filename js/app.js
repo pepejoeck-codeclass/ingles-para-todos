@@ -57,8 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.toggle("dark");
   });
 
-  // INICIAR EJERCICIO
+  // 🟢 INICIAR EJERCICIO (AQUÍ DESBLOQUEAMOS SONIDOS)
   startBtn.addEventListener("click", () => {
+
+    unlockSounds(); // 🔓 MUY IMPORTANTE: activar sonidos aquí
+
     currentQuestion =
       questions[Math.floor(Math.random() * questions.length)];
 
@@ -84,42 +87,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (userAnswer === currentQuestion.es.toLowerCase()) {
-  score += 5;
-  soundCorrect.play(); // 🔊 sonido correcto
+      score += 5;
+      soundCorrect.play(); // 🔊 sonido correcto
 
-  // Animación correcta
-  document.querySelector(".card").classList.add("correct");
-  setTimeout(() => {
-    document.querySelector(".card").classList.remove("correct");
-  }, 500);
+      // Animación correcta
+      document.querySelector(".card").classList.add("correct");
+      setTimeout(() => {
+        document.querySelector(".card").classList.remove("correct");
+      }, 500);
 
-  alert("✅ Correcto +5 puntos");
-} else {
-  soundWrong.play(); // 🔊 sonido incorrecto
+      alert("✅ Correcto +5 puntos");
+    } else {
+      soundWrong.play(); // 🔊 sonido incorrecto
 
-  // Animación incorrecta
-  document.querySelector(".card").classList.add("wrong");
-  setTimeout(() => {
-    document.querySelector(".card").classList.remove("wrong");
-  }, 500);
+      // Animación incorrecta
+      document.querySelector(".card").classList.add("wrong");
+      setTimeout(() => {
+        document.querySelector(".card").classList.remove("wrong");
+      }, 500);
 
-  alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
-}
+      alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
+    }
 
     // SUBIR NIVEL CADA 20 PUNTOS
     if (score >= level * 20) {
-  level++;
-  soundLevelUp.play(); // 🔊 subir nivel
+      level++;
+      soundLevelUp.play(); // 🔊 subir nivel
 
-  // Animación de nivel
-  const levelCard = document.getElementById("levelText");
-  levelCard.classList.add("level-up");
-  setTimeout(() => {
-    levelCard.classList.remove("level-up");
-  }, 1000);
+      // Animación de nivel
+      const levelCard = document.getElementById("levelText");
+      levelCard.classList.add("level-up");
+      setTimeout(() => {
+        levelCard.classList.remove("level-up");
+      }, 1000);
 
-  alert("🎉 Subiste de nivel");
-}
+      alert("🎉 Subiste de nivel");
+    }
 
     scoreText.textContent = score + " puntos";
     levelText.textContent = "Nivel " + level;
