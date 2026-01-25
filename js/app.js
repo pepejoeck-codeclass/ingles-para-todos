@@ -26,6 +26,45 @@ console.log("🔥 app.js cargado correctamente");
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    // ===== MODO MAESTRO 👨‍🏫 =====
+  const openTeacher = document.getElementById("openTeacher");
+  const teacherPanel = document.getElementById("teacherPanel");
+  const closeTeacher = document.getElementById("closeTeacher");
+  const studentsTable = document.getElementById("studentsTable");
+
+  if (openTeacher) {
+    openTeacher.addEventListener("click", () => {
+      teacherPanel.style.display = "block";
+      loadStudentsForTeacher();
+    });
+  }
+
+  if (closeTeacher) {
+    closeTeacher.addEventListener("click", () => {
+      teacherPanel.style.display = "none";
+    });
+  }
+
+  function loadStudentsForTeacher() {
+    studentsTable.innerHTML = "";
+
+    let students = JSON.parse(localStorage.getItem("studentsList")) || [];
+
+    students.forEach(student => {
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${student.username}</td>
+        <td>${student.grade}</td>
+        <td>${student.group}</td>
+        <td>${student.score}</td>
+        <td>${student.level}</td>
+      `;
+
+      studentsTable.appendChild(row);
+    });
+  }
+
   // ===== LOGIN =====
   const loginCard = document.getElementById("loginCard");
   const mainContent = document.getElementById("mainContent");
@@ -83,7 +122,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loginCard.style.display = "none";
     mainContent.style.display = "block";
 
-    loadProgress();
+    loadProgress();   registerStudent();
+
   });
 
   // ===== CERRAR SESIÓN (SIN BORRAR PROGRESO) =====
@@ -248,4 +288,26 @@ function loadUserData() {
 
   grade = localStorage.getItem(`user_${username}_grade`);
   group = localStorage.getItem(`user_${username}_group`);
+}
+
+function registerStudent() {
+  let students = JSON.parse(localStorage.getItem("studentsList")) || [];
+
+  const grade = document.getElementById("gradeInput").value;
+  const group = document.getElementById("groupInput").value;
+
+  // revisar si ya existe
+  let existing = students.find(s => s.username === username);
+
+  if (!existing) {
+    students.push({
+      username: username,
+      grade: grade,
+      group: group,
+      score: score,
+      level: level
+    });
+  }
+
+  localStorage.setItem("studentsList", JSON.stringify(students));
 }
