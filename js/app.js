@@ -12,7 +12,7 @@ let stars = 0;
 
 const TEACHER_PASSWORD = "161286";
 
-// 📚 LECCIÓN (todas correctas o se reinicia)
+// 📚 LECCIÓN
 const lesson = [
   { en: "Hello", es: "hola" },
   { en: "Goodbye", es: "adiós" },
@@ -70,18 +70,23 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProgress();
   }
 
-  // LOGIN
+  // 🔐 LOGIN CORREGIDO (NOMBRE O CORREO + GRADO + GRUPO)
   loginBtn.addEventListener("click", () => {
+
     let name = usernameInput.value.trim();
     const email = emailInput.value.trim();
     const grade = gradeInput.value.trim();
     const group = groupInput.value.trim();
 
-    if (!name && email) name = email;
-
-    if (!name || !grade || !group) {
-      alert("Completa nombre (o correo), grado y grupo");
+    // Debe haber NOMBRE O CORREO
+    if ((!name && !email) || !grade || !group) {
+      alert("Completa nombre o correo, grado y grupo");
       return;
+    }
+
+    // Si no puso nombre, usar correo como usuario
+    if (!name && email) {
+      name = email;
     }
 
     username = name;
@@ -102,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     location.reload();
   });
 
-  // INICIAR LECCIÓN
+  // ▶️ INICIAR LECCIÓN
   startBtn.addEventListener("click", () => {
     currentIndex = 0;
     mistakes = 0;
@@ -116,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     feedback.textContent = "";
   }
 
-  // RESPONDER
+  // ✅ RESPONDER
   checkBtn.addEventListener("click", () => {
     const userAnswer = answerInput.value.trim().toLowerCase();
     const correct = lesson[currentIndex].es;
