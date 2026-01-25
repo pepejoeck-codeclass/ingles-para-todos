@@ -12,14 +12,15 @@
   <!-- HEADER -->
   <header>
     <h1>Inglés Para Todos</h1>
-<button id="logoutBtn" style="margin-top:10px;">🚪 Cambiar usuario</button>
+
+    <button id="logoutBtn" style="margin-top:10px;">🚪 Cambiar usuario</button>
 
     <div class="header-buttons">
       <button id="themeToggle">🌙</button>
       <button id="hamburger" class="hamburger">☰</button>
     </div>
 
-    <!-- MENÚ CON LECCIONES -->
+    <!-- MENÚ -->
     <nav id="nav">
       <a href="#" class="lesson" data-lesson="1">Lección 1</a>
       <a href="#" class="lesson locked" data-lesson="2">Lección 2 🔒</a>
@@ -28,35 +29,28 @@
       <a href="#">Juegos</a>
       <a href="#">Progreso</a>
 
-      <!-- 👨‍🏫 BOTÓN MODO MAESTRO -->
-  <button id="openTeacher" style="background:none;border:none;color:blue;cursor:pointer;">
-  👨‍🏫 Modo Maestro
-</button>
+      <!-- BOTÓN MODO MAESTRO -->
+      <button id="openTeacher" style="background:none;border:none;color:blue;cursor:pointer;">
+        👨‍🏫 Modo Maestro
+      </button>
     </nav>
   </header>
 
   <!-- LOGIN -->
   <section class="card" id="loginCard">
-  <h2>Iniciar sesión</h2>
-<input type="text" id="gradeInput" placeholder="Grado (ej. 1°)" />
-<input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
-    
-  <input
-    type="text"
-    id="usernameInput"
-    placeholder="Escribe tu nombre completo"
-  />
+    <h2>Iniciar sesión</h2>
 
-  <p>— o —</p>
+    <input type="text" id="gradeInput" placeholder="Grado (ej. 1°)" />
+    <input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
 
-  <input
-    type="email"
-    id="emailInput"
-    placeholder="Escribe tu correo (Gmail, Hotmail, etc)"
-  />
+    <input type="text" id="usernameInput" placeholder="Escribe tu nombre completo" />
 
-  <button id="loginBtn">Entrar</button>
-</section>
+    <p>— o —</p>
+
+    <input type="email" id="emailInput" placeholder="Escribe tu correo (Gmail, Hotmail, etc)" />
+
+    <button id="loginBtn">Entrar</button>
+  </section>
 
   <!-- CONTENIDO PRINCIPAL -->
   <main id="mainContent" style="display:none;">
@@ -65,11 +59,7 @@
     <section class="card">
       <h2 id="questionText">Pulsa para comenzar</h2>
 
-      <input
-        type="text"
-        id="answerInput"
-        placeholder="Escribe tu respuesta..."
-      />
+      <input type="text" id="answerInput" placeholder="Escribe tu respuesta..." />
 
       <button id="startGame">Iniciar ejercicio</button>
       <button id="checkAnswer">Responder</button>
@@ -82,28 +72,28 @@
       <p id="levelText">Nivel 1</p>
     </section>
 
-    <!-- ===== PANEL MAESTRO 👨‍🏫 ===== -->
-<section id="teacherPanel" style="display:none;" class="card">
-  <h2>👨‍🏫 Panel del Maestro</h2>
+    <!-- PANEL MAESTRO 👨‍🏫 -->
+    <section id="teacherPanel" style="display:none;" class="card">
+      <h2>👨‍🏫 Panel del Maestro</h2>
 
-  <table border="1" width="100%">
-    <thead>
-      <tr>
-        <th>Alumno</th>
-        <th>Grado</th>
-        <th>Grupo</th>
-        <th>Puntaje</th>
-        <th>Nivel</th>
-      </tr>
-    </thead>
-    <tbody id="studentsTable"></tbody>
-  </table>
+      <table border="1" width="100%">
+        <thead>
+          <tr>
+            <th>Alumno</th>
+            <th>Grado</th>
+            <th>Grupo</th>
+            <th>Puntaje</th>
+            <th>Nivel</th>
+          </tr>
+        </thead>
+        <tbody id="studentsTable"></tbody>
+      </table>
 
-  <br>
+      <br>
 
-  <button id="exportExcel">📥 Exportar a Excel</button>
-  <button id="closeTeacher">❌ Cerrar</button>
-</section>
+      <button id="exportExcel">📥 Exportar a Excel</button>
+      <button id="closeTeacher">❌ Cerrar</button>
+    </section>
 
   </main>
 
