@@ -1,3 +1,6 @@
+// 🔐 CONTRASEÑA SECRETA DEL MAESTRO
+const TEACHER_PASSWORD = "161286";
+
 let username = localStorage.getItem("username");
 let score = 0;
 let level = 1;
@@ -42,14 +45,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const starsText = document.getElementById("starsText");
   const medalText = document.getElementById("medalText");
 
-  // AUTO LOGIN
+  // ===== AUTO LOGIN =====
   if (username) {
     loginCard.style.display = "none";
     mainContent.style.display = "block";
     loadProgress();
   }
 
-  // LOGIN
+  // ===== LOGIN =====
   loginBtn.addEventListener("click", () => {
     const name = usernameInput.value.trim();
     const email = emailInput.value.trim();
@@ -69,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     registerStudent();
   });
 
-  // LOGOUT
+  // ===== LOGOUT =====
   logoutBtn.addEventListener("click", () => {
     if (confirm("¿Quieres cerrar sesión y cambiar de usuario?")) {
       localStorage.removeItem("username");
@@ -77,17 +80,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // MENÚ HAMBURGUESA
+  // ===== MENÚ HAMBURGUESA =====
   hamburger.addEventListener("click", () => {
     nav.classList.toggle("open");
   });
 
-  // MODO OSCURO
+  // ===== MODO OSCURO =====
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
   });
 
-  // JUEGO
+  // ===== JUEGO =====
   const questions = [
     { en: "Hello", es: "Hola" },
     { en: "Goodbye", es: "Adiós" },
@@ -137,18 +140,25 @@ document.addEventListener("DOMContentLoaded", () => {
     currentQuestion = null;
   });
 
-  // MODO MAESTRO
+  // 🔐 ===== MODO MAESTRO CON CONTRASEÑA =====
   openTeacher.addEventListener("click", (e) => {
     e.preventDefault();
-    teacherPanel.style.display = "block";
-    loadStudentsForTeacher();
+
+    const pass = prompt("🔐 Ingresa la contraseña del Maestro:");
+
+    if (pass === TEACHER_PASSWORD) {
+      teacherPanel.style.display = "block";
+      loadStudentsForTeacher();
+    } else {
+      alert("❌ Contraseña incorrecta. Acceso denegado.");
+    }
   });
 
   closeTeacher.addEventListener("click", () => {
     teacherPanel.style.display = "none";
   });
 
-  // EXPORTAR EXCEL
+  // ===== EXPORTAR A EXCEL =====
   exportExcel.addEventListener("click", () => {
 
     let students = JSON.parse(localStorage.getItem("studentsList")) || [];
