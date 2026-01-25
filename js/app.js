@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const mainContent = document.getElementById("mainContent");
   const usernameInput = document.getElementById("usernameInput");
   const loginBtn = document.getElementById("loginBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
 
   // Si ya había usuario guardado
   if (username) {
@@ -44,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProgress();
   }
 
+  // BOTÓN ENTRAR
   loginBtn.addEventListener("click", () => {
     const name = usernameInput.value.trim();
 
@@ -59,6 +61,14 @@ document.addEventListener("DOMContentLoaded", () => {
     mainContent.style.display = "block";
 
     loadProgress();
+  });
+
+  // ===== CERRAR SESIÓN (ESTO FALTABA 🔥) =====
+  logoutBtn.addEventListener("click", () => {
+    if (confirm("¿Quieres cambiar de usuario? Se borrará el progreso actual.")) {
+      localStorage.clear();
+      location.reload();
+    }
   });
 
   // ===== ELEMENTOS =====
