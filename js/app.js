@@ -1,27 +1,4 @@
 // ===============================
-// 🔊 SONIDOS (DESBLOQUEO CORRECTO)
-// ===============================
-let soundCorrect = new Audio("sounds/correct.mp3");
-let soundError = new Audio("sounds/wrong.mp3");
-let soundLevel = new Audio("sounds/levelup.mp3");
-
-let audioUnlocked = false;
-
-function unlockAudio() {
-  if (audioUnlocked) return;
-
-  [soundCorrect, soundError, soundLevel].forEach(sound => {
-    sound.play().then(() => {
-      sound.pause();
-      sound.currentTime = 0;
-    }).catch(() => {});
-  });
-
-  audioUnlocked = true;
-  console.log("🔊 Audio desbloqueado");
-}
-
-// ===============================
 // VARIABLES PRINCIPALES
 // ===============================
 let username = localStorage.getItem("username");
@@ -42,9 +19,50 @@ const messages = [
 ];
 
 // ===============================
+// 🔊 SONIDOS (GITHUB PAGES READY)
+// ===============================
+let soundCorrect;
+let soundError;
+let soundLevel;
+let audioUnlocked = false;
+
+function initSounds() {
+  soundCorrect = new Audio("./sounds/correct.mp3");
+  soundError   = new Audio("./sounds/wrong.mp3");
+  soundLevel   = new Audio("./sounds/levelup.mp3");
+
+  soundCorrect.volume = 1;
+  soundError.volume = 1;
+  soundLevel.volume = 1;
+
+  console.log("🔊 Sonidos cargados:");
+  console.log(soundCorrect.src);
+  console.log(soundError.src);
+  console.log(soundLevel.src);
+}
+
+// 🔓 DESBLOQUEAR AUDIO CON PRIMER CLIC REAL
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  [soundCorrect, soundError, soundLevel].forEach(sound => {
+    sound.play().then(() => {
+      sound.pause();
+      sound.currentTime = 0;
+    }).catch(() => {});
+  });
+
+  audioUnlocked = true;
+  console.log("🔓 Audio desbloqueado correctamente");
+}
+
+// ===============================
 // INICIO
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
+
+  // 🔊 Inicializar sonidos
+  initSounds();
 
   // ELEMENTOS
   const loginCard = document.getElementById("loginCard");
@@ -133,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentQuestion = null;
 
   startBtn.addEventListener("click", () => {
-    // 🔓 desbloquear audio aquí
+    // 🔓 desbloquear audio en el primer clic real
     unlockAudio();
 
     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
@@ -189,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===============================
-  // 🔐 MODO MAESTRO CON CONTRASEÑA
+  // 🔐 MODO MAESTRO
   // ===============================
   openTeacher.addEventListener("click", (e) => {
     e.preventDefault();
@@ -210,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===============================
-  // 📥 EXPORTAR A EXCEL (CSV)
+  // 📥 EXPORTAR A EXCEL
   // ===============================
   exportExcel.addEventListener("click", () => {
 
