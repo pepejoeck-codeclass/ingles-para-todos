@@ -1,5 +1,5 @@
 // ===============================
-// 🔊 SONIDOS (RUTA CORRECTA)
+// 🔊 SONIDOS
 // ===============================
 const soundCorrect = new Audio("assets/sounds/correct.mp3");
 const soundError   = new Audio("assets/sounds/wrong.mp3");
@@ -23,7 +23,18 @@ function unlockAudio() {
 }
 
 // ===============================
-// DATOS GLOBALES
+// MENSAJES MOTIVADORES
+// ===============================
+const messages = [
+  "🔥 Excellent job",
+  "⭐ You're doing great",
+  "👏 Keep it up",
+  "💪 You can do it",
+  "🎯 Perfect"
+];
+
+// ===============================
+// DATOS
 // ===============================
 let currentStudent = null;
 let lessonIndex = 0;
@@ -131,14 +142,14 @@ loginBtn.addEventListener("click", () => {
 });
 
 // ===============================
-// CERRAR SESIÓN
+// CERRAR SESIÓN ALUMNO
 // ===============================
 logoutBtn.addEventListener("click", () => {
-  if (!currentStudent) return;
+  if (!currentStudent) location.reload();
 
   let students = JSON.parse(localStorage.getItem("students")) || [];
   students.forEach(s => {
-    if (s.name === currentStudent.name) s.online = false;
+    if (currentStudent && s.name === currentStudent.name) s.online = false;
   });
   localStorage.setItem("students", JSON.stringify(students));
 
@@ -150,7 +161,6 @@ logoutBtn.addEventListener("click", () => {
 // ===============================
 startBtn.addEventListener("click", () => {
   unlockAudio();
-
   lessonIndex = 0;
   mistakes = 0;
   showQuestion();
@@ -172,19 +182,24 @@ checkBtn.addEventListener("click", () => {
     soundCorrect.currentTime = 0;
     soundCorrect.play();
 
+    const msg = messages[Math.floor(Math.random() * messages.length)];
+    feedback.textContent = msg;
+    feedback.style.color = "green";
+
     lessonIndex++;
     currentStudent.score += 5;
     currentStudent.stars += 1;
 
     if (lessonIndex >= lesson.length) {
+
       if (mistakes === 0) {
         currentStudent.level++;
 
         soundLevel.currentTime = 0;
         soundLevel.play();
 
-        medalText.textContent = "🏅 ¡Medalla ganada!";
-        feedback.textContent = "🎉 ¡Lección perfecta! Subiste de nivel";
+        feedback.textContent = "🎉 SIGUIENTE NIVEL 🎉";
+        feedback.style.color = "gold";
       } else {
         feedback.textContent = "❌ Fallaste, reinicia la lección";
         lessonIndex = 0;
@@ -202,13 +217,24 @@ checkBtn.addEventListener("click", () => {
 
     mistakes++;
     feedback.textContent = "❌ Incorrecto, reinicia toda la lección";
+    feedback.style.color = "red";
     lessonIndex = 0;
     mistakes = 0;
   }
 
+  assignMedal();
   saveProgress();
   updateUI();
 });
+
+// ===============================
+// MEDALLAS AUTOMÁTICAS
+// ===============================
+function assignMedal() {
+  if (currentStudent.level >= 3) medalText.textContent = "🥇 Medalla Oro";
+  else if (currentStudent.level === 2) medalText.textContent = "🥈 Medalla Plata";
+  else medalText.textContent = "🥉 Medalla Bronce";
+}
 
 // ===============================
 // GUARDAR PROGRESO
@@ -216,7 +242,7 @@ checkBtn.addEventListener("click", () => {
 function saveProgress() {
   let students = JSON.parse(localStorage.getItem("students")) || [];
   students = students.map(s => {
-    if (s.name === currentStudent.name) return currentStudent;
+    if (currentStudent && s.name === currentStudent.name) return currentStudent;
     return s;
   });
   localStorage.setItem("students", JSON.stringify(students));
@@ -229,7 +255,7 @@ function updateUI() {
 }
 
 // ===============================
-// LOGIN MAESTRO (INDEPENDIENTE)
+// LOGIN MAESTRO
 // ===============================
 openTeacherBtn.addEventListener("click", () => {
   teacherLogin.style.display = "block";
@@ -238,10 +264,7 @@ openTeacherBtn.addEventListener("click", () => {
 });
 
 teacherLoginBtn.addEventListener("click", () => {
-  const user = teacherUser.value.trim();
-  const pass = teacherPass.value.trim();
-
-  if (user === "Jose de Jesus Ramos Flores" && pass === "161286") {
+  if (teacherUser.value === "Jose de Jesus Ramos Flores" && teacherPass.value === "161286") {
     teacherLogin.style.display = "none";
     teacherPanel.style.display = "block";
     loadTeacherPanel();
@@ -250,8 +273,13 @@ teacherLoginBtn.addEventListener("click", () => {
   }
 });
 
+// ===============================
+// CERRAR SESIÓN MAESTRO
+// ===============================
 closeTeacher.addEventListener("click", () => {
   teacherPanel.style.display = "none";
+  teacherLogin.style.display = "none";
+  loginCard.style.display = "block";
 });
 
 // ===============================
@@ -260,13 +288,11 @@ closeTeacher.addEventListener("click", () => {
 function loadTeacherPanel() {
   const students = JSON.parse(localStorage.getItem("students")) || [];
 
-  // Conectados
   connectedList.innerHTML = "";
   students.filter(s => s.online).forEach(s => {
     connectedList.innerHTML += `<li>${s.name} (${s.grade}-${s.group})</li>`;
   });
 
-  // Ranking
   studentsTable.innerHTML = "";
   const ordered = [...students].sort((a,b)=>b.score-a.score);
 
