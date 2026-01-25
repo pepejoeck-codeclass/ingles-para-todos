@@ -19,7 +19,8 @@
     <button id="hamburger" class="hamburger">☰</button>
   </div>
 
-  <nav id="nav">
+  <!-- MENÚ -->
+  <nav id="nav" style="display:none;">
     <a href="#">Lección 1</a>
     <a href="#">Lección 2 🔒</a>
     <a href="#">Lección 3 🔒</a>
@@ -42,7 +43,7 @@
 
   <input type="email" id="emailInput" placeholder="Correo" />
 
-  <button id="loginBtn" type="button">Entrar</button>
+  <button id="loginBtn">Entrar</button>
 </section>
 
 <!-- LOGIN MAESTRO -->
@@ -52,7 +53,7 @@
   <input type="text" id="teacherUser" placeholder="Usuario">
   <input type="password" id="teacherPass" placeholder="Contraseña">
 
-  <button id="teacherLoginBtn" type="button">Entrar como maestro</button>
+  <button id="teacherLoginBtn">Entrar como maestro</button>
 </section>
 
 <!-- CONTENIDO ALUMNO -->
@@ -86,16 +87,10 @@
   <h3>👀 Alumnos conectados</h3>
   <ul id="connectedList"></ul>
 
-  <!-- SEPARACIÓN AUTOMÁTICA POR GRUPOS -->
-  <h3>🏫 Seleccionar grupo</h3>
+  <h3>🏫 Filtrar por grupo</h3>
   <select id="groupSelect">
     <option value="">Todos los grupos</option>
   </select>
-
-  <!-- FILTROS MANUALES (SIGUEN FUNCIONANDO) -->
-  <h3>🔎 Filtros manuales</h3>
-  <input type="text" id="filterGrade" placeholder="Filtrar por grado">
-  <input type="text" id="filterGroup" placeholder="Filtrar por grupo">
 
   <h3>🏆 Ranking</h3>
   <table border="1" width="100%">
@@ -113,21 +108,12 @@
   </table>
 
   <br>
-
   <canvas id="progressChart"></canvas>
 
   <br><br>
-
   <button id="exportBtn">📥 Exportar a Excel</button>
   <br><br>
-  <button id="closeTeacher" type="button">❌ Cerrar sesión maestro</button>
-</section>
-
-<!-- FICHA INDIVIDUAL -->
-<section id="studentCard" class="card" style="display:none;">
-  <h2>🧑‍🎓 Ficha del Alumno</h2>
-  <p id="cardInfo"></p>
-  <button id="closeCard">Cerrar ficha</button>
+  <button id="closeTeacher">❌ Cerrar sesión maestro</button>
 </section>
 
 <script src="js/app.js"></script>
