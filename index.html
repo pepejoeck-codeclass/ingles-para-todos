@@ -11,7 +11,6 @@
 <header>
   <h1>Inglés Para Todos</h1>
 
-  <!-- BOTÓN CAMBIAR USUARIO (FUERA DEL MENÚ COMO TÚ QUIERES) -->
   <button id="logoutBtn">🚪 Cambiar usuario</button>
 
   <div class="header-buttons">
@@ -19,17 +18,13 @@
     <button id="hamburger" class="hamburger">☰</button>
   </div>
 
-  <!-- MENÚ DESPLEGABLE -->
-  <nav id="nav" class="menu">
+  <!-- MENÚ -->
+  <nav id="nav">
     <a href="#">Lección 1</a>
     <a href="#">Lección 2 🔒</a>
     <a href="#">Lección 3 🔒</a>
-
     <a href="#">Juegos</a>
     <a href="#">Progreso</a>
-
-    <!-- BOTÓN SOLO MAESTRO -->
-    <a href="#" id="openTeacher">👨‍🏫 Modo Maestro</a>
   </nav>
 </header>
 
@@ -39,12 +34,11 @@
 
   <input type="text" id="gradeInput" placeholder="Grado (ej. 1°)" />
   <input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
-
-  <input type="text" id="usernameInput" placeholder="Escribe tu nombre completo" />
+  <input type="text" id="usernameInput" placeholder="Nombre completo" />
 
   <p>— o —</p>
 
-  <input type="email" id="emailInput" placeholder="Escribe tu correo" />
+  <input type="email" id="emailInput" placeholder="Correo" />
 
   <button id="loginBtn">Entrar</button>
 </section>
@@ -55,9 +49,7 @@
   <!-- JUEGO -->
   <section class="card">
     <h2 id="questionText">Pulsa para comenzar</h2>
-
-    <!-- MENSAJES MOTIVADORES -->
-    <p id="feedback" style="font-size:18px; font-weight:bold; margin-top:10px;"></p>
+    <p id="feedback" style="font-size:18px; font-weight:bold;"></p>
 
     <input type="text" id="answerInput" placeholder="Escribe tu respuesta..." />
 
@@ -73,30 +65,6 @@
     <h2>Puntaje</h2>
     <p id="scoreText">0 puntos</p>
     <p id="levelText">Nivel 1</p>
-  </section>
-
-  <!-- PANEL MAESTRO -->
-  <section id="teacherPanel" class="card" style="display:none;">
-    <h2>👨‍🏫 Panel del Maestro Principal</h2>
-
-    <table border="1" width="100%">
-      <thead>
-        <tr>
-          <th>Alumno</th>
-          <th>Grado</th>
-          <th>Grupo</th>
-          <th>Puntaje</th>
-          <th>Nivel</th>
-          <th>Estrellas</th>
-        </tr>
-      </thead>
-      <tbody id="studentsTable"></tbody>
-    </table>
-
-    <br>
-    <button id="exportExcel">📥 Exportar a Excel</button>
-    <br><br>
-    <button id="closeTeacher">❌ Cerrar</button>
   </section>
 
 </main>
