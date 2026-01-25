@@ -152,3 +152,10 @@ body.dark #nav a {
   100% { box-shadow: 0 0 5px gold; }
 }
 
+#nav {
+  display: none;
+}
+
+#nav.open {
+  display: block;
+}
