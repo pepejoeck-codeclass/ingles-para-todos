@@ -1,4 +1,28 @@
 // ===============================
+// 🔊 SONIDOS (RUTA CORRECTA)
+// ===============================
+const soundCorrect = new Audio("assets/sounds/correct.mp3");
+const soundError   = new Audio("assets/sounds/wrong.mp3");
+const soundLevel   = new Audio("assets/sounds/levelup.mp3");
+
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  [soundCorrect, soundError, soundLevel].forEach(sound => {
+    sound.muted = true;
+    sound.play().then(() => {
+      sound.pause();
+      sound.currentTime = 0;
+      sound.muted = false;
+    }).catch(()=>{});
+  });
+
+  audioUnlocked = true;
+}
+
+// ===============================
 // DATOS GLOBALES
 // ===============================
 let currentStudent = null;
@@ -22,6 +46,7 @@ const userDisplay = document.getElementById("userDisplay");
 const usernameInput = document.getElementById("usernameInput");
 const gradeInput = document.getElementById("gradeInput");
 const groupInput = document.getElementById("groupInput");
+const emailInput = document.getElementById("emailInput");
 const loginBtn = document.getElementById("loginBtn");
 
 const logoutBtn = document.getElementById("logoutBtn");
@@ -50,7 +75,7 @@ const studentsTable = document.getElementById("studentsTable");
 const connectedList = document.getElementById("connectedList");
 const exportBtn = document.getElementById("exportBtn");
 
-// Menú
+// Menú hamburguesa
 const hamburger = document.getElementById("hamburger");
 const nav = document.getElementById("nav");
 
@@ -62,22 +87,28 @@ hamburger.addEventListener("click", () => {
 // LOGIN ALUMNO
 // ===============================
 loginBtn.addEventListener("click", () => {
+
   const name = usernameInput.value.trim();
   const grade = gradeInput.value.trim();
   const group = groupInput.value.trim();
+  const email = emailInput.value.trim();
 
-  if (!name || !grade || !group) {
-    alert("Completa nombre, grado y grupo");
+  if ((!name && !email) || !grade || !group) {
+    alert("Completa nombre o correo, grado y grupo");
     return;
   }
 
+  const finalName = name || email;
+
   let students = JSON.parse(localStorage.getItem("students")) || [];
 
-  let student = students.find(s => s.name === name && s.grade === grade && s.group === group);
+  let student = students.find(s => s.name === finalName && s.grade === grade && s.group === group);
 
   if (!student) {
     student = {
-      name, grade, group,
+      name: finalName,
+      grade,
+      group,
       score: 0,
       level: 1,
       stars: 0,
@@ -118,6 +149,8 @@ logoutBtn.addEventListener("click", () => {
 // SISTEMA DE LECCIÓN
 // ===============================
 startBtn.addEventListener("click", () => {
+  unlockAudio();
+
   lessonIndex = 0;
   mistakes = 0;
   showQuestion();
@@ -135,6 +168,10 @@ checkBtn.addEventListener("click", () => {
   const correct = lesson[lessonIndex].es;
 
   if (userAnswer === correct) {
+
+    soundCorrect.currentTime = 0;
+    soundCorrect.play();
+
     lessonIndex++;
     currentStudent.score += 5;
     currentStudent.stars += 1;
@@ -142,6 +179,10 @@ checkBtn.addEventListener("click", () => {
     if (lessonIndex >= lesson.length) {
       if (mistakes === 0) {
         currentStudent.level++;
+
+        soundLevel.currentTime = 0;
+        soundLevel.play();
+
         medalText.textContent = "🏅 ¡Medalla ganada!";
         feedback.textContent = "🎉 ¡Lección perfecta! Subiste de nivel";
       } else {
@@ -155,6 +196,10 @@ checkBtn.addEventListener("click", () => {
     }
 
   } else {
+
+    soundError.currentTime = 0;
+    soundError.play();
+
     mistakes++;
     feedback.textContent = "❌ Incorrecto, reinicia toda la lección";
     lessonIndex = 0;
@@ -165,6 +210,9 @@ checkBtn.addEventListener("click", () => {
   updateUI();
 });
 
+// ===============================
+// GUARDAR PROGRESO
+// ===============================
 function saveProgress() {
   let students = JSON.parse(localStorage.getItem("students")) || [];
   students = students.map(s => {
@@ -181,10 +229,12 @@ function updateUI() {
 }
 
 // ===============================
-// LOGIN MAESTRO
+// LOGIN MAESTRO (INDEPENDIENTE)
 // ===============================
 openTeacherBtn.addEventListener("click", () => {
   teacherLogin.style.display = "block";
+  loginCard.style.display = "none";
+  mainContent.style.display = "none";
 });
 
 teacherLoginBtn.addEventListener("click", () => {
@@ -216,7 +266,7 @@ function loadTeacherPanel() {
     connectedList.innerHTML += `<li>${s.name} (${s.grade}-${s.group})</li>`;
   });
 
-  // Tabla ranking
+  // Ranking
   studentsTable.innerHTML = "";
   const ordered = [...students].sort((a,b)=>b.score-a.score);
 
