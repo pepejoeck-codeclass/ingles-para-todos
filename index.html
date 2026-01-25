@@ -28,7 +28,6 @@
   </nav>
 </header>
 
-<!-- BOTÓN MAESTRO FUERA -->
 <button id="openTeacherBtn" style="margin:10px;">👨‍🏫 Modo Maestro</button>
 
 <!-- LOGIN ALUMNO -->
@@ -87,8 +86,14 @@
   <h3>👀 Alumnos conectados</h3>
   <ul id="connectedList"></ul>
 
-  <!-- FILTROS -->
-  <h3>🏫 Filtros</h3>
+  <!-- SEPARACIÓN AUTOMÁTICA POR GRUPOS -->
+  <h3>🏫 Seleccionar grupo</h3>
+  <select id="groupSelect">
+    <option value="">Todos los grupos</option>
+  </select>
+
+  <!-- FILTROS MANUALES (SIGUEN FUNCIONANDO) -->
+  <h3>🔎 Filtros manuales</h3>
   <input type="text" id="filterGrade" placeholder="Filtrar por grado">
   <input type="text" id="filterGroup" placeholder="Filtrar por grupo">
 
