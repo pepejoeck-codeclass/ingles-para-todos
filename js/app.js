@@ -9,7 +9,6 @@ let audioUnlocked = false;
 
 function unlockAudio() {
   if (audioUnlocked) return;
-
   [soundCorrect, soundError, soundLevel].forEach(sound => {
     sound.muted = true;
     sound.play().then(() => {
@@ -18,12 +17,9 @@ function unlockAudio() {
       sound.muted = false;
     }).catch(()=>{});
   });
-
   audioUnlocked = true;
 }
 
-// ===============================
-// MENSAJES MOTIVADORES
 // ===============================
 const messages = [
   "🔥 Excellent job",
@@ -33,11 +29,11 @@ const messages = [
   "🎯 Perfect"
 ];
 
-// ===============================
 let currentStudent = null;
 let lessonIndex = 0;
 let mistakes = 0;
 let chartInstance = null;
+let autoRefresh = null;
 
 const lesson = [
   { en: "Hello", es: "hola" },
@@ -58,7 +54,6 @@ const gradeInput = document.getElementById("gradeInput");
 const groupInput = document.getElementById("groupInput");
 const emailInput = document.getElementById("emailInput");
 const loginBtn = document.getElementById("loginBtn");
-
 const logoutBtn = document.getElementById("logoutBtn");
 
 const startBtn = document.getElementById("startGame");
@@ -80,11 +75,18 @@ const teacherLoginBtn = document.getElementById("teacherLoginBtn");
 const teacherUser = document.getElementById("teacherUser");
 const teacherPass = document.getElementById("teacherPass");
 const closeTeacher = document.getElementById("closeTeacher");
-const refreshBtn = document.getElementById("refreshBtn");
 
 const studentsTable = document.getElementById("studentsTable");
 const connectedList = document.getElementById("connectedList");
 const exportBtn = document.getElementById("exportBtn");
+
+const filterGrade = document.getElementById("filterGrade");
+const filterGroup = document.getElementById("filterGroup");
+
+// Ficha
+const studentCard = document.getElementById("studentCard");
+const cardInfo = document.getElementById("cardInfo");
+const closeCard = document.getElementById("closeCard");
 
 // ===============================
 // MENÚ HAMBURGUESA
@@ -133,7 +135,6 @@ loginBtn.addEventListener("click", () => {
   teacherPanel.style.display = "none";
 
   userDisplay.textContent = "Welcome " + student.name;
-
   updateUI();
 });
 
@@ -249,37 +250,44 @@ teacherLoginBtn.addEventListener("click", () => {
     teacherLogin.style.display = "none";
     teacherPanel.style.display = "block";
     loadTeacherPanel();
+
+    // 🔄 AUTO ACTUALIZAR CADA 5 SEGUNDOS
+    autoRefresh = setInterval(loadTeacherPanel, 5000);
+
   } else {
     alert("❌ Usuario o contraseña incorrectos");
   }
 });
 
 // ===============================
-// 🔴 CERRAR SESIÓN MAESTRO (YA FUNCIONA 100%)
+// CERRAR SESIÓN MAESTRO
 // ===============================
 closeTeacher.addEventListener("click", () => {
   teacherPanel.style.display = "none";
   teacherLogin.style.display = "none";
   loginCard.style.display = "block";
 
+  clearInterval(autoRefresh);
+
   teacherUser.value = "";
   teacherPass.value = "";
 
-  alert("Sesión de maestro cerrada correctamente 👋");
+  alert("Sesión de maestro cerrada 👋");
 });
 
 // ===============================
-// 🔄 ACTUALIZAR
-// ===============================
-refreshBtn.addEventListener("click", () => {
-  loadTeacherPanel();
-});
-
-// ===============================
-// PANEL MAESTRO
+// PANEL MAESTRO + FILTROS + FICHA
 // ===============================
 function loadTeacherPanel() {
-  const students = JSON.parse(localStorage.getItem("students")) || [];
+  let students = JSON.parse(localStorage.getItem("students")) || [];
+
+  const fg = filterGrade.value.toLowerCase();
+  const fgr = filterGroup.value.toLowerCase();
+
+  students = students.filter(s =>
+    (!fg || s.grade.toLowerCase().includes(fg)) &&
+    (!fgr || s.group.toLowerCase().includes(fgr))
+  );
 
   connectedList.innerHTML = "";
   students.filter(s => s.online).forEach(s => {
@@ -290,19 +298,40 @@ function loadTeacherPanel() {
   const ordered = [...students].sort((a,b)=>b.score-a.score);
 
   ordered.forEach(s => {
-    studentsTable.innerHTML += `
-      <tr>
-        <td>${s.name}</td>
-        <td>${s.grade}</td>
-        <td>${s.group}</td>
-        <td>${s.score}</td>
-        <td>${s.level}</td>
-        <td>${s.stars}</td>
-      </tr>`;
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${s.name}</td>
+      <td>${s.grade}</td>
+      <td>${s.group}</td>
+      <td>${s.score}</td>
+      <td>${s.level}</td>
+      <td>${s.stars}</td>
+    `;
+    row.addEventListener("click", () => showStudentCard(s));
+    studentsTable.appendChild(row);
   });
 
   drawChart(ordered);
 }
+
+// ===============================
+// FICHA INDIVIDUAL
+// ===============================
+function showStudentCard(s) {
+  studentCard.style.display = "block";
+  cardInfo.innerHTML = `
+    <strong>Nombre:</strong> ${s.name}<br>
+    <strong>Grado:</strong> ${s.grade}<br>
+    <strong>Grupo:</strong> ${s.group}<br>
+    <strong>Puntaje:</strong> ${s.score}<br>
+    <strong>Nivel:</strong> ${s.level}<br>
+    <strong>Estrellas:</strong> ${s.stars}
+  `;
+}
+
+closeCard.addEventListener("click", () => {
+  studentCard.style.display = "none";
+});
 
 // ===============================
 // EXPORTAR EXCEL
