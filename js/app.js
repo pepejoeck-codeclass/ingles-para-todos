@@ -19,7 +19,7 @@ function unlockSounds() {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ELEMENTOS
+  // ===== ELEMENTOS =====
   const loginCard = document.getElementById("loginCard");
   const mainContent = document.getElementById("mainContent");
   const nav = document.getElementById("nav");
@@ -49,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (username) {
     loginCard.style.display = "none";
     mainContent.style.display = "block";
-    nav.style.display = "block";
     loadProgress();
   }
 
@@ -68,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loginCard.style.display = "none";
     mainContent.style.display = "block";
-    nav.style.display = "block";
 
     loadProgress();
     registerStudent();
@@ -82,12 +80,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ===== MENÚ =====
+  // ===== MENÚ HAMBURGUESA (CORRECTO) =====
   hamburger.addEventListener("click", () => {
-    nav.style.display = nav.style.display === "block" ? "none" : "block";
+    nav.classList.toggle("open");
   });
 
-  // ===== TEMA =====
+  // ===== TEMA OSCURO =====
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
   });
@@ -107,6 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
     questionText.textContent = `¿Cómo se dice "${currentQuestion.en}" en español?`;
     answerInput.value = "";
+    answerInput.focus();
   });
 
   checkBtn.addEventListener("click", () => {
@@ -139,8 +138,9 @@ document.addEventListener("DOMContentLoaded", () => {
     currentQuestion = null;
   });
 
-  // ===== MODO MAESTRO =====
-  openTeacher.addEventListener("click", () => {
+  // ===== MODO MAESTRO 👨‍🏫 (FUNCIONANDO) =====
+  openTeacher.addEventListener("click", (e) => {
+    e.preventDefault();
     teacherPanel.style.display = "block";
     loadStudentsForTeacher();
   });
@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-// ===== PROGRESO =====
+// ===== PROGRESO POR USUARIO =====
 function saveProgress() {
   if (!username) return;
   localStorage.setItem(`user_${username}_score`, score);
