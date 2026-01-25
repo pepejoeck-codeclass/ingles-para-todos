@@ -38,6 +38,7 @@ let currentStudent = null;
 let chartInstance = null;
 let autoRefresh = null;
 let sessionStart = null;
+let timeInterval = null;
 
 // ===============================
 // ELEMENTOS
@@ -67,6 +68,7 @@ const scoreText = document.getElementById("scoreText");
 const levelText = document.getElementById("levelText");
 const starsText = document.getElementById("starsText");
 const medalText = document.getElementById("medalText");
+const timeText  = document.getElementById("timeText");
 
 // Maestro
 const openTeacherBtn = document.getElementById("openTeacherBtn");
@@ -105,18 +107,19 @@ if (localStorage.getItem("darkMode") === "true") {
 logoutBtn.addEventListener("click", () => {
   if (!confirm("¿Quieres cerrar sesión y cambiar de usuario?")) return;
 
-  if (currentStudent) {
-    saveTimeWorked();
-    let students = JSON.parse(localStorage.getItem("students")) || [];
-    students = students.map(s => {
-      if (s.name === currentStudent.name) s.online = false;
-      return s;
-    });
-    localStorage.setItem("students", JSON.stringify(students));
-  }
+  saveTimeWorked();
+
+  let students = JSON.parse(localStorage.getItem("students")) || [];
+  students = students.map(s => {
+    if (currentStudent && s.name === currentStudent.name) s.online = false;
+    return s;
+  });
+  localStorage.setItem("students", JSON.stringify(students));
 
   currentStudent = null;
   lessonIndex = 0;
+
+  if (timeInterval) clearInterval(timeInterval);
 
   mainContent.style.display = "none";
   teacherPanel.style.display = "none";
@@ -165,8 +168,23 @@ loginBtn.addEventListener("click", () => {
   mainContent.style.display = "block";
   userDisplay.textContent = "Welcome " + student.name;
 
+  startTimeCounter();
   updateUI();
 });
+
+// ===============================
+// ⏱ CONTADOR DE TIEMPO EN VIVO PARA ALUMNO
+// ===============================
+function startTimeCounter() {
+  if (timeInterval) clearInterval(timeInterval);
+
+  timeInterval = setInterval(() => {
+    if (!currentStudent) return;
+    const seconds = Math.floor((Date.now() - sessionStart) / 1000);
+    const total = currentStudent.time + seconds;
+    timeText.textContent = "⏱ Tiempo: " + Math.floor(total / 60) + " min";
+  }, 1000);
+}
 
 // ===============================
 // 🎮 JUEGO
@@ -247,7 +265,7 @@ function saveStudent() {
 }
 
 // ===============================
-// ⏱ TIEMPO TRABAJADO
+// ⏱ GUARDAR TIEMPO AL SALIR
 // ===============================
 function saveTimeWorked() {
   if (!currentStudent || !sessionStart) return;
@@ -271,7 +289,7 @@ teacherLoginBtn.addEventListener("click", () => {
     teacherLogin.style.display = "none";
     teacherPanel.style.display = "block";
     loadTeacherPanel();
-    autoRefresh = setInterval(loadTeacherPanel, 5000); // AUTO ACTUALIZA
+    autoRefresh = setInterval(loadTeacherPanel, 5000);
   } else {
     alert("❌ Usuario o contraseña incorrectos");
   }
@@ -338,11 +356,10 @@ function applyGroupFilter() {
 groupSelect.addEventListener("change", applyGroupFilter);
 
 // ===============================
-// 📈 GRÁFICA GENERAL
+// 📈 GRÁFICA
 // ===============================
 function drawChart(students) {
   const ctx = document.getElementById("progressChart");
-
   if (chartInstance) chartInstance.destroy();
 
   chartInstance = new Chart(ctx, {
