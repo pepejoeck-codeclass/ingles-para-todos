@@ -3,8 +3,10 @@ const soundCorrect = new Audio("assets/sounds/correct.mp3");
 const soundWrong = new Audio("assets/sounds/wrong.mp3");
 const soundLevelUp = new Audio("assets/sounds/levelup.mp3");
 
-// ===== USUARIO Y PROGRESO (POR USUARIO) =====
+// ===== USUARIO ACTUAL =====
 let username = localStorage.getItem("username") || null;
+let grade = null;
+let group = null;
 
 let score = 0;
 let level = 1;
@@ -12,20 +14,12 @@ let unlockedLesson = 1;
 
 // 🔓 Desbloquear sonidos con la primera interacción
 function unlockSounds() {
-  soundCorrect.play().then(() => {
-    soundCorrect.pause();
-    soundCorrect.currentTime = 0;
-  }).catch(() => {});
-
-  soundWrong.play().then(() => {
-    soundWrong.pause();
-    soundWrong.currentTime = 0;
-  }).catch(() => {});
-
-  soundLevelUp.play().then(() => {
-    soundLevelUp.pause();
-    soundLevelUp.currentTime = 0;
-  }).catch(() => {});
+  [soundCorrect, soundWrong, soundLevelUp].forEach(sound => {
+    sound.play().then(() => {
+      sound.pause();
+      sound.currentTime = 0;
+    }).catch(() => {});
+  });
 }
 
 console.log("🔥 app.js cargado correctamente");
@@ -35,51 +29,72 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== LOGIN =====
   const loginCard = document.getElementById("loginCard");
   const mainContent = document.getElementById("mainContent");
+
   const usernameInput = document.getElementById("usernameInput");
-  const loginBtn = document.getElementById("loginBtn");
   const emailInput = document.getElementById("emailInput");
+  const gradeInput = document.getElementById("gradeInput");
+  const groupInput = document.getElementById("groupInput");
+
+  const loginBtn = document.getElementById("loginBtn");
   const logoutBtn = document.getElementById("logoutBtn");
 
   // Si ya había usuario guardado → entrar automático
   if (username) {
     loginCard.style.display = "none";
     mainContent.style.display = "block";
+    loadUserData();
     loadProgress();
   }
 
- loginBtn.addEventListener("click", () => {
-  const name = usernameInput.value.trim();
-  const email = emailInput.value.trim();
+  // ===== INICIAR SESIÓN =====
+  loginBtn.addEventListener("click", () => {
+    const name = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+    const gradeValue = gradeInput.value.trim();
+    const groupValue = groupInput.value.trim();
 
-  if (!name && !email) {
-    alert("Escribe tu nombre o tu correo 🙂");
-    return;
-  }
+    if (!name && !email) {
+      alert("Escribe tu nombre o tu correo 🙂");
+      return;
+    }
 
-  // Si usó correo, ese será su identificador
-  if (email) {
-    username = email.toLowerCase();
-  } else {
-    username = name;
-  }
+    if (!gradeValue || !groupValue) {
+      alert("Escribe tu grado y tu grupo 🙂");
+      return;
+    }
 
-  localStorage.setItem("username", username);
+    // Identificador del usuario
+    if (email) {
+      username = email.toLowerCase();
+    } else {
+      username = name;
+    }
 
-  loginCard.style.display = "none";
-  mainContent.style.display = "block";
+    grade = gradeValue;
+    group = groupValue;
 
-  loadProgress();
-});
+    localStorage.setItem("username", username);
+    localStorage.setItem(`user_${username}_grade`, grade);
+    localStorage.setItem(`user_${username}_group`, group);
+
+    // 👉 REGISTRAR ALUMNO EN LISTA GENERAL DEL MAESTRO
+    registerStudent(username, grade, group);
+
+    loginCard.style.display = "none";
+    mainContent.style.display = "block";
+
+    loadProgress();
+  });
 
   // ===== CERRAR SESIÓN (SIN BORRAR PROGRESO) =====
   logoutBtn.addEventListener("click", () => {
     if (confirm("¿Quieres cerrar sesión y cambiar de usuario?")) {
-      localStorage.removeItem("username"); // SOLO cerrar sesión
+      localStorage.removeItem("username"); // solo cerrar sesión
       location.reload();
     }
   });
 
-  // ===== ELEMENTOS =====
+  // ===== ELEMENTOS DEL JUEGO =====
   const hamburger = document.getElementById("hamburger");
   const nav = document.getElementById("nav");
   const themeBtn = document.getElementById("themeToggle");
@@ -111,24 +126,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.toggle("dark");
   });
 
-  // ===== BLOQUEAR LECCIONES =====
-  document.querySelectorAll(".lesson").forEach(lesson => {
-    lesson.addEventListener("click", (e) => {
-      const lessonNumber = parseInt(lesson.dataset.lesson);
-
-      if (lessonNumber > unlockedLesson) {
-        e.preventDefault();
-        alert("🔒 Termina la lección anterior para desbloquear esta");
-      } else {
-        alert("📘 Estás en la Lección " + lessonNumber);
-      }
-    });
-  });
-
   // ===== INICIAR EJERCICIO =====
   startBtn.addEventListener("click", () => {
-
-    unlockSounds(); // activar sonidos
+    unlockSounds();
 
     currentQuestion =
       questions[Math.floor(Math.random() * questions.length)];
@@ -157,49 +157,50 @@ document.addEventListener("DOMContentLoaded", () => {
     if (userAnswer === currentQuestion.es.toLowerCase()) {
       score += 5;
       soundCorrect.play();
-
-      document.querySelector(".card").classList.add("correct");
-      setTimeout(() => {
-        document.querySelector(".card").classList.remove("correct");
-      }, 500);
-
       alert("✅ Correcto +5 puntos");
     } else {
       soundWrong.play();
-
-      document.querySelector(".card").classList.add("wrong");
-      setTimeout(() => {
-        document.querySelector(".card").classList.remove("wrong");
-      }, 500);
-
       alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
     }
 
-    // ===== SUBIR NIVEL Y DESBLOQUEAR LECCIÓN =====
+    // ===== SUBIR NIVEL =====
     if (score >= level * 20) {
       level++;
-
-      // desbloquear siguiente lección
       unlockedLesson = Math.max(unlockedLesson, level);
-
       soundLevelUp.play();
-
-      alert("🎉 Subiste de nivel y desbloqueaste nueva lección");
+      alert("🎉 Subiste de nivel");
     }
 
-    // Guardar progreso del usuario
     saveProgress();
 
     scoreText.textContent = score + " puntos";
     levelText.textContent = "Nivel " + level;
-
-    updateLessonsMenu();
 
     questionText.textContent = "Pulsa para comenzar";
     currentQuestion = null;
   });
 
 });
+
+
+// ===== REGISTRAR ALUMNOS PARA EL MAESTRO 👨‍🏫 =====
+function registerStudent(username, grade, group) {
+  let students = JSON.parse(localStorage.getItem("studentsList")) || [];
+
+  const exists = students.find(s => s.username === username);
+
+  if (!exists) {
+    students.push({
+      username: username,
+      grade: grade,
+      group: group,
+      score: 0,
+      level: 1
+    });
+
+    localStorage.setItem("studentsList", JSON.stringify(students));
+  }
+}
 
 
 // ===== GUARDAR PROGRESO (POR USUARIO) =====
@@ -209,6 +210,22 @@ function saveProgress() {
   localStorage.setItem(`user_${username}_score`, score);
   localStorage.setItem(`user_${username}_level`, level);
   localStorage.setItem(`user_${username}_unlockedLesson`, unlockedLesson);
+
+  // Actualizar datos en lista del maestro
+  let students = JSON.parse(localStorage.getItem("studentsList")) || [];
+
+  students = students.map(student => {
+    if (student.username === username) {
+      return {
+        ...student,
+        score: score,
+        level: level
+      };
+    }
+    return student;
+  });
+
+  localStorage.setItem("studentsList", JSON.stringify(students));
 }
 
 
@@ -222,24 +239,13 @@ function loadProgress() {
 
   document.getElementById("scoreText").textContent = score + " puntos";
   document.getElementById("levelText").textContent = "Nivel " + level;
-
-  updateLessonsMenu();
 }
 
 
-// ===== ACTUALIZAR MENÚ DE LECCIONES =====
-function updateLessonsMenu() {
-  const lessons = document.querySelectorAll(".lesson");
+// ===== CARGAR DATOS DEL USUARIO =====
+function loadUserData() {
+  if (!username) return;
 
-  lessons.forEach(lesson => {
-    const lessonNumber = parseInt(lesson.dataset.lesson);
-
-    if (lessonNumber <= unlockedLesson) {
-      lesson.classList.remove("locked");
-      lesson.textContent = "Lección " + lessonNumber;
-    } else {
-      lesson.classList.add("locked");
-      lesson.textContent = "Lección " + lessonNumber + " 🔒";
-    }
-  });
+  grade = localStorage.getItem(`user_${username}_grade`);
+  group = localStorage.getItem(`user_${username}_group`);
 }
