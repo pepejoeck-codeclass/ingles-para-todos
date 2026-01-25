@@ -28,7 +28,7 @@
   </nav>
 </header>
 
-<!-- BOTÓN MAESTRO FUERA DEL MENÚ -->
+<!-- BOTÓN MAESTRO FUERA -->
 <button id="openTeacherBtn" style="margin:10px;">👨‍🏫 Modo Maestro</button>
 
 <!-- LOGIN ALUMNO -->
@@ -50,15 +50,14 @@
 <section class="card" id="teacherLogin" style="display:none;">
   <h2>👨‍🏫 Acceso Maestro</h2>
 
-  <input type="text" id="teacherUser" placeholder="Usuario" autocomplete="off">
-  <input type="password" id="teacherPass" placeholder="Contraseña" autocomplete="off">
+  <input type="text" id="teacherUser" placeholder="Usuario">
+  <input type="password" id="teacherPass" placeholder="Contraseña">
 
   <button id="teacherLoginBtn" type="button">Entrar como maestro</button>
 </section>
 
 <!-- CONTENIDO ALUMNO -->
 <main id="mainContent" style="display:none;">
-
   <h3 id="userDisplay"></h3>
 
   <section class="card">
@@ -79,7 +78,6 @@
     <p id="scoreText">0 puntos</p>
     <p id="levelText">Nivel 1</p>
   </section>
-
 </main>
 
 <!-- PANEL MAESTRO -->
@@ -88,6 +86,11 @@
 
   <h3>👀 Alumnos conectados</h3>
   <ul id="connectedList"></ul>
+
+  <!-- FILTROS -->
+  <h3>🏫 Filtros</h3>
+  <input type="text" id="filterGrade" placeholder="Filtrar por grado">
+  <input type="text" id="filterGroup" placeholder="Filtrar por grupo">
 
   <h3>🏆 Ranking</h3>
   <table border="1" width="100%">
@@ -111,9 +114,15 @@
   <br><br>
 
   <button id="exportBtn">📥 Exportar a Excel</button>
-  <button id="refreshBtn">🔄 Actualizar en vivo</button>
   <br><br>
   <button id="closeTeacher" type="button">❌ Cerrar sesión maestro</button>
+</section>
+
+<!-- FICHA INDIVIDUAL -->
+<section id="studentCard" class="card" style="display:none;">
+  <h2>🧑‍🎓 Ficha del Alumno</h2>
+  <p id="cardInfo"></p>
+  <button id="closeCard">Cerrar ficha</button>
 </section>
 
 <script src="js/app.js"></script>
