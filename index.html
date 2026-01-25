@@ -19,7 +19,8 @@
     <button id="hamburger" class="hamburger">☰</button>
   </div>
 
-  <nav id="nav">
+  <!-- MENÚ HAMBURGUESA -->
+  <nav id="nav" style="display:none;">
     <a href="#">Lección 1</a>
     <a href="#">Lección 2 🔒</a>
     <a href="#">Juegos</a>
@@ -35,6 +36,10 @@
   <input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
   <input type="text" id="usernameInput" placeholder="Nombre completo" />
 
+  <p>— o —</p>
+
+  <input type="email" id="emailInput" placeholder="Correo (Gmail / Facebook)" />
+
   <button id="loginBtn">Entrar</button>
 </section>
 
@@ -44,7 +49,7 @@
   <!-- JUEGO -->
   <section class="card">
     <h2 id="questionText">Pulsa iniciar lección</h2>
-    <p id="feedback"></p>
+    <p id="feedback" style="font-size:18px;font-weight:bold;"></p>
 
     <input type="text" id="answerInput" placeholder="Escribe tu respuesta..." />
 
@@ -83,7 +88,7 @@
       <tbody id="studentsTable"></tbody>
     </table>
 
-    <h3>📊 Gráfica de progreso</h3>
+    <h3>📊 Progreso</h3>
     <canvas id="progressChart"></canvas>
 
     <br>
