@@ -3,6 +3,12 @@ const soundCorrect = new Audio("assets/sounds/correct.mp3");
 const soundWrong = new Audio("assets/sounds/wrong.mp3");
 const soundLevelUp = new Audio("assets/sounds/levelup.mp3");
 
+// ===== USUARIO Y PROGRESO =====
+let username = localStorage.getItem("username") || null;
+let unlockedLesson = parseInt(localStorage.getItem("unlockedLesson")) || 1;
+let score = parseInt(localStorage.getItem("score")) || 0;
+let level = parseInt(localStorage.getItem("level")) || 1;
+
 // 🔓 Desbloquear sonidos con la primera interacción
 function unlockSounds() {
   soundCorrect.play().then(() => {
@@ -24,6 +30,38 @@ function unlockSounds() {
 console.log("🔥 app.js cargado correctamente");
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  // ===== LOGIN =====
+  const loginCard = document.getElementById("loginCard");
+  const mainContent = document.getElementById("mainContent");
+  const usernameInput = document.getElementById("usernameInput");
+  const loginBtn = document.getElementById("loginBtn");
+
+  // Si ya había usuario guardado
+  if (username) {
+    loginCard.style.display = "none";
+    mainContent.style.display = "block";
+    loadProgress();
+  }
+
+  loginBtn.addEventListener("click", () => {
+    const name = usernameInput.value.trim();
+
+    if (!name) {
+      alert("Escribe tu nombre 🙂");
+      return;
+    }
+
+    username = name;
+    localStorage.setItem("username", username);
+
+    loginCard.style.display = "none";
+    mainContent.style.display = "block";
+
+    loadProgress();
+  });
+
+  // ===== ELEMENTOS =====
   const hamburger = document.getElementById("hamburger");
   const nav = document.getElementById("nav");
   const themeBtn = document.getElementById("themeToggle");
@@ -36,8 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const scoreText = document.getElementById("scoreText");
   const levelText = document.getElementById("levelText");
 
-  let score = 0;
-  let level = 1;
   let currentQuestion = null;
 
   const questions = [
@@ -47,20 +83,34 @@ document.addEventListener("DOMContentLoaded", () => {
     { en: "Thank you", es: "Gracias" }
   ];
 
-  // MENÚ
+  // ===== MENÚ HAMBURGUESA =====
   hamburger.addEventListener("click", () => {
     nav.classList.toggle("open");
   });
 
-  // TEMA OSCURO
+  // ===== TEMA OSCURO =====
   themeBtn.addEventListener("click", () => {
     document.body.classList.toggle("dark");
   });
 
-  // 🟢 INICIAR EJERCICIO (AQUÍ DESBLOQUEAMOS SONIDOS)
+  // ===== BLOQUEAR LECCIONES =====
+  document.querySelectorAll(".lesson").forEach(lesson => {
+    lesson.addEventListener("click", (e) => {
+      const lessonNumber = parseInt(lesson.dataset.lesson);
+
+      if (lessonNumber > unlockedLesson) {
+        e.preventDefault();
+        alert("🔒 Termina la lección anterior para desbloquear esta");
+      } else {
+        alert("📘 Estás en la Lección " + lessonNumber);
+      }
+    });
+  });
+
+  // ===== INICIAR EJERCICIO =====
   startBtn.addEventListener("click", () => {
 
-    unlockSounds(); // 🔓 MUY IMPORTANTE: activar sonidos aquí
+    unlockSounds(); // activar sonidos
 
     currentQuestion =
       questions[Math.floor(Math.random() * questions.length)];
@@ -72,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
     answerInput.focus();
   });
 
-  // RESPONDER
+  // ===== RESPONDER =====
   checkBtn.addEventListener("click", () => {
     if (!currentQuestion) {
       alert("Primero inicia un ejercicio 🙂");
@@ -88,9 +138,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (userAnswer === currentQuestion.es.toLowerCase()) {
       score += 5;
-      soundCorrect.play(); // 🔊 sonido correcto
+      soundCorrect.play();
 
-      // Animación correcta
       document.querySelector(".card").classList.add("correct");
       setTimeout(() => {
         document.querySelector(".card").classList.remove("correct");
@@ -98,9 +147,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       alert("✅ Correcto +5 puntos");
     } else {
-      soundWrong.play(); // 🔊 sonido incorrecto
+      soundWrong.play();
 
-      // Animación incorrecta
       document.querySelector(".card").classList.add("wrong");
       setTimeout(() => {
         document.querySelector(".card").classList.remove("wrong");
@@ -109,25 +157,59 @@ document.addEventListener("DOMContentLoaded", () => {
       alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
     }
 
-    // SUBIR NIVEL CADA 20 PUNTOS
+    // ===== SUBIR NIVEL Y DESBLOQUEAR LECCIÓN =====
     if (score >= level * 20) {
       level++;
-      soundLevelUp.play(); // 🔊 subir nivel
 
-      // Animación de nivel
-      const levelCard = document.getElementById("levelText");
-      levelCard.classList.add("level-up");
-      setTimeout(() => {
-        levelCard.classList.remove("level-up");
-      }, 1000);
+      // Desbloquear siguiente lección
+      unlockedLesson = Math.max(unlockedLesson, level);
 
-      alert("🎉 Subiste de nivel");
+      soundLevelUp.play();
+
+      alert("🎉 Subiste de nivel y desbloqueaste nueva lección");
     }
+
+    // Guardar progreso
+    saveProgress();
 
     scoreText.textContent = score + " puntos";
     levelText.textContent = "Nivel " + level;
 
+    updateLessonsMenu();
+
     questionText.textContent = "Pulsa para comenzar";
     currentQuestion = null;
   });
+
 });
+
+// ===== GUARDAR PROGRESO =====
+function saveProgress() {
+  localStorage.setItem("score", score);
+  localStorage.setItem("level", level);
+  localStorage.setItem("unlockedLesson", unlockedLesson);
+}
+
+// ===== CARGAR PROGRESO =====
+function loadProgress() {
+  document.getElementById("scoreText").textContent = score + " puntos";
+  document.getElementById("levelText").textContent = "Nivel " + level;
+  updateLessonsMenu();
+}
+
+// ===== ACTUALIZAR MENÚ DE LECCIONES =====
+function updateLessonsMenu() {
+  const lessons = document.querySelectorAll(".lesson");
+
+  lessons.forEach(lesson => {
+    const lessonNumber = parseInt(lesson.dataset.lesson);
+
+    if (lessonNumber <= unlockedLesson) {
+      lesson.classList.remove("locked");
+      lesson.textContent = "Lección " + lessonNumber;
+    } else {
+      lesson.classList.add("locked");
+      lesson.textContent = "Lección " + lessonNumber + " 🔒";
+    }
+  });
+}
