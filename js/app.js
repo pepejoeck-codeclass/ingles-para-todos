@@ -88,6 +88,46 @@ hamburger.addEventListener("click", () => {
 });
 
 // ===============================
+// 🚪 CAMBIAR USUARIO (LOGOUT GENERAL)
+// ===============================
+logoutBtn.addEventListener("click", () => {
+  if (!confirm("¿Quieres cerrar sesión y cambiar de usuario?")) return;
+
+  // Marcar alumno como desconectado
+  if (currentStudent) {
+    let students = JSON.parse(localStorage.getItem("students")) || [];
+    students = students.map(s => {
+      if (s.name === currentStudent.name) s.online = false;
+      return s;
+    });
+    localStorage.setItem("students", JSON.stringify(students));
+  }
+
+  // Limpiar estados
+  currentStudent = null;
+  lessonIndex = 0;
+
+  // Ocultar todo
+  mainContent.style.display = "none";
+  teacherPanel.style.display = "none";
+  teacherLogin.style.display = "none";
+
+  // Mostrar login alumno
+  loginCard.style.display = "block";
+
+  // Limpiar campos
+  usernameInput.value = "";
+  emailInput.value = "";
+  gradeInput.value = "";
+  groupInput.value = "";
+  feedback.textContent = "";
+  questionText.textContent = "Pulsa para comenzar";
+
+  // Detener actualización automática del maestro
+  if (autoRefresh) clearInterval(autoRefresh);
+});
+
+// ===============================
 // LOGIN ALUMNO
 // ===============================
 loginBtn.addEventListener("click", () => {
@@ -216,22 +256,21 @@ teacherLoginBtn.addEventListener("click", () => {
 });
 
 // ===============================
-// CERRAR SESIÓN MAESTRO
+// CERRAR SESIÓN MAESTRO (BOTÓN INTERNO)
 // ===============================
 closeTeacher.addEventListener("click", () => {
   teacherPanel.style.display = "none";
   teacherLogin.style.display = "none";
   loginCard.style.display = "block";
-  clearInterval(autoRefresh);
+  if (autoRefresh) clearInterval(autoRefresh);
 });
 
 // ===============================
-// PANEL MAESTRO CON FILTRO REAL POR GRUPO
+// PANEL MAESTRO
 // ===============================
 function loadTeacherPanel() {
   let students = JSON.parse(localStorage.getItem("students")) || [];
 
-  // Llenar grupos SOLO una vez si está vacío
   if (groupSelect.options.length === 1) {
     const groups = [...new Set(students.map(s => s.group))];
     groups.forEach(g => {
@@ -245,9 +284,7 @@ function loadTeacherPanel() {
   const selectedGroup = groupSelect.value;
 
   let filtered = students;
-  if (selectedGroup) {
-    filtered = students.filter(s => s.group === selectedGroup);
-  }
+  if (selectedGroup) filtered = students.filter(s => s.group === selectedGroup);
 
   connectedList.innerHTML = "";
   filtered.filter(s => s.online).forEach(s => {
