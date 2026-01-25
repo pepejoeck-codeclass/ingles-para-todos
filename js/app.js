@@ -1,9 +1,9 @@
 // ===============================
-// 🔊 SONIDOS (RUTAS CORRECTAS)
+// 🔊 SONIDOS (RUTAS CORRECTAS PARA GITHUB PAGES)
 // ===============================
-const soundCorrect = new Audio("/ingles-para-todos/assets/sounds/correct.mp3");
-const soundError   = new Audio("/ingles-para-todos/assets/sounds/wrong.mp3");
-const soundLevel   = new Audio("/ingles-para-todos/assets/sounds/levelup.mp3");
+const soundCorrect = new Audio("assets/sounds/correct.mp3");
+const soundError   = new Audio("assets/sounds/wrong.mp3");
+const soundLevel   = new Audio("assets/sounds/levelup.mp3");
 
 let audioUnlocked = false;
 
@@ -20,7 +20,7 @@ function unlockAudio() {
   });
 
   audioUnlocked = true;
-  console.log("🔊 Audio desbloqueado");
+  console.log("🔊 Audio desbloqueado correctamente");
 }
 
 // ===============================
@@ -30,8 +30,6 @@ let username = localStorage.getItem("username");
 let score = 0;
 let level = 1;
 let stars = 0;
-
-const TEACHER_PASSWORD = "161286";
 
 const messages = [
   "🔥 Excellent job",
@@ -58,8 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const levelText = document.getElementById("levelText");
   const starsText = document.getElementById("starsText");
   const medalText = document.getElementById("medalText");
-
-  const feedback = document.getElementById("feedback"); // MENSAJES EN PANTALLA
+  const feedback = document.getElementById("feedback");
 
   // AUTO LOGIN
   if (username) {
@@ -73,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===============================
   const questions = [
     { en: "Hello", es: "hola" },
-    { en: "Goodbye", es: "adiós" },
+    { en: "Goodbye", es: "adios" },
     { en: "Please", es: "por favor" },
     { en: "Thank you", es: "gracias" }
   ];
@@ -81,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentQuestion = null;
 
   startBtn.addEventListener("click", () => {
-    unlockAudio(); // 🔓 AQUÍ SE DESBLOQUEA EL AUDIO
+    unlockAudio(); // 🔓 DESBLOQUEO DE AUDIO AQUÍ
 
     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
     questionText.textContent = `¿Cómo se dice "${currentQuestion.en}" en español?`;
@@ -93,9 +90,10 @@ document.addEventListener("DOMContentLoaded", () => {
   checkBtn.addEventListener("click", () => {
     if (!currentQuestion) return;
 
-    const userAnswer = answerInput.value.trim().toLowerCase();
+    const userAnswer = normalize(answerInput.value);
+    const correctAnswer = normalize(currentQuestion.es);
 
-    if (userAnswer === currentQuestion.es) {
+    if (userAnswer === correctAnswer) {
       score += 5;
       stars++;
 
@@ -119,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (score >= level * 20) {
       level++;
 
-      // 🔊 SONIDO NIVEL
+      // 🔊 SONIDO SUBIR NIVEL
       soundLevel.currentTime = 0;
       soundLevel.play();
 
@@ -140,15 +138,29 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ===============================
+// ✍️ NORMALIZAR TEXTO (QUITAR ACENTOS Y MAYÚSCULAS)
+// ===============================
+function normalize(text) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
+
+// ===============================
 // 💾 PROGRESO
 // ===============================
 function saveProgress() {
+  if (!username) return;
   localStorage.setItem(`user_${username}_score`, score);
   localStorage.setItem(`user_${username}_level`, level);
   localStorage.setItem(`user_${username}_stars`, stars);
 }
 
 function loadProgress() {
+  if (!username) return;
+
   score = parseInt(localStorage.getItem(`user_${username}_score`)) || 0;
   level = parseInt(localStorage.getItem(`user_${username}_level`)) || 1;
   stars = parseInt(localStorage.getItem(`user_${username}_stars`)) || 0;
