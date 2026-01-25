@@ -5,28 +5,24 @@
   <title>Inglés Para Todos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <header>
   <h1>Inglés Para Todos</h1>
+  <span id="userDisplay"></span>
 
   <button id="logoutBtn">🚪 Cambiar usuario</button>
 
   <div class="header-buttons">
-    <button id="themeToggle">🌙</button>
     <button id="hamburger" class="hamburger">☰</button>
   </div>
 
-  <!-- MENÚ -->
   <nav id="nav">
     <a href="#">Lección 1</a>
     <a href="#">Lección 2 🔒</a>
-    <a href="#">Lección 3 🔒</a>
     <a href="#">Juegos</a>
-    <a href="#">Progreso</a>
-
-    <!-- BOTÓN MAESTRO -->
     <a href="#" id="openTeacher">👨‍🏫 Modo Maestro</a>
   </nav>
 </header>
@@ -39,10 +35,6 @@
   <input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
   <input type="text" id="usernameInput" placeholder="Nombre completo" />
 
-  <p>— o —</p>
-
-  <input type="email" id="emailInput" placeholder="Correo" />
-
   <button id="loginBtn">Entrar</button>
 </section>
 
@@ -51,12 +43,12 @@
 
   <!-- JUEGO -->
   <section class="card">
-    <h2 id="questionText">Pulsa para comenzar</h2>
-    <p id="feedback" style="font-size:18px; font-weight:bold;"></p>
+    <h2 id="questionText">Pulsa iniciar lección</h2>
+    <p id="feedback"></p>
 
     <input type="text" id="answerInput" placeholder="Escribe tu respuesta..." />
 
-    <button id="startGame">Iniciar ejercicio</button>
+    <button id="startGame">Iniciar lección</button>
     <button id="checkAnswer">Responder</button>
 
     <p id="starsText">⭐ Estrellas: 0</p>
@@ -74,6 +66,9 @@
   <section id="teacherPanel" class="card" style="display:none;">
     <h2>👨‍🏫 Panel del Maestro</h2>
 
+    <button id="exportBtn">📥 Exportar a Excel</button>
+
+    <h3>🏆 Ranking de alumnos</h3>
     <table border="1" width="100%">
       <thead>
         <tr>
@@ -87,6 +82,9 @@
       </thead>
       <tbody id="studentsTable"></tbody>
     </table>
+
+    <h3>📊 Gráfica de progreso</h3>
+    <canvas id="progressChart"></canvas>
 
     <br>
     <button id="closeTeacher">❌ Cerrar</button>
