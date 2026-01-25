@@ -9,6 +9,7 @@
 </head>
 <body>
 
+  <!-- HEADER -->
   <header>
     <h1>Inglés Para Todos</h1>
 
@@ -17,14 +18,28 @@
       <button id="hamburger" class="hamburger">☰</button>
     </div>
 
+    <!-- MENÚ CON LECCIONES -->
     <nav id="nav">
-      <a href="#">Lecciones</a>
+      <a href="#" class="lesson" data-lesson="1">Lección 1</a>
+      <a href="#" class="lesson locked" data-lesson="2">Lección 2 🔒</a>
+      <a href="#" class="lesson locked" data-lesson="3">Lección 3 🔒</a>
+
       <a href="#">Juegos</a>
       <a href="#">Progreso</a>
     </nav>
   </header>
 
-  <main>
+  <!-- LOGIN -->
+  <section class="login-card" id="loginCard">
+    <h2>👋 Bienvenido</h2>
+    <p>Escribe tu nombre para comenzar:</p>
+    <input type="text" id="usernameInput" placeholder="Tu nombre..." />
+    <button id="loginBtn">Entrar</button>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main id="mainContent" style="display:none;">
+
     <!-- JUEGO -->
     <section class="card">
       <h2 id="questionText">Pulsa para comenzar</h2>
@@ -45,8 +60,10 @@
       <p id="scoreText">0 puntos</p>
       <p id="levelText">Nivel 1</p>
     </section>
+
   </main>
 
+  <!-- JS -->
   <script src="js/app.js"></script>
 
 </body>
