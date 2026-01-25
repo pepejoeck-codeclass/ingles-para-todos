@@ -1,5 +1,5 @@
 // ===============================
-// 🔊 SONIDOS (RUTAS CORRECTAS PARA GITHUB PAGES)
+// 🔊 SONIDOS (RUTAS CORRECTAS)
 // ===============================
 const soundCorrect = new Audio("assets/sounds/correct.mp3");
 const soundError   = new Audio("assets/sounds/wrong.mp3");
@@ -20,17 +20,20 @@ function unlockAudio() {
   });
 
   audioUnlocked = true;
-  console.log("🔊 Audio desbloqueado correctamente");
+  console.log("🔊 Audio desbloqueado");
 }
 
 // ===============================
-// VARIABLES
+// VARIABLES PRINCIPALES
 // ===============================
 let username = localStorage.getItem("username");
 let score = 0;
 let level = 1;
 let stars = 0;
 
+// ===============================
+// MENSAJES MOTIVADORES
+// ===============================
 const messages = [
   "🔥 Excellent job",
   "⭐ You're doing great",
@@ -44,9 +47,18 @@ const messages = [
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
 
+  // ELEMENTOS LOGIN
   const loginCard = document.getElementById("loginCard");
   const mainContent = document.getElementById("mainContent");
 
+  const usernameInput = document.getElementById("usernameInput");
+  const emailInput = document.getElementById("emailInput");
+  const gradeInput = document.getElementById("gradeInput");
+  const groupInput = document.getElementById("groupInput");
+  const loginBtn = document.getElementById("loginBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  // ELEMENTOS JUEGO
   const startBtn = document.getElementById("startGame");
   const checkBtn = document.getElementById("checkAnswer");
   const questionText = document.getElementById("questionText");
@@ -58,12 +70,49 @@ document.addEventListener("DOMContentLoaded", () => {
   const medalText = document.getElementById("medalText");
   const feedback = document.getElementById("feedback");
 
+  // ===============================
   // AUTO LOGIN
+  // ===============================
   if (username) {
     loginCard.style.display = "none";
     mainContent.style.display = "block";
     loadProgress();
   }
+
+  // ===============================
+  // LOGIN
+  // ===============================
+  loginBtn.addEventListener("click", () => {
+    const name = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+    const grade = gradeInput.value.trim();
+    const group = groupInput.value.trim();
+
+    if ((!name && !email) || !grade || !group) {
+      alert("Por favor escribe Nombre o Correo, Grado y Grupo");
+      return;
+    }
+
+    username = email ? email.toLowerCase() : name;
+    localStorage.setItem("username", username);
+    localStorage.setItem(`user_${username}_grade`, grade);
+    localStorage.setItem(`user_${username}_group`, group);
+
+    loginCard.style.display = "none";
+    mainContent.style.display = "block";
+
+    loadProgress();
+  });
+
+  // ===============================
+  // LOGOUT
+  // ===============================
+  logoutBtn.addEventListener("click", () => {
+    if (confirm("¿Quieres cambiar de usuario?")) {
+      localStorage.removeItem("username");
+      location.reload();
+    }
+  });
 
   // ===============================
   // 🎮 JUEGO
@@ -78,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentQuestion = null;
 
   startBtn.addEventListener("click", () => {
-    unlockAudio(); // 🔓 DESBLOQUEO DE AUDIO AQUÍ
+    unlockAudio();
 
     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
     questionText.textContent = `¿Cómo se dice "${currentQuestion.en}" en español?`;
@@ -97,7 +146,6 @@ document.addEventListener("DOMContentLoaded", () => {
       score += 5;
       stars++;
 
-      // 🔊 SONIDO CORRECTO
       soundCorrect.currentTime = 0;
       soundCorrect.play();
 
@@ -106,7 +154,6 @@ document.addEventListener("DOMContentLoaded", () => {
       feedback.style.color = "green";
 
     } else {
-      // 🔊 SONIDO ERROR
       soundError.currentTime = 0;
       soundError.play();
 
@@ -117,7 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (score >= level * 20) {
       level++;
 
-      // 🔊 SONIDO SUBIR NIVEL
       soundLevel.currentTime = 0;
       soundLevel.play();
 
@@ -138,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ===============================
-// ✍️ NORMALIZAR TEXTO (QUITAR ACENTOS Y MAYÚSCULAS)
+// ✍️ NORMALIZAR TEXTO
 // ===============================
 function normalize(text) {
   return text
@@ -166,7 +212,7 @@ function loadProgress() {
   stars = parseInt(localStorage.getItem(`user_${username}_stars`)) || 0;
 
   document.getElementById("scoreText").textContent = score + " puntos";
-  document.getElementById("levelText").textContent = "Nivel " + level;
+  document.getElementById("levelText").textContent = "Nivel " + level";
   document.getElementById("starsText").textContent = "⭐ Estrellas: " + stars;
 
   assignMedal();
