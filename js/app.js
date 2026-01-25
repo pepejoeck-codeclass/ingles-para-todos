@@ -2,7 +2,7 @@
 // 🔊 SONIDOS (DESBLOQUEO CORRECTO)
 // ===============================
 let soundCorrect = new Audio("sounds/correct.mp3");
-let soundError = new Audio("sounds/error.mp3");
+let soundError = new Audio("sounds/wrong.mp3");
 let soundLevel = new Audio("sounds/levelup.mp3");
 
 let audioUnlocked = false;
