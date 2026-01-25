@@ -11,14 +11,13 @@
 <header>
   <h1>Inglés Para Todos</h1>
 
-  <button id="logoutBtn">🚪 Cambiar usuario</button>
-
   <div class="header-buttons">
     <button id="themeToggle">🌙</button>
-    <button id="hamburger">☰</button>
+    <button id="hamburger" class="hamburger">☰</button>
   </div>
 
-  <nav id="nav" style="display:none;">
+  <!-- MENÚ DESPLEGABLE -->
+  <nav id="nav">
     <a href="#">Lección 1</a>
     <a href="#">Lección 2 🔒</a>
     <a href="#">Lección 3 🔒</a>
@@ -26,9 +25,8 @@
     <a href="#">Juegos</a>
     <a href="#">Progreso</a>
 
-    <button id="openTeacher" type="button" style="background:none;border:none;color:blue;cursor:pointer;">
-      👨‍🏫 Modo Maestro
-    </button>
+    <a href="#" id="openTeacher">👨‍🏫 Modo Maestro</a>
+    <a href="#" id="logoutBtn">🚪 Cambiar usuario</a>
   </nav>
 </header>
 
