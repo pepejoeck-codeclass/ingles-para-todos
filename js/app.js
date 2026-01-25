@@ -40,6 +40,9 @@ let currentStudent = null;
 let lessonIndex = 0;
 let mistakes = 0;
 
+// ===============================
+// LECCIÓN
+// ===============================
 const lesson = [
   { en: "Hello", es: "hola" },
   { en: "Goodbye", es: "adios" },
@@ -86,7 +89,9 @@ const studentsTable = document.getElementById("studentsTable");
 const connectedList = document.getElementById("connectedList");
 const exportBtn = document.getElementById("exportBtn");
 
-// Menú hamburguesa
+// ===============================
+// MENÚ HAMBURGUESA
+// ===============================
 const hamburger = document.getElementById("hamburger");
 const nav = document.getElementById("nav");
 
@@ -135,6 +140,8 @@ loginBtn.addEventListener("click", () => {
 
   loginCard.style.display = "none";
   mainContent.style.display = "block";
+  teacherLogin.style.display = "none";
+  teacherPanel.style.display = "none";
 
   userDisplay.textContent = "Welcome " + student.name;
 
@@ -145,13 +152,13 @@ loginBtn.addEventListener("click", () => {
 // CERRAR SESIÓN ALUMNO
 // ===============================
 logoutBtn.addEventListener("click", () => {
-  if (!currentStudent) location.reload();
-
-  let students = JSON.parse(localStorage.getItem("students")) || [];
-  students.forEach(s => {
-    if (currentStudent && s.name === currentStudent.name) s.online = false;
-  });
-  localStorage.setItem("students", JSON.stringify(students));
+  if (currentStudent) {
+    let students = JSON.parse(localStorage.getItem("students")) || [];
+    students.forEach(s => {
+      if (s.name === currentStudent.name) s.online = false;
+    });
+    localStorage.setItem("students", JSON.stringify(students));
+  }
 
   location.reload();
 });
@@ -228,7 +235,7 @@ checkBtn.addEventListener("click", () => {
 });
 
 // ===============================
-// MEDALLAS AUTOMÁTICAS
+// MEDALLAS
 // ===============================
 function assignMedal() {
   if (currentStudent.level >= 3) medalText.textContent = "🥇 Medalla Oro";
@@ -258,9 +265,9 @@ function updateUI() {
 // LOGIN MAESTRO
 // ===============================
 openTeacherBtn.addEventListener("click", () => {
-  teacherLogin.style.display = "block";
   loginCard.style.display = "none";
   mainContent.style.display = "none";
+  teacherLogin.style.display = "block";
 });
 
 teacherLoginBtn.addEventListener("click", () => {
@@ -274,12 +281,21 @@ teacherLoginBtn.addEventListener("click", () => {
 });
 
 // ===============================
-// CERRAR SESIÓN MAESTRO
+// 🔴 CERRAR SESIÓN MAESTRO (ARREGLADO)
 // ===============================
 closeTeacher.addEventListener("click", () => {
+
+  // Ocultar panel maestro
   teacherPanel.style.display = "none";
   teacherLogin.style.display = "none";
+
+  // Regresar a login normal
   loginCard.style.display = "block";
+  mainContent.style.display = "none";
+
+  // Limpiar campos
+  teacherUser.value = "";
+  teacherPass.value = "";
 });
 
 // ===============================
