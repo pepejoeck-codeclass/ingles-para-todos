@@ -37,6 +37,7 @@ let lessonIndex = 0;
 let currentStudent = null;
 let chartInstance = null;
 let autoRefresh = null;
+let sessionStart = null;
 
 // ===============================
 // ELEMENTOS
@@ -78,7 +79,6 @@ const closeTeacher = document.getElementById("closeTeacher");
 
 const studentsTable = document.getElementById("studentsTable");
 const connectedList = document.getElementById("connectedList");
-const exportBtn = document.getElementById("exportBtn");
 const groupSelect = document.getElementById("groupSelect");
 
 // ===============================
@@ -89,27 +89,24 @@ hamburger.addEventListener("click", () => {
 });
 
 // ===============================
-// 🌙 MODO OSCURO (ARREGLADO)
+// 🌙 MODO OSCURO
 // ===============================
 themeToggle.addEventListener("click", () => {
   document.body.classList.toggle("dark");
-
-  // Guardar preferencia
   localStorage.setItem("darkMode", document.body.classList.contains("dark"));
 });
-
-// Restaurar modo oscuro al cargar
 if (localStorage.getItem("darkMode") === "true") {
   document.body.classList.add("dark");
 }
 
 // ===============================
-// 🚪 CAMBIAR USUARIO (LOGOUT GENERAL)
+// 🚪 LOGOUT GENERAL
 // ===============================
 logoutBtn.addEventListener("click", () => {
   if (!confirm("¿Quieres cerrar sesión y cambiar de usuario?")) return;
 
   if (currentStudent) {
+    saveTimeWorked();
     let students = JSON.parse(localStorage.getItem("students")) || [];
     students = students.map(s => {
       if (s.name === currentStudent.name) s.online = false;
@@ -125,13 +122,6 @@ logoutBtn.addEventListener("click", () => {
   teacherPanel.style.display = "none";
   teacherLogin.style.display = "none";
   loginCard.style.display = "block";
-
-  usernameInput.value = "";
-  emailInput.value = "";
-  gradeInput.value = "";
-  groupInput.value = "";
-  feedback.textContent = "";
-  questionText.textContent = "Pulsa para comenzar";
 
   if (autoRefresh) clearInterval(autoRefresh);
 });
@@ -157,7 +147,11 @@ loginBtn.addEventListener("click", () => {
   let student = students.find(s => s.name === finalName && s.grade === grade && s.group === group);
 
   if (!student) {
-    student = { name: finalName, grade, group, score: 0, level: 1, stars: 0, online: true };
+    student = { 
+      name: finalName, grade, group, 
+      score: 0, level: 1, stars: 0, 
+      time: 0, history: [], online: true 
+    };
     students.push(student);
   } else {
     student.online = true;
@@ -165,6 +159,7 @@ loginBtn.addEventListener("click", () => {
 
   localStorage.setItem("students", JSON.stringify(students));
   currentStudent = student;
+  sessionStart = Date.now();
 
   loginCard.style.display = "none";
   mainContent.style.display = "block";
@@ -202,6 +197,13 @@ checkBtn.addEventListener("click", () => {
       currentStudent.level++;
       soundLevel.play();
       feedback.textContent = "🎉 SIGUIENTE NIVEL";
+
+      currentStudent.history.push({
+        date: new Date().toLocaleString(),
+        score: currentStudent.score,
+        level: currentStudent.level
+      });
+
       lessonIndex = 0;
     } else {
       setTimeout(showQuestion, 1000);
@@ -245,6 +247,17 @@ function saveStudent() {
 }
 
 // ===============================
+// ⏱ TIEMPO TRABAJADO
+// ===============================
+function saveTimeWorked() {
+  if (!currentStudent || !sessionStart) return;
+  const seconds = Math.floor((Date.now() - sessionStart) / 1000);
+  currentStudent.time += seconds;
+  sessionStart = null;
+  saveStudent();
+}
+
+// ===============================
 // LOGIN MAESTRO
 // ===============================
 openTeacherBtn.addEventListener("click", () => {
@@ -258,7 +271,7 @@ teacherLoginBtn.addEventListener("click", () => {
     teacherLogin.style.display = "none";
     teacherPanel.style.display = "block";
     loadTeacherPanel();
-    autoRefresh = setInterval(loadTeacherPanel, 5000);
+    autoRefresh = setInterval(loadTeacherPanel, 5000); // AUTO ACTUALIZA
   } else {
     alert("❌ Usuario o contraseña incorrectos");
   }
@@ -273,14 +286,12 @@ closeTeacher.addEventListener("click", () => {
 });
 
 // ===============================
-// 📊 PANEL MAESTRO (FILTRO POR GRUPO ARREGLADO)
+// 📊 PANEL MAESTRO
 // ===============================
 function loadTeacherPanel() {
   let students = JSON.parse(localStorage.getItem("students")) || [];
 
-  // Limpiar opciones y volver a crear
   groupSelect.innerHTML = `<option value="">Todos los grupos</option>`;
-
   const groups = [...new Set(students.map(s => s.group))];
   groups.forEach(g => {
     const opt = document.createElement("option");
@@ -301,23 +312,22 @@ function applyGroupFilter() {
     filtered = students.filter(s => s.group === selectedGroup);
   }
 
-  // Alumnos conectados
   connectedList.innerHTML = "";
   filtered.filter(s => s.online).forEach(s => {
     connectedList.innerHTML += `<li>${s.name} (${s.grade}-${s.group})</li>`;
   });
 
-  // Tabla ranking
   studentsTable.innerHTML = "";
   filtered.sort((a,b)=>b.score-a.score).forEach(s => {
     studentsTable.innerHTML += `
-      <tr>
+      <tr onclick="showStudentReport('${s.name}')">
         <td>${s.name}</td>
         <td>${s.grade}</td>
         <td>${s.group}</td>
         <td>${s.score}</td>
         <td>${s.level}</td>
         <td>${s.stars}</td>
+        <td>${Math.floor(s.time/60)} min</td>
       </tr>
     `;
   });
@@ -328,7 +338,7 @@ function applyGroupFilter() {
 groupSelect.addEventListener("change", applyGroupFilter);
 
 // ===============================
-// 📈 GRÁFICA
+// 📈 GRÁFICA GENERAL
 // ===============================
 function drawChart(students) {
   const ctx = document.getElementById("progressChart");
@@ -345,4 +355,25 @@ function drawChart(students) {
       }]
     }
   });
+}
+
+// ===============================
+// 🧾 REPORTE INDIVIDUAL
+// ===============================
+function showStudentReport(name) {
+  let students = JSON.parse(localStorage.getItem("students")) || [];
+  const s = students.find(st => st.name === name);
+
+  let report = `📘 REPORTE DE ${s.name}\n\n`;
+  report += `Grado: ${s.grade}\nGrupo: ${s.group}\n`;
+  report += `Puntaje: ${s.score}\nNivel: ${s.level}\n`;
+  report += `Estrellas: ${s.stars}\n`;
+  report += `Tiempo trabajado: ${Math.floor(s.time/60)} minutos\n\n`;
+  report += `📅 HISTORIAL:\n`;
+
+  s.history.forEach(h => {
+    report += `${h.date} → Puntaje: ${h.score} Nivel: ${h.level}\n`;
+  });
+
+  alert(report);
 }
