@@ -43,6 +43,7 @@ let autoRefresh = null;
 // ===============================
 const nav = document.getElementById("nav");
 const hamburger = document.getElementById("hamburger");
+const themeToggle = document.getElementById("themeToggle");
 
 const loginCard = document.getElementById("loginCard");
 const mainContent = document.getElementById("mainContent");
@@ -88,12 +89,26 @@ hamburger.addEventListener("click", () => {
 });
 
 // ===============================
+// 🌙 MODO OSCURO (ARREGLADO)
+// ===============================
+themeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+
+  // Guardar preferencia
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+});
+
+// Restaurar modo oscuro al cargar
+if (localStorage.getItem("darkMode") === "true") {
+  document.body.classList.add("dark");
+}
+
+// ===============================
 // 🚪 CAMBIAR USUARIO (LOGOUT GENERAL)
 // ===============================
 logoutBtn.addEventListener("click", () => {
   if (!confirm("¿Quieres cerrar sesión y cambiar de usuario?")) return;
 
-  // Marcar alumno como desconectado
   if (currentStudent) {
     let students = JSON.parse(localStorage.getItem("students")) || [];
     students = students.map(s => {
@@ -103,19 +118,14 @@ logoutBtn.addEventListener("click", () => {
     localStorage.setItem("students", JSON.stringify(students));
   }
 
-  // Limpiar estados
   currentStudent = null;
   lessonIndex = 0;
 
-  // Ocultar todo
   mainContent.style.display = "none";
   teacherPanel.style.display = "none";
   teacherLogin.style.display = "none";
-
-  // Mostrar login alumno
   loginCard.style.display = "block";
 
-  // Limpiar campos
   usernameInput.value = "";
   emailInput.value = "";
   gradeInput.value = "";
@@ -123,7 +133,6 @@ logoutBtn.addEventListener("click", () => {
   feedback.textContent = "";
   questionText.textContent = "Pulsa para comenzar";
 
-  // Detener actualización automática del maestro
   if (autoRefresh) clearInterval(autoRefresh);
 });
 
@@ -165,7 +174,7 @@ loginBtn.addEventListener("click", () => {
 });
 
 // ===============================
-// JUEGO
+// 🎮 JUEGO
 // ===============================
 startBtn.addEventListener("click", () => {
   unlockAudio();
@@ -256,8 +265,6 @@ teacherLoginBtn.addEventListener("click", () => {
 });
 
 // ===============================
-// CERRAR SESIÓN MAESTRO (BOTÓN INTERNO)
-// ===============================
 closeTeacher.addEventListener("click", () => {
   teacherPanel.style.display = "none";
   teacherLogin.style.display = "none";
@@ -266,31 +273,41 @@ closeTeacher.addEventListener("click", () => {
 });
 
 // ===============================
-// PANEL MAESTRO
+// 📊 PANEL MAESTRO (FILTRO POR GRUPO ARREGLADO)
 // ===============================
 function loadTeacherPanel() {
   let students = JSON.parse(localStorage.getItem("students")) || [];
 
-  if (groupSelect.options.length === 1) {
-    const groups = [...new Set(students.map(s => s.group))];
-    groups.forEach(g => {
-      const opt = document.createElement("option");
-      opt.value = g;
-      opt.textContent = g;
-      groupSelect.appendChild(opt);
-    });
-  }
+  // Limpiar opciones y volver a crear
+  groupSelect.innerHTML = `<option value="">Todos los grupos</option>`;
 
+  const groups = [...new Set(students.map(s => s.group))];
+  groups.forEach(g => {
+    const opt = document.createElement("option");
+    opt.value = g;
+    opt.textContent = g;
+    groupSelect.appendChild(opt);
+  });
+
+  applyGroupFilter();
+}
+
+function applyGroupFilter() {
+  let students = JSON.parse(localStorage.getItem("students")) || [];
   const selectedGroup = groupSelect.value;
 
   let filtered = students;
-  if (selectedGroup) filtered = students.filter(s => s.group === selectedGroup);
+  if (selectedGroup !== "") {
+    filtered = students.filter(s => s.group === selectedGroup);
+  }
 
+  // Alumnos conectados
   connectedList.innerHTML = "";
   filtered.filter(s => s.online).forEach(s => {
     connectedList.innerHTML += `<li>${s.name} (${s.grade}-${s.group})</li>`;
   });
 
+  // Tabla ranking
   studentsTable.innerHTML = "";
   filtered.sort((a,b)=>b.score-a.score).forEach(s => {
     studentsTable.innerHTML += `
@@ -308,10 +325,10 @@ function loadTeacherPanel() {
   drawChart(filtered);
 }
 
-groupSelect.addEventListener("change", loadTeacherPanel);
+groupSelect.addEventListener("change", applyGroupFilter);
 
 // ===============================
-// GRÁFICA
+// 📈 GRÁFICA
 // ===============================
 function drawChart(students) {
   const ctx = document.getElementById("progressChart");
