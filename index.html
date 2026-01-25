@@ -27,6 +27,9 @@
 
       <a href="#">Juegos</a>
       <a href="#">Progreso</a>
+
+      <!-- 👨‍🏫 BOTÓN MODO MAESTRO -->
+  <a href="#" id="openTeacher">👨‍🏫 Modo Maestro</a>
     </nav>
   </header>
 
@@ -76,6 +79,29 @@
       <p id="scoreText">0 puntos</p>
       <p id="levelText">Nivel 1</p>
     </section>
+
+    <!-- ===== PANEL MAESTRO 👨‍🏫 ===== -->
+<section id="teacherPanel" style="display:none;" class="card">
+  <h2>👨‍🏫 Panel del Maestro</h2>
+
+  <table border="1" width="100%">
+    <thead>
+      <tr>
+        <th>Alumno</th>
+        <th>Grado</th>
+        <th>Grupo</th>
+        <th>Puntaje</th>
+        <th>Nivel</th>
+      </tr>
+    </thead>
+    <tbody id="studentsTable"></tbody>
+  </table>
+
+  <br>
+
+  <button id="exportExcel">📥 Exportar a Excel</button>
+  <button id="closeTeacher">❌ Cerrar</button>
+</section>
 
   </main>
 
