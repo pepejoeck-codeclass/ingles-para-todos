@@ -6,6 +6,11 @@ let score = 0;
 let level = 1;
 let stars = 0;
 
+// 🔊 SONIDOS
+const soundCorrect = new Audio("sounds/correct.mp3");
+const soundError = new Audio("sounds/error.mp3");
+const soundLevel = new Audio("sounds/levelup.mp3");
+
 // MENSAJES MOTIVADORES
 const messages = [
   "🔥 Excellent job",
@@ -116,15 +121,23 @@ document.addEventListener("DOMContentLoaded", () => {
       score += 5;
       stars++;
 
+      // 🔊 SONIDO DE ACIERTO
+      soundCorrect.play();
+
       const msg = messages[Math.floor(Math.random() * messages.length)];
       alert(msg + " ⭐ +1 estrella");
 
     } else {
+      // 🔊 SONIDO DE ERROR
+      soundError.play();
       alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
     }
 
     if (score >= level * 20) {
       level++;
+
+      // 🔊 SONIDO SUBIR NIVEL
+      soundLevel.play();
       alert("🎉 Subiste de nivel");
     }
 
