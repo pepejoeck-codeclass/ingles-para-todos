@@ -7,9 +7,35 @@ let level = 1;
 let stars = 0;
 
 // 🔊 SONIDOS
-const soundCorrect = new Audio("sounds/correct.mp3");
-const soundError = new Audio("sounds/error.mp3");
-const soundLevel = new Audio("sounds/levelup.mp3");
+// 🔊 SONIDOS (DESBLOQUEO DE AUDIO)
+let soundCorrect = new Audio("sounds/correct.mp3");
+let soundError = new Audio("sounds/error.mp3");
+let soundLevel = new Audio("sounds/levelup.mp3");
+
+let audioUnlocked = false;
+
+// Desbloquear audio con el primer clic del usuario
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  soundCorrect.play().then(() => {
+    soundCorrect.pause();
+    soundCorrect.currentTime = 0;
+  }).catch(() => {});
+
+  soundError.play().then(() => {
+    soundError.pause();
+    soundError.currentTime = 0;
+  }).catch(() => {});
+
+  soundLevel.play().then(() => {
+    soundLevel.pause();
+    soundLevel.currentTime = 0;
+  }).catch(() => {});
+
+  audioUnlocked = true;
+  console.log("🔊 Audio desbloqueado correctamente");
+}
 
 // MENSAJES MOTIVADORES
 const messages = [
@@ -106,6 +132,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentQuestion = null;
 
   startBtn.addEventListener("click", () => {
+
+  // 🔓 Desbloquear audio en el primer clic
+  unlockAudio();
+
     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
     questionText.textContent = `¿Cómo se dice "${currentQuestion.en}" en español?`;
     answerInput.value = "";
@@ -122,14 +152,16 @@ document.addEventListener("DOMContentLoaded", () => {
       stars++;
 
       // 🔊 SONIDO DE ACIERTO
-      soundCorrect.play();
+      soundCorrect.currentTime = 0;
+soundCorrect.play();
 
       const msg = messages[Math.floor(Math.random() * messages.length)];
       alert(msg + " ⭐ +1 estrella");
 
     } else {
       // 🔊 SONIDO DE ERROR
-      soundError.play();
+      soundError.currentTime = 0;
+soundError.play();
       alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
     }
 
@@ -137,7 +169,8 @@ document.addEventListener("DOMContentLoaded", () => {
       level++;
 
       // 🔊 SONIDO SUBIR NIVEL
-      soundLevel.play();
+      soundLevel.currentTime = 0;
+soundLevel.play();
       alert("🎉 Subiste de nivel");
     }
 
