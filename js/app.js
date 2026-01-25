@@ -12,7 +12,7 @@ let stars = 0;
 
 const TEACHER_PASSWORD = "161286";
 
-// 📚 LECCIÓN (debe contestar todas bien)
+// 📚 LECCIÓN (todas correctas o se reinicia)
 const lesson = [
   { en: "Hello", es: "hola" },
   { en: "Goodbye", es: "adiós" },
@@ -31,9 +31,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const gradeInput = document.getElementById("gradeInput");
   const groupInput = document.getElementById("groupInput");
   const usernameInput = document.getElementById("usernameInput");
+  const emailInput = document.getElementById("emailInput");
 
   const loginBtn = document.getElementById("loginBtn");
   const logoutBtn = document.getElementById("logoutBtn");
+
+  const hamburger = document.getElementById("hamburger");
+  const nav = document.getElementById("nav");
 
   const startBtn = document.getElementById("startGame");
   const checkBtn = document.getElementById("checkAnswer");
@@ -53,22 +57,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeTeacher = document.getElementById("closeTeacher");
   const exportBtn = document.getElementById("exportBtn");
 
+  // ☰ HAMBURGUESA
+  hamburger.addEventListener("click", () => {
+    nav.style.display = nav.style.display === "block" ? "none" : "block";
+  });
+
   // AUTO LOGIN
   if (username) {
     loginCard.style.display = "none";
     mainContent.style.display = "block";
-    userDisplay.textContent = "👤 " + username;
+    userDisplay.textContent = "Welcome " + username;
     loadProgress();
   }
 
   // LOGIN
   loginBtn.addEventListener("click", () => {
-    const name = usernameInput.value.trim();
-    const grade = gradeInput.value;
-    const group = groupInput.value;
+    let name = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+    const grade = gradeInput.value.trim();
+    const group = groupInput.value.trim();
+
+    if (!name && email) name = email;
 
     if (!name || !grade || !group) {
-      alert("Completa nombre, grado y grupo");
+      alert("Completa nombre (o correo), grado y grupo");
       return;
     }
 
@@ -79,14 +91,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loginCard.style.display = "none";
     mainContent.style.display = "block";
-    userDisplay.textContent = "👤 " + username;
+    userDisplay.textContent = "Welcome " + username;
 
     loadProgress();
   });
 
   // LOGOUT
   logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("username");
+    localStorage.clear();
     location.reload();
   });
 
@@ -121,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
           soundLevel.play();
           feedback.textContent = "🎉 ¡Lección perfecta! Subiste de nivel";
         } else {
-          feedback.textContent = "❌ Fallaste una vez, intenta la lección otra vez";
+          feedback.textContent = "❌ Fallaste antes, repite toda la lección";
           currentIndex = 0;
           mistakes = 0;
           return;
@@ -167,7 +179,6 @@ document.addEventListener("DOMContentLoaded", () => {
     teacherPanel.style.display = "none";
   });
 
-  // EXPORTAR EXCEL
   exportBtn.addEventListener("click", exportToCSV);
 
 });
@@ -195,12 +206,12 @@ function loadProgress() {
 function assignMedal() {
   const medalText = document.getElementById("medalText");
 
-  if (level >= 5) medalText.textContent = "🥇 Oro";
-  else if (level >= 3) medalText.textContent = "🥈 Plata";
-  else medalText.textContent = "🥉 Bronce";
+  if (level >= 5) medalText.textContent = "🥇 Medalla Oro";
+  else if (level >= 3) medalText.textContent = "🥈 Medalla Plata";
+  else medalText.textContent = "🥉 Medalla Bronce";
 }
 
-// 👨‍🎓 ALUMNOS
+// 👨‍🎓 REGISTRO DE ALUMNOS
 function registerStudent(name, grade, group) {
   let students = JSON.parse(localStorage.getItem("studentsList")) || [];
 
@@ -231,7 +242,6 @@ function loadTeacherPanel() {
   table.innerHTML = "";
 
   let students = JSON.parse(localStorage.getItem("studentsList")) || [];
-
   students.sort((a, b) => b.score - a.score);
 
   students.forEach(s => {
