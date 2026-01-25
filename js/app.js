@@ -34,16 +34,11 @@ const messages = [
 ];
 
 // ===============================
-// DATOS
-// ===============================
 let currentStudent = null;
 let lessonIndex = 0;
 let mistakes = 0;
 let chartInstance = null;
 
-// ===============================
-// LECCIÓN
-// ===============================
 const lesson = [
   { en: "Hello", es: "hola" },
   { en: "Goodbye", es: "adios" },
@@ -123,15 +118,7 @@ loginBtn.addEventListener("click", () => {
   let student = students.find(s => s.name === finalName && s.grade === grade && s.group === group);
 
   if (!student) {
-    student = {
-      name: finalName,
-      grade,
-      group,
-      score: 0,
-      level: 1,
-      stars: 0,
-      online: true
-    };
+    student = { name: finalName, grade, group, score: 0, level: 1, stars: 0, online: true };
     students.push(student);
   } else {
     student.online = true;
@@ -161,7 +148,6 @@ logoutBtn.addEventListener("click", () => {
     });
     localStorage.setItem("students", JSON.stringify(students));
   }
-
   location.reload();
 });
 
@@ -188,7 +174,6 @@ checkBtn.addEventListener("click", () => {
 
   if (userAnswer === correct) {
 
-    soundCorrect.currentTime = 0;
     soundCorrect.play();
 
     const msg = messages[Math.floor(Math.random() * messages.length)];
@@ -200,33 +185,22 @@ checkBtn.addEventListener("click", () => {
     currentStudent.stars += 1;
 
     if (lessonIndex >= lesson.length) {
-
       if (mistakes === 0) {
         currentStudent.level++;
-
-        soundLevel.currentTime = 0;
         soundLevel.play();
-
         feedback.textContent = "🎉 SIGUIENTE NIVEL 🎉";
-        feedback.style.color = "gold";
       } else {
         feedback.textContent = "❌ Fallaste, reinicia la lección";
         lessonIndex = 0;
         mistakes = 0;
         return;
       }
-    } else {
-      showQuestion();
-    }
+    } else showQuestion();
 
   } else {
-
-    soundError.currentTime = 0;
     soundError.play();
-
     mistakes++;
     feedback.textContent = "❌ Incorrecto, reinicia toda la lección";
-    feedback.style.color = "red";
     lessonIndex = 0;
     mistakes = 0;
   }
@@ -250,10 +224,7 @@ function assignMedal() {
 // ===============================
 function saveProgress() {
   let students = JSON.parse(localStorage.getItem("students")) || [];
-  students = students.map(s => {
-    if (currentStudent && s.name === currentStudent.name) return currentStudent;
-    return s;
-  });
+  students = students.map(s => s.name === currentStudent.name ? currentStudent : s);
   localStorage.setItem("students", JSON.stringify(students));
 }
 
@@ -269,48 +240,36 @@ function updateUI() {
 openTeacherBtn.addEventListener("click", () => {
   loginCard.style.display = "none";
   mainContent.style.display = "none";
+  teacherPanel.style.display = "none";
   teacherLogin.style.display = "block";
 });
 
 teacherLoginBtn.addEventListener("click", () => {
   if (teacherUser.value === "Jose de Jesus Ramos Flores" && teacherPass.value === "161286") {
-
-    localStorage.setItem("teacherLogged", "true");
-
     teacherLogin.style.display = "none";
     teacherPanel.style.display = "block";
     loadTeacherPanel();
-
   } else {
     alert("❌ Usuario o contraseña incorrectos");
   }
 });
 
 // ===============================
-// 🔴 CERRAR SESIÓN MAESTRO (ARREGLADO 100%)
+// 🔴 CERRAR SESIÓN MAESTRO (YA FUNCIONA 100%)
 // ===============================
 closeTeacher.addEventListener("click", () => {
-
-  // BORRAR SESIÓN MAESTRO
-  localStorage.removeItem("teacherLogged");
-
-  // LIMPIAR CAMPOS
-  teacherUser.value = "";
-  teacherPass.value = "";
-
-  // OCULTAR PANEL
   teacherPanel.style.display = "none";
   teacherLogin.style.display = "none";
-
-  // MOSTRAR LOGIN PRINCIPAL
   loginCard.style.display = "block";
-  mainContent.style.display = "none";
+
+  teacherUser.value = "";
+  teacherPass.value = "";
 
   alert("Sesión de maestro cerrada correctamente 👋");
 });
 
 // ===============================
-// 🔄 ACTUALIZAR EN VIVO
+// 🔄 ACTUALIZAR
 // ===============================
 refreshBtn.addEventListener("click", () => {
   loadTeacherPanel();
@@ -382,16 +341,3 @@ function drawChart(students) {
     }
   });
 }
-
-// ===============================
-// AUTO ABRIR MAESTRO SI YA ESTABA LOGUEADO
-// ===============================
-window.addEventListener("load", () => {
-  if (localStorage.getItem("teacherLogged") === "true") {
-    loginCard.style.display = "none";
-    mainContent.style.display = "none";
-    teacherLogin.style.display = "none";
-    teacherPanel.style.display = "block";
-    loadTeacherPanel();
-  }
-});
