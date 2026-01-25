@@ -1,43 +1,38 @@
-// 🔐 CONTRASEÑA SECRETA DEL MAESTRO
-const TEACHER_PASSWORD = "161286";
-
-let username = localStorage.getItem("username");
-let score = 0;
-let level = 1;
-let stars = 0;
-
-// 🔊 SONIDOS
-// 🔊 SONIDOS (DESBLOQUEO DE AUDIO)
+// ===============================
+// 🔊 SONIDOS (DESBLOQUEO CORRECTO)
+// ===============================
 let soundCorrect = new Audio("sounds/correct.mp3");
 let soundError = new Audio("sounds/error.mp3");
 let soundLevel = new Audio("sounds/levelup.mp3");
 
 let audioUnlocked = false;
 
-// Desbloquear audio con el primer clic del usuario
 function unlockAudio() {
   if (audioUnlocked) return;
 
-  soundCorrect.play().then(() => {
-    soundCorrect.pause();
-    soundCorrect.currentTime = 0;
-  }).catch(() => {});
-
-  soundError.play().then(() => {
-    soundError.pause();
-    soundError.currentTime = 0;
-  }).catch(() => {});
-
-  soundLevel.play().then(() => {
-    soundLevel.pause();
-    soundLevel.currentTime = 0;
-  }).catch(() => {});
+  [soundCorrect, soundError, soundLevel].forEach(sound => {
+    sound.play().then(() => {
+      sound.pause();
+      sound.currentTime = 0;
+    }).catch(() => {});
+  });
 
   audioUnlocked = true;
-  console.log("🔊 Audio desbloqueado correctamente");
+  console.log("🔊 Audio desbloqueado");
 }
 
-// MENSAJES MOTIVADORES
+// ===============================
+// VARIABLES PRINCIPALES
+// ===============================
+let username = localStorage.getItem("username");
+let score = 0;
+let level = 1;
+let stars = 0;
+
+// 🔐 CONTRASEÑA MAESTRO
+const TEACHER_PASSWORD = "161286";
+
+// 💬 MENSAJES MOTIVADORES
 const messages = [
   "🔥 Excellent job",
   "⭐ You're doing great",
@@ -46,8 +41,12 @@ const messages = [
   "🎯 Perfect"
 ];
 
+// ===============================
+// INICIO
+// ===============================
 document.addEventListener("DOMContentLoaded", () => {
 
+  // ELEMENTOS
   const loginCard = document.getElementById("loginCard");
   const mainContent = document.getElementById("mainContent");
   const nav = document.getElementById("nav");
@@ -76,14 +75,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const starsText = document.getElementById("starsText");
   const medalText = document.getElementById("medalText");
 
-  // ===== AUTO LOGIN =====
+  // AUTO LOGIN
   if (username) {
     loginCard.style.display = "none";
     mainContent.style.display = "block";
     loadProgress();
   }
 
-  // ===== LOGIN =====
+  // LOGIN
   loginBtn.addEventListener("click", () => {
     const name = usernameInput.value.trim();
     const email = emailInput.value.trim();
@@ -103,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     registerStudent();
   });
 
-  // ===== LOGOUT =====
+  // LOGOUT
   logoutBtn.addEventListener("click", () => {
     if (confirm("¿Quieres cerrar sesión y cambiar de usuario?")) {
       localStorage.removeItem("username");
@@ -111,17 +110,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ===== MENÚ HAMBURGUESA =====
+  // MENÚ HAMBURGUESA
   hamburger.addEventListener("click", () => {
     nav.classList.toggle("open");
   });
 
-  // ===== MODO OSCURO =====
+  // MODO OSCURO
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
   });
 
-  // ===== JUEGO =====
+  // ===============================
+  // JUEGO
+  // ===============================
   const questions = [
     { en: "Hello", es: "Hola" },
     { en: "Goodbye", es: "Adiós" },
@@ -132,9 +133,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentQuestion = null;
 
   startBtn.addEventListener("click", () => {
-
-  // 🔓 Desbloquear audio en el primer clic
-  unlockAudio();
+    // 🔓 desbloquear audio aquí
+    unlockAudio();
 
     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
     questionText.textContent = `¿Cómo se dice "${currentQuestion.en}" en español?`;
@@ -151,26 +151,28 @@ document.addEventListener("DOMContentLoaded", () => {
       score += 5;
       stars++;
 
-      // 🔊 SONIDO DE ACIERTO
+      // 🔊 sonido correcto
       soundCorrect.currentTime = 0;
-soundCorrect.play();
+      soundCorrect.play();
 
       const msg = messages[Math.floor(Math.random() * messages.length)];
       alert(msg + " ⭐ +1 estrella");
 
     } else {
-      // 🔊 SONIDO DE ERROR
+      // 🔊 sonido error
       soundError.currentTime = 0;
-soundError.play();
+      soundError.play();
+
       alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
     }
 
     if (score >= level * 20) {
       level++;
 
-      // 🔊 SONIDO SUBIR NIVEL
+      // 🔊 sonido subir nivel
       soundLevel.currentTime = 0;
-soundLevel.play();
+      soundLevel.play();
+
       alert("🎉 Subiste de nivel");
     }
 
@@ -186,25 +188,30 @@ soundLevel.play();
     currentQuestion = null;
   });
 
-  // 🔐 ===== MODO MAESTRO CON CONTRASEÑA =====
+  // ===============================
+  // 🔐 MODO MAESTRO CON CONTRASEÑA
+  // ===============================
   openTeacher.addEventListener("click", (e) => {
     e.preventDefault();
 
-    const pass = prompt("🔐 Ingresa la contraseña del Maestro:");
+    const pass = prompt("🔐 Ingresa la contraseña del maestro:");
 
-    if (pass === TEACHER_PASSWORD) {
-      teacherPanel.style.display = "block";
-      loadStudentsForTeacher();
-    } else {
-      alert("❌ Contraseña incorrecta. Acceso denegado.");
+    if (pass !== TEACHER_PASSWORD) {
+      alert("❌ Contraseña incorrecta");
+      return;
     }
+
+    teacherPanel.style.display = "block";
+    loadStudentsForTeacher();
   });
 
   closeTeacher.addEventListener("click", () => {
     teacherPanel.style.display = "none";
   });
 
-  // ===== EXPORTAR A EXCEL =====
+  // ===============================
+  // 📥 EXPORTAR A EXCEL (CSV)
+  // ===============================
   exportExcel.addEventListener("click", () => {
 
     let students = JSON.parse(localStorage.getItem("studentsList")) || [];
@@ -233,7 +240,9 @@ soundLevel.play();
 
 });
 
-// ===== PROGRESO =====
+// ===============================
+// 💾 PROGRESO
+// ===============================
 function saveProgress() {
   if (!username) return;
   localStorage.setItem(`user_${username}_score`, score);
@@ -255,7 +264,9 @@ function loadProgress() {
   assignMedal();
 }
 
-// ===== MEDALLAS =====
+// ===============================
+// 🏅 MEDALLAS
+// ===============================
 function assignMedal() {
   const medalText = document.getElementById("medalText");
 
@@ -268,7 +279,9 @@ function assignMedal() {
   }
 }
 
-// ===== REGISTRAR ALUMNOS =====
+// ===============================
+// 👨‍🎓 REGISTRAR ALUMNOS
+// ===============================
 function registerStudent() {
   let students = JSON.parse(localStorage.getItem("studentsList")) || [];
 
@@ -297,7 +310,9 @@ function updateStudentProgress() {
   localStorage.setItem("studentsList", JSON.stringify(students));
 }
 
-// ===== PANEL MAESTRO =====
+// ===============================
+// 📊 PANEL MAESTRO
+// ===============================
 function loadStudentsForTeacher() {
   const table = document.getElementById("studentsTable");
   table.innerHTML = "";
