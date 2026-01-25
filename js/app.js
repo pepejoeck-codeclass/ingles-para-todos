@@ -65,8 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ===== CERRAR SESIÓN (SIN BORRAR PROGRESO) =====
   logoutBtn.addEventListener("click", () => {
-    if (confirm("¿Quieres cerrar sesión?")) {
-      localStorage.removeItem("username"); // solo cerrar sesión
+    if (confirm("¿Quieres cerrar sesión y cambiar de usuario?")) {
+      localStorage.removeItem("username"); // SOLO cerrar sesión
       location.reload();
     }
   });
