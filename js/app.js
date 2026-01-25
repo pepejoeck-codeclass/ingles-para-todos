@@ -1,5 +1,5 @@
 // ===============================
-// 🔊 SONIDOS (RUTAS CORRECTAS)
+// 🔊 SONIDOS (RUTA CORRECTA)
 // ===============================
 const soundCorrect = new Audio("assets/sounds/correct.mp3");
 const soundError   = new Audio("assets/sounds/wrong.mp3");
@@ -20,11 +20,10 @@ function unlockAudio() {
   });
 
   audioUnlocked = true;
-  console.log("🔊 Audio desbloqueado");
 }
 
 // ===============================
-// VARIABLES PRINCIPALES
+// VARIABLES
 // ===============================
 let username = localStorage.getItem("username");
 let score = 0;
@@ -32,7 +31,7 @@ let level = 1;
 let stars = 0;
 
 // ===============================
-// MENSAJES MOTIVADORES
+// MENSAJES
 // ===============================
 const messages = [
   "🔥 Excellent job",
@@ -47,7 +46,7 @@ const messages = [
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ELEMENTOS LOGIN
+  // LOGIN
   const loginCard = document.getElementById("loginCard");
   const mainContent = document.getElementById("mainContent");
 
@@ -58,7 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginBtn = document.getElementById("loginBtn");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  // ELEMENTOS JUEGO
+  // MENÚ
+  const hamburger = document.getElementById("hamburger");
+  const nav = document.getElementById("nav");
+
+  // JUEGO
   const startBtn = document.getElementById("startGame");
   const checkBtn = document.getElementById("checkAnswer");
   const questionText = document.getElementById("questionText");
@@ -89,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const group = groupInput.value.trim();
 
     if ((!name && !email) || !grade || !group) {
-      alert("Por favor escribe Nombre o Correo, Grado y Grupo");
+      alert("Escribe nombre o correo, grado y grupo");
       return;
     }
 
@@ -108,10 +111,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // LOGOUT
   // ===============================
   logoutBtn.addEventListener("click", () => {
-    if (confirm("¿Quieres cambiar de usuario?")) {
+    if (confirm("¿Cambiar de usuario?")) {
       localStorage.removeItem("username");
       location.reload();
     }
+  });
+
+  // ===============================
+  // MENÚ HAMBURGUESA
+  // ===============================
+  hamburger.addEventListener("click", () => {
+    nav.classList.toggle("open");
   });
 
   // ===============================
@@ -184,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ===============================
-// ✍️ NORMALIZAR TEXTO
+// NORMALIZAR TEXTO (QUITAR ACENTOS)
 // ===============================
 function normalize(text) {
   return text
@@ -212,7 +222,7 @@ function loadProgress() {
   stars = parseInt(localStorage.getItem(`user_${username}_stars`)) || 0;
 
   document.getElementById("scoreText").textContent = score + " puntos";
-  document.getElementById("levelText").textContent = "Nivel " + level";
+  document.getElementById("levelText").textContent = "Nivel " + level;
   document.getElementById("starsText").textContent = "⭐ Estrellas: " + stars;
 
   assignMedal();
