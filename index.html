@@ -11,7 +11,6 @@
 <header>
   <h1>Inglés Para Todos</h1>
 
-  <!-- BOTÓN CAMBIAR USUARIO FUERA DEL MENÚ -->
   <button id="logoutBtn">🚪 Cambiar usuario</button>
 
   <div class="header-buttons">
@@ -19,7 +18,7 @@
     <button id="hamburger" class="hamburger">☰</button>
   </div>
 
-  <!-- MENÚ HAMBURGUESA -->
+  <!-- MENÚ -->
   <nav id="nav">
     <a href="#">Lección 1</a>
     <a href="#">Lección 2 🔒</a>
@@ -28,9 +27,8 @@
     <a href="#">Juegos</a>
     <a href="#">Progreso</a>
 
-    <button id="openTeacher" type="button" class="menu-btn">
-      👨‍🏫 Modo Maestro
-    </button>
+    <!-- BOTÓN SOLO MAESTRO -->
+    <a href="#" id="openTeacher">👨‍🏫 Modo Maestro</a>
   </nav>
 </header>
 
@@ -61,6 +59,9 @@
 
     <button id="startGame">Iniciar ejercicio</button>
     <button id="checkAnswer">Responder</button>
+
+    <p id="starsText">⭐ Estrellas: 0</p>
+    <p id="medalText"></p>
   </section>
 
   <!-- PUNTAJE -->
@@ -72,7 +73,7 @@
 
   <!-- PANEL MAESTRO -->
   <section id="teacherPanel" class="card" style="display:none;">
-    <h2>👨‍🏫 Panel del Maestro</h2>
+    <h2>👨‍🏫 Panel del Maestro Principal</h2>
 
     <table border="1" width="100%">
       <thead>
@@ -82,12 +83,16 @@
           <th>Grupo</th>
           <th>Puntaje</th>
           <th>Nivel</th>
+          <th>Estrellas</th>
         </tr>
       </thead>
       <tbody id="studentsTable"></tbody>
     </table>
 
     <br>
+
+    <button id="exportExcel">📥 Exportar a Excel</button>
+    <br><br>
     <button id="closeTeacher">❌ Cerrar</button>
   </section>
 
