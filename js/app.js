@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const mainContent = document.getElementById("mainContent");
   const usernameInput = document.getElementById("usernameInput");
   const loginBtn = document.getElementById("loginBtn");
+  const emailInput = document.getElementById("emailInput");
   const logoutBtn = document.getElementById("logoutBtn");
 
   // Si ya había usuario guardado → entrar automático
@@ -46,22 +47,29 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProgress();
   }
 
-  loginBtn.addEventListener("click", () => {
-    const name = usernameInput.value.trim();
+ loginBtn.addEventListener("click", () => {
+  const name = usernameInput.value.trim();
+  const email = emailInput.value.trim();
 
-    if (!name) {
-      alert("Escribe tu nombre 🙂");
-      return;
-    }
+  if (!name && !email) {
+    alert("Escribe tu nombre o tu correo 🙂");
+    return;
+  }
 
+  // Si usó correo, ese será su identificador
+  if (email) {
+    username = email.toLowerCase();
+  } else {
     username = name;
-    localStorage.setItem("username", username);
+  }
 
-    loginCard.style.display = "none";
-    mainContent.style.display = "block";
+  localStorage.setItem("username", username);
 
-    loadProgress();
-  });
+  loginCard.style.display = "none";
+  mainContent.style.display = "block";
+
+  loadProgress();
+});
 
   // ===== CERRAR SESIÓN (SIN BORRAR PROGRESO) =====
   logoutBtn.addEventListener("click", () => {
