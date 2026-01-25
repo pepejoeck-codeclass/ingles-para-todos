@@ -264,7 +264,7 @@ function updateUI() {
 }
 
 // ===============================
-// LOGIN MAESTRO (CON SESIÓN RECORDADA)
+// LOGIN MAESTRO
 // ===============================
 openTeacherBtn.addEventListener("click", () => {
   loginCard.style.display = "none";
@@ -287,24 +287,30 @@ teacherLoginBtn.addEventListener("click", () => {
 });
 
 // ===============================
-// 🔴 CERRAR SESIÓN MAESTRO (LIMPIA SESIÓN)
+// 🔴 CERRAR SESIÓN MAESTRO (ARREGLADO 100%)
 // ===============================
 closeTeacher.addEventListener("click", () => {
 
+  // BORRAR SESIÓN MAESTRO
   localStorage.removeItem("teacherLogged");
 
+  // LIMPIAR CAMPOS
+  teacherUser.value = "";
+  teacherPass.value = "";
+
+  // OCULTAR PANEL
   teacherPanel.style.display = "none";
   teacherLogin.style.display = "none";
 
+  // MOSTRAR LOGIN PRINCIPAL
   loginCard.style.display = "block";
   mainContent.style.display = "none";
 
-  teacherUser.value = "";
-  teacherPass.value = "";
+  alert("Sesión de maestro cerrada correctamente 👋");
 });
 
 // ===============================
-// 🔄 BOTÓN ACTUALIZAR EN VIVO
+// 🔄 ACTUALIZAR EN VIVO
 // ===============================
 refreshBtn.addEventListener("click", () => {
   loadTeacherPanel();
@@ -378,7 +384,7 @@ function drawChart(students) {
 }
 
 // ===============================
-// 🟢 AUTO-ABRIR PANEL MAESTRO SI YA ESTABA LOGUEADO
+// AUTO ABRIR MAESTRO SI YA ESTABA LOGUEADO
 // ===============================
 window.addEventListener("load", () => {
   if (localStorage.getItem("teacherLogged") === "true") {
