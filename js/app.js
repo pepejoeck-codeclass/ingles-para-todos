@@ -1,206 +1,272 @@
-// --- CONFIGURACIÓN DE FIREBASE ---
-// 1. Reemplaza este objeto con el que copiaste de tu consola de Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyD-ejemplo-clave-api",
-    authDomain: "tu-proyecto.firebaseapp.com",
-    databaseURL: "https://tu-proyecto-default-rtdb.firebaseio.com",
-    projectId: "tu-proyecto",
-    storageBucket: "tu-proyecto.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef"
-};
+// ===============================
+// DATOS GLOBALES
+// ===============================
+let currentStudent = null;
+let lessonIndex = 0;
+let mistakes = 0;
 
-// Inicializar Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const db = firebase.database();
+const lesson = [
+  { en: "Hello", es: "hola" },
+  { en: "Goodbye", es: "adios" },
+  { en: "Please", es: "por favor" },
+  { en: "Thank you", es: "gracias" }
+];
 
-// --- VARIABLES GLOBALES ---
-let currentUser = null;
-let currentScore = 0;
+// ===============================
+// ELEMENTOS
+// ===============================
+const loginCard = document.getElementById("loginCard");
+const mainContent = document.getElementById("mainContent");
+const userDisplay = document.getElementById("userDisplay");
 
-// --- FUNCIONES DE NAVEGACIÓN ---
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-}
+const usernameInput = document.getElementById("usernameInput");
+const gradeInput = document.getElementById("gradeInput");
+const groupInput = document.getElementById("groupInput");
+const loginBtn = document.getElementById("loginBtn");
 
-function showTeacherLogin() {
-    document.getElementById('teacher-login-form').classList.remove('hidden');
-}
+const logoutBtn = document.getElementById("logoutBtn");
 
-// --- LOGIN MAESTRO ---
-function loginTeacher() {
-    const user = document.getElementById('teacher-user').value.trim();
-    const pass = document.getElementById('teacher-pass').value.trim();
+const startBtn = document.getElementById("startGame");
+const checkBtn = document.getElementById("checkAnswer");
+const questionText = document.getElementById("questionText");
+const answerInput = document.getElementById("answerInput");
+const feedback = document.getElementById("feedback");
 
-    // Verificación fija solicitada
-    if (user === "Jose de Jesus Ramos Flores" && pass === "161286") {
-        currentUser = { name: user, role: 'teacher' };
-        alert("¡Bienvenido Profesor Jose de Jesus!");
-        showScreen('teacher-dashboard');
-        initTeacherView(); // Iniciar monitoreo en tiempo real
-    } else {
-        alert("Usuario o contraseña incorrectos");
-    }
-}
+const scoreText = document.getElementById("scoreText");
+const levelText = document.getElementById("levelText");
+const starsText = document.getElementById("starsText");
+const medalText = document.getElementById("medalText");
 
-// --- LOGIN ALUMNO ---
-function loginStudent() {
-    const name = document.getElementById('student-name').value.trim();
-    const grade = document.getElementById('student-grade').value;
-    const group = document.getElementById('student-group').value;
+// Maestro
+const openTeacherBtn = document.getElementById("openTeacherBtn");
+const teacherLogin = document.getElementById("teacherLogin");
+const teacherPanel = document.getElementById("teacherPanel");
+const teacherLoginBtn = document.getElementById("teacherLoginBtn");
+const teacherUser = document.getElementById("teacherUser");
+const teacherPass = document.getElementById("teacherPass");
+const closeTeacher = document.getElementById("closeTeacher");
 
-    if (!name || !grade || !group) {
-        alert("Por favor llena todos los datos");
-        return;
-    }
+const studentsTable = document.getElementById("studentsTable");
+const connectedList = document.getElementById("connectedList");
+const exportBtn = document.getElementById("exportBtn");
 
-    // Crear ID único simple (nombre + grado + grupo sin espacios)
-    const studentId = (name + grade + group).replace(/\s+/g, '').toLowerCase();
+// Menú
+const hamburger = document.getElementById("hamburger");
+const nav = document.getElementById("nav");
 
-    currentUser = {
-        id: studentId,
-        name: name,
-        grade: grade,
-        group: group,
-        role: 'student'
+hamburger.addEventListener("click", () => {
+  nav.style.display = nav.style.display === "block" ? "none" : "block";
+});
+
+// ===============================
+// LOGIN ALUMNO
+// ===============================
+loginBtn.addEventListener("click", () => {
+  const name = usernameInput.value.trim();
+  const grade = gradeInput.value.trim();
+  const group = groupInput.value.trim();
+
+  if (!name || !grade || !group) {
+    alert("Completa nombre, grado y grupo");
+    return;
+  }
+
+  let students = JSON.parse(localStorage.getItem("students")) || [];
+
+  let student = students.find(s => s.name === name && s.grade === grade && s.group === group);
+
+  if (!student) {
+    student = {
+      name, grade, group,
+      score: 0,
+      level: 1,
+      stars: 0,
+      online: true
     };
+    students.push(student);
+  } else {
+    student.online = true;
+  }
 
-    // 1. Guardar/Actualizar usuario en base de datos
-    // 2. Marcar como conectado (Online)
-    const userRef = db.ref('students/' + studentId);
-    
-    userRef.update({
-        name: name,
-        grade: grade,
-        group: group,
-        lastLogin: new Date().toISOString(),
-        online: true
-    }).then(() => {
-        // Escuchar cambios en su puntaje para mostrarlo
-        userRef.child('score').once('value', (snapshot) => {
-            currentScore = snapshot.val() || 0;
-            document.getElementById('display-score').innerText = currentScore;
-            document.getElementById('welcome-msg').innerText = `Hola, ${name}`;
-            
-            // Configurar desconexión automática (para quitar "En línea" si cierra la pestaña)
-            userRef.child('online').onDisconnect().set(false);
-            
-            showScreen('student-dashboard');
-        });
-    });
+  localStorage.setItem("students", JSON.stringify(students));
+  currentStudent = student;
+
+  loginCard.style.display = "none";
+  mainContent.style.display = "block";
+
+  userDisplay.textContent = "Welcome " + student.name;
+
+  updateUI();
+});
+
+// ===============================
+// CERRAR SESIÓN
+// ===============================
+logoutBtn.addEventListener("click", () => {
+  if (!currentStudent) return;
+
+  let students = JSON.parse(localStorage.getItem("students")) || [];
+  students.forEach(s => {
+    if (s.name === currentStudent.name) s.online = false;
+  });
+  localStorage.setItem("students", JSON.stringify(students));
+
+  location.reload();
+});
+
+// ===============================
+// SISTEMA DE LECCIÓN
+// ===============================
+startBtn.addEventListener("click", () => {
+  lessonIndex = 0;
+  mistakes = 0;
+  showQuestion();
+});
+
+function showQuestion() {
+  const q = lesson[lessonIndex];
+  questionText.textContent = `¿Cómo se dice "${q.en}" en español?`;
+  answerInput.value = "";
+  feedback.textContent = "";
 }
 
-function logout() {
-    if (currentUser && currentUser.role === 'student') {
-        // Marcar offline al salir manualmente
-        db.ref('students/' + currentUser.id).update({ online: false });
+checkBtn.addEventListener("click", () => {
+  const userAnswer = answerInput.value.trim().toLowerCase();
+  const correct = lesson[lessonIndex].es;
+
+  if (userAnswer === correct) {
+    lessonIndex++;
+    currentStudent.score += 5;
+    currentStudent.stars += 1;
+
+    if (lessonIndex >= lesson.length) {
+      if (mistakes === 0) {
+        currentStudent.level++;
+        medalText.textContent = "🏅 ¡Medalla ganada!";
+        feedback.textContent = "🎉 ¡Lección perfecta! Subiste de nivel";
+      } else {
+        feedback.textContent = "❌ Fallaste, reinicia la lección";
+        lessonIndex = 0;
+        mistakes = 0;
+        return;
+      }
+    } else {
+      showQuestion();
     }
-    currentUser = null;
-    location.reload(); // Recargar página para limpiar
+
+  } else {
+    mistakes++;
+    feedback.textContent = "❌ Incorrecto, reinicia toda la lección";
+    lessonIndex = 0;
+    mistakes = 0;
+  }
+
+  saveProgress();
+  updateUI();
+});
+
+function saveProgress() {
+  let students = JSON.parse(localStorage.getItem("students")) || [];
+  students = students.map(s => {
+    if (s.name === currentStudent.name) return currentStudent;
+    return s;
+  });
+  localStorage.setItem("students", JSON.stringify(students));
 }
 
-// --- LÓGICA DE LECCIONES (EJEMPLO) ---
-// Puedes agregar más preguntas aquí
-const lessons = {
-    1: [
-        { q: "¿Cómo se dice 'Rojo' en inglés?", options: ["Blue", "Red", "Green"], correct: 1 },
-        { q: "¿Cómo se dice 'Azul' en inglés?", options: ["Blue", "Yellow", "Pink"], correct: 0 }
-    ],
-    2: [
-        { q: "¿Qué número es 'One'?", options: ["1", "5", "10"], correct: 0 },
-        { q: "¿Qué número es 'Ten'?", options: ["2", "10", "0"], correct: 1 }
-    ]
-};
-
-function startLesson(level) {
-    showScreen('lesson-screen');
-    const questions = lessons[level];
-    const container = document.getElementById('question-container');
-    container.innerHTML = ""; // Limpiar
-
-    let scoreInLesson = 0;
-
-    questions.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.innerHTML = `<p><strong>${index + 1}. ${item.q}</strong></p>`;
-        
-        item.options.forEach((opt, optIndex) => {
-            const btn = document.createElement('button');
-            btn.innerText = opt;
-            btn.onclick = () => {
-                // Lógica simple de respuesta
-                if (optIndex === item.correct) {
-                    alert("¡Correcto! +10 puntos");
-                    scoreInLesson += 10;
-                } else {
-                    alert("Incorrecto");
-                }
-                // Al responder la última...
-                if (index === questions.length - 1) {
-                    finishLesson(scoreInLesson);
-                }
-            };
-            div.appendChild(btn);
-        });
-        container.appendChild(div);
-    });
+function updateUI() {
+  scoreText.textContent = `${currentStudent.score} puntos`;
+  levelText.textContent = `Nivel ${currentStudent.level}`;
+  starsText.textContent = `⭐ Estrellas: ${currentStudent.stars}`;
 }
 
-function finishLesson(points) {
-    if (currentUser.role === 'student') {
-        // Guardar progreso en la nube
-        const newTotal = currentScore + points;
-        db.ref('students/' + currentUser.id).update({
-            score: newTotal
-        });
-        currentScore = newTotal;
-        alert(`Lección terminada. Ganaste ${points} puntos.`);
-        showScreen('student-dashboard');
-        document.getElementById('display-score').innerText = currentScore;
+// ===============================
+// LOGIN MAESTRO
+// ===============================
+openTeacherBtn.addEventListener("click", () => {
+  teacherLogin.style.display = "block";
+});
+
+teacherLoginBtn.addEventListener("click", () => {
+  const user = teacherUser.value.trim();
+  const pass = teacherPass.value.trim();
+
+  if (user === "Jose de Jesus Ramos Flores" && pass === "161286") {
+    teacherLogin.style.display = "none";
+    teacherPanel.style.display = "block";
+    loadTeacherPanel();
+  } else {
+    alert("❌ Usuario o contraseña incorrectos");
+  }
+});
+
+closeTeacher.addEventListener("click", () => {
+  teacherPanel.style.display = "none";
+});
+
+// ===============================
+// PANEL MAESTRO
+// ===============================
+function loadTeacherPanel() {
+  const students = JSON.parse(localStorage.getItem("students")) || [];
+
+  // Conectados
+  connectedList.innerHTML = "";
+  students.filter(s => s.online).forEach(s => {
+    connectedList.innerHTML += `<li>${s.name} (${s.grade}-${s.group})</li>`;
+  });
+
+  // Tabla ranking
+  studentsTable.innerHTML = "";
+  const ordered = [...students].sort((a,b)=>b.score-a.score);
+
+  ordered.forEach(s => {
+    studentsTable.innerHTML += `
+      <tr>
+        <td>${s.name}</td>
+        <td>${s.grade}</td>
+        <td>${s.group}</td>
+        <td>${s.score}</td>
+        <td>${s.level}</td>
+        <td>${s.stars}</td>
+      </tr>`;
+  });
+
+  drawChart(ordered);
+}
+
+// ===============================
+// EXPORTAR EXCEL
+// ===============================
+exportBtn.addEventListener("click", () => {
+  const students = JSON.parse(localStorage.getItem("students")) || [];
+
+  let csv = "Alumno,Grado,Grupo,Puntaje,Nivel,Estrellas\n";
+  students.forEach(s => {
+    csv += `${s.name},${s.grade},${s.group},${s.score},${s.level},${s.stars}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "alumnos.csv";
+  a.click();
+});
+
+// ===============================
+// GRÁFICA
+// ===============================
+function drawChart(students) {
+  const ctx = document.getElementById("progressChart");
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: students.map(s => s.name),
+      datasets: [{
+        label: "Puntaje",
+        data: students.map(s => s.score)
+      }]
     }
-}
-
-function returnToDashboard() {
-    showScreen('student-dashboard');
-}
-
-// --- VISTA DEL MAESTRO (TIEMPO REAL) ---
-function initTeacherView() {
-    const studentsRef = db.ref('students');
-    const tableBody = document.querySelector('#students-table tbody');
-    const onlineCountSpan = document.getElementById('online-count');
-
-    // Escuchar cambios en tiempo real en la base de datos
-    studentsRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        tableBody.innerHTML = ""; // Limpiar tabla
-        let onlineCount = 0;
-
-        if (data) {
-            // Convertir objeto de objetos a array
-            Object.values(data).forEach(student => {
-                const tr = document.createElement('tr');
-                
-                // Estado Online/Offline
-                let statusHtml = '<span class="offline-badge">🔴 Offline</span>';
-                if (student.online === true) {
-                    statusHtml = '<span class="online-badge">🟢 En línea</span>';
-                    onlineCount++;
-                }
-
-                tr.innerHTML = `
-                    <td>${statusHtml}</td>
-                    <td>${student.name}</td>
-                    <td>${student.grade}° ${student.group}</td>
-                    <td>${student.score || 0}</td>
-                    <td>${student.lastLogin ? new Date(student.lastLogin).toLocaleDateString() : '-'}</td>
-                `;
-                tableBody.appendChild(tr);
-            });
-        }
-        onlineCountSpan.innerText = onlineCount;
-    });
+  });
 }
