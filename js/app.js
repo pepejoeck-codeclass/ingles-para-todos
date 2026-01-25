@@ -82,6 +82,7 @@ const exportBtn = document.getElementById("exportBtn");
 
 const filterGrade = document.getElementById("filterGrade");
 const filterGroup = document.getElementById("filterGroup");
+const groupSelect = document.getElementById("groupSelect");
 
 // Ficha
 const studentCard = document.getElementById("studentCard");
@@ -89,17 +90,7 @@ const cardInfo = document.getElementById("cardInfo");
 const closeCard = document.getElementById("closeCard");
 
 // ===============================
-// MENÚ HAMBURGUESA
-// ===============================
-const hamburger = document.getElementById("hamburger");
-const nav = document.getElementById("nav");
-
-hamburger.addEventListener("click", () => {
-  nav.style.display = nav.style.display === "block" ? "none" : "block";
-});
-
-// ===============================
-// LOGIN ALUMNO
+// LOGIN ALUMNO (SIN CAMBIOS)
 // ===============================
 loginBtn.addEventListener("click", () => {
 
@@ -153,89 +144,6 @@ logoutBtn.addEventListener("click", () => {
 });
 
 // ===============================
-// SISTEMA DE LECCIÓN
-// ===============================
-startBtn.addEventListener("click", () => {
-  unlockAudio();
-  lessonIndex = 0;
-  mistakes = 0;
-  showQuestion();
-});
-
-function showQuestion() {
-  const q = lesson[lessonIndex];
-  questionText.textContent = `¿Cómo se dice "${q.en}" en español?`;
-  answerInput.value = "";
-  feedback.textContent = "";
-}
-
-checkBtn.addEventListener("click", () => {
-  const userAnswer = answerInput.value.trim().toLowerCase();
-  const correct = lesson[lessonIndex].es;
-
-  if (userAnswer === correct) {
-
-    soundCorrect.play();
-
-    const msg = messages[Math.floor(Math.random() * messages.length)];
-    feedback.textContent = msg;
-    feedback.style.color = "green";
-
-    lessonIndex++;
-    currentStudent.score += 5;
-    currentStudent.stars += 1;
-
-    if (lessonIndex >= lesson.length) {
-      if (mistakes === 0) {
-        currentStudent.level++;
-        soundLevel.play();
-        feedback.textContent = "🎉 SIGUIENTE NIVEL 🎉";
-      } else {
-        feedback.textContent = "❌ Fallaste, reinicia la lección";
-        lessonIndex = 0;
-        mistakes = 0;
-        return;
-      }
-    } else showQuestion();
-
-  } else {
-    soundError.play();
-    mistakes++;
-    feedback.textContent = "❌ Incorrecto, reinicia toda la lección";
-    lessonIndex = 0;
-    mistakes = 0;
-  }
-
-  assignMedal();
-  saveProgress();
-  updateUI();
-});
-
-// ===============================
-// MEDALLAS
-// ===============================
-function assignMedal() {
-  if (currentStudent.level >= 3) medalText.textContent = "🥇 Medalla Oro";
-  else if (currentStudent.level === 2) medalText.textContent = "🥈 Medalla Plata";
-  else medalText.textContent = "🥉 Medalla Bronce";
-}
-
-// ===============================
-// GUARDAR PROGRESO
-// ===============================
-function saveProgress() {
-  let students = JSON.parse(localStorage.getItem("students")) || [];
-  students = students.map(s => s.name === currentStudent.name ? currentStudent : s);
-  localStorage.setItem("students", JSON.stringify(students));
-}
-
-function updateUI() {
-  scoreText.textContent = `${currentStudent.score} puntos`;
-  levelText.textContent = `Nivel ${currentStudent.level}`;
-  starsText.textContent = `⭐ Estrellas: ${currentStudent.stars}`;
-}
-
-// ===============================
 // LOGIN MAESTRO
 // ===============================
 openTeacherBtn.addEventListener("click", () => {
@@ -250,10 +158,7 @@ teacherLoginBtn.addEventListener("click", () => {
     teacherLogin.style.display = "none";
     teacherPanel.style.display = "block";
     loadTeacherPanel();
-
-    // 🔄 AUTO ACTUALIZAR CADA 5 SEGUNDOS
     autoRefresh = setInterval(loadTeacherPanel, 5000);
-
   } else {
     alert("❌ Usuario o contraseña incorrectos");
   }
@@ -268,7 +173,6 @@ closeTeacher.addEventListener("click", () => {
   loginCard.style.display = "block";
 
   clearInterval(autoRefresh);
-
   teacherUser.value = "";
   teacherPass.value = "";
 
@@ -276,15 +180,27 @@ closeTeacher.addEventListener("click", () => {
 });
 
 // ===============================
-// PANEL MAESTRO + FILTROS + FICHA
+// PANEL MAESTRO CON GRUPOS AUTOMÁTICOS
 // ===============================
 function loadTeacherPanel() {
   let students = JSON.parse(localStorage.getItem("students")) || [];
 
+  // 🔹 LLENAR SELECT DE GRUPOS AUTOMÁTICAMENTE
+  const groups = [...new Set(students.map(s => s.group))];
+  groupSelect.innerHTML = `<option value="">Todos los grupos</option>`;
+  groups.forEach(g => {
+    const opt = document.createElement("option");
+    opt.value = g;
+    opt.textContent = g;
+    groupSelect.appendChild(opt);
+  });
+
+  const selectedGroup = groupSelect.value;
   const fg = filterGrade.value.toLowerCase();
   const fgr = filterGroup.value.toLowerCase();
 
   students = students.filter(s =>
+    (!selectedGroup || s.group === selectedGroup) &&
     (!fg || s.grade.toLowerCase().includes(fg)) &&
     (!fgr || s.group.toLowerCase().includes(fgr))
   );
@@ -315,6 +231,11 @@ function loadTeacherPanel() {
 }
 
 // ===============================
+// ACTUALIZAR AL CAMBIAR GRUPO
+// ===============================
+groupSelect.addEventListener("change", loadTeacherPanel);
+
+// ===============================
 // FICHA INDIVIDUAL
 // ===============================
 function showStudentCard(s) {
@@ -331,24 +252,6 @@ function showStudentCard(s) {
 
 closeCard.addEventListener("click", () => {
   studentCard.style.display = "none";
-});
-
-// ===============================
-// EXPORTAR EXCEL
-// ===============================
-exportBtn.addEventListener("click", () => {
-  const students = JSON.parse(localStorage.getItem("students")) || [];
-
-  let csv = "Alumno,Grado,Grupo,Puntaje,Nivel,Estrellas\n";
-  students.forEach(s => {
-    csv += `${s.name},${s.grade},${s.group},${s.score},${s.level},${s.stars}\n`;
-  });
-
-  const blob = new Blob([csv], { type: "text/csv" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "alumnos.csv";
-  a.click();
 });
 
 // ===============================
