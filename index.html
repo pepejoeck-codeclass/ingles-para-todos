@@ -15,6 +15,7 @@
 
   <span id="userDisplay" style="font-weight:bold;"></span>
 
+  <!-- BOTÓN MAESTRO FUERA DEL MENÚ -->
   <button id="openTeacherBtn">👨‍🏫 Modo Maestro</button>
   <button id="logoutBtn">🚪 Cerrar sesión</button>
 
@@ -34,6 +35,11 @@
   <input type="text" id="gradeInput" placeholder="Grado (ej. 1°)">
   <input type="text" id="groupInput" placeholder="Grupo (ej. A)">
 
+  <p>— o —</p>
+
+  <!-- LOGIN CON CORREO (SIMULADO) -->
+  <input type="email" id="emailInput" placeholder="Correo (Gmail / Facebook)">
+
   <button id="loginBtn">Entrar</button>
 </section>
 
@@ -41,7 +47,7 @@
 <section class="card" id="teacherLogin" style="display:none;">
   <h2>👨‍🏫 Acceso Maestro</h2>
 
-  <input type="text" id="teacherUser" placeholder="Usuario">
+  <input type="text" id="teacherUser" placeholder="Usuario maestro">
   <input type="password" id="teacherPass" placeholder="Contraseña">
 
   <button id="teacherLoginBtn">Entrar como Maestro</button>
@@ -71,33 +77,35 @@
     <p id="levelText">Nivel 1</p>
   </section>
 
-  <!-- PANEL MAESTRO -->
-  <section id="teacherPanel" class="card" style="display:none;">
-    <h2>👨‍🏫 Panel Maestro</h2>
-
-    <h3>👀 Alumnos conectados</h3>
-    <ul id="connectedList"></ul>
-
-    <h3>🏆 Ranking de alumnos</h3>
-    <table border="1" width="100%">
-      <thead>
-        <tr>
-          <th>Alumno</th><th>Grado</th><th>Grupo</th>
-          <th>Puntaje</th><th>Nivel</th><th>Estrellas</th>
-        </tr>
-      </thead>
-      <tbody id="studentsTable"></tbody>
-    </table>
-
-    <button id="exportBtn">📥 Exportar a Excel</button>
-
-    <h3>📊 Progreso</h3>
-    <canvas id="progressChart"></canvas>
-
-    <button id="closeTeacher">❌ Cerrar panel</button>
-  </section>
-
 </main>
+
+<!-- PANEL MAESTRO -->
+<section id="teacherPanel" class="card" style="display:none;">
+  <h2>👨‍🏫 Panel Maestro</h2>
+
+  <h3>👀 Alumnos conectados</h3>
+  <ul id="connectedList"></ul>
+
+  <h3>🏆 Ranking de alumnos</h3>
+  <table border="1" width="100%">
+    <thead>
+      <tr>
+        <th>Alumno</th><th>Grado</th><th>Grupo</th>
+        <th>Puntaje</th><th>Nivel</th><th>Estrellas</th>
+      </tr>
+    </thead>
+    <tbody id="studentsTable"></tbody>
+  </table>
+
+  <br>
+  <button id="exportBtn">📥 Exportar a Excel</button>
+
+  <h3>📊 Progreso</h3>
+  <canvas id="progressChart"></canvas>
+
+  <br>
+  <button id="closeTeacher">❌ Cerrar panel</button>
+</section>
 
 <script src="js/app.js"></script>
 </body>
