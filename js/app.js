@@ -19,27 +19,15 @@ const messages = [
 ];
 
 // ===============================
-// 🔊 SONIDOS (RUTA CORRECTA GITHUB)
+// 🔊 SONIDOS (RUTA CORRECTA PARA TU SITIO)
 // ===============================
-let soundCorrect;
-let soundError;
-let soundLevel;
+let soundCorrect = new Audio("https://pepejoeck-codeclass.github.io/ingles-para-todos/sounds/correct.mp3");
+let soundError   = new Audio("https://pepejoeck-codeclass.github.io/ingles-para-todos/sounds/wrong.mp3");
+let soundLevel   = new Audio("https://pepejoeck-codeclass.github.io/ingles-para-todos/sounds/levelup.mp3");
+
 let audioUnlocked = false;
 
-function initSounds() {
-  // ⚠️ CAMBIA "InglesParaTodos" POR EL NOMBRE EXACTO DE TU REPOSITORIO
-  soundCorrect = new Audio("/InglesParaTodos/sounds/correct.mp3");
-  soundError   = new Audio("/InglesParaTodos/sounds/wrong.mp3");
-  soundLevel   = new Audio("/InglesParaTodos/sounds/levelup.mp3");
-
-  soundCorrect.volume = 1;
-  soundError.volume = 1;
-  soundLevel.volume = 1;
-
-  console.log("🔊 Sonidos listos");
-}
-
-// 🔓 DESBLOQUEAR AUDIO CON PRIMER CLIC
+// 🔓 DESBLOQUEAR AUDIO
 function unlockAudio() {
   if (audioUnlocked) return;
 
@@ -51,15 +39,13 @@ function unlockAudio() {
   });
 
   audioUnlocked = true;
-  console.log("🔓 Audio desbloqueado");
+  console.log("🔊 Audio desbloqueado correctamente");
 }
 
 // ===============================
 // INICIO
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
-
-  initSounds();
 
   const loginCard = document.getElementById("loginCard");
   const mainContent = document.getElementById("mainContent");
@@ -88,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const levelText = document.getElementById("levelText");
   const starsText = document.getElementById("starsText");
   const medalText = document.getElementById("medalText");
-  const messageBox = document.getElementById("messageBox");
+  const messageBox = document.getElementById("messageBox") || document.createElement("div");
 
   if (username) {
     loginCard.style.display = "none";
@@ -96,7 +82,44 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProgress();
   }
 
-  // JUEGO
+  // ===== MENÚ HAMBURGUESA =====
+  hamburger.addEventListener("click", () => {
+    nav.classList.toggle("open");
+  });
+
+  // ===== TEMA OSCURO =====
+  themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+  });
+
+  // ===== LOGIN =====
+  loginBtn.addEventListener("click", () => {
+    const name = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+
+    if (!name && !email) {
+      alert("Escribe tu nombre o tu correo");
+      return;
+    }
+
+    username = email ? email.toLowerCase() : name;
+    localStorage.setItem("username", username);
+
+    loginCard.style.display = "none";
+    mainContent.style.display = "block";
+
+    loadProgress();
+    registerStudent();
+  });
+
+  logoutBtn.addEventListener("click", () => {
+    if (confirm("¿Quieres cerrar sesión y cambiar de usuario?")) {
+      localStorage.removeItem("username");
+      location.reload();
+    }
+  });
+
+  // ===== JUEGO =====
   const questions = [
     { en: "Hello", es: "Hola" },
     { en: "Goodbye", es: "Adiós" },
@@ -128,21 +151,18 @@ document.addEventListener("DOMContentLoaded", () => {
       soundCorrect.play();
 
       const msg = messages[Math.floor(Math.random() * messages.length)];
-      messageBox.textContent = msg;
+      messageBox.textContent = msg + " ⭐ +1 estrella";
 
     } else {
       soundError.currentTime = 0;
       soundError.play();
-
       messageBox.textContent = "❌ Incorrecto";
     }
 
     if (score >= level * 20) {
       level++;
-
       soundLevel.currentTime = 0;
       soundLevel.play();
-
       messageBox.textContent = "🎉 Subiste de nivel";
     }
 
@@ -157,10 +177,51 @@ document.addEventListener("DOMContentLoaded", () => {
     currentQuestion = null;
   });
 
+  // ===== MODO MAESTRO =====
+  openTeacher.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const pass = prompt("🔐 Ingresa la contraseña del maestro:");
+    if (pass !== TEACHER_PASSWORD) {
+      alert("❌ Contraseña incorrecta");
+      return;
+    }
+    teacherPanel.style.display = "block";
+    loadStudentsForTeacher();
+  });
+
+  closeTeacher.addEventListener("click", () => {
+    teacherPanel.style.display = "none";
+  });
+
+  // ===== EXPORTAR EXCEL =====
+  exportExcel.addEventListener("click", () => {
+
+    let students = JSON.parse(localStorage.getItem("studentsList")) || [];
+    if (students.length === 0) {
+      alert("No hay alumnos para exportar");
+      return;
+    }
+
+    let csv = "Alumno,Grado,Grupo,Puntaje,Nivel,Estrellas\n";
+    students.forEach(s => {
+      csv += `${s.username},${s.grade},${s.group},${s.score},${s.level},${s.stars || 0}\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "resultados_alumnos.csv";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  });
+
 });
 
 // ===============================
-// 💾 PROGRESO Y MEDALLAS
+// 💾 PROGRESO
 // ===============================
 function saveProgress() {
   if (!username) return;
@@ -175,10 +236,16 @@ function loadProgress() {
   stars = parseInt(localStorage.getItem(`user_${username}_stars`)) || 0;
 }
 
+// ===============================
+// 🏅 MEDALLAS
+// ===============================
 function assignMedal() {
   const medalText = document.getElementById("medalText");
-
-  if (level >= 3) medalText.textContent = "🥇 Medalla Oro";
-  else if (level === 2) medalText.textContent = "🥈 Medalla Plata";
-  else medalText.textContent = "🥉 Medalla Bronce";
+  medalText.textContent =
+    level >= 3 ? "🥇 Medalla Oro" : level === 2 ? "🥈 Medalla Plata" : "🥉 Medalla Bronce";
 }
+
+// ===============================
+// 👨‍🎓 REGISTRAR ALUMNOS
+// ===============================
+// ... (rest remains the same)
