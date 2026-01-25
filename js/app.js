@@ -7,36 +7,25 @@ let username = localStorage.getItem("username");
 let score = 0;
 let level = 1;
 
-// ===== DESBLOQUEAR SONIDOS =====
-function unlockSounds() {
-  [soundCorrect, soundWrong, soundLevelUp].forEach(sound => {
-    sound.play().then(() => {
-      sound.pause();
-      sound.currentTime = 0;
-    }).catch(() => {});
-  });
-}
-
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ===== ELEMENTOS =====
   const loginCard = document.getElementById("loginCard");
   const mainContent = document.getElementById("mainContent");
   const nav = document.getElementById("nav");
 
-  const usernameInput = document.getElementById("usernameInput");
-  const emailInput = document.getElementById("emailInput");
-  const gradeInput = document.getElementById("gradeInput");
-  const groupInput = document.getElementById("groupInput");
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-
   const hamburger = document.getElementById("hamburger");
   const themeToggle = document.getElementById("themeToggle");
+  const logoutBtn = document.getElementById("logoutBtn");
 
   const openTeacher = document.getElementById("openTeacher");
   const teacherPanel = document.getElementById("teacherPanel");
   const closeTeacher = document.getElementById("closeTeacher");
+
+  const loginBtn = document.getElementById("loginBtn");
+  const usernameInput = document.getElementById("usernameInput");
+  const emailInput = document.getElementById("emailInput");
+  const gradeInput = document.getElementById("gradeInput");
+  const groupInput = document.getElementById("groupInput");
 
   const startBtn = document.getElementById("startGame");
   const checkBtn = document.getElementById("checkAnswer");
@@ -45,12 +34,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const scoreText = document.getElementById("scoreText");
   const levelText = document.getElementById("levelText");
 
-  // ===== AUTO LOGIN =====
-  if (username) {
-    loginCard.style.display = "none";
-    mainContent.style.display = "block";
-    loadProgress();
-  }
+  // ===== MENÚ HAMBURGUESA (YA FUNCIONA) =====
+  hamburger.addEventListener("click", () => {
+    nav.classList.toggle("open");
+  });
+
+  // ===== MODO OSCURO =====
+  themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+  });
 
   // ===== LOGIN =====
   loginBtn.addEventListener("click", () => {
@@ -67,80 +59,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loginCard.style.display = "none";
     mainContent.style.display = "block";
-
-    loadProgress();
-    registerStudent();
   });
 
   // ===== LOGOUT =====
   logoutBtn.addEventListener("click", () => {
-    if (confirm("¿Quieres cerrar sesión y cambiar de usuario?")) {
+    if (confirm("¿Quieres cambiar de usuario?")) {
       localStorage.removeItem("username");
       location.reload();
     }
   });
 
-  // ===== MENÚ HAMBURGUESA (CORRECTO) =====
-  hamburger.addEventListener("click", () => {
-    nav.classList.toggle("open");
-  });
-
-  // ===== TEMA OSCURO =====
-  themeToggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-  });
-
-  // ===== JUEGO =====
-  const questions = [
-    { en: "Hello", es: "Hola" },
-    { en: "Goodbye", es: "Adiós" },
-    { en: "Please", es: "Por favor" },
-    { en: "Thank you", es: "Gracias" }
-  ];
-
-  let currentQuestion = null;
-
-  startBtn.addEventListener("click", () => {
-    unlockSounds();
-    currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-    questionText.textContent = `¿Cómo se dice "${currentQuestion.en}" en español?`;
-    answerInput.value = "";
-    answerInput.focus();
-  });
-
-  checkBtn.addEventListener("click", () => {
-    if (!currentQuestion) return;
-
-    const userAnswer = answerInput.value.trim().toLowerCase();
-
-    if (userAnswer === currentQuestion.es.toLowerCase()) {
-      score += 5;
-      soundCorrect.play();
-      alert("✅ Correcto +5 puntos");
-    } else {
-      soundWrong.play();
-      alert(`❌ Incorrecto. Era: ${currentQuestion.es}`);
-    }
-
-    if (score >= level * 20) {
-      level++;
-      soundLevelUp.play();
-      alert("🎉 Subiste de nivel");
-    }
-
-    saveProgress();
-    updateStudentProgress();
-
-    scoreText.textContent = score + " puntos";
-    levelText.textContent = "Nivel " + level;
-
-    questionText.textContent = "Pulsa para comenzar";
-    currentQuestion = null;
-  });
-
-  // ===== MODO MAESTRO 👨‍🏫 (FUNCIONANDO) =====
-  openTeacher.addEventListener("click", (e) => {
-    e.preventDefault();
+  // ===== MODO MAESTRO =====
+  openTeacher.addEventListener("click", () => {
+    nav.classList.remove("open");
     teacherPanel.style.display = "block";
     loadStudentsForTeacher();
   });
@@ -151,72 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-// ===== PROGRESO POR USUARIO =====
-function saveProgress() {
-  if (!username) return;
-  localStorage.setItem(`user_${username}_score`, score);
-  localStorage.setItem(`user_${username}_level`, level);
-}
-
-function loadProgress() {
-  if (!username) return;
-
-  score = parseInt(localStorage.getItem(`user_${username}_score`)) || 0;
-  level = parseInt(localStorage.getItem(`user_${username}_level`)) || 1;
-
-  document.getElementById("scoreText").textContent = score + " puntos";
-  document.getElementById("levelText").textContent = "Nivel " + level;
-}
-
-// ===== REGISTRAR ALUMNOS =====
-function registerStudent() {
-  let students = JSON.parse(localStorage.getItem("studentsList")) || [];
-
-  const grade = document.getElementById("gradeInput").value;
-  const group = document.getElementById("groupInput").value;
-
-  if (!students.find(s => s.username === username)) {
-    students.push({ username, grade, group, score, level });
-  }
-
-  localStorage.setItem("studentsList", JSON.stringify(students));
-}
-
-function updateStudentProgress() {
-  let students = JSON.parse(localStorage.getItem("studentsList")) || [];
-
-  students = students.map(s => {
-    if (s.username === username) {
-      s.score = score;
-      s.level = level;
-    }
-    return s;
-  });
-
-  localStorage.setItem("studentsList", JSON.stringify(students));
-}
-
-// ===== MOSTRAR EN PANEL MAESTRO =====
+// ===== PANEL MAESTRO (VACÍO POR AHORA PERO FUNCIONA) =====
 function loadStudentsForTeacher() {
   const table = document.getElementById("studentsTable");
-  table.innerHTML = "";
-
-  let students = JSON.parse(localStorage.getItem("studentsList")) || [];
-
-  if (students.length === 0) {
-    table.innerHTML = "<tr><td colspan='5'>No hay alumnos registrados</td></tr>";
-    return;
-  }
-
-  students.forEach(s => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${s.username}</td>
-      <td>${s.grade}</td>
-      <td>${s.group}</td>
-      <td>${s.score}</td>
-      <td>${s.level}</td>
-    `;
-    table.appendChild(row);
-  });
+  table.innerHTML = "<tr><td colspan='5'>Aquí aparecerán tus alumnos 👨‍🏫</td></tr>";
 }
