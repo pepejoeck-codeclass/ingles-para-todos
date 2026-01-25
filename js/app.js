@@ -1,18 +1,21 @@
-// 🔊 SONIDOS
+// 🔊 SONIDOS (RUTA CORRECTA EN GITHUB PAGES)
 const soundCorrect = new Audio("/ingles-para-todos/assets/sounds/correct.mp3");
 const soundError   = new Audio("/ingles-para-todos/assets/sounds/wrong.mp3");
 const soundLevel   = new Audio("/ingles-para-todos/assets/sounds/levelup.mp3");
 
+// 🔐 CONTRASEÑA MAESTRO
+const TEACHER_PASSWORD = "161286";
+
+// VARIABLES DE USUARIO
 let username = localStorage.getItem("username");
-let isTeacher = localStorage.getItem("isTeacher") === "true";
+let grade = localStorage.getItem("grade");
+let group = localStorage.getItem("group");
 
 let score = 0;
 let level = 1;
 let stars = 0;
 
-const TEACHER_PASSWORD = "161286";
-
-// 📚 LECCIÓN
+// 📚 LECCIÓN (TODAS DEBEN SER CORRECTAS)
 const lesson = [
   { en: "Hello", es: "hola" },
   { en: "Goodbye", es: "adiós" },
@@ -52,17 +55,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const medalText = document.getElementById("medalText");
   const userDisplay = document.getElementById("userDisplay");
 
-  const openTeacher = document.getElementById("openTeacher");
+  const openTeacherBtn = document.getElementById("openTeacherBtn");
   const teacherPanel = document.getElementById("teacherPanel");
   const closeTeacher = document.getElementById("closeTeacher");
   const exportBtn = document.getElementById("exportBtn");
 
-  // ☰ HAMBURGUESA
+  // ☰ MENÚ HAMBURGUESA
   hamburger.addEventListener("click", () => {
     nav.style.display = nav.style.display === "block" ? "none" : "block";
   });
 
-  // AUTO LOGIN
+  // 🔁 AUTO LOGIN
   if (username) {
     loginCard.style.display = "none";
     mainContent.style.display = "block";
@@ -70,29 +73,30 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProgress();
   }
 
-  // 🔐 LOGIN CORREGIDO (NOMBRE O CORREO + GRADO + GRUPO)
+  // 🔐 LOGIN (NOMBRE O CORREO + GRADO + GRUPO)
   loginBtn.addEventListener("click", () => {
 
     let name = usernameInput.value.trim();
     const email = emailInput.value.trim();
-    const grade = gradeInput.value.trim();
-    const group = groupInput.value.trim();
+    const g = gradeInput.value.trim();
+    const gr = groupInput.value.trim();
 
-    // Debe haber NOMBRE O CORREO
-    if ((!name && !email) || !grade || !group) {
+    if ((!name && !email) || !g || !gr) {
       alert("Completa nombre o correo, grado y grupo");
       return;
     }
 
-    // Si no puso nombre, usar correo como usuario
-    if (!name && email) {
-      name = email;
-    }
+    if (!name && email) name = email;
 
     username = name;
-    localStorage.setItem("username", username);
+    grade = g;
+    group = gr;
 
-    registerStudent(username, grade, group);
+    localStorage.setItem("username", username);
+    localStorage.setItem("grade", grade);
+    localStorage.setItem("group", group);
+
+    registerStudent();
 
     loginCard.style.display = "none";
     mainContent.style.display = "block";
@@ -101,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProgress();
   });
 
-  // LOGOUT
+  // 🚪 LOGOUT
   logoutBtn.addEventListener("click", () => {
     localStorage.clear();
     location.reload();
@@ -123,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ✅ RESPONDER
   checkBtn.addEventListener("click", () => {
+
     const userAnswer = answerInput.value.trim().toLowerCase();
     const correct = lesson[currentIndex].es;
 
@@ -139,8 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
           feedback.textContent = "🎉 ¡Lección perfecta! Subiste de nivel";
         } else {
           feedback.textContent = "❌ Fallaste antes, repite toda la lección";
-          currentIndex = 0;
-          mistakes = 0;
+          resetLesson();
           return;
         }
       } else {
@@ -149,10 +153,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } else {
       soundError.play();
-      mistakes++;
       feedback.textContent = "❌ Incorrecto, la lección se reinicia";
-      currentIndex = 0;
-      mistakes = 0;
+      resetLesson();
+      return;
     }
 
     assignMedal();
@@ -164,16 +167,19 @@ document.addEventListener("DOMContentLoaded", () => {
     starsText.textContent = "⭐ Estrellas: " + stars;
   });
 
-  // 🔐 MODO MAESTRO
-  openTeacher.addEventListener("click", () => {
-    if (!isTeacher) {
-      const pass = prompt("Contraseña del maestro:");
-      if (pass !== TEACHER_PASSWORD) {
-        alert("Contraseña incorrecta");
-        return;
-      }
-      localStorage.setItem("isTeacher", "true");
-      isTeacher = true;
+  function resetLesson() {
+    currentIndex = 0;
+    mistakes = 0;
+  }
+
+  // 👨‍🏫 MODO MAESTRO FUERA DEL MENÚ
+  openTeacherBtn.addEventListener("click", () => {
+
+    const pass = prompt("Contraseña del maestro:");
+
+    if (pass !== TEACHER_PASSWORD) {
+      alert("❌ Contraseña incorrecta");
+      return;
     }
 
     teacherPanel.style.display = "block";
@@ -188,13 +194,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-// 💾 PROGRESO
+// 💾 GUARDAR PROGRESO POR ALUMNO
 function saveProgress() {
   localStorage.setItem(`user_${username}_score`, score);
   localStorage.setItem(`user_${username}_level`, level);
   localStorage.setItem(`user_${username}_stars`, stars);
 }
 
+// 🔁 CARGAR PROGRESO
 function loadProgress() {
   score = parseInt(localStorage.getItem(`user_${username}_score`)) || 0;
   level = parseInt(localStorage.getItem(`user_${username}_level`)) || 1;
@@ -207,7 +214,7 @@ function loadProgress() {
   assignMedal();
 }
 
-// 🏅 MEDALLAS
+// 🏅 MEDALLAS AUTOMÁTICAS
 function assignMedal() {
   const medalText = document.getElementById("medalText");
 
@@ -217,16 +224,24 @@ function assignMedal() {
 }
 
 // 👨‍🎓 REGISTRO DE ALUMNOS
-function registerStudent(name, grade, group) {
+function registerStudent() {
   let students = JSON.parse(localStorage.getItem("studentsList")) || [];
 
-  if (!students.find(s => s.name === name)) {
-    students.push({ name, grade, group, score: 0, level: 1, stars: 0 });
+  if (!students.find(s => s.name === username)) {
+    students.push({
+      name: username,
+      grade,
+      group,
+      score: 0,
+      level: 1,
+      stars: 0
+    });
   }
 
   localStorage.setItem("studentsList", JSON.stringify(students));
 }
 
+// 🔄 ACTUALIZAR ALUMNO
 function updateStudent() {
   let students = JSON.parse(localStorage.getItem("studentsList")) || [];
 
@@ -247,6 +262,8 @@ function loadTeacherPanel() {
   table.innerHTML = "";
 
   let students = JSON.parse(localStorage.getItem("studentsList")) || [];
+
+  // RANKING
   students.sort((a, b) => b.score - a.score);
 
   students.forEach(s => {
@@ -284,7 +301,7 @@ function drawChart(students) {
   });
 }
 
-// 📥 EXPORTAR EXCEL
+// 📥 EXPORTAR A EXCEL
 function exportToCSV() {
   let students = JSON.parse(localStorage.getItem("studentsList")) || [];
 
@@ -296,6 +313,6 @@ function exportToCSV() {
   const blob = new Blob([csv], { type: "text/csv" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "alumnos.csv";
+  link.download = "alumnos_progreso.csv";
   link.click();
 }
