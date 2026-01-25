@@ -40,7 +40,7 @@ button {
   background: white;
 }
 
-/* NAV */
+/* ===== MENÚ HAMBURGUESA NAV ===== */
 #nav {
   position: absolute;
   top: 60px;
@@ -50,7 +50,7 @@ button {
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
   display: none;
   flex-direction: column;
-  min-width: 160px;
+  min-width: 180px;
   z-index: 999;
 }
 
@@ -65,6 +65,7 @@ button {
   border-bottom: none;
 }
 
+/* CUANDO SE ABRE */
 #nav.open {
   display: flex;
 }
@@ -113,7 +114,7 @@ body.dark #nav a {
   border-bottom: 1px solid #333;
 }
 
-/* ===== ANIMACIONES DE RESPUESTA ===== */
+/* ===== ANIMACIONES ===== */
 
 .correct {
   background-color: #c8f7c5 !important;
@@ -125,14 +126,12 @@ body.dark #nav a {
   animation: shake 0.4s ease;
 }
 
-/* Animación de acierto */
 @keyframes pop {
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
 }
 
-/* Animación de error (vibrar) */
 @keyframes shake {
   0% { transform: translateX(0); }
   25% { transform: translateX(-5px); }
@@ -141,7 +140,6 @@ body.dark #nav a {
   100% { transform: translateX(0); }
 }
 
-/* Animación subir nivel */
 .level-up {
   animation: glow 1s ease;
 }
@@ -150,12 +148,4 @@ body.dark #nav a {
   0% { box-shadow: 0 0 5px gold; }
   50% { box-shadow: 0 0 20px gold; }
   100% { box-shadow: 0 0 5px gold; }
-}
-
-#nav {
-  display: none;
-}
-
-#nav.open {
-  display: block;
 }
