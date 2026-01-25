@@ -1,120 +1,15 @@
-# ARCHIVO 1 — index.html (COMPLETO Y CORREGIDO)
-
-```html
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Inglés Para Todos</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-
-<header>
-  <h1>Inglés Para Todos</h1>
-
-  <button id="logoutBtn" style="margin-top:10px;">🚪 Cambiar usuario</button>
-
-  <div class="header-buttons">
-    <button id="themeToggle">🌙</button>
-    <button id="hamburger" class="hamburger">☰</button>
-  </div>
-
-  <nav id="nav">
-    <a href="#" class="lesson" data-lesson="1">Lección 1</a>
-    <a href="#" class="lesson locked" data-lesson="2">Lección 2 🔒</a>
-    <a href="#" class="lesson locked" data-lesson="3">Lección 3 🔒</a>
-
-    <a href="#">Juegos</a>
-    <a href="#">Progreso</a>
-
-    <!-- BOTÓN MODO MAESTRO (IMPORTANTE type=button) -->
-    <button id="openTeacher" type="button" style="background:none;border:none;color:blue;cursor:pointer;font-size:16px;">
-      👨‍🏫 Modo Maestro
-    </button>
-  </nav>
-</header>
-
-<!-- LOGIN -->
-<section class="card" id="loginCard">
-  <h2>Iniciar sesión</h2>
-
-  <input type="text" id="gradeInput" placeholder="Grado (ej. 1°)" />
-  <input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
-
-  <input type="text" id="usernameInput" placeholder="Escribe tu nombre completo" />
-
-  <p>— o —</p>
-
-  <input type="email" id="emailInput" placeholder="Escribe tu correo" />
-
-  <button id="loginBtn">Entrar</button>
-</section>
-
-<!-- CONTENIDO PRINCIPAL -->
-<main id="mainContent" style="display:none;">
-
-  <!-- JUEGO -->
-  <section class="card">
-    <h2 id="questionText">Pulsa para comenzar</h2>
-
-    <input type="text" id="answerInput" placeholder="Escribe tu respuesta..." />
-
-    <button id="startGame">Iniciar ejercicio</button>
-    <button id="checkAnswer">Responder</button>
-  </section>
-
-  <!-- PUNTAJE -->
-  <section class="card">
-    <h2>Puntaje</h2>
-    <p id="scoreText">0 puntos</p>
-    <p id="levelText">Nivel 1</p>
-  </section>
-
-  <!-- PANEL MAESTRO -->
-  <section id="teacherPanel" class="card" style="display:none;">
-    <h2>👨‍🏫 Panel del Maestro</h2>
-
-    <table border="1" width="100%">
-      <thead>
-        <tr>
-          <th>Alumno</th>
-          <th>Grado</th>
-          <th>Grupo</th>
-          <th>Puntaje</th>
-          <th>Nivel</th>
-        </tr>
-      </thead>
-      <tbody id="studentsTable"></tbody>
-    </table>
-
-    <br>
-
-    <button id="closeTeacher">❌ Cerrar</button>
-  </section>
-</main>
-
-<script src="js/app.js"></script>
-</body>
-</html>
-```
-
----
-
-# ARCHIVO 2 — app.js (COMPLETO Y FUNCIONANDO)
-
-```javascript
 // ===== SONIDOS =====
 const soundCorrect = new Audio("assets/sounds/correct.mp3");
 const soundWrong = new Audio("assets/sounds/wrong.mp3");
 const soundLevelUp = new Audio("assets/sounds/levelup.mp3");
 
+// ===== USUARIO Y PROGRESO =====
 let username = localStorage.getItem("username") || null;
 let score = 0;
 let level = 1;
 let unlockedLesson = 1;
 
+// ===== DESBLOQUEAR SONIDOS =====
 function unlockSounds() {
   [soundCorrect, soundWrong, soundLevelUp].forEach(sound => {
     sound.play().then(() => {
@@ -124,8 +19,10 @@ function unlockSounds() {
   });
 }
 
+// ===== INICIO =====
 document.addEventListener("DOMContentLoaded", () => {
 
+  // ===== ELEMENTOS LOGIN =====
   const loginCard = document.getElementById("loginCard");
   const mainContent = document.getElementById("mainContent");
   const usernameInput = document.getElementById("usernameInput");
@@ -135,9 +32,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginBtn = document.getElementById("loginBtn");
   const logoutBtn = document.getElementById("logoutBtn");
 
+  // ===== MODO MAESTRO =====
   const openTeacher = document.getElementById("openTeacher");
   const teacherPanel = document.getElementById("teacherPanel");
   const closeTeacher = document.getElementById("closeTeacher");
+
+  // ===== MENÚ Y TEMA =====
+  const hamburger = document.getElementById("hamburger");
+  const nav = document.getElementById("nav");
+  const themeBtn = document.getElementById("themeToggle");
+
+  hamburger.addEventListener("click", () => {
+    nav.classList.toggle("open");
+  });
+
+  themeBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+  });
 
   // ===== AUTO LOGIN =====
   if (username) {
@@ -152,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = emailInput.value.trim();
 
     if (!name && !email) {
-      alert("Escribe tu nombre o tu correo");
+      alert("Escribe tu nombre o tu correo 🙂");
       return;
     }
 
@@ -196,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
     questionText.textContent = `¿Cómo se dice "${currentQuestion.en}" en español?`;
     answerInput.value = "";
+    answerInput.focus();
   });
 
   checkBtn.addEventListener("click", () => {
@@ -228,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentQuestion = null;
   });
 
-  // ===== MODO MAESTRO FUNCIONANDO =====
+  // ===== ABRIR PANEL MAESTRO =====
   openTeacher.addEventListener("click", (e) => {
     e.preventDefault();
     teacherPanel.style.display = "block";
@@ -241,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-// ===== PROGRESO =====
+// ===== PROGRESO POR USUARIO =====
 function saveProgress() {
   if (!username) return;
   localStorage.setItem(`user_${username}_score`, score);
@@ -258,7 +170,7 @@ function loadProgress() {
   document.getElementById("levelText").textContent = "Nivel " + level;
 }
 
-// ===== REGISTRAR ALUMNOS =====
+// ===== REGISTRAR ALUMNO =====
 function registerStudent() {
   let students = JSON.parse(localStorage.getItem("studentsList")) || [];
 
@@ -272,6 +184,7 @@ function registerStudent() {
   localStorage.setItem("studentsList", JSON.stringify(students));
 }
 
+// ===== ACTUALIZAR PROGRESO ALUMNO =====
 function updateStudentProgress() {
   let students = JSON.parse(localStorage.getItem("studentsList")) || [];
 
@@ -286,6 +199,7 @@ function updateStudentProgress() {
   localStorage.setItem("studentsList", JSON.stringify(students));
 }
 
+// ===== MOSTRAR EN PANEL MAESTRO =====
 function loadStudentsForTeacher() {
   const table = document.getElementById("studentsTable");
   table.innerHTML = "";
@@ -309,4 +223,3 @@ function loadStudentsForTeacher() {
     table.appendChild(row);
   });
 }
-```
