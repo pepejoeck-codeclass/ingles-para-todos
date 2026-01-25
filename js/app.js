@@ -3,11 +3,12 @@ const soundCorrect = new Audio("assets/sounds/correct.mp3");
 const soundWrong = new Audio("assets/sounds/wrong.mp3");
 const soundLevelUp = new Audio("assets/sounds/levelup.mp3");
 
-// ===== USUARIO Y PROGRESO =====
+// ===== USUARIO Y PROGRESO (POR USUARIO) =====
 let username = localStorage.getItem("username") || null;
-let unlockedLesson = parseInt(localStorage.getItem("unlockedLesson")) || 1;
-let score = parseInt(localStorage.getItem("score")) || 0;
-let level = parseInt(localStorage.getItem("level")) || 1;
+
+let score = 0;
+let level = 1;
+let unlockedLesson = 1;
 
 // 🔓 Desbloquear sonidos con la primera interacción
 function unlockSounds() {
@@ -38,14 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginBtn = document.getElementById("loginBtn");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  // Si ya había usuario guardado
+  // Si ya había usuario guardado → entrar automático
   if (username) {
     loginCard.style.display = "none";
     mainContent.style.display = "block";
     loadProgress();
   }
 
-  // BOTÓN ENTRAR
   loginBtn.addEventListener("click", () => {
     const name = usernameInput.value.trim();
 
@@ -63,10 +63,10 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProgress();
   });
 
-  // ===== CERRAR SESIÓN (ESTO FALTABA 🔥) =====
+  // ===== CERRAR SESIÓN (SIN BORRAR PROGRESO) =====
   logoutBtn.addEventListener("click", () => {
-    if (confirm("¿Quieres cambiar de usuario? Se borrará el progreso actual.")) {
-      localStorage.clear();
+    if (confirm("¿Quieres cerrar sesión?")) {
+      localStorage.removeItem("username"); // solo cerrar sesión
       location.reload();
     }
   });
@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (score >= level * 20) {
       level++;
 
-      // Desbloquear siguiente lección
+      // desbloquear siguiente lección
       unlockedLesson = Math.max(unlockedLesson, level);
 
       soundLevelUp.play();
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("🎉 Subiste de nivel y desbloqueaste nueva lección");
     }
 
-    // Guardar progreso
+    // Guardar progreso del usuario
     saveProgress();
 
     scoreText.textContent = score + " puntos";
@@ -193,19 +193,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-// ===== GUARDAR PROGRESO =====
+
+// ===== GUARDAR PROGRESO (POR USUARIO) =====
 function saveProgress() {
-  localStorage.setItem("score", score);
-  localStorage.setItem("level", level);
-  localStorage.setItem("unlockedLesson", unlockedLesson);
+  if (!username) return;
+
+  localStorage.setItem(`user_${username}_score`, score);
+  localStorage.setItem(`user_${username}_level`, level);
+  localStorage.setItem(`user_${username}_unlockedLesson`, unlockedLesson);
 }
 
-// ===== CARGAR PROGRESO =====
+
+// ===== CARGAR PROGRESO (POR USUARIO) =====
 function loadProgress() {
+  if (!username) return;
+
+  score = parseInt(localStorage.getItem(`user_${username}_score`)) || 0;
+  level = parseInt(localStorage.getItem(`user_${username}_level`)) || 1;
+  unlockedLesson = parseInt(localStorage.getItem(`user_${username}_unlockedLesson`)) || 1;
+
   document.getElementById("scoreText").textContent = score + " puntos";
   document.getElementById("levelText").textContent = "Nivel " + level;
+
   updateLessonsMenu();
 }
+
 
 // ===== ACTUALIZAR MENÚ DE LECCIONES =====
 function updateLessonsMenu() {
