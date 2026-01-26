@@ -71,7 +71,7 @@ function restoreBackupIfNeeded() {
 restoreBackupIfNeeded();
 
 // ===============================
-// 🧠 EJERCICIOS (HOLA / ADIÓS / POR FAVOR / GRACIAS)
+// 🧠 EJERCICIOS
 // ===============================
 const questions = [
   { q: "How do you say 'Hola' in English?", a: "hello" },
@@ -88,13 +88,8 @@ let currentQuestion = null;
 document.addEventListener("DOMContentLoaded", () => {
 
   const loginCard = document.getElementById("loginCard");
-  const teacherLogin = document.getElementById("teacherLogin");
   const mainContent = document.getElementById("mainContent");
-  const teacherPanel = document.getElementById("teacherPanel");
 
-  const openTeacherBtn = document.getElementById("openTeacherBtn");
-  const teacherLoginBtn = document.getElementById("teacherLoginBtn");
-  const closeTeacher = document.getElementById("closeTeacher");
   const logoutBtn = document.getElementById("logoutBtn");
 
   const loginBtn = document.getElementById("loginBtn");
@@ -113,10 +108,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const scoreText = document.getElementById("scoreText");
   const levelText = document.getElementById("levelText");
   const starsText = document.getElementById("starsText");
-  const medalText = document.getElementById("medalText");
 
   const feedback = document.getElementById("feedback");
-  const groupSelect = document.getElementById("groupSelect");
 
   // ===============================
   // 🍔 MENÚ HAMBURGUESA
@@ -189,7 +182,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ RESPONDER EJERCICIO
   // ===============================
   checkBtn.addEventListener("click", () => {
-    if (!currentQuestion) return;
+    if (!currentQuestion) {
+      alert("Primero presiona 'Iniciar ejercicio'");
+      return;
+    }
 
     const answer = answerInput.value.trim().toLowerCase();
 
@@ -215,11 +211,17 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===============================
-  // FILTRO GRUPO MAESTRO
+  // 🚪 CERRAR SESIÓN ALUMNO (ARREGLADO)
   // ===============================
-  groupSelect.addEventListener("change", () => {
-    selectedGroupFilter = groupSelect.value;
-    updateTeacherTableOnly();
+  logoutBtn.addEventListener("click", () => {
+    removeConnectedUser();
+    stopTimer();
+
+    localStorage.removeItem("username");
+    localStorage.removeItem("grade");
+    localStorage.removeItem("group");
+
+    location.reload();
   });
 
 });
@@ -232,6 +234,10 @@ function startTimer() {
     timeWorked++;
     saveProgress();
   }, 60000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
 }
 
 // ===============================
@@ -267,5 +273,10 @@ function updateDisplay() {
 function registerConnectedUser() {
   const user = { username, grade, group };
   connectedUsers.push(user);
+  localStorage.setItem("connectedUsers", JSON.stringify(connectedUsers));
+}
+
+function removeConnectedUser() {
+  connectedUsers = connectedUsers.filter(u => u.username !== username);
   localStorage.setItem("connectedUsers", JSON.stringify(connectedUsers));
 }
