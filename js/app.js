@@ -283,16 +283,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ===============================
-// ⏱ TIEMPO (ARREGLADO)
+// ⏱ TIEMPO (ARREGLADO PROFESIONAL)
 // ===============================
 function startTimer() {
   if (timerInterval) return;
 
   timerInterval = setInterval(() => {
-    timeWorked++;
+    timeWorked++; // ahora cuenta en SEGUNDOS
     updateDisplay();
     saveProgress();
-  }, 60000);
+  }, 1000); // cada segundo
 }
 
 function stopTimer() {
