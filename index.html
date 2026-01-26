@@ -53,10 +53,13 @@
   <h3 id="userDisplay"></h3>
   <section class="card">
     <h2 id="questionText">Pulsa para comenzar</h2>
-    <p id="feedback"></p>
+    <p id="feedback" style="font-weight: bold; height: 20px;"></p>
     <input type="text" id="answerInput" placeholder="Respuesta..." autocomplete="off" />
-    <button type="button" id="startGame">Nueva Pregunta</button>
-    <button type="button" id="checkAnswer">Responder</button>
+    <div style="margin-top:10px;">
+        <button type="button" id="startGame">Nueva Pregunta</button>
+        <button type="button" id="checkAnswer">Responder</button>
+    </div>
+    <hr>
     <p id="starsText">⭐ Estrellas: 0</p>
     <p id="timeText">⏱ Tiempo: 0 min 0 s</p>
   </section>
@@ -68,18 +71,26 @@
 
 <section id="teacherPanel" class="card" style="display:none;">
   <h2>👨‍🏫 Panel Maestro</h2>
-  <select id="groupSelect"><option value="">Todos los grupos</option></select>
-  <button type="button" id="refreshTeacher">🔄 Actualizar</button>
-  <button type="button" id="exportBtn" style="background-color: #28a745; color: white;">📥 Exportar a Excel (CSV)</button>
+  <div style="margin-bottom: 15px;">
+      <label>Filtrar por Grupo:</label>
+      <select id="groupSelect">
+          <option value="">Todos los grupos</option>
+      </select>
+      <button type="button" id="refreshTeacher">🔄 Actualizar</button>
+      <button type="button" id="exportBtn" style="background-color: #28a745; color: white;">📥 Exportar a Excel</button>
+  </div>
   
-  <table border="1" width="100%" style="margin-top:10px;">
-    <thead>
-      <tr>
-        <th>Alumno</th><th>Grado</th><th>Grupo</th><th>Puntos</th><th>Nivel</th><th>⭐</th><th>Tiempo</th>
-      </tr>
-    </thead>
-    <tbody id="studentsTable"></tbody>
-  </table>
+  <div style="overflow-x: auto;">
+      <table border="1" width="100%" style="border-collapse: collapse; text-align: center;">
+        <thead>
+          <tr style="background-color: #eee;">
+            <th>Alumno</th><th>Grado</th><th>Grupo</th><th>Puntos</th><th>Nivel</th><th>⭐</th><th>Tiempo</th>
+          </tr>
+        </thead>
+        <tbody id="studentsTable"></tbody>
+      </table>
+  </div>
+  <br>
   <button type="button" id="closeTeacherPanel">Cerrar Sesión Maestro</button>
 </section>
 
