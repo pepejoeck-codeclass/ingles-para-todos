@@ -20,14 +20,8 @@ let timerInterval = null;
 
 let connectedUsers = JSON.parse(localStorage.getItem("connectedUsers")) || [];
 
-const TEACHER_USER = "Jose de Jesus Ramos Flores";
-const TEACHER_PASS = "161286";
-
-let selectedGroupFilter = "";
-let groupsLoadedOnce = false;
-
 // ===============================
-// 🔐 RESPALDO
+// RESPALDO AUTOMÁTICO
 // ===============================
 function backupAllStudents() {
   let students = [];
@@ -43,7 +37,7 @@ function backupAllStudents() {
 }
 
 // ===============================
-// 🔄 RESTAURAR SI SE BORRÓ TODO
+// RESTAURAR RESPALDO SI SE BORRÓ TODO
 // ===============================
 function restoreBackupIfNeeded() {
   let hasStudents = false;
@@ -112,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const feedback = document.getElementById("feedback");
 
   // ===============================
-  // 🍔 MENÚ HAMBURGUESA
+  // 🍔 MENÚ HAMBURGUESA (NO TOCADO)
   // ===============================
   const hamburger = document.getElementById("hamburger");
   const nav = document.getElementById("nav");
@@ -211,16 +205,22 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===============================
-  // 🚪 CERRAR SESIÓN ALUMNO (ARREGLADO)
+  // 🚪 CERRAR SESIÓN ALUMNO (TOTALMENTE ARREGLADO)
   // ===============================
   logoutBtn.addEventListener("click", () => {
+
+    // Quitar de conectados
     removeConnectedUser();
+
+    // Detener reloj
     stopTimer();
 
+    // Borrar sesión activa
     localStorage.removeItem("username");
     localStorage.removeItem("grade");
     localStorage.removeItem("group");
 
+    // Volver limpio al login
     location.reload();
   });
 
