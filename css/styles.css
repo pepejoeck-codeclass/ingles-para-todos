@@ -1,138 +1,135 @@
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
 }
 
 body {
-  background: #f5f5f5;
-  color: #222;
+    background: #f5f5f5;
+    color: #222;
+    transition: background 0.3s, color 0.3s;
 }
 
 /* HEADER */
 header {
-  background: #2b5cff;
-  color: white;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
+    background: #2b5cff;
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
 }
 
 .header-buttons {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
 button {
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
 }
 
 /* HAMBURGUESA */
 .hamburger {
-  font-size: 22px;
-  background: white;
+    font-size: 22px;
+    background: white;
+    color: #2b5cff;
 }
 
 /* NAV MENÚ */
 #nav {
-  position: absolute;
-  top: 60px;
-  right: 16px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  display: none;
-  flex-direction: column;
-  min-width: 180px;
-  z-index: 999;
+    position: absolute;
+    top: 60px;
+    right: 16px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    display: none; /* Oculto por defecto */
+    flex-direction: column;
+    min-width: 180px;
+    z-index: 999;
 }
 
-#nav a,
-#nav .menu-btn {
-  padding: 12px 16px;
-  text-decoration: none;
-  color: #222;
-  border-bottom: 1px solid #eee;
-  background: none;
-  text-align: left;
+/* Clase que activa el menú */
+#nav.active {
+    display: flex !important;
+}
+
+#nav a, #nav .menu-btn {
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #222;
+    border-bottom: 1px solid #eee;
+    background: none;
+    text-align: left;
 }
 
 #nav a:last-child {
-  border-bottom: none;
-}
-
-#nav.open {
-  display: flex;
+    border-bottom: none;
 }
 
 /* CARDS */
 main {
-  padding: 16px;
+    padding: 16px;
 }
 
 .card {
-  background: white;
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 16px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
 }
 
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  font-size: 16px;
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
 }
 
-/* MODO OSCURO */
+/* ===============================
+   MODO OSCURO (PROFESIONAL)
+   =============================== */
 body.dark {
-  background: #121212;
-  color: #f2f2f2;
+    background-color: #121212 !important;
+    color: #f2f2f2 !important;
 }
 
 body.dark header {
-  background: #1f1f1f;
+    background: #1f1f1f !important;
 }
 
 body.dark .card {
-  background: #1e1e1e;
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    border: 1px solid #333;
 }
 
 body.dark #nav {
-  background: #1e1e1e;
+    background: #1e1e1e !important;
 }
 
-body.dark #nav a,
-body.dark .menu-btn {
-  color: #f2f2f2;
-  border-bottom: 1px solid #333;
+body.dark #nav a {
+    color: #f2f2f2 !important;
+    border-bottom: 1px solid #333;
 }
 
-/* Reglas para Modo Oscuro */
-body.dark {
-    background-color: #1a1a1a !important;
-    color: #f0f0f0 !important;
-}
-body.dark .card {
+body.dark input, body.dark select {
     background-color: #2d2d2d !important;
-    color: #ffffff !important;
+    color: white !important;
     border: 1px solid #444;
 }
-body.dark input, body.dark select {
-    background-color: #3d3d3d !important;
-    color: white !important;
-    border: 1px solid #555;
-}
 
-/* Regla para que el Nav se muestre cuando JS lo active */
-#nav.active {
-    display: block !important;
+body.dark .hamburger {
+    background: #333;
+    color: white;
 }
