@@ -27,7 +27,7 @@ let selectedGroupFilter = "";
 let groupsLoadedOnce = false;
 
 // ===============================
-// 🔐 SISTEMA DE RESPALDO PROFESIONAL (ANTI BORRADO)
+// 🔐 RESPALDO
 // ===============================
 function backupAllStudents() {
   let students = [];
@@ -40,11 +40,10 @@ function backupAllStudents() {
   }
 
   localStorage.setItem("backupStudents", JSON.stringify(students));
-  localStorage.setItem("lastBackup", new Date().toISOString());
 }
 
 // ===============================
-// 🔄 RESTAURAR AUTOMÁTICO SI SE BORRÓ TODO
+// 🔄 RESTAURAR SI SE BORRÓ TODO
 // ===============================
 function restoreBackupIfNeeded() {
   let hasStudents = false;
@@ -72,12 +71,13 @@ function restoreBackupIfNeeded() {
 restoreBackupIfNeeded();
 
 // ===============================
-// 🧠 EJERCICIOS BÁSICOS (HOLA / ADIÓS / POR FAVOR)
+// 🧠 EJERCICIOS (HOLA / ADIÓS / POR FAVOR / GRACIAS)
 // ===============================
 const questions = [
   { q: "How do you say 'Hola' in English?", a: "hello" },
   { q: "How do you say 'Adiós' in English?", a: "goodbye" },
-  { q: "How do you say 'Por favor' in English?", a: "please" }
+  { q: "How do you say 'Por favor' in English?", a: "please" },
+  { q: "How do you say 'Gracias' in English?", a: "thank you" }
 ];
 
 let currentQuestion = null;
@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const groupSelect = document.getElementById("groupSelect");
 
   // ===============================
-  // 🍔 MENÚ HAMBURGUESA (100% FUNCIONAL)
+  // 🍔 MENÚ HAMBURGUESA
   // ===============================
   const hamburger = document.getElementById("hamburger");
   const nav = document.getElementById("nav");
@@ -175,23 +175,28 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===============================
-  // EJERCICIOS
+  // ▶️ INICIAR EJERCICIO
   // ===============================
   startBtn.addEventListener("click", () => {
     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
     questionText.textContent = currentQuestion.q;
     feedback.textContent = "";
     answerInput.value = "";
+    answerInput.focus();
   });
 
+  // ===============================
+  // ✅ RESPONDER EJERCICIO
+  // ===============================
   checkBtn.addEventListener("click", () => {
     if (!currentQuestion) return;
 
     const answer = answerInput.value.trim().toLowerCase();
 
     if (answer === currentQuestion.a) {
-      feedback.textContent = "✅ Correct!";
+      feedback.textContent = "🔥 Excellent job!";
       soundCorrect.play();
+
       score += 10;
       stars++;
 
@@ -254,4 +259,13 @@ function updateDisplay() {
   document.getElementById("scoreText").textContent = score + " puntos";
   document.getElementById("levelText").textContent = "Nivel " + level;
   document.getElementById("starsText").textContent = "⭐ Estrellas: " + stars;
+}
+
+// ===============================
+// 👀 CONECTADOS
+// ===============================
+function registerConnectedUser() {
+  const user = { username, grade, group };
+  connectedUsers.push(user);
+  localStorage.setItem("connectedUsers", JSON.stringify(connectedUsers));
 }
