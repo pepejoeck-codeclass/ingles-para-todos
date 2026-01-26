@@ -31,7 +31,34 @@ const messages = [
   "🎯 Perfect"
 ];
 
-let selectedGroupFilter = ""; // 🔹 GUARDA EL FILTRO ACTUAL
+let selectedGroupFilter = "";
+let groupsLoadedOnce = false;   // 🔥 CLAVE PARA NO RESETEAR FILTRO
+
+// ===============================
+// 🔐 RESTAURAR RESPALDO SI SE BORRÓ TODO
+// ===============================
+function restoreBackupIfNeeded() {
+  let hasStudents = false;
+
+  for (let key in localStorage) {
+    if (key.startsWith("user_")) {
+      hasStudents = true;
+      break;
+    }
+  }
+
+  if (!hasStudents) {
+    const backup = JSON.parse(localStorage.getItem("backupStudents"));
+    if (backup) {
+      backup.forEach(s => {
+        localStorage.setItem(`user_${s.username}`, JSON.stringify(s));
+      });
+      alert("🔄 Progreso restaurado automáticamente desde respaldo");
+    }
+  }
+}
+
+restoreBackupIfNeeded();
 
 // ===============================
 // INICIO
@@ -165,75 +192,17 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===============================
-  // 🎮 JUEGO
-  // ===============================
-  const questions = [
-    { en: "Hello", es: "hola" },
-    { en: "Goodbye", es: "adiós" },
-    { en: "Please", es: "por favor" },
-    { en: "Thank you", es: "gracias" }
-  ];
-
-  let currentQuestion = null;
-
-  startBtn.addEventListener("click", () => {
-    currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-    questionText.textContent = `¿Cómo se dice "${currentQuestion.en}" en español?`;
-    answerInput.value = "";
-    feedback.textContent = "";
-  });
-
-  checkBtn.addEventListener("click", () => {
-    if (!currentQuestion) return;
-
-    const userAnswer = answerInput.value.trim().toLowerCase();
-
-    if (userAnswer === currentQuestion.es) {
-      score += 5;
-      stars++;
-
-      soundCorrect.play();
-
-      const msg = messages[Math.floor(Math.random() * messages.length)];
-      feedback.textContent = msg + " ⭐ +1 estrella";
-      feedback.style.color = "green";
-
-    } else {
-      soundError.play();
-      feedback.textContent = `❌ Incorrecto. Era: ${currentQuestion.es}`;
-      feedback.style.color = "red";
-      return;
-    }
-
-    if (score >= level * 20) {
-      level++;
-      soundLevel.play();
-      feedback.textContent = "🎉 SIGUIENTE NIVEL";
-      feedback.style.color = "gold";
-    }
-
-    assignMedal();
-    saveProgress();
-
-    scoreText.textContent = score + " puntos";
-    levelText.textContent = "Nivel " + level;
-    starsText.textContent = "⭐ Estrellas: " + stars;
-
-    currentQuestion = null;
-  });
-
-  // ===============================
-  // FILTRO POR GRUPO (GUARDAR SELECCIÓN)
+  // FILTRO POR GRUPO (NO SE BORRA JAMÁS)
   // ===============================
   groupSelect.addEventListener("change", () => {
     selectedGroupFilter = groupSelect.value;
-    loadTeacherPanel();
+    updateTeacherTableOnly();
   });
 
 });
 
 // ===============================
-// ⏱ TIEMPO DE TRABAJO
+// ⏱ TIEMPO
 // ===============================
 function startTimer() {
   timerInterval = setInterval(() => {
@@ -248,13 +217,14 @@ function stopTimer() {
 }
 
 // ===============================
-// 💾 PROGRESO
+// 💾 PROGRESO + RESPALDO
 // ===============================
 function saveProgress() {
-  const data = {
-    username, grade, group, score, level, stars, timeWorked
-  };
+  const data = { username, grade, group, score, level, stars, timeWorked };
   localStorage.setItem(`user_${username}`, JSON.stringify(data));
+
+  // 🔐 RESPALDO AUTOMÁTICO
+  backupAllStudents();
 }
 
 function loadProgress() {
@@ -275,6 +245,22 @@ function loadProgress() {
 }
 
 // ===============================
+// 🔐 RESPALDO GENERAL
+// ===============================
+function backupAllStudents() {
+  let students = [];
+
+  for (let key in localStorage) {
+    if (key.startsWith("user_")) {
+      const data = JSON.parse(localStorage.getItem(key));
+      if (data) students.push(data);
+    }
+  }
+
+  localStorage.setItem("backupStudents", JSON.stringify(students));
+}
+
+// ===============================
 // 🏅 MEDALLAS
 // ===============================
 function assignMedal() {
@@ -286,7 +272,7 @@ function assignMedal() {
 }
 
 // ===============================
-// 👀 ALUMNOS CONECTADOS
+// 👀 CONECTADOS
 // ===============================
 function registerConnectedUser() {
   const user = { username, grade, group };
@@ -327,23 +313,41 @@ function loadTeacherPanel() {
     }
   }
 
-  // 🔹 MANTENER FILTRO SELECCIONADO
-  const currentFilter = selectedGroupFilter;
+  // 🔥 SOLO LLENAR GRUPOS UNA VEZ
+  if (!groupsLoadedOnce) {
+    let groups = [...new Set(students.map(s => s.group))];
+    groupSelect.innerHTML = `<option value="">Todos los grupos</option>`;
+    groups.forEach(g => {
+      const opt = document.createElement("option");
+      opt.value = g;
+      opt.textContent = g;
+      groupSelect.appendChild(opt);
+    });
+    groupsLoadedOnce = true;
+  }
 
-  let groups = [...new Set(students.map(s => s.group))];
-  groupSelect.innerHTML = `<option value="">Todos los grupos</option>`;
-  groups.forEach(g => {
-    const opt = document.createElement("option");
-    opt.value = g;
-    opt.textContent = g;
-    groupSelect.appendChild(opt);
-  });
+  updateTeacherTableOnly();
+}
 
-  groupSelect.value = currentFilter; // 🔥 AQUÍ NO SE PIERDE LA SELECCIÓN
+// ===============================
+// 🔄 ACTUALIZAR SOLO TABLA (NO FILTRO)
+// ===============================
+function updateTeacherTableOnly() {
+  const studentsTable = document.getElementById("studentsTable");
+  studentsTable.innerHTML = "";
+
+  let students = [];
+
+  for (let key in localStorage) {
+    if (key.startsWith("user_")) {
+      const data = JSON.parse(localStorage.getItem(key));
+      if (data) students.push(data);
+    }
+  }
 
   let filtered = students;
-  if (currentFilter) {
-    filtered = students.filter(s => s.group === currentFilter);
+  if (selectedGroupFilter) {
+    filtered = students.filter(s => s.group === selectedGroupFilter);
   }
 
   filtered.sort((a, b) => b.score - a.score);
