@@ -5,13 +5,11 @@
   <title>Inglés Para Todos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <header>
   <h1>Inglés Para Todos</h1>
-
   <div class="header-buttons">
     <button type="button" id="themeToggle">🌙 / ☀️</button>
     <button type="button" id="hamburger" class="hamburger">☰</button>
@@ -73,13 +71,10 @@
   <h2>👨‍🏫 Panel Maestro</h2>
   <div style="margin-bottom: 15px;">
       <label>Filtrar por Grupo:</label>
-      <select id="groupSelect">
-          <option value="">Todos los grupos</option>
-      </select>
+      <select id="groupSelect"><option value="">Todos los grupos</option></select>
       <button type="button" id="refreshTeacher">🔄 Actualizar</button>
       <button type="button" id="exportBtn" style="background-color: #28a745; color: white;">📥 Exportar a Excel</button>
   </div>
-  
   <div style="overflow-x: auto;">
       <table border="1" width="100%" style="border-collapse: collapse; text-align: center;">
         <thead>
