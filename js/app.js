@@ -32,7 +32,7 @@ const messages = [
 ];
 
 let selectedGroupFilter = "";
-let groupsLoadedOnce = false;   // 🔥 CLAVE PARA NO RESETEAR FILTRO
+let groupsLoadedOnce = false;
 
 // ===============================
 // 🔐 RESTAURAR RESPALDO SI SE BORRÓ TODO
@@ -92,11 +92,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const levelText = document.getElementById("levelText");
   const starsText = document.getElementById("starsText");
   const medalText = document.getElementById("medalText");
-  const timeText = document.getElementById("timeText");
 
   const feedback = document.getElementById("feedback");
 
   const groupSelect = document.getElementById("groupSelect");
+
+  // ===============================
+  // 🍔 MENÚ HAMBURGUESA (ARREGLADO)
+  // ===============================
+  const hamburger = document.getElementById("hamburger");
+  const nav = document.getElementById("nav");
+
+  hamburger.addEventListener("click", () => {
+    if (nav.style.display === "block") {
+      nav.style.display = "none";
+    } else {
+      nav.style.display = "block";
+    }
+  });
 
   // ===============================
   // AUTO LOGIN ALUMNO
@@ -192,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===============================
-  // FILTRO POR GRUPO (NO SE BORRA JAMÁS)
+  // FILTRO POR GRUPO
   // ===============================
   groupSelect.addEventListener("change", () => {
     selectedGroupFilter = groupSelect.value;
@@ -207,7 +220,6 @@ document.addEventListener("DOMContentLoaded", () => {
 function startTimer() {
   timerInterval = setInterval(() => {
     timeWorked++;
-    document.getElementById("timeText").textContent = "⏱ Tiempo: " + timeWorked + " min";
     saveProgress();
   }, 60000);
 }
@@ -222,8 +234,6 @@ function stopTimer() {
 function saveProgress() {
   const data = { username, grade, group, score, level, stars, timeWorked };
   localStorage.setItem(`user_${username}`, JSON.stringify(data));
-
-  // 🔐 RESPALDO AUTOMÁTICO
   backupAllStudents();
 }
 
@@ -239,7 +249,6 @@ function loadProgress() {
   document.getElementById("scoreText").textContent = score + " puntos";
   document.getElementById("levelText").textContent = "Nivel " + level;
   document.getElementById("starsText").textContent = "⭐ Estrellas: " + stars;
-  document.getElementById("timeText").textContent = "⏱ Tiempo: " + timeWorked + " min";
 
   assignMedal();
 }
@@ -313,7 +322,6 @@ function loadTeacherPanel() {
     }
   }
 
-  // 🔥 SOLO LLENAR GRUPOS UNA VEZ
   if (!groupsLoadedOnce) {
     let groups = [...new Set(students.map(s => s.group))];
     groupSelect.innerHTML = `<option value="">Todos los grupos</option>`;
@@ -330,7 +338,7 @@ function loadTeacherPanel() {
 }
 
 // ===============================
-// 🔄 ACTUALIZAR SOLO TABLA (NO FILTRO)
+// 🔄 ACTUALIZAR SOLO TABLA
 // ===============================
 function updateTeacherTableOnly() {
   const studentsTable = document.getElementById("studentsTable");
