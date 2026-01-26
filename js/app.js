@@ -739,7 +739,9 @@ function updateDisplay() {
 
   const timeText = document.getElementById("timeText");
   if (timeText) {
-    timeText.textContent = "⏱ Tiempo: " + timeWorked + " min";
+    const minutes = Math.floor(timeWorked / 60);
+    const seconds = timeWorked % 60;
+    timeText.textContent = `⏱ Tiempo: ${minutes} min ${seconds} s`;
   }
 }
 
