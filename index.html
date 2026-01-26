@@ -13,7 +13,7 @@
   <h1>Inglés Para Todos</h1>
 
   <div class="header-buttons">
-    <button type="button" id="themeToggle">🌙</button>
+    <button type="button" id="themeToggle">🌙 / ☀️</button>
     <button type="button" id="hamburger" class="hamburger">☰</button>
   </div>
   
@@ -32,89 +32,55 @@
 </header>
 
 <section class="card" id="loginCard">
-  <h2>👤 Iniciar sesión (Alumno)</h2>
-
-  <input type="text" id="gradeInput" placeholder="Grado (ej. 1)" />
-  <input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
+  <h2>👤 Iniciar sesión</h2>
+  <input type="text" id="gradeInput" placeholder="Grado" />
+  <input type="text" id="groupInput" placeholder="Grupo" />
   <input type="text" id="usernameInput" placeholder="Nombre completo" />
-
   <p>— o —</p>
-
-  <input type="email" id="emailInput" placeholder="Correo (Opcional)" />
-
+  <input type="email" id="emailInput" placeholder="Correo" />
   <button type="button" id="loginBtn">Entrar</button>
 </section>
 
 <section class="card" id="teacherLogin" style="display:none;">
   <h2>👨‍🏫 Acceso Maestro</h2>
-
   <input type="text" id="teacherUser" placeholder="Usuario">
   <input type="password" id="teacherPass" placeholder="Contraseña">
-
-  <div style="margin-top:10px;">
-      <button type="button" id="teacherLoginBtn">Entrar como maestro</button>
-      <button type="button" id="closeTeacherLogin" style="background-color: #666;">Cancelar</button>
-  </div>
+  <button type="button" id="teacherLoginBtn">Entrar</button>
+  <button type="button" id="closeTeacherLogin">Cancelar</button>
 </section>
 
 <main id="mainContent" style="display:none;">
   <h3 id="userDisplay"></h3>
-
   <section class="card">
     <h2 id="questionText">Pulsa para comenzar</h2>
-    <p id="feedback" style="font-size:18px; font-weight:bold; min-height: 24px;"></p>
-
-    <input type="text" id="answerInput" placeholder="Escribe tu respuesta en inglés..." autocomplete="off" />
-
-    <div style="margin-top: 10px;">
-        <button type="button" id="startGame">🎲 Nueva Pregunta</button>
-        <button type="button" id="checkAnswer">✅ Responder</button>
-    </div>
-
-    <hr>
-    
-    <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-        <p id="starsText">⭐ Estrellas: 0</p>
-        <p id="timeText">⏱ Tiempo: 0 min 0 s</p>
-    </div>
+    <p id="feedback"></p>
+    <input type="text" id="answerInput" placeholder="Respuesta..." autocomplete="off" />
+    <button type="button" id="startGame">Nueva Pregunta</button>
+    <button type="button" id="checkAnswer">Responder</button>
+    <p id="starsText">⭐ Estrellas: 0</p>
+    <p id="timeText">⏱ Tiempo: 0 min 0 s</p>
   </section>
-
   <section class="card">
-    <h2>Tu Progreso</h2>
-    <p id="scoreText" style="font-size: 1.5em; font-weight: bold;">0 puntos</p>
+    <p id="scoreText">0 puntos</p>
     <p id="levelText">Nivel 1</p>
   </section>
 </main>
 
 <section id="teacherPanel" class="card" style="display:none;">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h2>👨‍🏫 Panel de Control</h2>
-      <button type="button" id="closeTeacherPanel">❌ Salir</button>
-  </div>
-
-  <h3>🏫 Filtrar por grupo</h3>
-  <select id="groupSelect">
-    <option value="">Todos los grupos</option>
-  </select>
-  <button type="button" id="refreshTeacher">🔄 Actualizar Tabla</button>
-
-  <h3>🏆 Ranking de alumnos (Datos locales)</h3>
-  <div style="overflow-x:auto;">
-      <table border="1" width="100%" style="border-collapse: collapse; text-align: center;">
-        <thead>
-          <tr style="background-color: #f0f0f0; color: #333;">
-            <th>Alumno</th>
-            <th>Grado</th>
-            <th>Grupo</th>
-            <th>Puntos</th>
-            <th>Nivel</th>
-            <th>⭐</th>
-            <th>Tiempo</th>
-          </tr>
-        </thead>
-        <tbody id="studentsTable"></tbody>
-      </table>
-  </div>
+  <h2>👨‍🏫 Panel Maestro</h2>
+  <select id="groupSelect"><option value="">Todos los grupos</option></select>
+  <button type="button" id="refreshTeacher">🔄 Actualizar</button>
+  <button type="button" id="exportBtn" style="background-color: #28a745; color: white;">📥 Exportar a Excel (CSV)</button>
+  
+  <table border="1" width="100%" style="margin-top:10px;">
+    <thead>
+      <tr>
+        <th>Alumno</th><th>Grado</th><th>Grupo</th><th>Puntos</th><th>Nivel</th><th>⭐</th><th>Tiempo</th>
+      </tr>
+    </thead>
+    <tbody id="studentsTable"></tbody>
+  </table>
+  <button type="button" id="closeTeacherPanel">Cerrar Sesión Maestro</button>
 </section>
 
 <script src="js/app.js"></script>
