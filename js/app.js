@@ -62,16 +62,21 @@ document.addEventListener("DOMContentLoaded", () => {
         timerInterval = null, currentQuestion = null;
 
     // ===============================
-    // 🛠️ FIX EXPERTO: HAMBURGUESA Y TEMA
+    // 🛠️ FIX EXPERTO: MODO OSCURO Y HAMBURGUESA
     // ===============================
     
-    // Hamburguesa - Usamos clase "active" para evitar fallos de lectura de CSS
-    hamburger.addEventListener("click", () => {
+    // Hamburguesa: Un solo toggle de clase. CSS hace el resto.
+    hamburger.addEventListener("click", (e) => {
+        e.stopPropagation();
         nav.classList.toggle("active");
-        nav.style.display = nav.classList.contains("active") ? "block" : "none";
     });
 
-    // Modo Oscuro - Aseguramos persistencia
+    // Cerrar menú al hacer clic fuera
+    document.addEventListener("click", () => {
+        nav.classList.remove("active");
+    });
+
+    // Modo Oscuro: Persistente y limpio
     function checkTheme() {
         if (localStorage.getItem("theme") === "dark") {
             document.body.classList.add("dark");
@@ -85,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ===============================
-    // 🕹️ LÓGICA DE JUEGO (MANTENIDA)
+    // 🕹️ LÓGICA DE JUEGO (PRESERVADA)
     // ===============================
     
     function init() {
@@ -164,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ===============================
-    // 👨‍🏫 PANEL MAESTRO (FILTRO REPARADO)
+    // 👨‍🏫 PANEL MAESTRO (PRESERVADO)
     // ===============================
 
     function updateGroupDropdown() {
@@ -206,6 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     groupSelect.addEventListener("change", loadTeacherPanel);
+    refreshTeacherBtn.addEventListener("click", () => { updateGroupDropdown(); loadTeacherPanel(); });
 
     // --- ACCIONES DE LOGIN ---
     loginBtn.addEventListener("click", () => {
