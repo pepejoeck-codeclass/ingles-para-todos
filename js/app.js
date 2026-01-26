@@ -23,19 +23,28 @@ let connectedUsers = JSON.parse(localStorage.getItem("connectedUsers")) || [];
 const TEACHER_USER = "Jose de Jesus Ramos Flores";
 const TEACHER_PASS = "161286";
 
-const messages = [
-  "🔥 Excellent job",
-  "⭐ You're doing great",
-  "👏 Keep it up",
-  "💪 You can do it",
-  "🎯 Perfect"
-];
-
 let selectedGroupFilter = "";
 let groupsLoadedOnce = false;
 
 // ===============================
-// 🔐 RESTAURAR RESPALDO SI SE BORRÓ TODO
+// 🔐 SISTEMA DE RESPALDO PROFESIONAL (ANTI BORRADO)
+// ===============================
+function backupAllStudents() {
+  let students = [];
+
+  for (let key in localStorage) {
+    if (key.startsWith("user_")) {
+      const data = JSON.parse(localStorage.getItem(key));
+      if (data) students.push(data);
+    }
+  }
+
+  localStorage.setItem("backupStudents", JSON.stringify(students));
+  localStorage.setItem("lastBackup", new Date().toISOString());
+}
+
+// ===============================
+// 🔄 RESTAURAR AUTOMÁTICO SI SE BORRÓ TODO
 // ===============================
 function restoreBackupIfNeeded() {
   let hasStudents = false;
@@ -49,16 +58,29 @@ function restoreBackupIfNeeded() {
 
   if (!hasStudents) {
     const backup = JSON.parse(localStorage.getItem("backupStudents"));
-    if (backup) {
+
+    if (backup && backup.length > 0) {
       backup.forEach(s => {
         localStorage.setItem(`user_${s.username}`, JSON.stringify(s));
       });
-      alert("🔄 Progreso restaurado automáticamente desde respaldo");
+
+      alert("🔄 Progreso restaurado automáticamente");
     }
   }
 }
 
 restoreBackupIfNeeded();
+
+// ===============================
+// 🧠 EJERCICIOS BÁSICOS (HOLA / ADIÓS / POR FAVOR)
+// ===============================
+const questions = [
+  { q: "How do you say 'Hola' in English?", a: "hello" },
+  { q: "How do you say 'Adiós' in English?", a: "goodbye" },
+  { q: "How do you say 'Por favor' in English?", a: "please" }
+];
+
+let currentQuestion = null;
 
 // ===============================
 // INICIO
@@ -94,25 +116,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const medalText = document.getElementById("medalText");
 
   const feedback = document.getElementById("feedback");
-
   const groupSelect = document.getElementById("groupSelect");
 
   // ===============================
-  // 🍔 MENÚ HAMBURGUESA (ARREGLADO)
+  // 🍔 MENÚ HAMBURGUESA (100% FUNCIONAL)
   // ===============================
   const hamburger = document.getElementById("hamburger");
   const nav = document.getElementById("nav");
 
-  hamburger.addEventListener("click", () => {
-    if (nav.style.display === "block") {
-      nav.style.display = "none";
-    } else {
-      nav.style.display = "block";
-    }
-  });
+  if (hamburger && nav) {
+    hamburger.addEventListener("click", () => {
+      nav.style.display = (nav.style.display === "block") ? "none" : "block";
+    });
+  }
 
   // ===============================
-  // AUTO LOGIN ALUMNO
+  // AUTO LOGIN
   // ===============================
   if (username && grade && group) {
     loginCard.style.display = "none";
@@ -133,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const gr = groupInput.value.trim();
 
     if (!name || !g || !gr) {
-      alert("Completa nombre (o correo), grado y grupo");
+      alert("Completa nombre, grado y grupo");
       return;
     }
 
@@ -156,56 +175,42 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===============================
-  // BOTÓN MODO MAESTRO
+  // EJERCICIOS
   // ===============================
-  openTeacherBtn.addEventListener("click", () => {
-    loginCard.style.display = "none";
-    teacherLogin.style.display = "block";
+  startBtn.addEventListener("click", () => {
+    currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+    questionText.textContent = currentQuestion.q;
+    feedback.textContent = "";
+    answerInput.value = "";
   });
 
-  // ===============================
-  // LOGIN MAESTRO
-  // ===============================
-  teacherLoginBtn.addEventListener("click", () => {
-    const user = document.getElementById("teacherUser").value;
-    const pass = document.getElementById("teacherPass").value;
+  checkBtn.addEventListener("click", () => {
+    if (!currentQuestion) return;
 
-    if (user === TEACHER_USER && pass === TEACHER_PASS) {
-      teacherLogin.style.display = "none";
-      teacherPanel.style.display = "block";
+    const answer = answerInput.value.trim().toLowerCase();
 
-      loadTeacherPanel();
-      setInterval(loadTeacherPanel, 5000);
+    if (answer === currentQuestion.a) {
+      feedback.textContent = "✅ Correct!";
+      soundCorrect.play();
+      score += 10;
+      stars++;
+
+      if (score % 50 === 0) {
+        level++;
+        soundLevel.play();
+      }
+
     } else {
-      alert("Usuario o contraseña incorrectos");
+      feedback.textContent = "❌ Try again";
+      soundError.play();
     }
+
+    updateDisplay();
+    saveProgress();
   });
 
   // ===============================
-  // CERRAR SESIÓN MAESTRO
-  // ===============================
-  closeTeacher.addEventListener("click", () => {
-    teacherPanel.style.display = "none";
-    teacherLogin.style.display = "none";
-    loginCard.style.display = "block";
-  });
-
-  // ===============================
-  // CERRAR SESIÓN ALUMNO
-  // ===============================
-  logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("username");
-    localStorage.removeItem("grade");
-    localStorage.removeItem("group");
-
-    stopTimer();
-    removeConnectedUser();
-
-    location.reload();
-  });
-
-  // ===============================
-  // FILTRO POR GRUPO
+  // FILTRO GRUPO MAESTRO
   // ===============================
   groupSelect.addEventListener("change", () => {
     selectedGroupFilter = groupSelect.value;
@@ -224,12 +229,8 @@ function startTimer() {
   }, 60000);
 }
 
-function stopTimer() {
-  clearInterval(timerInterval);
-}
-
 // ===============================
-// 💾 PROGRESO + RESPALDO
+// 💾 PROGRESO
 // ===============================
 function saveProgress() {
   const data = { username, grade, group, score, level, stars, timeWorked };
@@ -246,157 +247,11 @@ function loadProgress() {
   stars = data.stars;
   timeWorked = data.timeWorked || 0;
 
+  updateDisplay();
+}
+
+function updateDisplay() {
   document.getElementById("scoreText").textContent = score + " puntos";
   document.getElementById("levelText").textContent = "Nivel " + level;
   document.getElementById("starsText").textContent = "⭐ Estrellas: " + stars;
-
-  assignMedal();
-}
-
-// ===============================
-// 🔐 RESPALDO GENERAL
-// ===============================
-function backupAllStudents() {
-  let students = [];
-
-  for (let key in localStorage) {
-    if (key.startsWith("user_")) {
-      const data = JSON.parse(localStorage.getItem(key));
-      if (data) students.push(data);
-    }
-  }
-
-  localStorage.setItem("backupStudents", JSON.stringify(students));
-}
-
-// ===============================
-// 🏅 MEDALLAS
-// ===============================
-function assignMedal() {
-  const medalText = document.getElementById("medalText");
-
-  if (level >= 3) medalText.textContent = "🥇 Medalla Oro";
-  else if (level === 2) medalText.textContent = "🥈 Medalla Plata";
-  else medalText.textContent = "🥉 Medalla Bronce";
-}
-
-// ===============================
-// 👀 CONECTADOS
-// ===============================
-function registerConnectedUser() {
-  const user = { username, grade, group };
-  connectedUsers.push(user);
-  localStorage.setItem("connectedUsers", JSON.stringify(connectedUsers));
-}
-
-function removeConnectedUser() {
-  connectedUsers = connectedUsers.filter(u => u.username !== username);
-  localStorage.setItem("connectedUsers", JSON.stringify(connectedUsers));
-}
-
-// ===============================
-// 👨‍🏫 PANEL MAESTRO
-// ===============================
-function loadTeacherPanel() {
-  const studentsTable = document.getElementById("studentsTable");
-  const connectedList = document.getElementById("connectedList");
-  const groupSelect = document.getElementById("groupSelect");
-
-  studentsTable.innerHTML = "";
-  connectedList.innerHTML = "";
-
-  connectedUsers = JSON.parse(localStorage.getItem("connectedUsers")) || [];
-
-  connectedUsers.forEach(u => {
-    const li = document.createElement("li");
-    li.textContent = `${u.username} (${u.grade} ${u.group})`;
-    connectedList.appendChild(li);
-  });
-
-  let students = [];
-
-  for (let key in localStorage) {
-    if (key.startsWith("user_")) {
-      const data = JSON.parse(localStorage.getItem(key));
-      if (data) students.push(data);
-    }
-  }
-
-  if (!groupsLoadedOnce) {
-    let groups = [...new Set(students.map(s => s.group))];
-    groupSelect.innerHTML = `<option value="">Todos los grupos</option>`;
-    groups.forEach(g => {
-      const opt = document.createElement("option");
-      opt.value = g;
-      opt.textContent = g;
-      groupSelect.appendChild(opt);
-    });
-    groupsLoadedOnce = true;
-  }
-
-  updateTeacherTableOnly();
-}
-
-// ===============================
-// 🔄 ACTUALIZAR SOLO TABLA
-// ===============================
-function updateTeacherTableOnly() {
-  const studentsTable = document.getElementById("studentsTable");
-  studentsTable.innerHTML = "";
-
-  let students = [];
-
-  for (let key in localStorage) {
-    if (key.startsWith("user_")) {
-      const data = JSON.parse(localStorage.getItem(key));
-      if (data) students.push(data);
-    }
-  }
-
-  let filtered = students;
-  if (selectedGroupFilter) {
-    filtered = students.filter(s => s.group === selectedGroupFilter);
-  }
-
-  filtered.sort((a, b) => b.score - a.score);
-
-  filtered.forEach(s => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${s.username}</td>
-      <td>${s.grade}</td>
-      <td>${s.group}</td>
-      <td>${s.score}</td>
-      <td>${s.level}</td>
-      <td>${s.stars}</td>
-      <td>${s.timeWorked} min</td>
-    `;
-    studentsTable.appendChild(tr);
-  });
-
-  drawChart(filtered);
-}
-
-// ===============================
-// 📈 GRÁFICA
-// ===============================
-function drawChart(students) {
-  const ctx = document.getElementById("progressChart").getContext("2d");
-
-  const labels = students.map(s => s.username);
-  const data = students.map(s => s.score);
-
-  if (window.myChart) window.myChart.destroy();
-
-  window.myChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [{
-        label: "Puntaje",
-        data,
-        backgroundColor: "rgba(54, 162, 235, 0.6)"
-      }]
-    }
-  });
 }
