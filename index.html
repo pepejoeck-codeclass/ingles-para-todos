@@ -12,14 +12,16 @@
 <header>
   <h1>Inglés Para Todos</h1>
 
-  <button id="logoutBtn">🚪 Cambiar usuario</button>
-
   <div class="header-buttons">
-    <button id="themeToggle">🌙</button>
-    <button id="hamburger" class="hamburger">☰</button>
+    <button type="button" id="themeToggle">🌙</button>
+    <button type="button" id="hamburger" class="hamburger">☰</button>
+  </div>
+  
+  <div style="margin-top: 10px;">
+      <button type="button" id="logoutBtn" style="display:none;">🚪 Cerrar Sesión</button>
+      <button type="button" id="openTeacherBtn">👨‍🏫 Modo Maestro</button>
   </div>
 
-  <!-- MENÚ -->
   <nav id="nav" style="display:none;">
     <a href="#">Lección 1</a>
     <a href="#">Lección 2 🔒</a>
@@ -29,95 +31,90 @@
   </nav>
 </header>
 
-<!-- BOTÓN MODO MAESTRO FUERA DEL MENÚ -->
-<button id="openTeacherBtn" style="margin:10px;">👨‍🏫 Modo Maestro</button>
-
-<!-- LOGIN ALUMNO -->
 <section class="card" id="loginCard">
-  <h2>Iniciar sesión</h2>
+  <h2>👤 Iniciar sesión (Alumno)</h2>
 
-  <input type="text" id="gradeInput" placeholder="Grado (ej. 1°)" />
+  <input type="text" id="gradeInput" placeholder="Grado (ej. 1)" />
   <input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
   <input type="text" id="usernameInput" placeholder="Nombre completo" />
 
   <p>— o —</p>
 
-  <input type="email" id="emailInput" placeholder="Correo" />
+  <input type="email" id="emailInput" placeholder="Correo (Opcional)" />
 
-  <button id="loginBtn">Entrar</button>
+  <button type="button" id="loginBtn">Entrar</button>
 </section>
 
-<!-- LOGIN MAESTRO -->
 <section class="card" id="teacherLogin" style="display:none;">
   <h2>👨‍🏫 Acceso Maestro</h2>
 
   <input type="text" id="teacherUser" placeholder="Usuario">
   <input type="password" id="teacherPass" placeholder="Contraseña">
 
-  <button id="teacherLoginBtn">Entrar como maestro</button>
+  <div style="margin-top:10px;">
+      <button type="button" id="teacherLoginBtn">Entrar como maestro</button>
+      <button type="button" id="closeTeacherLogin" style="background-color: #666;">Cancelar</button>
+  </div>
 </section>
 
-<!-- CONTENIDO ALUMNO -->
 <main id="mainContent" style="display:none;">
   <h3 id="userDisplay"></h3>
 
   <section class="card">
     <h2 id="questionText">Pulsa para comenzar</h2>
-    <p id="feedback" style="font-size:18px; font-weight:bold;"></p>
+    <p id="feedback" style="font-size:18px; font-weight:bold; min-height: 24px;"></p>
 
-    <input type="text" id="answerInput" placeholder="Escribe tu respuesta..." />
+    <input type="text" id="answerInput" placeholder="Escribe tu respuesta en inglés..." autocomplete="off" />
 
-    <button id="startGame">Iniciar ejercicio</button>
-    <button id="checkAnswer">Responder</button>
+    <div style="margin-top: 10px;">
+        <button type="button" id="startGame">🎲 Nueva Pregunta</button>
+        <button type="button" id="checkAnswer">✅ Responder</button>
+    </div>
 
-    <p id="starsText">⭐ Estrellas: 0</p>
-    <p id="medalText"></p>
-    <p id="timeText">⏱ Tiempo: 0 min</p>
+    <hr>
+    
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+        <p id="starsText">⭐ Estrellas: 0</p>
+        <p id="timeText">⏱ Tiempo: 0 min 0 s</p>
+    </div>
   </section>
 
   <section class="card">
-    <h2>Puntaje</h2>
-    <p id="scoreText">0 puntos</p>
+    <h2>Tu Progreso</h2>
+    <p id="scoreText" style="font-size: 1.5em; font-weight: bold;">0 puntos</p>
     <p id="levelText">Nivel 1</p>
   </section>
 </main>
 
-<!-- PANEL MAESTRO -->
 <section id="teacherPanel" class="card" style="display:none;">
-  <h2>👨‍🏫 Panel Maestro</h2>
-
-  <h3>👀 Alumnos conectados</h3>
-  <ul id="connectedList"></ul>
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>👨‍🏫 Panel de Control</h2>
+      <button type="button" id="closeTeacherPanel">❌ Salir</button>
+  </div>
 
   <h3>🏫 Filtrar por grupo</h3>
   <select id="groupSelect">
     <option value="">Todos los grupos</option>
   </select>
+  <button type="button" id="refreshTeacher">🔄 Actualizar Tabla</button>
 
-  <h3>🏆 Ranking de alumnos</h3>
-  <table border="1" width="100%">
-    <thead>
-      <tr>
-        <th>Alumno</th>
-        <th>Grado</th>
-        <th>Grupo</th>
-        <th>Puntaje</th>
-        <th>Nivel</th>
-        <th>Estrellas</th>
-        <th>Tiempo</th>
-      </tr>
-    </thead>
-    <tbody id="studentsTable"></tbody>
-  </table>
-
-  <br>
-  <h3>📈 Gráfica de progreso</h3>
-  <canvas id="progressChart"></canvas>
-
-  <br><br>
-  <button id="exportBtn">📥 Exportar a Excel</button>
-  <br><br>
-  <button id="closeTeacher">❌ Cerrar sesión maestro</button>
+  <h3>🏆 Ranking de alumnos (Datos locales)</h3>
+  <div style="overflow-x:auto;">
+      <table border="1" width="100%" style="border-collapse: collapse; text-align: center;">
+        <thead>
+          <tr style="background-color: #f0f0f0; color: #333;">
+            <th>Alumno</th>
+            <th>Grado</th>
+            <th>Grupo</th>
+            <th>Puntos</th>
+            <th>Nivel</th>
+            <th>⭐</th>
+            <th>Tiempo</th>
+          </tr>
+        </thead>
+        <tbody id="studentsTable"></tbody>
+      </table>
+  </div>
 </section>
 
 <script src="js/app.js"></script>
