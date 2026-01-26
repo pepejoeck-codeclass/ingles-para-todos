@@ -21,6 +21,15 @@ let timerInterval = null;
 let connectedUsers = JSON.parse(localStorage.getItem("connectedUsers")) || [];
 
 // ===============================
+// 🔐 DATOS MAESTRO
+// ===============================
+const TEACHER_USER = "Jose de Jesus Ramos Flores";
+const TEACHER_PASS = "161286";
+
+let teacherLogged = false;
+let selectedGroup = "";
+
+// ===============================
 // RESPALDO AUTOMÁTICO
 // ===============================
 function backupAllStudents() {
@@ -83,6 +92,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const loginCard = document.getElementById("loginCard");
   const mainContent = document.getElementById("mainContent");
+  const teacherPanel = document.getElementById("teacherPanel");
+  const teacherLogin = document.getElementById("teacherLogin");
 
   const logoutBtn = document.getElementById("logoutBtn");
 
@@ -118,7 +129,50 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===============================
-  // AUTO LOGIN
+  // 👨‍🏫 BOTÓN MODO MAESTRO
+  // ===============================
+  const openTeacherBtn = document.getElementById("openTeacherBtn");
+
+  openTeacherBtn.addEventListener("click", () => {
+    loginCard.style.display = "none";
+    mainContent.style.display = "none";
+    teacherLogin.style.display = "block";
+  });
+
+  // ===============================
+  // 🔐 LOGIN MAESTRO
+  // ===============================
+  const teacherUser = document.getElementById("teacherUser");
+  const teacherPass = document.getElementById("teacherPass");
+  const teacherLoginBtn = document.getElementById("teacherLoginBtn");
+
+  teacherLoginBtn.addEventListener("click", () => {
+    if (
+      teacherUser.value === TEACHER_USER &&
+      teacherPass.value === TEACHER_PASS
+    ) {
+      teacherLogged = true;
+      teacherLogin.style.display = "none";
+      teacherPanel.style.display = "block";
+      loadTeacherPanel();
+    } else {
+      alert("❌ Usuario o contraseña incorrectos");
+    }
+  });
+
+  // ===============================
+  // ❌ CERRAR SESIÓN MAESTRO
+  // ===============================
+  const closeTeacher = document.getElementById("closeTeacher");
+
+  closeTeacher.addEventListener("click", () => {
+    teacherLogged = false;
+    teacherPanel.style.display = "none";
+    loginCard.style.display = "block";
+  });
+
+  // ===============================
+  // AUTO LOGIN ALUMNO
   // ===============================
   if (username && grade && group) {
     loginCard.style.display = "none";
@@ -205,24 +259,27 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===============================
-  // 🚪 CERRAR SESIÓN ALUMNO (TOTALMENTE ARREGLADO)
+  // 🚪 CERRAR SESIÓN ALUMNO
   // ===============================
   logoutBtn.addEventListener("click", () => {
-
-    // Quitar de conectados
     removeConnectedUser();
-
-    // Detener reloj
     stopTimer();
 
-    // Borrar sesión activa
     localStorage.removeItem("username");
     localStorage.removeItem("grade");
     localStorage.removeItem("group");
 
-    // Volver limpio al login
     location.reload();
   });
+
+  // ===============================
+  // 🔄 AUTO ACTUALIZAR PANEL MAESTRO
+  // ===============================
+  setInterval(() => {
+    if (teacherLogged) {
+      loadTeacherPanel();
+    }
+  }, 5000);
 
 });
 
@@ -279,4 +336,67 @@ function registerConnectedUser() {
 function removeConnectedUser() {
   connectedUsers = connectedUsers.filter(u => u.username !== username);
   localStorage.setItem("connectedUsers", JSON.stringify(connectedUsers));
+}
+
+// ===============================
+// 👨‍🏫 PANEL MAESTRO
+// ===============================
+function loadTeacherPanel() {
+  const table = document.getElementById("studentsTable");
+  const connectedList = document.getElementById("connectedList");
+  const groupSelect = document.getElementById("groupSelect");
+
+  table.innerHTML = "";
+  connectedList.innerHTML = "";
+
+  let groups = new Set();
+  let students = [];
+
+  for (let key in localStorage) {
+    if (key.startsWith("user_")) {
+      const s = JSON.parse(localStorage.getItem(key));
+      if (s) students.push(s);
+    }
+  }
+
+  students.forEach(s => groups.add(s.group));
+
+  if (groupSelect.options.length === 1) {
+    groups.forEach(g => {
+      const opt = document.createElement("option");
+      opt.value = g;
+      opt.textContent = g;
+      groupSelect.appendChild(opt);
+    });
+  }
+
+  groupSelect.onchange = () => {
+    selectedGroup = groupSelect.value;
+    loadTeacherPanel();
+  };
+
+  let filtered = selectedGroup
+    ? students.filter(s => s.group === selectedGroup)
+    : students;
+
+  filtered.sort((a, b) => b.score - a.score);
+
+  filtered.forEach(s => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${s.username}</td>
+      <td>${s.grade}</td>
+      <td>${s.group}</td>
+      <td>${s.score}</td>
+      <td>${s.level}</td>
+      <td>${s.stars}</td>
+    `;
+    table.appendChild(row);
+  });
+
+  connectedUsers.forEach(u => {
+    const li = document.createElement("li");
+    li.textContent = `${u.username} (${u.grade}${u.group})`;
+    connectedList.appendChild(li);
+  });
 }
