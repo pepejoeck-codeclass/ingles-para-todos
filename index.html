@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - FINAL PRO</title>
+    <title>Inglés Para Todos - HEROES EDITION</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -31,7 +31,7 @@
         .teacher-header-img { width: 100%; max-height: 180px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 10px; }
         
         /* INPUTS */
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; font-family: 'Nunito'; }
         .btn { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; background: var(--primary); }
         .btn-danger { background: var(--accent); } .btn-secondary { background: #6c757d; }
         .btn-excel { background: #217346; } .btn-pdf { background: #b30b00; } .btn-chart { background: #6610f2; } .btn-download { background: #007bff; }
@@ -45,18 +45,18 @@
         .nav-item.active { color: var(--primary); font-weight: bold; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
         
-        /* HUD MEJORADO PARA VER MEDALLAS SEPARADAS */
-        .hud-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; font-size: 11px; font-weight: bold; background: #f0f2f5; padding: 8px; border-radius: 10px; margin-bottom: 5px; }
-        .hud-row { display: flex; justify-content: space-between; padding: 2px 5px; border-bottom: 1px solid #ddd; }
+        /* HUD */
+        .hud-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 12px; font-weight: bold; background: #f0f2f5; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
+        .hud-item { display: flex; flex-direction: column; align-items: center; }
         
         /* MAESTRO */
-        .teacher-panel-container { width: 100%; max-width: 1300px; display: none; padding-bottom: 50px; }
+        .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: center; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
         th { background: var(--primary); color: white; }
         td { vertical-align: middle; }
         
-        .action-btn { padding: 6px 8px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; font-size: 13px; }
+        .action-btn { padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; font-size: 14px; }
         .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-edit { background: #ffc107; color: black; } .btn-history { background: #795548; }
         
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
@@ -70,34 +70,69 @@
 
         .history-table { width: 100%; margin-top: 15px; text-align: left; }
         .history-table th { background: #6c757d; }
+
+        /* --- NUEVOS ESTILOS PARA NOTICIAS Y LEADERBOARD --- */
+        .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
+        .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
+        
+        .leader-table { width: 100%; font-size: 14px; border-collapse: collapse; }
+        .leader-table th { background: #f1f1f1; color: #333; padding: 8px; }
+        .leader-table td { padding: 8px; border-bottom: 1px solid #eee; }
+        .rank-1 { background-color: #fff9db; font-weight: bold; }
+        .rank-1 td:first-child::before { content: '🥇 '; }
+        .rank-2 { background-color: #f8f9fa; }
+        .rank-2 td:first-child::before { content: '🥈 '; }
+        .rank-3 { background-color: #fff0e6; }
+        .rank-3 td:first-child::before { content: '🥉 '; }
     </style>
 </head>
 <body>
 
-    <div id="loginCard" class="app-container login-width">
-        <div class="card">
-            <img src="assets/images/logo_main.png.jpg" alt="Logo" class="logo-img">
-            <h2>Inglés Para Todos</h2>
-            
-            <input type="email" id="emailInput" placeholder="Correo Electrónico">
-            <input type="password" id="passwordInput" placeholder="Contraseña">
-            
-            <hr>
-            <p style="font-size: 12px;">* ¿Nuevo? Llena esto:</p>
-            <input type="text" id="usernameInput" placeholder="Nombre Completo">
-            <div style="display: flex; gap: 10px;">
-                <input type="number" id="gradeInput" placeholder="Grado" style="width:50%">
-                <input type="text" id="groupInput" placeholder="Grupo" style="width:50%">
-            </div>
+    <div id="loginContainerWrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        
+        <div id="loginCard" class="app-container login-width">
+            <div class="card">
+                <img src="assets/images/logo_main.png.jpg" alt="Logo" class="logo-img">
+                <h2>Inglés Para Todos</h2>
+                
+                <input type="email" id="emailInput" placeholder="Correo Electrónico">
+                <input type="password" id="passwordInput" placeholder="Contraseña">
+                
+                <hr>
+                <p style="font-size: 12px;">* ¿Nuevo? Llena esto:</p>
+                <input type="text" id="usernameInput" placeholder="Nombre Completo">
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="gradeInput" placeholder="Grado" style="width:50%">
+                    <input type="text" id="groupInput" placeholder="Grupo" style="width:50%">
+                </div>
 
-            <button onclick="intentarLogin()" class="btn">🚀 ENTRAR / REGISTRAR</button>
-            <div style="margin-top: 15px;">
-                <a href="#" onclick="recuperarPassword()" style="font-size: 13px; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a>
+                <button onclick="intentarLogin()" class="btn">🚀 ENTRAR / REGISTRAR</button>
+                <div style="margin-top: 15px;">
+                    <a href="#" onclick="recuperarPassword()" style="font-size: 13px; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <p style="color: white;">¿Maestro?</p>
+                <img src="assets/images/super_teacher_btn.jpg.jpg" onclick="mostrarLoginMaestro()" class="teacher-badge-img">
             </div>
         </div>
-        <div style="text-align: center;">
-            <p style="color: white;">¿Maestro?</p>
-            <img src="assets/images/super_teacher_btn.jpg.jpg" onclick="mostrarLoginMaestro()" class="teacher-badge-img">
+
+        <div id="communitySection" class="community-section">
+            
+            <div class="news-box">
+                <h3 style="margin-top:0; color:#333;"><i class="fas fa-bullhorn"></i> Noticias / News</h3>
+                <div id="newsContent" style="white-space: pre-wrap; color: #555;">Cargando noticias...</div>
+            </div>
+
+            <div class="leaderboard-box">
+                <h3 style="margin-top:0; color:#004e92;"><i class="fas fa-trophy"></i> The Best Heroes Practicing</h3>
+                <table class="leader-table">
+                    <thead><tr><th>Hero</th><th>Time</th><th>Pts</th><th>Medals</th></tr></thead>
+                    <tbody id="leaderboardBody"><tr><td colspan="4">Cargando héroes...</td></tr></tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 
@@ -159,6 +194,14 @@
             </div>
             <hr>
             
+            <div style="background: #fff3cd; padding: 10px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ffeeba;">
+                <h4 style="margin: 0 0 5px 0;">📢 Publicar Noticia Nueva</h4>
+                <div style="display: flex; gap: 10px;">
+                    <textarea id="teacherNewsInput" rows="1" style="resize: none; height: 40px;" placeholder="Escribe aquí la noticia para tus alumnos..."></textarea>
+                    <button onclick="publicarNoticia()" class="btn" style="margin-top: 8px; width: auto;">Publicar</button>
+                </div>
+            </div>
+
             <div class="dashboard-grid">
                 <div class="stat-card"><div class="stat-number" id="totalAlumnos">0</div>Alumnos</div>
                 <div class="stat-card"><div class="stat-number" id="promedioAciertos">0</div>Aciertos</div>
@@ -182,15 +225,9 @@
                 <table id="tablaAlumnos">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
-                            <th>Gpo</th>
-                            <th>Nvl</th>
-                            <th>🕓 Tiempo</th>
-                            <th>✅</th>
-                            <th>❌</th>
-                            <th style="color:#d4af37">🥇</th>
-                            <th style="color:#C0C0C0">🥈</th>
-                            <th style="color:#CD7F32">🥉</th>
+                            <th>Nombre</th><th>Gpo</th><th>Nvl</th><th>🕓 Tiempo</th>
+                            <th>✅</th><th>❌</th>
+                            <th style="color:#d4af37">🥇</th><th style="color:#C0C0C0">🥈</th><th style="color:#CD7F32">🥉</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -211,9 +248,7 @@
     <div id="modalGraficaGrupal" class="modal-overlay">
         <div class="modal-content" style="max-width: 900px;">
             <h3>📊 Rendimiento del Grupo</h3>
-            <div style="background: white; padding: 10px;">
-                <canvas id="groupBigChart"></canvas>
-            </div>
+            <div style="background: white; padding: 10px;"><canvas id="groupBigChart"></canvas></div>
             <br>
             <button onclick="descargarGraficaGrupal()" class="btn btn-download"><i class="fas fa-download"></i> Descargar Imagen</button>
             <button onclick="cerrarModal('modalGraficaGrupal')" class="btn btn-secondary">Cerrar</button>
@@ -224,10 +259,7 @@
         <div class="modal-content">
             <h3 id="historialNombre">Historial de Trabajo 📜</h3>
             <div style="overflow-y: auto; max-height: 300px;">
-                <table class="history-table">
-                    <thead><tr><th>Fecha</th><th>Tiempo Trabajado</th></tr></thead>
-                    <tbody id="historialCuerpo"></tbody>
-                </table>
+                <table class="history-table"><thead><tr><th>Fecha</th><th>Tiempo Trabajado</th></tr></thead><tbody id="historialCuerpo"></tbody></table>
             </div>
             <br><button onclick="cerrarModal('modalHistorial')" class="btn btn-secondary">Cerrar</button>
         </div>
@@ -286,6 +318,12 @@
             }
         });
 
+        // INICIALIZACIÓN LANDING
+        document.addEventListener("DOMContentLoaded", () => {
+            cargarNoticias();
+            cargarLeaderboard();
+        });
+
         // 5. CRONÓMETRO
         function iniciarCronometro() {
             if(timerInterval) clearInterval(timerInterval);
@@ -314,36 +352,69 @@
             document.getElementById("timerDisplay").textContent = formatearTiempo(datosUsuario.timeWorked || 0);
             document.getElementById("correctDisplay").textContent = datosUsuario.totalCorrect || 0;
             document.getElementById("wrongDisplay").textContent = datosUsuario.totalWrong || 0;
-            
-            // Medallas Separadas
             const m = datosUsuario.medals || {gold:0, silver:0, bronze:0};
             document.getElementById("goldDisplay").textContent = m.gold;
             document.getElementById("silverDisplay").textContent = m.silver;
             document.getElementById("bronzeDisplay").textContent = m.bronze;
-            
             document.getElementById("scoreText").textContent = datosUsuario.score || 0;
         }
 
         // 7. PANTALLAS
         function mostrarLogin() {
+            document.getElementById("loginContainerWrapper").style.display = "flex";
             document.getElementById("loginCard").style.display = "block";
+            document.getElementById("communitySection").style.display = "flex";
             document.getElementById("mainContent").style.display = "none";
             document.getElementById("teacherPanel").style.display = "none";
             document.getElementById("teacherLogin").style.display = "none";
+            cargarLeaderboard(); // Refrescar ranking
         }
         function mostrarJuego() {
-            document.getElementById("loginCard").style.display = "none";
+            document.getElementById("loginContainerWrapper").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
             document.getElementById("userDisplay").textContent = "Alumno: " + (datosUsuario.username || "Héroe");
             actualizarUI(); actualizarCandados(); cargarPregunta(); iniciarCronometro();
         }
         function mostrarLoginMaestro() {
-            document.getElementById("loginCard").style.display = "none";
+            document.getElementById("loginContainerWrapper").style.display = "none";
             document.getElementById("teacherLogin").style.display = "block";
         }
         function volverInicio() {
             document.getElementById("teacherLogin").style.display = "none";
-            document.getElementById("loginCard").style.display = "block";
+            document.getElementById("teacherPanel").style.display = "none";
+            document.getElementById("loginContainerWrapper").style.display = "flex";
+        }
+
+        // --- NOTICIAS Y LEADERBOARD ---
+        function cargarNoticias() {
+            db.collection("global").doc("news").onSnapshot((doc) => {
+                if(doc.exists) {
+                    const text = doc.data().text || "Bienvenido a Inglés Para Todos.";
+                    document.getElementById("newsContent").innerText = text;
+                    document.getElementById("teacherNewsInput").value = text;
+                }
+            });
+        }
+        function publicarNoticia() {
+            const txt = document.getElementById("teacherNewsInput").value;
+            db.collection("global").doc("news").set({ text: txt }).then(() => Swal.fire("Publicado", "Noticia actualizada", "success"));
+        }
+        function cargarLeaderboard() {
+            db.collection("students").orderBy("timeWorked", "desc").limit(10).get().then((snap) => {
+                const tbody = document.getElementById("leaderboardBody");
+                tbody.innerHTML = "";
+                let rank = 1;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const tr = document.createElement("tr");
+                    if(rank===1) tr.className = "rank-1"; else if(rank===2) tr.className = "rank-2"; else if(rank===3) tr.className = "rank-3";
+                    
+                    const medallas = (d.medals?.gold||0) + (d.medals?.silver||0) + (d.medals?.bronze||0);
+                    tr.innerHTML = `<td>${d.username}</td><td>${formatearTiempo(d.timeWorked||0)}</td><td>${d.score}</td><td>${medallas} 🏅</td>`;
+                    tbody.appendChild(tr);
+                    rank++;
+                });
+            });
         }
 
         // 8. LOGIN ALUMNO
@@ -411,8 +482,6 @@
         }
         function finSesion() {
             let msg = "", medal = "";
-            
-            // LOGICA CLASIFICACION MEDALLAS
             if(aciertosSesion === 5) {
                 msg = "🏆 PERFECT! LEVEL UP!"; medal = "gold"; 
                 datosUsuario.medals.gold++;
@@ -426,7 +495,6 @@
                 msg = "🥉 Try again."; medal = "bronze"; 
                 datosUsuario.medals.bronze++;
             }
-            
             db.collection("students").doc(usuarioActual).update({ unlockedLevels: datosUsuario.unlockedLevels, medals: datosUsuario.medals });
             actualizarCandados();
             Swal.fire({ title: msg, icon: medal === 'gold' ? 'success':'info', confirmButtonText: 'OK' }).then(() => {
@@ -462,7 +530,7 @@
         }
         function cerrarSesionMaestro() {
             document.getElementById("teacherPanel").style.display = "none";
-            document.getElementById("loginCard").style.display = "block";
+            document.getElementById("loginContainerWrapper").style.display = "flex";
         }
         function cargarTablaAlumnos() {
             document.getElementById("cuerpoTabla").innerHTML = "<tr><td colspan='10'>Cargando...</td></tr>";
