@@ -52,7 +52,6 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- RUTAS DE IMÁGENES ACTUALIZADAS A assets/images/ --- */
         .logo-img {
             width: 100%;
             max-width: 300px;
@@ -82,7 +81,6 @@
             border-radius: 10px;
         }
 
-        /* --- ESTILOS GENERALES --- */
         h2 { color: var(--primary); margin-bottom: 15px; text-transform: uppercase; font-weight: 900; }
         
         input {
@@ -117,7 +115,6 @@
         .btn-danger:active { transform: translateY(4px); box-shadow: none; }
         .btn-secondary { background: #6c757d; }
 
-        /* --- JUEGO --- */
         .level-badge {
             background: var(--gold);
             color: #000;
@@ -155,7 +152,6 @@
             border-left: 5px solid var(--primary);
         }
 
-        /* --- NAVEGACIÓN --- */
         .bottom-nav {
             display: flex;
             justify-content: space-around;
@@ -170,7 +166,7 @@
         .nav-item i { font-size: 20px; display: block; margin-bottom: 3px; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
 
-        /* --- PANEL MAESTRO --- */
+        /* TEACHER PANEL */
         .teacher-panel-container {
             width: 95%;
             max-width: 1000px;
@@ -200,13 +196,14 @@
         .action-btn { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; }
         .btn-info { background: #17a2b8; }
         .btn-delete { background: #dc3545; }
+        .btn-reset { background: #ffc107; color: black; }
     </style>
 </head>
 <body>
 
     <div id="loginCard" class="app-container">
         <div class="card">
-            <img src="assets/images/logo_main.png" alt="Inglés Para Todos" class="logo-img" onerror="this.style.display='none'; alert('Revisa que el logo esté en assets/images/logo_main.png')">
+            <img src="assets/images/logo_main.png" alt="Inglés Para Todos" class="logo-img" onerror="this.style.display='none'">
             
             <h2>Identidad Secreta</h2>
             
@@ -214,7 +211,7 @@
             <input type="password" id="passwordInput" placeholder="Contraseña Secreta">
             
             <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
-            <p style="font-size: 12px; color: #666; margin-bottom: 5px;">* ¿Eres nuevo? Llena esto:</p>
+            <p style="font-size: 12px; color: #666; margin-bottom: 5px;">* ¿Nuevo? Llena esto para registrarte:</p>
             
             <input type="text" id="usernameInput" placeholder="Tu Nombre Real">
             <div style="display: flex; gap: 10px;">
@@ -253,6 +250,7 @@
             <div style="text-align: left;">
                 <div id="userDisplay" style="font-weight: bold; color: var(--primary);">Héroe: ...</div>
                 <div id="scoreText" style="font-size: 12px; color: #666;">Puntos: 0</div>
+                <div id="timeText" style="font-size: 12px; color: #666;">⏱ 0m 0s</div>
             </div>
             <button id="logoutBtn" class="btn-danger" style="width: auto; padding: 5px 15px; font-size: 12px; margin:0;">
                 <i class="fas fa-sign-out-alt"></i> Salir
@@ -285,15 +283,17 @@
             <div class="dashboard-grid">
                 <div class="stat-card"><div class="stat-number" id="medalsCount">0</div><div>Medallas</div></div>
                 <div class="stat-card"><div class="stat-number" id="correctCount">0</div><div>Aciertos</div></div>
+                <div class="stat-card"><div class="stat-number" id="wrongCount">0</div><div>Errores</div></div>
             </div>
             <div style="background: #f1f1f1; padding: 10px; border-radius: 10px; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <select id="groupSelect" style="padding: 8px; border-radius: 5px; flex: 1;"><option value="">Todos</option></select>
+                <select id="groupSelect" style="padding: 8px; border-radius: 5px; flex: 1;"><option value="">Cargando...</option></select>
                 <button id="refreshTeacher" class="action-btn btn-info"><i class="fas fa-sync"></i></button>
                 <button id="exportExcelBtn" class="action-btn" style="background-color: #217346;"><i class="fas fa-file-excel"></i> Excel</button>
+                <button id="resetMonthlyBtn" class="action-btn btn-reset" style="background-color: #ffc107; color: black; font-weight:bold">⚠️ RESET GLOBAL</button>
             </div>
             <div style="overflow-x: auto;">
                 <table id="teacherTable">
-                    <thead><tr><th>Nombre</th><th>Gpo</th><th>Nivel</th><th>Puntos</th><th>Acciones</th></tr></thead>
+                    <thead><tr><th>Nombre</th><th>Gpo</th><th>Nivel</th><th>Puntos</th><th>Aciertos</th><th>Acciones</th></tr></thead>
                     <tbody id="studentsTable"></tbody>
                 </table>
             </div>
