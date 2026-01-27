@@ -16,6 +16,7 @@ const firebaseConfig = {
   measurementId: "G-5MEQGW13ZE"
 };
 
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -59,8 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const soundLevelUp = new Audio("assets/sounds/levelup.mp3"); 
 
     // --- CREDENCIALES MAESTRO ---
-    const TEACHER_USER = "Jose de Jesus Ramos Flores";
-    const TEACHER_PASS = "161286";
+    // NOTA IMPORTANTE: Estas variables deben tener nombres distintos a los IDs del HTML
+    const TEACHER_USERNAME_VAL = "Jose de Jesus Ramos Flores";
+    const TEACHER_PASSWORD_VAL = "161286";
 
     // --- REFERENCIAS DOM ---
     const loginCard = document.getElementById("loginCard");
@@ -92,9 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const emailInput = document.getElementById("emailInput");
     const passwordInput = document.getElementById("passwordInput");
 
-    // Inputs Maestro
-    const teacherUserInput = document.getElementById("teacherUser");
-    const teacherPassInput = document.getElementById("teacherPass");
+    // Inputs Maestro (IDs actualizados en HTML para evitar conflictos)
+    const teacherUserInput = document.getElementById("teacherUserInputHTML");
+    const teacherPassInput = document.getElementById("teacherPassInputHTML");
+    
+    // Panel Maestro elementos
     const groupSelect = document.getElementById("groupSelect");
     const studentsTable = document.getElementById("studentsTable");
 
@@ -108,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const timeText = document.getElementById("timeText");
     const lessonProgressBar = document.getElementById("lessonProgressBar");
 
-    // Contadores Teacher
+    // Contadores Teacher Dashboard
     const correctCountDisplay = document.getElementById("correctCount");
     const wrongCountDisplay = document.getElementById("wrongCount");
     const medalsCountDisplay = document.getElementById("medalsCount");
@@ -120,20 +124,24 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentQuestion = null;
 
     // ==========================================
-    // 1. SISTEMA DE AUTENTICACIÓN MEJORADO
+    // 1. SISTEMA DE AUTENTICACIÓN (LOGIN)
     // ==========================================
 
+    // Escuchar cambios de sesión (se activa automático al loguearse)
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUserId = user.uid;
-            console.log("Usuario detectado:", user.email);
+            console.log("Usuario autenticado:", user.email);
             await loadUserData(user.uid);
             showStudentInterface();
             updateLevelLocks();
         } else {
             currentUserId = null;
             currentUserData = {};
-            showLoginInterface();
+            // Solo mostramos login si no estamos en panel maestro
+            if(teacherPanel.style.display === "none" && teacherLogin.style.display === "none") {
+                showLoginInterface();
+            }
         }
     });
 
@@ -154,20 +162,20 @@ document.addEventListener("DOMContentLoaded", () => {
             loginBtn.textContent = "🚀 Verificando...";
 
             try {
-                // INTENTO DE LOGIN
+                // INTENTO DE INICIAR SESIÓN
                 await signInWithEmailAndPassword(auth, email, password);
-                // Si pasa, el onAuthStateChanged se encargará del resto
+                // Si funciona, onAuthStateChanged hará el resto
             } catch (error) {
                 console.error("Error Login:", error.code);
                 
-                // SI EL USUARIO NO EXISTE, INTENTAMOS CREARLO
+                // SI EL USUARIO NO EXISTE, INTENTAMOS REGISTRARLO
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
                     
-                    // Validamos que haya llenado los datos de registro
+                    // Si intenta registrarse, DEBE llenar los otros datos
                     if (!name || !grade || !group) {
                         Swal.fire({
                             title: "Usuario Nuevo",
-                            text: "El correo no existe. Para registrarte, por favor llena TU NOMBRE, GRADO y GRUPO en los campos de arriba.",
+                            text: "Ese correo no existe. Para crear tu cuenta, llena Nombre, Grado y Grupo.",
                             icon: "info"
                         });
                         loginBtn.disabled = false;
@@ -176,18 +184,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
                     try {
-                        // CREACIÓN DE USUARIO
+                        // CREAR USUARIO NUEVO
                         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                         const user = userCredential.user;
                         
-                        // Guardar datos iniciales en Firestore
+                        // Guardar en base de datos
                         await setDoc(doc(db, "students", user.uid), {
                             uid: user.uid,
                             username: name, 
                             grade: grade, 
                             group: group, 
                             email: email,
-                            password: password, // NOTA: Guardar pass en texto plano no es ideal en producción real, pero ok para este proyecto escolar
+                            password: password, 
                             score: 0, 
                             level: 1, 
                             timeWorked: 0,
@@ -205,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         Swal.fire("Error Registro", msg, "error"); 
                     }
                 } else if (error.code === 'auth/wrong-password') {
-                    Swal.fire("Error", "Contraseña incorrecta.", "error");
+                    Swal.fire("Contraseña Incorrecta", "Inténtalo de nuevo.", "error");
                 } else { 
                     Swal.fire("Error Acceso", error.message, "error"); 
                 }
@@ -215,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Recuperar contraseña
     if(forgotPasswordLink) {
         forgotPasswordLink.addEventListener("click", async (e) => {
             e.preventDefault();
@@ -232,20 +241,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (!querySnapshot.empty) {
                         const userData = querySnapshot.docs[0].data();
                         if(userData.password) Swal.fire(`Hola ${userData.username}`, `Tu contraseña es: <b>${userData.password}</b>`, 'info');
-                        else Swal.fire('Atención', 'Este usuario no tiene contraseña guardada visible.', 'warning');
+                        else Swal.fire('Atención', 'Este usuario no tiene contraseña visible.', 'warning');
                     } else { 
-                        Swal.fire('Error', 'Correo no encontrado en la base de datos.', 'error'); 
+                        Swal.fire('Error', 'Correo no encontrado.', 'error'); 
                     }
                 } catch(err) {
                     console.error(err);
-                    Swal.fire('Error', 'Hubo un problema consultando la base de datos.', 'error');
+                    Swal.fire('Error', 'Error de conexión.', 'error');
                 }
             }
         });
     }
 
     // ==========================================
-    // 2. LÓGICA DEL JUEGO Y DATOS
+    // 2. LÓGICA DEL JUEGO
     // ==========================================
 
     async function loadUserData(uid) {
@@ -254,18 +263,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 currentUserData = docSnap.data();
-                // Inicializar campos faltantes para compatibilidad
+                // Inicializar datos faltantes si es cuenta vieja
                 if(!currentUserData.medals) currentUserData.medals = { gold:0, silver:0, bronze:0 };
                 if(!currentUserData.unlockedLevels) currentUserData.unlockedLevels = [1];
                 if(!currentUserData.totalCorrect) currentUserData.totalCorrect = 0;
                 if(!currentUserData.totalWrong) currentUserData.totalWrong = 0;
                 updateDisplay();
-            } else {
-                console.log("El documento del usuario no existe en Firestore");
             }
-        } catch (e) {
-            console.error("Error cargando datos:", e);
-        }
+        } catch (e) { console.error("Error cargando datos:", e); }
     }
 
     async function saveProgress() {
@@ -281,19 +286,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if(!currentUserData) return;
         scoreText.textContent = `Puntos: ${currentUserData.score || 0}`;
         levelText.textContent = `Nivel: ${currentLevel}`;
-        
         userDisplay.textContent = `⚡ Alumno: ${currentUserData.username}`;
         
-        // Timer visual
         const t = currentUserData.timeWorked || 0;
         const min = Math.floor(t / 60), sec = t % 60;
         if(timeText) timeText.textContent = `⏱ ${min}m ${sec}s`;
     }
 
-    // Funciones Globales (attached to window for HTML access)
+    // Funciones globales para HTML
     window.selectLevel = (level) => {
         if (!currentUserData.unlockedLevels || !currentUserData.unlockedLevels.includes(level)) {
-            Swal.fire({ icon: 'error', title: '¡Alto ahí!', text: 'Debes completar el nivel anterior para desbloquear este.' });
+            Swal.fire({ icon: 'error', title: '¡Bloqueado!', text: 'Completa el nivel anterior primero.' });
             return;
         }
         currentLevel = level;
@@ -301,9 +304,8 @@ document.addEventListener("DOMContentLoaded", () => {
         correctInSession = 0;
         updateProgressBar();
         
-        // Actualizar visualmente la navegación
+        // UI Nav
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        // Nota: esto asume que los niveles son secuenciales en el HTML
         if(level === 1) document.querySelector('.nav-item:nth-child(1)').classList.add('active');
         if(level === 2) document.getElementById('navL2').classList.add('active');
         if(level === 3) document.getElementById('navL3').classList.add('active');
@@ -340,7 +342,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 feedback.textContent = `❌ Era: ${currentQuestion.a}`;
                 feedback.style.color = "#dc3545";
                 soundError.play().catch(()=>{});
-                
                 currentUserData.totalWrong = (currentUserData.totalWrong || 0) + 1;
             }
 
@@ -375,34 +376,28 @@ document.addEventListener("DOMContentLoaded", () => {
         let medal = null;
         let msg = "";
 
-        // Lógica de medallas
         if (percentage === 100) {
-            medal = "gold";
-            msg = "🥇 ¡PERFECTO! MEDALLA DE ORO";
+            medal = "gold"; msg = "🥇 ¡MEDALLA DE ORO!";
             soundLevelUp.play().catch(()=>{});
             currentUserData.medals.gold++;
             unlockNextLevel();
         } else if (percentage >= 80) {
-            medal = "silver";
-            msg = "🥈 ¡MUY BIEN! MEDALLA DE PLATA";
+            medal = "silver"; msg = "🥈 ¡MEDALLA DE PLATA!";
             soundLevelUp.play().catch(()=>{});
             currentUserData.medals.silver++;
             unlockNextLevel();
         } else {
-            medal = "bronze";
-            msg = "🥉 Sigue practicando. Medalla de Bronce.";
+            medal = "bronze"; msg = "🥉 Medalla de Bronce.";
             currentUserData.medals.bronze++;
         }
 
-        const historyRecord = {
+        if(!currentUserData.history) currentUserData.history = [];
+        currentUserData.history.push({
             date: new Date().toLocaleDateString(),
             level: currentLevel,
             score: percentage,
             medal: medal
-        };
-        
-        if(!currentUserData.history) currentUserData.history = [];
-        currentUserData.history.push(historyRecord);
+        });
 
         await saveProgress();
         updateDisplay();
@@ -425,7 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const next = currentLevel + 1;
         if (next <= 3 && !currentUserData.unlockedLevels.includes(next)) {
             currentUserData.unlockedLevels.push(next);
-            Swal.fire("NIVEL DESBLOQUEADO", `Has abierto la Lección ${next}`, "success");
+            Swal.fire("NIVEL DESBLOQUEADO", `¡Lección ${next} abierta!`, "success");
         }
     }
 
@@ -454,7 +449,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 if(!currentUserData.timeWorked) currentUserData.timeWorked = 0;
                 currentUserData.timeWorked++;
                 if (currentUserData.timeWorked % 5 === 0) updateDisplay();
-                // Guardar cada 30 segundos para no saturar Firestore
                 if (currentUserData.timeWorked % 30 === 0) saveProgress();
             }
         }, 1000);
@@ -462,18 +456,19 @@ document.addEventListener("DOMContentLoaded", () => {
     
     function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
 
-
     // ==========================================
-    // 3. PANEL DE MAESTRO (CORECCIÓN)
+    // 3. PANEL DE MAESTRO (SOLUCIÓN LOGIN)
     // ==========================================
 
     if(teacherLoginBtn) {
         teacherLoginBtn.addEventListener("click", () => {
-            // USAR .TRIM() PARA EVITAR ERRORES DE ESPACIOS
-            const inputUser = teacherUserInput.value.trim();
-            const inputPass = teacherPassInput.value.trim();
+            // Depuración: ver qué está escribiendo
+            console.log("Intentando login maestro...");
+            
+            const userVal = teacherUserInput.value.trim(); // Elimina espacios accidentales
+            const passVal = teacherPassInput.value.trim();
 
-            if (inputUser === TEACHER_USER && inputPass === TEACHER_PASS) {
+            if (userVal === TEACHER_USERNAME_VAL && passVal === TEACHER_PASSWORD_VAL) {
                 teacherLogin.style.display = "none";
                 teacherPanel.style.display = "block";
                 loadTeacherPanel();
@@ -493,7 +488,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Funciones globales para tabla (necesarias porque se llaman desde onclick="" en HTML generado)
+    // Funciones globales (window) para la tabla dinámica
     window.changeGroup = async (uid) => {
         const { value: newGroup } = await Swal.fire({
             title: 'Cambiar Grupo',
@@ -532,14 +527,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const student = window.allStudentsData.find(s => s.uid === uid);
         if(!student) return;
 
-        document.getElementById("statsModal").style.display = "flex"; // Flex para centrar
+        document.getElementById("statsModal").style.display = "flex"; 
         const indArea = document.getElementById("individualStatsArea");
         if(indArea) indArea.style.display = "block";
         
         const nameLabel = document.getElementById("individualName");
         if(nameLabel) nameLabel.textContent = `Detalle: ${student.username}`;
 
-        // Gráfica Individual
         const chartCanvas = document.getElementById('individualChart');
         if(chartCanvas) {
             const ctx = chartCanvas.getContext('2d');
@@ -561,7 +555,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadTeacherPanel() {
         const selectedGroupBefore = groupSelect.value;
-        studentsTable.innerHTML = "<tr><td colspan='6' style='text-align:center'>Cargando datos de la nube...</td></tr>";
+        studentsTable.innerHTML = "<tr><td colspan='6' style='text-align:center'>Cargando datos...</td></tr>";
         
         try {
             const querySnapshot = await getDocs(collection(db, "students"));
@@ -573,7 +567,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.allStudentsData.push(data); 
             });
 
-            // Llenar select de grupos
+            // Llenar select grupos
             const groups = [...new Set(window.allStudentsData.map(s => s.group))].sort();
             groupSelect.innerHTML = '<option value="">Todos los grupos</option>';
             groups.forEach(g => {
@@ -589,8 +583,8 @@ document.addEventListener("DOMContentLoaded", () => {
             renderCharts();
 
         } catch(e) {
-            console.error("Error cargando panel:", e);
-            studentsTable.innerHTML = "<tr><td colspan='6' style='color:red'>Error cargando datos. Revisa la consola.</td></tr>";
+            console.error("Error panel:", e);
+            studentsTable.innerHTML = "<tr><td colspan='6' style='color:red'>Error cargando datos.</td></tr>";
         }
     }
 
@@ -598,13 +592,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const filter = groupSelect.value;
         let filtered = filter ? window.allStudentsData.filter(s => s.group === filter) : window.allStudentsData;
         
-        // Ordenar por PUNTOS (mayor a menor)
-        filtered.sort((a, b) => (b.score || 0) - (a.score || 0));
+        filtered.sort((a, b) => (b.score || 0) - (a.score || 0)); // Ordenar por puntos
 
         studentsTable.innerHTML = "";
         
         if(filtered.length === 0) {
-            studentsTable.innerHTML = "<tr><td colspan='6' style='text-align:center'>No hay alumnos registrados aún.</td></tr>";
+            studentsTable.innerHTML = "<tr><td colspan='6' style='text-align:center'>No hay alumnos.</td></tr>";
             return;
         }
 
@@ -623,9 +616,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td style="font-weight:bold; color:blue;">${s.score || 0} pts</td>
                 <td style="color:green; text-align:center">${correct}</td>
                 <td>
-                   <button onclick="viewStudentStats('${s.uid}')" class="action-btn btn-info" title="Ver Gráfica"><i class="fas fa-chart-pie"></i></button>
-                   <button onclick="changeGroup('${s.uid}')" class="action-btn btn-group" style="background:#6c757d" title="Cambiar Grupo"><i class="fas fa-folder"></i></button>
-                   <button onclick="resetStudent('${s.uid}')" class="action-btn btn-reset" style="background:#ffc107; color:black" title="Reiniciar"><i class="fas fa-sync"></i></button>
+                   <button onclick="viewStudentStats('${s.uid}')" class="action-btn btn-info" title="Ver"><i class="fas fa-chart-pie"></i></button>
+                   <button onclick="changeGroup('${s.uid}')" class="action-btn btn-reset" style="background:#6c757d; color:white;" title="Grupo"><i class="fas fa-folder"></i></button>
+                   <button onclick="resetStudent('${s.uid}')" class="action-btn btn-reset" title="Reiniciar"><i class="fas fa-sync"></i></button>
                    <button onclick="deleteStudent('${s.uid}')" class="action-btn btn-delete" title="Eliminar"><i class="fas fa-trash"></i></button>
                 </td>`;
             studentsTable.appendChild(row);
@@ -639,29 +632,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if(exportExcelBtn) {
         exportExcelBtn.addEventListener("click", () => {
             if(!window.allStudentsData || window.allStudentsData.length === 0) {
-                Swal.fire("Vacío", "No hay datos para exportar", "warning");
-                return;
+                Swal.fire("Vacío", "No hay datos.", "warning"); return;
             }
             
             const dataForExcel = window.allStudentsData.map(s => ({
-                Nombre: s.username,
-                Grupo: s.group,
-                Correo: s.email,
-                Contraseña: s.password || "Oculta",
-                Puntos: s.score,
-                Nivel_Juego: Math.max(...(s.unlockedLevels || [1])),
-                Tiempo_Minutos: ((s.timeWorked||0)/60).toFixed(2),
-                Total_Correctas: s.totalCorrect || 0,
-                Total_Incorrectas: s.totalWrong || 0,
-                Medallas_Oro: (s.medals?.gold || 0),
-                Medallas_Plata: (s.medals?.silver || 0),
-                Medallas_Bronce: (s.medals?.bronze || 0)
+                Nombre: s.username, Grupo: s.group, Correo: s.email,
+                Pass: s.password || "Oculta", Puntos: s.score,
+                Nivel: Math.max(...(s.unlockedLevels || [1])),
+                Tiempo_Min: ((s.timeWorked||0)/60).toFixed(2),
+                Correctas: s.totalCorrect || 0, Incorrectas: s.totalWrong || 0,
+                Oro: (s.medals?.gold || 0), Plata: (s.medals?.silver || 0), Bronce: (s.medals?.bronze || 0)
             }));
 
             const ws = XLSX.utils.json_to_sheet(dataForExcel);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Reporte Alumnos");
-            XLSX.writeFile(wb, "Reporte_Escuela_Ingles.xlsx");
+            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+            XLSX.writeFile(wb, "Reporte_Escuela.xlsx");
         });
     }
 
@@ -677,9 +663,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.onclick = function(event) {
         const modal = document.getElementById("statsModal");
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
+        if (event.target == modal) modal.style.display = "none";
     };
 
     function renderCharts() {
@@ -688,8 +672,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const ctx = chartCanvas.getContext('2d');
         let totalGold = 0, totalSilver = 0, totalBronze = 0;
-        let totalCorrect = 0;
-        let totalWrong = 0;
+        let totalCorrect = 0, totalWrong = 0;
         
         if(window.allStudentsData) {
             window.allStudentsData.forEach(s => {
@@ -703,7 +686,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
         
-        // Actualizar tarjetas del dashboard
         if(medalsCountDisplay) medalsCountDisplay.textContent = totalGold + totalSilver + totalBronze;
         if(correctCountDisplay) correctCountDisplay.textContent = totalCorrect;
         if(wrongCountDisplay) wrongCountDisplay.textContent = totalWrong;
@@ -715,7 +697,7 @@ document.addEventListener("DOMContentLoaded", () => {
             data: {
                 labels: ['Oro 🥇', 'Plata 🥈', 'Bronce 🥉'],
                 datasets: [{
-                    label: 'Total Medallas Escuela',
+                    label: 'Total Medallas',
                     data: [totalGold, totalSilver, totalBronze],
                     backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32']
                 }]
@@ -728,27 +710,21 @@ document.addEventListener("DOMContentLoaded", () => {
         downloadPdfBtn.addEventListener("click", () => {
             const element = document.getElementById('reportContent');
             const opt = { 
-                margin: 10, 
-                filename: 'Reporte_Grafico.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2 }, 
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+                margin: 10, filename: 'Reporte.pdf', image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
             };
             html2pdf().set(opt).from(element).save();
         });
     }
 
     if(refreshTeacherBtn) refreshTeacherBtn.addEventListener("click", loadTeacherPanel);
-    if(groupSelect) groupSelect.addEventListener("change", renderTable); // Optimización: solo renderizar tabla al cambiar grupo, no pedir datos de nuevo
+    if(groupSelect) groupSelect.addEventListener("change", renderTable); 
 
     if(resetMonthlyBtn) {
         resetMonthlyBtn.addEventListener("click", async () => {
-            const confirmCode = prompt("⚠️ PELIGRO ⚠️\nEscribe 'BORRAR' para reiniciar a TODOS los alumnos a cero:");
+            const confirmCode = prompt("⚠️ Escribe 'BORRAR' para reiniciar a TODOS los alumnos:");
             if (confirmCode === "BORRAR") {
                 const batch = writeBatch(db);
-                // NOTA: Firebase tiene limite de 500 operaciones por batch. 
-                // Si tienes más de 500 alumnos, esto necesita paginación. 
-                // Para una clase normal está bien.
                 window.allStudentsData.forEach((student) => {
                     const ref = doc(db, "students", student.uid);
                     batch.update(ref, { 
@@ -766,16 +742,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 5. UTILIDADES DE INTERFAZ (UI)
+    // 5. UTILIDADES (LOGOUT Y UI)
     // ==========================================
 
     if(logoutBtn) {
         logoutBtn.addEventListener("click", () => {
             saveProgress(); 
             stopTimer();
-            signOut(auth).then(() => { 
-                location.reload(); 
-            });
+            signOut(auth).then(() => { location.reload(); });
         });
     }
 
