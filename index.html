@@ -1,241 +1,498 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Inglés Para Todos - Super Edition</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/styles.css">
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  
-  <style>
-    /* --- TEMA SUPER HEROE (Azul, Rojo, Amarillo) --- */
-    :root {
-        --super-blue: #003D7A; /* Azul Superman */
-        --super-red: #B51808;  /* Rojo Superman */
-        --super-yellow: #F2C305; /* Amarillo Superman */
-        --bg-color: #f4f6f9;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inglés Para Todos - Super Student Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; }
-    
-    /* Header estilizado */
-    header { background: var(--super-blue); color: white; padding: 15px; border-bottom: 5px solid var(--super-red); display: flex; flex-direction: column; align-items: center; }
-    header h1 { margin: 0; font-size: 1.8em; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #000; }
+    <style>
+        :root {
+            --super-blue: #003D7A; /* Azul oscuro de tu imagen */
+            --super-red: #D10000;   /* Rojo Superman */
+            --super-yellow: #FFD700; /* Amarillo brillante */
+            --white: #ffffff;
+            --gray-light: #f4f4f4;
+            --comic-font: 'Bangers', cursive;
+            --body-font: 'Roboto', sans-serif;
+        }
 
-    /* Navegación */
-    #nav { background: #00264d; width: 100%; display: flex; justify-content: center; gap: 15px; padding: 10px 0; margin-top: 10px; flex-wrap: wrap; }
-    .nav-link { color: white; cursor: pointer; padding: 8px 15px; border-radius: 20px; transition: 0.3s; font-weight: bold; }
-    .nav-link:hover { background: var(--super-yellow); color: #000; transform: scale(1.1); }
-    .locked { opacity: 0.5; pointer-events: none; }
-    
-    /* Tarjetas */
-    .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-width: 600px; margin: 20px auto; text-align: center; border-top: 5px solid var(--super-yellow); }
-    
-    /* Botones Generales */
-    button { cursor: pointer; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; transition: 0.3s; font-size: 1em; box-shadow: 0 3px 5px rgba(0,0,0,0.2); }
-    button:hover { transform: translateY(-3px); box-shadow: 0 5px 10px rgba(0,0,0,0.3); }
-    
-    #loginBtn, #checkAnswer { background: var(--super-blue); color: white; }
-    #startGame { background: var(--super-yellow); color: #000; }
-    
-    /* Inputs */
-    input { padding: 12px; margin: 8px 0; width: 80%; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; }
-    input:focus { border-color: var(--super-blue); outline: none; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    /* TABLA MAESTRO */
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th { background: var(--super-red); color: white; padding: 10px; }
-    td { padding: 8px; border-bottom: 1px solid #ddd; }
-    tr:nth-child(even) { background-color: #f2f2f2; }
-    
-    /* Botones Tabla */
-    .action-btn { width: 35px; height: 35px; margin: 0 2px; border-radius: 5px; color: white; }
-    .btn-group { background: var(--super-yellow); color: black; }
-    .btn-reset { background: var(--super-blue); }
-    .btn-delete { background: var(--super-red); }
-    .btn-info { background: #17a2b8; }
+        body {
+            font-family: var(--body-font);
+            background-color: var(--gray-light);
+            background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px; /* Efecto sutil de puntos de cómic */
+        }
 
-    /* Dashboard Alumno */
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-    .stat-box { background: #f8f9fa; padding: 10px; border-radius: 10px; border-left: 4px solid var(--super-blue); }
-    .stat-value { font-size: 1.4em; font-weight: bold; display: block; }
-    .stat-label { font-size: 0.8em; color: #666; text-transform: uppercase; }
+        /* --- ENCABEZADO (CORREGIDO) --- */
+        header {
+            background-color: var(--super-blue);
+            color: var(--white);
+            padding: 15px 20px;
+            border-bottom: 5px solid var(--super-red); /* Borde rojo estilo superhéroe */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 100;
+        }
 
-    /* Imágenes Branding */
-    .logo-img { max-width: 150px; margin-bottom: 15px; border-radius: 50%; border: 4px solid var(--super-red); }
-    .header-img { max-width: 120px; border-radius: 10px; box-shadow: 0 0 10px white; }
+        .header-content {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    /* Maestro Header */
-    .teacher-header-controls { display: flex; justify-content: space-between; align-items: center; background: #eee; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
-  </style>
+        .logo-area {
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-family: var(--comic-font);
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0px #000;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .subtitle {
+            color: var(--super-yellow);
+            font-weight: bold;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        /* --- BOTÓN MODO MAESTRO (DESTACADO) --- */
+        .teacher-toggle-btn {
+            background-color: var(--super-yellow);
+            color: var(--super-blue);
+            border: 3px solid #000;
+            padding: 10px 20px;
+            font-family: var(--comic-font);
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 30px;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .teacher-toggle-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000;
+            background-color: #ffe033;
+        }
+
+        .teacher-toggle-btn.active {
+            background-color: var(--super-red);
+            color: white;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .main-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .main-container {
+                grid-template-columns: 2fr 1fr; /* Izquierda contenido, Derecha ranking */
+            }
+        }
+
+        /* --- TARJETAS --- */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #000;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            font-family: var(--comic-font);
+            font-size: 1.8rem;
+            color: var(--super-blue);
+            border-bottom: 2px solid var(--super-red);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- NIVELES (Estilo Visualización Alumno) --- */
+        .level-row {
+            background: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid var(--super-blue);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .level-row.locked {
+            opacity: 0.6;
+            border-left-color: #ccc;
+        }
+
+        .level-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .icon-lock { color: #555; }
+        .icon-open { color: var(--super-red); }
+
+        /* --- RANKING / POSICIONES --- */
+        .leaderboard-list {
+            list-style: none;
+        }
+
+        .student-rank-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+
+        .student-rank-item:hover {
+            transform: scale(1.02);
+            border-color: var(--super-blue);
+        }
+
+        .rank-badge {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            margin-right: 10px;
+            font-family: var(--comic-font);
+        }
+
+        .rank-1 { background-color: #FFD700; border: 2px solid #daa520; box-shadow: 0 0 10px #FFD700; } /* Oro */
+        .rank-2 { background-color: #C0C0C0; border: 2px solid #a9a9a9; } /* Plata */
+        .rank-3 { background-color: #CD7F32; border: 2px solid #8b4513; } /* Bronce */
+        .rank-other { background-color: var(--super-blue); }
+
+        .points-badge {
+            background-color: var(--super-red);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* --- PANEL DE MAESTRO (Oculto por defecto) --- */
+        #teacher-panel {
+            display: none; /* Se activa con JS */
+            background-color: #fffde7; /* Fondo amarillento suave para diferenciar */
+            border: 3px dashed var(--super-blue);
+        }
+
+        .teacher-controls {
+            display: grid;
+            gap: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        input, select {
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            flex-grow: 1;
+            font-family: var(--body-font);
+        }
+
+        .btn-action {
+            padding: 10px 15px;
+            background-color: var(--super-blue);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-action:hover { background-color: #002a5c; }
+        
+        .btn-delete {
+            background-color: #D10000;
+        }
+
+    </style>
 </head>
 <body>
 
-<header>
-  <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
-    <img src="assets/images/TEACHING IS SUPER.jpg" alt="Logo" class="header-img">
-    <div>
-        <h1>Inglés Para Todos</h1>
-        <small style="color: #ffd700; font-weight: bold;">SUPER STUDENT EDITION</small>
-    </div>
-  </div>
-
-  <div style="margin-top: 5px;">
-      <button type="button" id="logoutBtn" style="display:none; background: #d9534f;">🚪 Salir</button>
-      <button type="button" id="openTeacherBtn" style="background: white; color: #333;">👨‍🏫 Modo Maestro</button>
-  </div>
-
-  <nav id="nav">
-    <a class="nav-link" id="navL1" onclick="window.selectLevel(1)">Nivel 1</a>
-    <a class="nav-link locked" id="navL2" onclick="window.selectLevel(2)">Nivel 2 <i class="fas fa-lock"></i></a>
-    <a class="nav-link locked" id="navL3" onclick="window.selectLevel(3)">Nivel 3 <i class="fas fa-lock"></i></a>
-  </nav>
-</header>
-
-<section class="card" id="loginCard">
-  <img src="assets/images/SUPER TEACHER.jpg" alt="Super Teacher" class="logo-img">
-  
-  <h2>👤 Iniciar Misión</h2>
-  <input type="text" id="gradeInput" placeholder="Grado (ej. 1)" />
-  <input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
-  <input type="text" id="usernameInput" placeholder="Nombre completo del Super Alumno" />
-  
-  <p style="margin: 10px 0; font-weight:bold; color: var(--super-blue);">— Credenciales Secretas —</p>
-  <input type="email" id="emailInput" placeholder="Correo electrónico" />
-  <input type="password" id="passwordInput" placeholder="Contraseña" />
-
-  <br><br>
-  <button type="button" id="loginBtn" style="width: 100%;">🚀 DESPEGAR</button>
-  <p style="margin-top:10px;"><a href="#" id="forgotPasswordLink" style="color: #666;">¿Olvidaste tu contraseña?</a></p>
-</section>
-
-<section class="card" id="teacherLogin" style="display:none; border-top-color: var(--super-red);">
-  <h2>👨‍🏫 Acceso Solo Maestros</h2>
-  <img src="assets/images/SUPER TEACHER.jpg" alt="Teacher" style="width: 80px; border-radius:50%; margin-bottom:10px;">
-  <br>
-  <input type="text" id="teacherUser" placeholder="Usuario Maestro">
-  <input type="password" id="teacherPass" placeholder="Contraseña Maestra">
-  <br><br>
-  <button type="button" id="teacherLoginBtn">Entrar</button>
-  <button type="button" id="closeTeacherLogin" style="background-color: #777;">Cancelar</button>
-</section>
-
-<main id="mainContent" style="display:none;">
-  
-  <div style="max-width: 800px; margin: 0 auto; padding: 10px;">
-      <h3 id="userDisplay" style="text-align:center; color: var(--super-blue);"></h3>
-      
-      <div class="card" style="margin-top: 0; padding: 15px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-             <span id="levelText" style="font-weight:bold; color: var(--super-blue);">Nivel 1</span>
-             <span id="timeText" style="font-weight:bold; color: #333;">⏱ 0m 0s</span>
+    <header>
+        <div class="header-content">
+            <div class="logo-area">
+                <h1>INGLÉS PARA TODOS</h1>
+                <div class="subtitle">Super Student Edition</div>
+            </div>
+            
+            <button class="teacher-toggle-btn" onclick="toggleTeacherMode()">
+                <i class="fas fa-user-graduate" id="btn-icon"></i>
+                <span id="btn-text">Soy Profe</span>
+            </button>
         </div>
+    </header>
+
+    <div class="main-container">
         
-        <div style="width: 100%; background-color: #e0e0e0; border-radius: 10px; margin: 10px 0; overflow: hidden; height: 15px;">
-             <div id="lessonProgressBar" style="width: 0%; height: 100%; background-color: var(--super-red); transition: width 0.5s;"></div>
-        </div>
+        <div class="left-column">
+            
+            <div id="teacher-panel" class="card">
+                <div class="card-header">
+                    <span><i class="fas fa-chalkboard-teacher"></i> Teacher Control Center</span>
+                </div>
+                
+                <div class="teacher-controls">
+                    <h3>Agregar Nuevo Estudiante</h3>
+                    <div class="control-group">
+                        <input type="text" id="newStudentName" placeholder="Nombre del Super Estudiante">
+                        <button class="btn-action" onclick="addStudent()">Agregar</button>
+                    </div>
 
-        <div class="stat-grid">
-            <div class="stat-box" style="border-color: #28a745;">
-                <span class="stat-value" id="correctCount" style="color: #28a745;">0</span>
-                <span class="stat-label">Correctas ✅</span>
+                    <hr style="margin: 15px 0; border-top: 2px dashed #ccc;">
+
+                    <h3>Dar Puntos / Poderes</h3>
+                    <div class="control-group">
+                        <select id="studentSelect">
+                            </select>
+                        <input type="number" id="pointsInput" placeholder="Puntos" value="10">
+                        <button class="btn-action" onclick="givePoints()"><i class="fas fa-star"></i> Dar</button>
+                    </div>
+                    
+                    <div class="control-group">
+                         <button class="btn-action btn-delete" onclick="resetAll()">Reiniciar Todo</button>
+                    </div>
+                </div>
             </div>
-            <div class="stat-box" style="border-color: #dc3545;">
-                <span class="stat-value" id="wrongCount" style="color: #dc3545;">0</span>
-                <span class="stat-label">Incorrectas ❌</span>
-            </div>
-            <div class="stat-box" style="border-color: #ffc107;">
-                <span class="stat-value" id="medalsCount" style="color: #ffc107;">0</span>
-                <span class="stat-label">Medallas 🏅</span>
-            </div>
-            <div class="stat-box" style="border-color: var(--super-blue);">
-                <span class="stat-value" id="scoreText">0</span>
-                <span class="stat-label">Puntos Totales</span>
+
+            <div class="card">
+                <div class="card-header">
+                    <span><i class="fas fa-map"></i> Mapa de Misiones</span>
+                </div>
+                
+                <div class="level-row">
+                    <div>
+                        <div class="level-title">Nivel 1: The Origin Story</div>
+                        <small>Vocabulario básico y saludos</small>
+                    </div>
+                    <i class="fas fa-check-circle icon-open fa-2x"></i>
+                </div>
+
+                <div class="level-row">
+                    <div>
+                        <div class="level-title">Nivel 2: Super Powers</div>
+                        <small>Verbo To Be y Presente Simple</small>
+                    </div>
+                    <i class="fas fa-lock-open icon-open fa-2x"></i>
+                </div>
+
+                <div class="level-row locked">
+                    <div>
+                        <div class="level-title">Nivel 3: Saving the City</div>
+                        <small>Presente Continuo (Bloqueado)</small>
+                    </div>
+                    <i class="fas fa-lock icon-lock fa-2x"></i>
+                </div>
             </div>
         </div>
-      </div>
-  </div>
 
-  <section class="card">
-    <h2 id="questionText" style="font-size: 1.5em;">Cargando...</h2>
-    <p id="feedback" style="font-weight: bold; height: 25px; margin-bottom:5px;"></p>
-    
-    <input type="text" id="answerInput" placeholder="Escribe tu respuesta..." autocomplete="off" />
-    
-    <div style="margin-top:15px; display:flex; gap:10px; justify-content:center;">
-        <button type="button" id="startGame">🔄 Saltar / Otra</button>
-        <button type="button" id="checkAnswer">✅ Responder</button>
-    </div>
-  </section>
-</main>
-
-<section id="teacherPanel" class="card" style="display:none; max-width: 95%; border-top-color: var(--super-red);">
-  <div class="teacher-header-controls">
-      <h2 style="margin:0;">👨‍🏫 Panel Super Maestro</h2>
-      <div>
-        <button type="button" id="teacherLogoutBtn" style="background: #333; color: white; font-size: 0.8em;">🔒 Cerrar Sesión Maestro</button>
-        <button type="button" id="closeTeacherPanel" style="background:transparent; color:#333; font-size:1.5em;">✖</button>
-      </div>
-  </div>
-
-  <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom: 15px; text-align: left;">
-      <label><b>Filtrar Grupo:</b></label>
-      <select id="groupSelect" style="padding:5px; margin-right: 10px;"><option value="">Todos</option></select>
-      
-      <hr style="margin: 10px 0;">
-      
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button type="button" id="refreshTeacher" style="background:#17a2b8; color:white;">🔄 Refrescar Tabla</button>
-          
-          <button type="button" id="exportExcelBtn" style="background:#28a745; color:white;">📗 Exportar Excel</button>
-          <button type="button" id="viewStatsBtn" style="background:#6f42c1; color:white;">📊 Reporte Gráfico</button>
-          <button type="button" id="resetMonthlyBtn" style="background:#d9534f; color:white;">⚠ Reiniciar ESCUELA</button>
-      </div>
-  </div>
-
-  <div style="overflow-x: auto;">
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Alumno</th>
-            <th>Gpo</th>
-            <th>Nivel</th>
-            <th>Tiempo ⏱</th>
-            <th>Correctas ✅</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="studentsTable"></tbody>
-      </table>
-  </div>
-</section>
-
-<div id="statsModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 10000; overflow-y: auto;">
-    <div style="background: white; margin: 5% auto; padding: 25px; width: 90%; max-width: 800px; border-radius: 10px; position:relative;">
-        <button onclick="document.getElementById('statsModal').style.display='none'" style="position:absolute; top:10px; right:10px; background:red; color:white; border:none; padding:5px 10px; border-radius:50%;">X</button>
-        
-        <h2>📊 Reporte de Rendimiento</h2>
-        <button id="downloadPdfBtn" style="background: var(--super-red); color: white; margin-bottom:15px;">🖨️ Descargar PDF</button>
-        
-        <div id="reportContent">
-            <div id="individualStatsArea" style="display:none; margin-bottom: 20px; background: #e3f2fd; padding: 10px; border-radius: 8px;">
-                <h3 id="individualName">Detalle Alumno</h3>
-                <canvas id="individualChart" style="max-height: 200px;"></canvas>
+        <div class="right-column">
+            <div class="card">
+                <div class="card-header">
+                    <span><i class="fas fa-trophy"></i> Top Heroes</span>
+                </div>
+                <div id="leaderboard-container">
+                    <ul class="leaderboard-list" id="leaderboardList">
+                        </ul>
+                </div>
             </div>
 
-            <div style="text-align:center; margin-bottom:20px;">
-                <h3>Resumen Grupal (Medallas)</h3>
-                <canvas id="groupChart" style="max-height:300px;"></canvas>
+            <div class="card">
+                <div class="card-header" style="font-size: 1.4rem;">
+                    <span><i class="fas fa-bullhorn"></i> Noticias</span>
+                </div>
+                <p>¡Recuerden practicar sus verbos irregulares para ganar puntos extra esta semana!</p>
             </div>
         </div>
     </div>
-</div>
 
-<script type="module" src="js/app.js"></script>
+    <script>
+        // --- LÓGICA JAVASCRIPT ---
+
+        // Datos iniciales (si no hay nada guardado)
+        const defaultStudents = [
+            { id: 1, name: 'Clark Kent', points: 150 },
+            { id: 2, name: 'Diana Prince', points: 140 },
+            { id: 3, name: 'Bruce Wayne', points: 120 },
+            { id: 4, name: 'Peter Parker', points: 95 }
+        ];
+
+        let students = JSON.parse(localStorage.getItem('superStudents')) || defaultStudents;
+        let isTeacherMode = false;
+
+        // Función para guardar en el navegador
+        function saveData() {
+            localStorage.setItem('superStudents', JSON.stringify(students));
+            renderLeaderboard();
+            updateStudentSelect();
+        }
+
+        // Alternar Modo Maestro
+        function toggleTeacherMode() {
+            isTeacherMode = !isTeacherMode;
+            const panel = document.getElementById('teacher-panel');
+            const btn = document.querySelector('.teacher-toggle-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnIcon = document.getElementById('btn-icon');
+
+            if (isTeacherMode) {
+                panel.style.display = 'block';
+                btn.classList.add('active');
+                btnText.innerText = "Modo Alumno";
+                btnIcon.className = "fas fa-user";
+                btn.style.backgroundColor = "#D10000"; // Rojo al estar activo
+            } else {
+                panel.style.display = 'none';
+                btn.classList.remove('active');
+                btnText.innerText = "Soy Profe";
+                btnIcon.className = "fas fa-user-graduate";
+                btn.style.backgroundColor = "#FFD700"; // Amarillo normal
+            }
+        }
+
+        // Renderizar Tabla de Posiciones (Ranking)
+        function renderLeaderboard() {
+            const list = document.getElementById('leaderboardList');
+            list.innerHTML = '';
+
+            // Ordenar por puntos (mayor a menor)
+            const sortedStudents = [...students].sort((a, b) => b.points - a.points);
+
+            sortedStudents.forEach((student, index) => {
+                const li = document.createElement('li');
+                li.className = 'student-rank-item';
+                
+                // Determinar clase de medalla
+                let rankClass = 'rank-other';
+                if (index === 0) rankClass = 'rank-1';
+                if (index === 1) rankClass = 'rank-2';
+                if (index === 2) rankClass = 'rank-3';
+
+                li.innerHTML = `
+                    <div style="display:flex; align-items:center;">
+                        <div class="rank-badge ${rankClass}">${index + 1}</div>
+                        <strong>${student.name}</strong>
+                    </div>
+                    <div class="points-badge">${student.points} pts</div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // Actualizar lista desplegable del maestro
+        function updateStudentSelect() {
+            const select = document.getElementById('studentSelect');
+            select.innerHTML = '';
+            // Ordenar alfabéticamente para el select
+            const sortedByName = [...students].sort((a, b) => a.name.localeCompare(b.name));
+            
+            sortedByName.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.innerText = student.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Agregar Estudiante
+        function addStudent() {
+            const input = document.getElementById('newStudentName');
+            const name = input.value.trim();
+            if (name) {
+                const newId = Date.now(); // ID único simple
+                students.push({ id: newId, name: name, points: 0 });
+                input.value = '';
+                saveData();
+                alert('¡Super Estudiante Agregado!');
+            }
+        }
+
+        // Dar Puntos
+        function givePoints() {
+            const select = document.getElementById('studentSelect');
+            const pointsInput = document.getElementById('pointsInput');
+            const studentId = parseInt(select.value);
+            const points = parseInt(pointsInput.value);
+
+            if (studentId && points) {
+                const studentIndex = students.findIndex(s => s.id === studentId);
+                if (studentIndex > -1) {
+                    students[studentIndex].points += points;
+                    saveData();
+                    // Efecto visual simple
+                    const originalBtnText = document.querySelector('.btn-action i').className;
+                    document.querySelector('.btn-action').innerHTML = "¡Poder Enviado!";
+                    setTimeout(() => {
+                         document.querySelector('.btn-action').innerHTML = `<i class="${originalBtnText}"></i> Dar`;
+                    }, 1000);
+                }
+            }
+        }
+        
+        function resetAll() {
+            if(confirm("¿Estás seguro de borrar todos los datos?")) {
+                localStorage.removeItem('superStudents');
+                location.reload();
+            }
+        }
+
+        // Inicializar
+        renderLeaderboard();
+        updateStudentSelect();
+
+    </script>
 </body>
 </html>
