@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - CONTROL TOTAL</title>
+    <title>Inglés Para Todos - FINAL PRO</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,8 +14,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
@@ -45,18 +45,18 @@
         .nav-item.active { color: var(--primary); font-weight: bold; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
         
-        /* HUD */
-        .hud-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 12px; font-weight: bold; background: #f0f2f5; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
-        .hud-item { display: flex; flex-direction: column; align-items: center; }
+        /* HUD MEJORADO PARA VER MEDALLAS SEPARADAS */
+        .hud-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; font-size: 11px; font-weight: bold; background: #f0f2f5; padding: 8px; border-radius: 10px; margin-bottom: 5px; }
+        .hud-row { display: flex; justify-content: space-between; padding: 2px 5px; border-bottom: 1px solid #ddd; }
         
         /* MAESTRO */
-        .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
+        .teacher-panel-container { width: 100%; max-width: 1300px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
+        th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: center; }
         th { background: var(--primary); color: white; }
         td { vertical-align: middle; }
         
-        .action-btn { padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; font-size: 14px; }
+        .action-btn { padding: 6px 8px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; font-size: 13px; }
         .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-edit { background: #ffc107; color: black; } .btn-history { background: #795548; }
         
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
@@ -119,14 +119,21 @@
                 <button onclick="cerrarSesion()" class="btn-danger" style="width: auto; padding: 5px 15px; font-size: 12px; margin:0;">Salir</button>
             </div>
             
-            <div class="hud-grid">
-                <div class="hud-item"><span style="color:blue">🕓</span><span id="timerDisplay">0m</span></div>
-                <div class="hud-item"><span style="color:green">✅</span><span id="correctDisplay">0</span></div>
-                <div class="hud-item"><span style="color:red">❌</span><span id="wrongDisplay">0</span></div>
-                <div class="hud-item"><span style="color:gold">🥇</span><span id="medalDisplay">0</span></div>
+            <div style="background: #f8f9fa; padding: 10px; border-radius: 10px; font-size: 13px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="color:blue">🕓 <span id="timerDisplay">0m</span></span>
+                    <span style="color:green">✅ <span id="correctDisplay">0</span></span>
+                    <span style="color:red">❌ <span id="wrongDisplay">0</span></span>
+                </div>
+                <hr style="margin: 5px 0;">
+                <div style="display: flex; justify-content: space-around; font-weight: bold;">
+                    <span style="color:#d4af37">🥇 <span id="goldDisplay">0</span></span>
+                    <span style="color:#C0C0C0">🥈 <span id="silverDisplay">0</span></span>
+                    <span style="color:#CD7F32">🥉 <span id="bronzeDisplay">0</span></span>
+                </div>
             </div>
 
-            <div style="font-size: 12px; color: #666; margin-bottom:5px;">Puntos Totales: <span id="scoreText">0</span></div>
+            <div style="font-size: 12px; color: #666; margin-top:5px;">Puntos Totales: <span id="scoreText">0</span></div>
         </div>
 
         <div class="card">
@@ -173,7 +180,20 @@
 
             <div style="overflow-x: auto;" id="tableContainer">
                 <table id="tablaAlumnos">
-                    <thead><tr><th>Nombre</th><th>Gpo</th><th>Nivel</th><th>🕓 Tiempo</th><th>✅</th><th>❌</th><th>🥇</th><th>Acciones</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Gpo</th>
+                            <th>Nvl</th>
+                            <th>🕓 Tiempo</th>
+                            <th>✅</th>
+                            <th>❌</th>
+                            <th style="color:#d4af37">🥇</th>
+                            <th style="color:#C0C0C0">🥈</th>
+                            <th style="color:#CD7F32">🥉</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
                     <tbody id="cuerpoTabla"></tbody>
                 </table>
             </div>
@@ -294,7 +314,13 @@
             document.getElementById("timerDisplay").textContent = formatearTiempo(datosUsuario.timeWorked || 0);
             document.getElementById("correctDisplay").textContent = datosUsuario.totalCorrect || 0;
             document.getElementById("wrongDisplay").textContent = datosUsuario.totalWrong || 0;
-            document.getElementById("medalDisplay").textContent = (datosUsuario.medals.gold||0) + (datosUsuario.medals.silver||0) + (datosUsuario.medals.bronze||0);
+            
+            // Medallas Separadas
+            const m = datosUsuario.medals || {gold:0, silver:0, bronze:0};
+            document.getElementById("goldDisplay").textContent = m.gold;
+            document.getElementById("silverDisplay").textContent = m.silver;
+            document.getElementById("bronzeDisplay").textContent = m.bronze;
+            
             document.getElementById("scoreText").textContent = datosUsuario.score || 0;
         }
 
@@ -385,16 +411,22 @@
         }
         function finSesion() {
             let msg = "", medal = "";
+            
+            // LOGICA CLASIFICACION MEDALLAS
             if(aciertosSesion === 5) {
-                msg = "🏆 PERFECT! LEVEL UP!"; medal = "gold"; datosUsuario.medals.gold++;
+                msg = "🏆 PERFECT! LEVEL UP!"; medal = "gold"; 
+                datosUsuario.medals.gold++;
                 audioLevelUp.currentTime = 0; audioLevelUp.play().catch(()=>{});
                 const next = nivelActual + 1;
                 if(!datosUsuario.unlockedLevels.includes(next) && next <= 3) datosUsuario.unlockedLevels.push(next);
             } else if (aciertosSesion === 4) {
-                msg = "🥈 Good! Need 100% to advance."; medal = "silver"; datosUsuario.medals.silver++;
+                msg = "🥈 Good! Need 100% to advance."; medal = "silver"; 
+                datosUsuario.medals.silver++;
             } else {
-                msg = "🥉 Try again."; medal = "bronze"; datosUsuario.medals.bronze++;
+                msg = "🥉 Try again."; medal = "bronze"; 
+                datosUsuario.medals.bronze++;
             }
+            
             db.collection("students").doc(usuarioActual).update({ unlockedLevels: datosUsuario.unlockedLevels, medals: datosUsuario.medals });
             actualizarCandados();
             Swal.fire({ title: msg, icon: medal === 'gold' ? 'success':'info', confirmButtonText: 'OK' }).then(() => {
@@ -433,7 +465,7 @@
             document.getElementById("loginCard").style.display = "block";
         }
         function cargarTablaAlumnos() {
-            document.getElementById("cuerpoTabla").innerHTML = "<tr><td colspan='8'>Cargando...</td></tr>";
+            document.getElementById("cuerpoTabla").innerHTML = "<tr><td colspan='10'>Cargando...</td></tr>";
             db.collection("students").get().then((querySnapshot) => {
                 listaAlumnosCache = [];
                 querySnapshot.forEach((doc) => { listaAlumnosCache.push({ ...doc.data(), uid: doc.id }); });
@@ -469,7 +501,10 @@
                 tr.innerHTML = `
                     <td style="text-align:left; font-weight:bold">${alum.username}</td><td>${alum.group}</td>
                     <td>${Math.max(...(alum.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(alum.timeWorked||0)}</td>
-                    <td style="color:green">${alum.totalCorrect||0}</td><td style="color:red">${alum.totalWrong||0}</td><td style="color:#d4af37">${m.gold}</td>
+                    <td style="color:green">${alum.totalCorrect||0}</td><td style="color:red">${alum.totalWrong||0}</td>
+                    <td style="color:#d4af37; font-weight:bold">${m.gold}</td>
+                    <td style="color:#C0C0C0; font-weight:bold">${m.silver}</td>
+                    <td style="color:#CD7F32; font-weight:bold">${m.bronze}</td>
                     <td>
                         <button onclick="verHistorial('${alum.uid}')" class="action-btn btn-history" title="Historial">📜</button>
                         <button onclick="verGraficaInd('${alum.uid}')" class="action-btn btn-info" title="Gráfica">📊</button>
@@ -483,36 +518,23 @@
             document.getElementById("promedioAciertos").textContent = data.reduce((a,b)=>a+(b.totalCorrect||0),0);
         }
 
-        // ACCIONES MAESTRO CON NUEVA LOGICA DE RESET
         async function cambiarGrupo(uid) {
             const { value: ng } = await Swal.fire({ title: 'Nuevo Grupo', input: 'text', showCancelButton: true });
             if (ng) { await db.collection("students").doc(uid).update({group: ng.toUpperCase()}); cargarTablaAlumnos(); }
         }
 
-        // --- NUEVA FUNCIÓN DE RESET AVANZADO ---
         async function resetearAlumno(uid) {
             const s = listaAlumnosCache.find(x => x.uid === uid);
             const nivelMax = Math.max(...(s.unlockedLevels || [1]));
-
             const { value: opcion } = await Swal.fire({
                 title: `Gestionar: ${s.username}`,
                 text: `Nivel actual: ${nivelMax} | Puntos: ${s.score}`,
                 input: 'select',
-                inputOptions: {
-                    'puntos': '📉 Reiniciar solo PUNTOS a 0',
-                    'nivel': '🔙 Regresar al Nivel anterior',
-                    'total': '⚠️ Reinicio TOTAL (Desde cero)'
-                },
-                inputPlaceholder: 'Selecciona una acción',
-                showCancelButton: true
+                inputOptions: { 'puntos': '📉 Reiniciar PUNTOS', 'nivel': '🔙 Regresar Nivel', 'total': '⚠️ Reinicio TOTAL' },
+                inputPlaceholder: 'Selecciona acción', showCancelButton: true
             });
-
             if (!opcion) return;
-
-            if (opcion === 'puntos') {
-                await db.collection("students").doc(uid).update({ score: 0 });
-                Swal.fire("Listo", "Puntos en 0.", "success");
-            }
+            if (opcion === 'puntos') { await db.collection("students").doc(uid).update({ score: 0 }); Swal.fire("Listo", "Puntos en 0.", "success"); }
             else if (opcion === 'nivel') {
                 if (nivelMax <= 1) { Swal.fire("Error", "Ya está en Nivel 1.", "warning"); return; }
                 const nuevosNiveles = s.unlockedLevels.filter(n => n !== nivelMax);
@@ -521,8 +543,7 @@
             }
             else if (opcion === 'total') {
                 await db.collection("students").doc(uid).update({
-                    score: 0, unlockedLevels: [1], totalCorrect: 0, totalWrong: 0,
-                    timeWorked: 0, medals: {gold:0, silver:0, bronze:0}, dailyLogs: {}
+                    score: 0, unlockedLevels: [1], totalCorrect: 0, totalWrong: 0, timeWorked: 0, medals: {gold:0, silver:0, bronze:0}, dailyLogs: {}
                 });
                 Swal.fire("Reiniciado", "Alumno comenzó de cero.", "success");
             }
@@ -539,7 +560,6 @@
             }
         }
 
-        // HISTORIAL DIARIO
         function verHistorial(uid) {
             const s = listaAlumnosCache.find(x => x.uid === uid);
             const logs = s.dailyLogs || {};
@@ -556,7 +576,6 @@
             });
         }
 
-        // GRAFICAS
         function verGraficaInd(uid) {
             const s = listaAlumnosCache.find(x => x.uid === uid);
             document.getElementById("modalGrafica").style.display = "flex"; document.getElementById("modalNombre").textContent = s.username;
@@ -581,18 +600,14 @@
         
         function descargarGraficaGrupal() {
             const canvas = document.getElementById('groupBigChart');
-            const link = document.createElement('a');
-            link.download = 'Grafica_Grupal.png';
-            link.href = canvas.toDataURL();
-            link.click();
+            const link = document.createElement('a'); link.download = 'Grafica_Grupal.png'; link.href = canvas.toDataURL(); link.click();
         }
-
         function cerrarModal(id) { document.getElementById(id).style.display = "none"; }
 
         function exportarExcel() {
             const filtro = document.getElementById("groupFilter").value;
             let data = listaAlumnosCache; if(filtro!=="todos") data = data.filter(s=>s.group===filtro);
-            const ws = XLSX.utils.json_to_sheet(data.map(s=>({Nombre:s.username, Grupo:s.group, Puntos:s.score, TiempoTotal:formatearTiempo(s.timeWorked||0), Correctas:s.totalCorrect})));
+            const ws = XLSX.utils.json_to_sheet(data.map(s=>({Nombre:s.username, Grupo:s.group, Puntos:s.score, TiempoTotal:formatearTiempo(s.timeWorked||0), Correctas:s.totalCorrect, Gold:s.medals?.gold, Silver:s.medals?.silver, Bronze:s.medals?.bronze})));
             const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Reporte"); XLSX.writeFile(wb, "Reporte.xlsx");
         }
         function exportarPDF() {
