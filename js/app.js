@@ -1,4 +1,4 @@
-// IMPORTAMOS LAS FUNCIONES DE FIREBASE DESDE LA NUBE
+// IMPORTAMOS LAS FUNCIONES DE FIREBASE (Usamos la versión compatible con módulos web)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -6,16 +6,18 @@ import { getFirestore, doc, setDoc, getDoc, getDocs, collection }
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ==========================================
-// ⚙️ CONFIGURACIÓN DE FIREBASE
-// ¡PEGA AQUÍ LO QUE COPIASTE DE LA CONSOLA!
+// ⚙️ CONFIGURACIÓN DE TU PROYECTO
+// (Ya puse tus datos aquí)
 // ==========================================
 const firebaseConfig = {
-  apiKey: "TU_API_KEY_AQUI",  // <--- REEMPLAZA ESTO
+  apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s",
   authDomain: "ingles-pepejoeck.firebaseapp.com",
+  databaseURL: "https://ingles-pepejoeck-default-rtdb.firebaseio.com",
   projectId: "ingles-pepejoeck",
-  storageBucket: "ingles-pepejoeck.appspot.com",
+  storageBucket: "ingles-pepejoeck.firebasestorage.app",
   messagingSenderId: "519995763844",
-  appId: "TU_APP_ID_AQUI"     // <--- REEMPLAZA ESTO
+  appId: "1:519995763844:web:350df130a6673b4002a6d1",
+  measurementId: "G-5MEQGW13ZE"
 };
 
 // INICIALIZAR FIREBASE
@@ -94,19 +96,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // ☁️ AUTENTICACIÓN Y CARGA
     // ===============================
 
-    // Escuchar si el usuario ya inició sesión (Persistencia automática)
+    // Escuchar si el usuario ya inició sesión
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // Usuario logueado
             currentUserId = user.uid;
             console.log("Usuario detectado:", user.email);
-            
-            // Cargar datos de Firestore
             await loadUserData(user.uid);
-            
             showStudentInterface();
         } else {
-            // Nadie logueado
             currentUserId = null;
             currentUserData = {};
             showLoginInterface();
@@ -131,15 +128,13 @@ document.addEventListener("DOMContentLoaded", () => {
         loginBtn.textContent = "Procesando...";
 
         try {
-            // 1. Intentamos Iniciar Sesión
             await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
-            // 2. Si falla (ej. usuario no encontrado), intentamos Registrar
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+            // Si falla el login, intentamos registrar
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
                 
-                // Para registrarse necesitamos los datos escolares obligatorios
                 if (!name || !grade || !group) {
-                    alert("⚠️ Para crear una cuenta nueva, completa Nombre, Grado y Grupo.");
+                    alert("⚠️ No encontramos ese usuario. Para crear cuenta nueva, completa Nombre, Grado y Grupo.");
                     loginBtn.disabled = false;
                     loginBtn.textContent = "Entrar / Registrarse";
                     return;
@@ -149,16 +144,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
                     
-                    // Guardar datos iniciales en la Nube (Firestore)
+                    // Guardar datos iniciales
                     await setDoc(doc(db, "students", user.uid), {
                         username: name,
                         grade: grade,
                         group: group,
                         email: email,
-                        score: 0,
-                        level: 1,
-                        stars: 0,
-                        timeWorked: 0,
+                        score: 0, level: 1, stars: 0, timeWorked: 0,
                         lastLogin: new Date().toISOString()
                     });
 
@@ -176,38 +168,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Cargar datos desde Firestore
     async function loadUserData(uid) {
-        const docRef = doc(db, "students", uid);
-        const docSnap = await getDoc(docRef);
+        try {
+            const docRef = doc(db, "students", uid);
+            const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-            currentUserData = docSnap.data();
-            updateDisplay();
-        } else {
-            console.log("No se encontraron datos del alumno.");
-        }
+            if (docSnap.exists()) {
+                currentUserData = docSnap.data();
+                updateDisplay();
+            }
+        } catch (e) { console.error("Error cargando datos", e); }
     }
 
-    // Guardar progreso en Firestore
+    // Guardar progreso
     async function saveProgress() {
         if (!currentUserId) return;
-        
-        // Actualizamos los valores locales al objeto
         currentUserData.timeWorked = (currentUserData.timeWorked || 0);
         currentUserData.lastLogin = new Date().toISOString();
 
         try {
             await setDoc(doc(db, "students", currentUserId), currentUserData, { merge: true });
-            console.log("Progreso guardado en nube...");
-        } catch (e) {
-            console.error("Error guardando progreso: ", e);
-        }
+        } catch (e) { console.error("Error guardando", e); }
     }
 
     // ===============================
     // 🎨 INTERFAZ
     // ===============================
     
-    // Hamburguesa y Tema
     hamburger.addEventListener("click", (e) => {
         e.stopPropagation();
         nav.classList.toggle("active");
@@ -236,7 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const min = Math.floor(t / 60);
         const sec = t % 60;
         timeText.textContent = `⏱ Tiempo: ${min}m ${sec}s`;
-        
         userDisplay.textContent = `👤 Hola, ${currentUserData.username || 'Alumno'}`;
     }
 
@@ -246,8 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if(!currentUserData.timeWorked) currentUserData.timeWorked = 0;
             currentUserData.timeWorked++;
             updateDisplay();
-            
-            // Guardar en nube cada 10 segundos para no saturar
             if (currentUserData.timeWorked % 10 === 0) saveProgress();
         }, 1000);
     }
@@ -271,7 +254,6 @@ document.addEventListener("DOMContentLoaded", () => {
             feedback.style.color = "green";
             soundCorrect.play().catch(()=>{});
             
-            // Actualizar datos locales
             currentUserData.score = (currentUserData.score || 0) + 10;
             currentUserData.stars = (currentUserData.stars || 0) + 1;
             
@@ -286,30 +268,25 @@ document.addEventListener("DOMContentLoaded", () => {
             soundError.play().catch(()=>{});
         }
         updateDisplay();
-        await saveProgress(); // Guardar tras responder
+        await saveProgress(); 
     });
 
     // ===============================
     // 👨‍🏫 PANEL MAESTRO (NUBE)
     // ===============================
     
-    // Función para descargar datos DE LA NUBE
     async function fetchAllStudents() {
         const querySnapshot = await getDocs(collection(db, "students"));
         let allStudents = [];
-        querySnapshot.forEach((doc) => {
-            allStudents.push(doc.data());
-        });
+        querySnapshot.forEach((doc) => { allStudents.push(doc.data()); });
         return allStudents;
     }
 
     async function loadTeacherPanel() {
         studentsTable.innerHTML = "<tr><td colspan='7'>Cargando datos de la nube...</td></tr>";
-        
         const allStudents = await fetchAllStudents();
-        studentsTable.innerHTML = ""; // Limpiar mensaje de carga
+        studentsTable.innerHTML = ""; 
 
-        // Llenar select de grupos
         const groups = [...new Set(allStudents.map(s => s.group))];
         const currentSel = groupSelect.value;
         groupSelect.innerHTML = '<option value="">Todos los grupos</option>';
@@ -320,7 +297,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         groupSelect.value = currentSel;
 
-        // Filtrar y Ordenar
         const filter = groupSelect.value;
         let filtered = filter ? allStudents.filter(s => s.group === filter) : allStudents;
         filtered.sort((a, b) => b.score - a.score);
@@ -338,7 +314,6 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshTeacherBtn.addEventListener("click", loadTeacherPanel);
     groupSelect.addEventListener("change", loadTeacherPanel);
 
-    // LOGIN MAESTRO (Local simple para proteger vista)
     teacherLoginBtn.addEventListener("click", () => {
         if (teacherUser.value === TEACHER_USER && teacherPass.value === TEACHER_PASS) {
             teacherLogin.style.display = "none";
@@ -351,9 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutBtn.addEventListener("click", () => {
         saveProgress();
         stopTimer();
-        signOut(auth).then(() => {
-            location.reload();
-        });
+        signOut(auth).then(() => { location.reload(); });
     });
 
     openTeacherBtn.addEventListener("click", () => {
@@ -371,7 +344,6 @@ document.addEventListener("DOMContentLoaded", () => {
         loginCard.style.display = "block";
     });
 
-    // Exportar Excel (usando datos de memoria cargados)
     exportBtn.addEventListener("click", async () => {
         const allStudents = await fetchAllStudents();
         let csv = "\uFEFFAlumno,Grado,Grupo,Puntaje,Nivel,Estrellas,Tiempo\n";
@@ -386,7 +358,6 @@ document.addEventListener("DOMContentLoaded", () => {
         link.click();
     });
 
-    // Helpers UI
     function showStudentInterface() {
         loginCard.style.display = "none";
         teacherLogin.style.display = "none";
