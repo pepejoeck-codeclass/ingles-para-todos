@@ -1,14 +1,9 @@
-// IMPORTAMOS LAS FUNCIONES DE FIREBASE (Usamos la versión compatible con módulos web)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection } 
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, updateDoc, deleteDoc } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ==========================================
-// ⚙️ CONFIGURACIÓN DE TU PROYECTO
-// (Ya puse tus datos aquí)
-// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s",
   authDomain: "ingles-pepejoeck.firebaseapp.com",
@@ -20,15 +15,11 @@ const firebaseConfig = {
   measurementId: "G-5MEQGW13ZE"
 };
 
-// INICIALIZAR FIREBASE
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", () => {
-    // ===============================
-    // 🔊 SONIDOS
-    // ===============================
     const soundCorrect = new Audio("assets/sounds/correct.mp3");
     const soundError = new Audio("assets/sounds/wrong.mp3");
     const soundLevel = new Audio("assets/sounds/levelup.mp3");
@@ -36,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const TEACHER_USER = "Jose de Jesus Ramos Flores";
     const TEACHER_PASS = "161286";
 
-    // Preguntas
     const questions = [
         { q: "How do you say 'Hola' in English?", a: "hello" },
         { q: "How do you say 'Adiós' in English?", a: "goodbye" },
@@ -48,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
         { q: "How do you say 'Azul' in English?", a: "blue" }
     ];
 
-    // REFERENCIAS DOM
     const loginCard = document.getElementById("loginCard"),
           mainContent = document.getElementById("mainContent"),
           teacherPanel = document.getElementById("teacherPanel"),
@@ -86,21 +75,14 @@ document.addEventListener("DOMContentLoaded", () => {
           starsText = document.getElementById("starsText"),
           timeText = document.getElementById("timeText");
 
-    // VARIABLES DE ESTADO
     let currentUserId = null; 
     let currentUserData = {};
     let timerInterval = null;
     let currentQuestion = null;
 
-    // ===============================
-    // ☁️ AUTENTICACIÓN Y CARGA
-    // ===============================
-
-    // Escuchar si el usuario ya inició sesión
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUserId = user.uid;
-            console.log("Usuario detectado:", user.email);
             await loadUserData(user.uid);
             showStudentInterface();
         } else {
@@ -110,11 +92,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Función Login / Registro Inteligente
     loginBtn.addEventListener("click", async () => {
         const email = emailInput.value.trim();
         const password = passwordInput.value.trim();
-        
         const name = usernameInput.value.trim();
         const grade = gradeInput.value.trim();
         const group = groupInput.value.trim().toUpperCase();
@@ -130,48 +110,34 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
-            // Si falla el login, intentamos registrar
             if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-                
                 if (!name || !grade || !group) {
                     alert("⚠️ No encontramos ese usuario. Para crear cuenta nueva, completa Nombre, Grado y Grupo.");
                     loginBtn.disabled = false;
                     loginBtn.textContent = "Entrar / Registrarse";
                     return;
                 }
-
                 try {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
-                    
-                    // Guardar datos iniciales
                     await setDoc(doc(db, "students", user.uid), {
-                        username: name,
-                        grade: grade,
-                        group: group,
-                        email: email,
+                        uid: user.uid, // Guardamos el ID para poder borrar/editar luego
+                        username: name, grade: grade, group: group, email: email,
                         score: 0, level: 1, stars: 0, timeWorked: 0,
                         lastLogin: new Date().toISOString()
                     });
-
                     alert("✅ ¡Cuenta creada exitosamente!");
-                } catch (regError) {
-                    alert("Error al registrar: " + regError.message);
-                }
-            } else {
-                alert("Error de acceso: " + error.message);
-            }
+                } catch (regError) { alert("Error al registrar: " + regError.message); }
+            } else { alert("Error de acceso: " + error.message); }
         }
         loginBtn.disabled = false;
         loginBtn.textContent = "Entrar / Registrarse";
     });
 
-    // Cargar datos desde Firestore
     async function loadUserData(uid) {
         try {
             const docRef = doc(db, "students", uid);
             const docSnap = await getDoc(docRef);
-
             if (docSnap.exists()) {
                 currentUserData = docSnap.data();
                 updateDisplay();
@@ -179,40 +145,16 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (e) { console.error("Error cargando datos", e); }
     }
 
-    // Guardar progreso
     async function saveProgress() {
         if (!currentUserId) return;
         currentUserData.timeWorked = (currentUserData.timeWorked || 0);
         currentUserData.lastLogin = new Date().toISOString();
-
         try {
             await setDoc(doc(db, "students", currentUserId), currentUserData, { merge: true });
         } catch (e) { console.error("Error guardando", e); }
     }
 
-    // ===============================
-    // 🎨 INTERFAZ
-    // ===============================
-    
-    hamburger.addEventListener("click", (e) => {
-        e.stopPropagation();
-        nav.classList.toggle("active");
-    });
-    document.addEventListener("click", () => { nav.classList.remove("active"); });
-
-    function checkTheme() {
-        if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
-    }
-    themeToggle.addEventListener("click", () => {
-        document.body.classList.toggle("dark");
-        const isDark = document.body.classList.contains("dark");
-        localStorage.setItem("theme", isDark ? "dark" : "light");
-    });
-    checkTheme();
-
-    // ===============================
-    // 🕹️ LÓGICA DE JUEGO
-    // ===============================
+    // --- LÓGICA DE JUEGO ---
     function updateDisplay() {
         if(!currentUserData) return;
         scoreText.textContent = `${currentUserData.score || 0} puntos`;
@@ -248,15 +190,12 @@ document.addEventListener("DOMContentLoaded", () => {
     checkBtn.addEventListener("click", async () => {
         if (!currentQuestion) return;
         const userAns = answerInput.value.trim().toLowerCase();
-        
         if (userAns === currentQuestion.a) {
             feedback.textContent = "🔥 ¡Excelente!";
             feedback.style.color = "green";
             soundCorrect.play().catch(()=>{});
-            
             currentUserData.score = (currentUserData.score || 0) + 10;
             currentUserData.stars = (currentUserData.stars || 0) + 1;
-            
             if (currentUserData.score % 50 === 0) {
                 currentUserData.level = (currentUserData.level || 1) + 1;
                 soundLevel.play().catch(()=>{});
@@ -271,46 +210,80 @@ document.addEventListener("DOMContentLoaded", () => {
         await saveProgress(); 
     });
 
-    // ===============================
-    // 👨‍🏫 PANEL MAESTRO (NUBE)
-    // ===============================
+    // ==========================================
+    // 👨‍🏫 ACCIONES DEL MAESTRO (NUEVO)
+    // ==========================================
     
-    async function fetchAllStudents() {
-        const querySnapshot = await getDocs(collection(db, "students"));
-        let allStudents = [];
-        querySnapshot.forEach((doc) => { allStudents.push(doc.data()); });
-        return allStudents;
-    }
+    // Función para cambiar grupo
+    window.changeGroup = async (uid) => {
+        const newGroup = prompt("Escribe el nuevo grupo (ejemplo: B):");
+        if (newGroup) {
+            try {
+                const docRef = doc(db, "students", uid);
+                await updateDoc(docRef, { group: newGroup.toUpperCase() });
+                alert("Grupo actualizado");
+                loadTeacherPanel(); // Recargar tabla
+            } catch (e) { alert("Error al cambiar grupo"); }
+        }
+    };
+
+    // Función para borrar alumno
+    window.deleteStudent = async (uid, name) => {
+        if (confirm(`¿Estás seguro de que quieres eliminar a ${name}? Se perderá todo su progreso.`)) {
+            try {
+                await deleteDoc(doc(db, "students", uid));
+                alert("Alumno eliminado de la base de datos");
+                loadTeacherPanel(); // Recargar tabla
+            } catch (e) { alert("Error al eliminar"); }
+        }
+    };
 
     async function loadTeacherPanel() {
-        studentsTable.innerHTML = "<tr><td colspan='7'>Cargando datos de la nube...</td></tr>";
-        const allStudents = await fetchAllStudents();
-        studentsTable.innerHTML = ""; 
+        studentsTable.innerHTML = "<tr><td colspan='8'>Cargando...</td></tr>";
+        const querySnapshot = await getDocs(collection(db, "students"));
+        let allStudents = [];
+        querySnapshot.forEach((doc) => { 
+            let data = doc.data();
+            data.uid = doc.id; // Nos aseguramos de tener el ID del documento
+            allStudents.push(data); 
+        });
 
         const groups = [...new Set(allStudents.map(s => s.group))];
-        const currentSel = groupSelect.value;
         groupSelect.innerHTML = '<option value="">Todos los grupos</option>';
         groups.forEach(g => {
             const opt = document.createElement("option");
             opt.value = g; opt.textContent = `Grupo ${g}`;
             groupSelect.appendChild(opt);
         });
-        groupSelect.value = currentSel;
 
         const filter = groupSelect.value;
         let filtered = filter ? allStudents.filter(s => s.group === filter) : allStudents;
         filtered.sort((a, b) => b.score - a.score);
 
+        studentsTable.innerHTML = "";
         filtered.forEach(s => {
             const row = document.createElement("tr");
             const t = s.timeWorked || 0;
-            const min = Math.floor(t / 60);
-            const sec = t % 60;
-            row.innerHTML = `<td>${s.username}</td><td>${s.grade}</td><td>${s.group}</td><td>${s.score}</td><td>${s.level}</td><td>${s.stars}</td><td>${min}m ${sec}s</td>`;
+            const min = Math.floor(t / 60), sec = t % 60;
+            
+            row.innerHTML = `
+                <td>${s.username}</td>
+                <td>${s.grade}</td>
+                <td>${s.group}</td>
+                <td>${s.score}</td>
+                <td>${s.level}</td>
+                <td>${s.stars}</td>
+                <td>${min}m ${sec}s</td>
+                <td>
+                    <button onclick="changeGroup('${s.uid}')" style="background:#ffc107; color:black; border:none; padding:3px 7px; cursor:pointer; margin-bottom:2px;">Gr.</button>
+                    <button onclick="deleteStudent('${s.uid}', '${s.username}')" style="background:#dc3545; color:white; border:none; padding:3px 7px; cursor:pointer;">X</button>
+                </td>
+            `;
             studentsTable.appendChild(row);
         });
     }
 
+    // --- RESTO DE BOTONES UI ---
     refreshTeacherBtn.addEventListener("click", loadTeacherPanel);
     groupSelect.addEventListener("change", loadTeacherPanel);
 
@@ -322,10 +295,8 @@ document.addEventListener("DOMContentLoaded", () => {
         } else { alert("Maestro no reconocido"); }
     });
 
-    // --- NAVEGACIÓN ---
     logoutBtn.addEventListener("click", () => {
-        saveProgress();
-        stopTimer();
+        saveProgress(); stopTimer();
         signOut(auth).then(() => { location.reload(); });
     });
 
@@ -344,23 +315,19 @@ document.addEventListener("DOMContentLoaded", () => {
         loginCard.style.display = "block";
     });
 
-    exportBtn.addEventListener("click", async () => {
-        const allStudents = await fetchAllStudents();
-        let csv = "\uFEFFAlumno,Grado,Grupo,Puntaje,Nivel,Estrellas,Tiempo\n";
-        allStudents.forEach(s => {
-             const min = Math.floor((s.timeWorked||0) / 60), sec = (s.timeWorked||0) % 60;
-             csv += `${s.username},${s.grade},${s.group},${s.score},${s.level},${s.stars},${min}m ${sec}s\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "Reporte_Nube_Ingles.csv";
-        link.click();
+    themeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("dark");
+        localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    });
+    if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+    hamburger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        nav.classList.toggle("active");
     });
 
     function showStudentInterface() {
         loginCard.style.display = "none";
-        teacherLogin.style.display = "none";
         mainContent.style.display = "block";
         logoutBtn.style.display = "inline-block";
         startTimer();
@@ -370,6 +337,5 @@ document.addEventListener("DOMContentLoaded", () => {
         loginCard.style.display = "block";
         mainContent.style.display = "none";
         logoutBtn.style.display = "none";
-        openTeacherBtn.style.display = "inline-block";
     }
 });
