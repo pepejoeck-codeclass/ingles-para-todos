@@ -24,7 +24,7 @@ const db = getFirestore(app);
 let currentLevel = 1;
 let questionsInSession = 0;
 let correctInSession = 0;
-const SESSION_LENGTH = 5; // Preguntas por ronda
+const SESSION_LENGTH = 5; 
 
 // --- BASE DE DATOS DE PREGUNTAS ---
 const questionsDB = {
@@ -62,14 +62,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const TEACHER_USER = "Jose de Jesus Ramos Flores";
     const TEACHER_PASS = "161286";
 
-    // --- ELEMENTOS DEL DOM (REFERENCIAS HTML) ---
-    // Pantallas Principales
+    // --- REFERENCIAS DOM ---
     const loginCard = document.getElementById("loginCard");
     const mainContent = document.getElementById("mainContent");
     const teacherPanel = document.getElementById("teacherPanel");
     const teacherLogin = document.getElementById("teacherLogin");
 
-    // Botones de Navegación y Acción
+    // Botones
     const logoutBtn = document.getElementById("logoutBtn");
     const openTeacherBtn = document.getElementById("openTeacherBtn");
     const loginBtn = document.getElementById("loginBtn");
@@ -86,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkBtn = document.getElementById("checkAnswer");
     const forgotPasswordLink = document.getElementById("forgotPasswordLink");
 
-    // Inputs de Login
+    // Inputs Login Alumno
     const gradeInput = document.getElementById("gradeInput");
     const groupInput = document.getElementById("groupInput");
     const usernameInput = document.getElementById("usernameInput");
@@ -94,12 +93,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const passwordInput = document.getElementById("passwordInput");
 
     // Inputs Maestro
-    const teacherUser = document.getElementById("teacherUser");
-    const teacherPass = document.getElementById("teacherPass");
+    const teacherUserInput = document.getElementById("teacherUser");
+    const teacherPassInput = document.getElementById("teacherPass");
     const groupSelect = document.getElementById("groupSelect");
     const studentsTable = document.getElementById("studentsTable");
 
-    // Elementos del Juego (HUD)
+    // HUD Juego
     const userDisplay = document.getElementById("userDisplay");
     const questionText = document.getElementById("questionText");
     const answerInput = document.getElementById("answerInput");
@@ -109,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const timeText = document.getElementById("timeText");
     const lessonProgressBar = document.getElementById("lessonProgressBar");
 
-    // Contadores del Dashboard
+    // Contadores Teacher
     const correctCountDisplay = document.getElementById("correctCount");
     const wrongCountDisplay = document.getElementById("wrongCount");
     const medalsCountDisplay = document.getElementById("medalsCount");
@@ -121,12 +120,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentQuestion = null;
 
     // ==========================================
-    // 1. SISTEMA DE AUTENTICACIÓN
+    // 1. SISTEMA DE AUTENTICACIÓN MEJORADO
     // ==========================================
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUserId = user.uid;
+            console.log("Usuario detectado:", user.email);
             await loadUserData(user.uid);
             showStudentInterface();
             updateLevelLocks();
@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const group = groupInput.value.trim().toUpperCase();
 
             if (!email || !password || password.length < 6) {
-                Swal.fire("Error", "Ingresa correo y contraseña (min 6 caracteres).", "warning");
+                Swal.fire("Error", "Ingresa un correo y contraseña válida (mínimo 6 caracteres).", "warning");
                 return;
             }
 
@@ -154,26 +154,43 @@ document.addEventListener("DOMContentLoaded", () => {
             loginBtn.textContent = "🚀 Verificando...";
 
             try {
+                // INTENTO DE LOGIN
                 await signInWithEmailAndPassword(auth, email, password);
+                // Si pasa, el onAuthStateChanged se encargará del resto
             } catch (error) {
-                // Si el usuario no existe o hay error, intentamos registrarlo si llenó los datos
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+                console.error("Error Login:", error.code);
+                
+                // SI EL USUARIO NO EXISTE, INTENTAMOS CREARLO
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                    
+                    // Validamos que haya llenado los datos de registro
                     if (!name || !grade || !group) {
-                        Swal.fire("Usuario Nuevo", "Para crear tu cuenta, llena Nombre, Grado y Grupo arriba.", "info");
+                        Swal.fire({
+                            title: "Usuario Nuevo",
+                            text: "El correo no existe. Para registrarte, por favor llena TU NOMBRE, GRADO y GRUPO en los campos de arriba.",
+                            icon: "info"
+                        });
                         loginBtn.disabled = false;
                         loginBtn.textContent = "🚀 DESPEGAR";
                         return;
                     }
+
                     try {
+                        // CREACIÓN DE USUARIO
                         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                         const user = userCredential.user;
                         
-                        // Crear documento inicial en Firestore
+                        // Guardar datos iniciales en Firestore
                         await setDoc(doc(db, "students", user.uid), {
                             uid: user.uid,
-                            username: name, grade: grade, group: group, email: email,
-                            password: password, 
-                            score: 0, level: 1, stars: 0, timeWorked: 0,
+                            username: name, 
+                            grade: grade, 
+                            group: group, 
+                            email: email,
+                            password: password, // NOTA: Guardar pass en texto plano no es ideal en producción real, pero ok para este proyecto escolar
+                            score: 0, 
+                            level: 1, 
+                            timeWorked: 0,
                             totalCorrect: 0,
                             totalWrong: 0,
                             medals: { gold: 0, silver: 0, bronze: 0 },
@@ -183,8 +200,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         });
                         Swal.fire("¡Bienvenido!", "Cuenta creada exitosamente.", "success");
                     } catch (regError) { 
-                        Swal.fire("Error Registro", regError.message, "error"); 
+                        let msg = "Error al crear cuenta.";
+                        if(regError.code === 'auth/email-already-in-use') msg = "Ese correo ya está registrado. Verifica tu contraseña.";
+                        Swal.fire("Error Registro", msg, "error"); 
                     }
+                } else if (error.code === 'auth/wrong-password') {
+                    Swal.fire("Error", "Contraseña incorrecta.", "error");
                 } else { 
                     Swal.fire("Error Acceso", error.message, "error"); 
                 }
@@ -205,13 +226,20 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (email) {
-                const q = query(collection(db, "students"), where("email", "==", email));
-                const querySnapshot = await getDocs(q);
-                if (!querySnapshot.empty) {
-                    const userData = querySnapshot.docs[0].data();
-                    if(userData.password) Swal.fire(`Hola ${userData.username}`, `Tu contraseña es: <b>${userData.password}</b>`, 'info');
-                    else Swal.fire('Atención', 'Usuario antiguo. Pide al maestro restablecer.', 'warning');
-                } else { Swal.fire('Error', 'Correo no encontrado.', 'error'); }
+                try {
+                    const q = query(collection(db, "students"), where("email", "==", email));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        const userData = querySnapshot.docs[0].data();
+                        if(userData.password) Swal.fire(`Hola ${userData.username}`, `Tu contraseña es: <b>${userData.password}</b>`, 'info');
+                        else Swal.fire('Atención', 'Este usuario no tiene contraseña guardada visible.', 'warning');
+                    } else { 
+                        Swal.fire('Error', 'Correo no encontrado en la base de datos.', 'error'); 
+                    }
+                } catch(err) {
+                    console.error(err);
+                    Swal.fire('Error', 'Hubo un problema consultando la base de datos.', 'error');
+                }
             }
         });
     }
@@ -221,16 +249,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
 
     async function loadUserData(uid) {
-        const docRef = doc(db, "students", uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            currentUserData = docSnap.data();
-            // Inicializar campos si faltan (para usuarios antiguos)
-            if(!currentUserData.medals) currentUserData.medals = { gold:0, silver:0, bronze:0 };
-            if(!currentUserData.unlockedLevels) currentUserData.unlockedLevels = [1];
-            if(!currentUserData.totalCorrect) currentUserData.totalCorrect = 0;
-            if(!currentUserData.totalWrong) currentUserData.totalWrong = 0;
-            updateDisplay();
+        try {
+            const docRef = doc(db, "students", uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                currentUserData = docSnap.data();
+                // Inicializar campos faltantes para compatibilidad
+                if(!currentUserData.medals) currentUserData.medals = { gold:0, silver:0, bronze:0 };
+                if(!currentUserData.unlockedLevels) currentUserData.unlockedLevels = [1];
+                if(!currentUserData.totalCorrect) currentUserData.totalCorrect = 0;
+                if(!currentUserData.totalWrong) currentUserData.totalWrong = 0;
+                updateDisplay();
+            } else {
+                console.log("El documento del usuario no existe en Firestore");
+            }
+        } catch (e) {
+            console.error("Error cargando datos:", e);
         }
     }
 
@@ -245,33 +279,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function updateDisplay() {
         if(!currentUserData) return;
-        scoreText.textContent = `${currentUserData.score || 0}`;
+        scoreText.textContent = `Puntos: ${currentUserData.score || 0}`;
         levelText.textContent = `Nivel: ${currentLevel}`;
         
-        // Actualizar contadores nuevos
-        correctCountDisplay.textContent = currentUserData.totalCorrect || 0;
-        wrongCountDisplay.textContent = currentUserData.totalWrong || 0;
+        userDisplay.textContent = `⚡ Alumno: ${currentUserData.username}`;
         
-        const m = currentUserData.medals || {gold:0, silver:0, bronze:0};
-        const totalMedals = (m.gold || 0) + (m.silver || 0) + (m.bronze || 0);
-        medalsCountDisplay.textContent = totalMedals;
-
+        // Timer visual
         const t = currentUserData.timeWorked || 0;
         const min = Math.floor(t / 60), sec = t % 60;
-        timeText.textContent = `⏱ ${min}m ${sec}s`;
-        
-        userDisplay.textContent = `⚡ Alumno: ${currentUserData.username}`;
+        if(timeText) timeText.textContent = `⏱ ${min}m ${sec}s`;
     }
 
+    // Funciones Globales (attached to window for HTML access)
     window.selectLevel = (level) => {
-        if (!currentUserData.unlockedLevels.includes(level)) {
-            Swal.fire({ icon: 'error', title: '¡Alto ahí!', text: 'Debes ganar medalla de Oro o Plata en el nivel anterior.' });
+        if (!currentUserData.unlockedLevels || !currentUserData.unlockedLevels.includes(level)) {
+            Swal.fire({ icon: 'error', title: '¡Alto ahí!', text: 'Debes completar el nivel anterior para desbloquear este.' });
             return;
         }
         currentLevel = level;
         questionsInSession = 0;
         correctInSession = 0;
         updateProgressBar();
+        
+        // Actualizar visualmente la navegación
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        // Nota: esto asume que los niveles son secuenciales en el HTML
+        if(level === 1) document.querySelector('.nav-item:nth-child(1)').classList.add('active');
+        if(level === 2) document.getElementById('navL2').classList.add('active');
+        if(level === 3) document.getElementById('navL3').classList.add('active');
+
         startQuestion();
     };
 
@@ -284,12 +320,12 @@ document.addEventListener("DOMContentLoaded", () => {
         answerInput.focus();
     }
 
-    if(startBtn) startBtn.addEventListener("click", startQuestion);
-
     if(checkBtn) {
         checkBtn.addEventListener("click", async () => {
             if (!currentQuestion) return;
             const userAns = answerInput.value.trim().toLowerCase();
+            if(!userAns) return;
+
             questionsInSession++;
             
             if (userAns === currentQuestion.a) {
@@ -310,18 +346,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
             updateProgressBar();
             updateDisplay();
+            await saveProgress();
 
             if (questionsInSession >= SESSION_LENGTH) {
-                await finishSession();
+                setTimeout(finishSession, 1000);
             } else {
-                // Pequeña pausa antes de la siguiente pregunta
                 setTimeout(startQuestion, 1500);
             }
-            await saveProgress(); 
         });
     }
 
-    // Permitir enviar respuesta con Enter
     if(answerInput) {
         answerInput.addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
@@ -341,6 +375,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let medal = null;
         let msg = "";
 
+        // Lógica de medallas
         if (percentage === 100) {
             medal = "gold";
             msg = "🥇 ¡PERFECTO! MEDALLA DE ORO";
@@ -395,7 +430,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function updateLevelLocks() {
-        if(!currentUserData.unlockedLevels) return;
+        if(!currentUserData || !currentUserData.unlockedLevels) return;
         [2, 3].forEach(lvl => {
             const el = document.getElementById(`navL${lvl}`);
             if(el) {
@@ -405,6 +440,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     if(icon) { icon.classList.remove('fa-lock'); icon.classList.add('fa-unlock'); }
                 } else {
                     el.classList.add("locked");
+                    const icon = el.querySelector('i');
+                    if(icon) { icon.classList.remove('fa-unlock'); icon.classList.add('fa-lock'); }
                 }
             }
         });
@@ -413,10 +450,13 @@ document.addEventListener("DOMContentLoaded", () => {
     function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(() => {
-            if(!currentUserData.timeWorked) currentUserData.timeWorked = 0;
-            currentUserData.timeWorked++;
-            if (currentUserData.timeWorked % 5 === 0) updateDisplay();
-            if (currentUserData.timeWorked % 30 === 0) saveProgress();
+            if(currentUserData) {
+                if(!currentUserData.timeWorked) currentUserData.timeWorked = 0;
+                currentUserData.timeWorked++;
+                if (currentUserData.timeWorked % 5 === 0) updateDisplay();
+                // Guardar cada 30 segundos para no saturar Firestore
+                if (currentUserData.timeWorked % 30 === 0) saveProgress();
+            }
         }, 1000);
     }
     
@@ -424,30 +464,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // ==========================================
-    // 3. PANEL DE MAESTRO (ADMINISTRACIÓN)
+    // 3. PANEL DE MAESTRO (CORECCIÓN)
     // ==========================================
 
     if(teacherLoginBtn) {
         teacherLoginBtn.addEventListener("click", () => {
-            if (teacherUser.value === TEACHER_USER && teacherPass.value === TEACHER_PASS) {
+            // USAR .TRIM() PARA EVITAR ERRORES DE ESPACIOS
+            const inputUser = teacherUserInput.value.trim();
+            const inputPass = teacherPassInput.value.trim();
+
+            if (inputUser === TEACHER_USER && inputPass === TEACHER_PASS) {
                 teacherLogin.style.display = "none";
                 teacherPanel.style.display = "block";
                 loadTeacherPanel();
-            } else { Swal.fire("Error", "Credenciales Incorrectas", "error"); }
+                Swal.fire("Acceso Concedido", "Bienvenido Profesor", "success");
+            } else { 
+                Swal.fire("Acceso Denegado", "Usuario o contraseña incorrectos", "error"); 
+            }
         });
     }
 
     if(teacherLogoutBtn) {
         teacherLogoutBtn.addEventListener("click", () => {
             teacherPanel.style.display = "none";
-            teacherUser.value = "";
-            teacherPass.value = "";
+            teacherUserInput.value = "";
+            teacherPassInput.value = "";
             loginCard.style.display = "block";
-            Swal.fire("Sesión Cerrada", "Modo maestro finalizado", "info");
         });
     }
 
-    // --- Funciones Globales para Botones en Tabla ---
+    // Funciones globales para tabla (necesarias porque se llaman desde onclick="" en HTML generado)
     window.changeGroup = async (uid) => {
         const { value: newGroup } = await Swal.fire({
             title: 'Cambiar Grupo',
@@ -457,25 +503,28 @@ document.addEventListener("DOMContentLoaded", () => {
         if (newGroup) {
             await updateDoc(doc(db, "students", uid), { group: newGroup.toUpperCase() });
             loadTeacherPanel();
+            Swal.fire("Listo", "Grupo actualizado", "success");
         }
     };
 
     window.resetStudent = async (uid) => {
-        if (confirm("¿Reiniciar alumno a CERO?")) {
+        if (confirm("¿Estás seguro de REINICIAR el progreso de este alumno a cero?")) {
             await updateDoc(doc(db, "students", uid), {
-                score: 0, stars: 0, level: 1, timeWorked: 0,
+                score: 0, level: 1, timeWorked: 0,
                 totalCorrect: 0, totalWrong: 0,
                 medals: {gold:0, silver:0, bronze:0},
                 unlockedLevels: [1], history: []
             });
             loadTeacherPanel();
+            Swal.fire("Reiniciado", "El alumno empieza desde cero.", "success");
         }
     };
 
     window.deleteStudent = async (uid) => {
-        if (confirm("¿ELIMINAR ALUMNO DEFINITIVAMENTE?")) {
+        if (confirm("¿ELIMINAR ALUMNO DEFINITIVAMENTE? Esta acción no se puede deshacer.")) {
             await deleteDoc(doc(db, "students", uid));
             loadTeacherPanel();
+            Swal.fire("Eliminado", "Alumno borrado de la base de datos.", "success");
         }
     };
 
@@ -483,7 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const student = window.allStudentsData.find(s => s.uid === uid);
         if(!student) return;
 
-        document.getElementById("statsModal").style.display = "block";
+        document.getElementById("statsModal").style.display = "flex"; // Flex para centrar
         const indArea = document.getElementById("individualStatsArea");
         if(indArea) indArea.style.display = "block";
         
@@ -507,55 +556,76 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         }
-        renderCharts(); // Renderiza también la global
+        renderCharts(); 
     };
 
     async function loadTeacherPanel() {
         const selectedGroupBefore = groupSelect.value;
-        studentsTable.innerHTML = "<tr><td colspan='6'>Cargando...</td></tr>";
+        studentsTable.innerHTML = "<tr><td colspan='6' style='text-align:center'>Cargando datos de la nube...</td></tr>";
         
-        const querySnapshot = await getDocs(collection(db, "students"));
-        window.allStudentsData = [];
-        
-        querySnapshot.forEach((doc) => { 
-            let data = doc.data();
-            data.uid = doc.id;
-            window.allStudentsData.push(data); 
-        });
+        try {
+            const querySnapshot = await getDocs(collection(db, "students"));
+            window.allStudentsData = [];
+            
+            querySnapshot.forEach((doc) => { 
+                let data = doc.data();
+                data.uid = doc.id;
+                window.allStudentsData.push(data); 
+            });
 
-        // Llenar select de grupos
-        const groups = [...new Set(window.allStudentsData.map(s => s.group))].sort();
-        groupSelect.innerHTML = '<option value="">Todos</option>';
-        groups.forEach(g => {
-            const opt = document.createElement("option");
-            opt.value = g; opt.textContent = `Gpo ${g}`;
-            groupSelect.appendChild(opt);
-        });
-        groupSelect.value = selectedGroupBefore;
+            // Llenar select de grupos
+            const groups = [...new Set(window.allStudentsData.map(s => s.group))].sort();
+            groupSelect.innerHTML = '<option value="">Todos los grupos</option>';
+            groups.forEach(g => {
+                if(g) {
+                    const opt = document.createElement("option");
+                    opt.value = g; opt.textContent = `Grupo ${g}`;
+                    groupSelect.appendChild(opt);
+                }
+            });
+            groupSelect.value = selectedGroupBefore;
 
+            renderTable();
+            renderCharts();
+
+        } catch(e) {
+            console.error("Error cargando panel:", e);
+            studentsTable.innerHTML = "<tr><td colspan='6' style='color:red'>Error cargando datos. Revisa la consola.</td></tr>";
+        }
+    }
+
+    function renderTable() {
         const filter = groupSelect.value;
         let filtered = filter ? window.allStudentsData.filter(s => s.group === filter) : window.allStudentsData;
-        filtered.sort((a, b) => b.score - a.score);
+        
+        // Ordenar por PUNTOS (mayor a menor)
+        filtered.sort((a, b) => (b.score || 0) - (a.score || 0));
 
         studentsTable.innerHTML = "";
         
+        if(filtered.length === 0) {
+            studentsTable.innerHTML = "<tr><td colspan='6' style='text-align:center'>No hay alumnos registrados aún.</td></tr>";
+            return;
+        }
+
         filtered.forEach(s => {
             const min = Math.floor((s.timeWorked || 0) / 60);
             const sec = (s.timeWorked || 0) % 60;
             const timeStr = `${min}m ${sec}s`;
             const correct = s.totalCorrect || 0;
+            const level = Math.max(...(s.unlockedLevels || [1]));
 
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${s.username}</td>
-                <td>${s.group}</td>
-                <td>${Math.max(...(s.unlockedLevels || [1]))}</td>
-                <td style="font-weight:bold; color:blue;">${timeStr}</td>
-                <td style="color:green;">${correct}</td>
+                <td>${s.username || "Sin Nombre"}</td>
+                <td>${s.group || "-"}</td>
+                <td style="text-align:center">${level}</td>
+                <td style="font-weight:bold; color:blue;">${s.score || 0} pts</td>
+                <td style="color:green; text-align:center">${correct}</td>
                 <td>
                    <button onclick="viewStudentStats('${s.uid}')" class="action-btn btn-info" title="Ver Gráfica"><i class="fas fa-chart-pie"></i></button>
-                   <button onclick="changeGroup('${s.uid}')" class="action-btn btn-group" title="Cambiar Grupo"><i class="fas fa-folder"></i></button>
-                   <button onclick="resetStudent('${s.uid}')" class="action-btn btn-reset" title="Reiniciar"><i class="fas fa-sync"></i></button>
+                   <button onclick="changeGroup('${s.uid}')" class="action-btn btn-group" style="background:#6c757d" title="Cambiar Grupo"><i class="fas fa-folder"></i></button>
+                   <button onclick="resetStudent('${s.uid}')" class="action-btn btn-reset" style="background:#ffc107; color:black" title="Reiniciar"><i class="fas fa-sync"></i></button>
                    <button onclick="deleteStudent('${s.uid}')" class="action-btn btn-delete" title="Eliminar"><i class="fas fa-trash"></i></button>
                 </td>`;
             studentsTable.appendChild(row);
@@ -566,7 +636,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // 4. EXPORTACIÓN Y GRÁFICAS
     // ==========================================
 
-    // Exportar a Excel
     if(exportExcelBtn) {
         exportExcelBtn.addEventListener("click", () => {
             if(!window.allStudentsData || window.allStudentsData.length === 0) {
@@ -599,14 +668,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if(viewStatsBtn) {
         viewStatsBtn.addEventListener("click", () => {
             const modal = document.getElementById("statsModal");
-            if(modal) modal.style.display = "block";
+            if(modal) modal.style.display = "flex";
             const indArea = document.getElementById("individualStatsArea");
-            if(indArea) indArea.style.display = "none"; // Ocultar individual al abrir general
+            if(indArea) indArea.style.display = "none"; 
             setTimeout(renderCharts, 200);
         });
     }
 
-    // Cerrar modales (clic fuera del modal)
     window.onclick = function(event) {
         const modal = document.getElementById("statsModal");
         if (event.target == modal) {
@@ -620,14 +688,25 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const ctx = chartCanvas.getContext('2d');
         let totalGold = 0, totalSilver = 0, totalBronze = 0;
+        let totalCorrect = 0;
+        let totalWrong = 0;
         
-        window.allStudentsData.forEach(s => {
-            if(s.medals) {
-                totalGold += s.medals.gold || 0;
-                totalSilver += s.medals.silver || 0;
-                totalBronze += s.medals.bronze || 0;
-            }
-        });
+        if(window.allStudentsData) {
+            window.allStudentsData.forEach(s => {
+                if(s.medals) {
+                    totalGold += s.medals.gold || 0;
+                    totalSilver += s.medals.silver || 0;
+                    totalBronze += s.medals.bronze || 0;
+                }
+                totalCorrect += s.totalCorrect || 0;
+                totalWrong += s.totalWrong || 0;
+            });
+        }
+        
+        // Actualizar tarjetas del dashboard
+        if(medalsCountDisplay) medalsCountDisplay.textContent = totalGold + totalSilver + totalBronze;
+        if(correctCountDisplay) correctCountDisplay.textContent = totalCorrect;
+        if(wrongCountDisplay) wrongCountDisplay.textContent = totalWrong;
 
         if(window.myChart instanceof Chart) window.myChart.destroy();
 
@@ -660,18 +739,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if(refreshTeacherBtn) refreshTeacherBtn.addEventListener("click", loadTeacherPanel);
-    if(groupSelect) groupSelect.addEventListener("change", loadTeacherPanel);
+    if(groupSelect) groupSelect.addEventListener("change", renderTable); // Optimización: solo renderizar tabla al cambiar grupo, no pedir datos de nuevo
 
     if(resetMonthlyBtn) {
         resetMonthlyBtn.addEventListener("click", async () => {
-            const confirmCode = prompt("Escribe 'BORRAR' para reiniciar a TODOS los alumnos a cero:");
+            const confirmCode = prompt("⚠️ PELIGRO ⚠️\nEscribe 'BORRAR' para reiniciar a TODOS los alumnos a cero:");
             if (confirmCode === "BORRAR") {
-                const querySnapshot = await getDocs(collection(db, "students"));
                 const batch = writeBatch(db);
-                querySnapshot.forEach((documento) => {
-                    const ref = doc(db, "students", documento.id);
+                // NOTA: Firebase tiene limite de 500 operaciones por batch. 
+                // Si tienes más de 500 alumnos, esto necesita paginación. 
+                // Para una clase normal está bien.
+                window.allStudentsData.forEach((student) => {
+                    const ref = doc(db, "students", student.uid);
                     batch.update(ref, { 
-                        score: 0, stars: 0, level: 1, timeWorked: 0, 
+                        score: 0, level: 1, timeWorked: 0, 
                         totalCorrect: 0, totalWrong: 0,
                         medals: {gold:0, silver:0, bronze:0}, 
                         unlockedLevels: [1], history: [] 
@@ -690,8 +771,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if(logoutBtn) {
         logoutBtn.addEventListener("click", () => {
-            saveProgress(); stopTimer();
-            signOut(auth).then(() => { location.reload(); });
+            saveProgress(); 
+            stopTimer();
+            signOut(auth).then(() => { 
+                location.reload(); 
+            });
         });
     }
 
@@ -718,7 +802,8 @@ document.addEventListener("DOMContentLoaded", () => {
     
     function showStudentInterface() {
         loginCard.style.display = "none";
-        mainContent.style.display = "flex"; // Ajuste para flexbox
+        teacherPanel.style.display = "none";
+        mainContent.style.display = "block";
         logoutBtn.style.display = "inline-block";
         startTimer();
         startQuestion();
@@ -727,6 +812,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function showLoginInterface() {
         loginCard.style.display = "block";
         mainContent.style.display = "none";
+        teacherPanel.style.display = "none";
         logoutBtn.style.display = "none";
     }
 });
