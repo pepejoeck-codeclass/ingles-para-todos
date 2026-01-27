@@ -2,9 +2,20 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Inglés Para Todos</title>
+  <title>Inglés Para Todos - Premium</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <style>
+    /* Estilos extra para las nuevas funciones */
+    .locked { opacity: 0.5; pointer-events: none; cursor: not-allowed; }
+    .nav-link { cursor: pointer; }
+    .medal-icon { font-size: 2em; margin: 0 5px; }
+  </style>
 </head>
 <body>
 
@@ -21,11 +32,10 @@
   </div>
 
   <nav id="nav">
-    <a href="#">Lección 1</a>
-    <a href="#">Lección 2 🔒</a>
-    <a href="#">Lección 3 🔒</a>
+    <a class="nav-link" id="navL1" onclick="window.selectLevel(1)">Lección 1 (Básicos)</a>
+    <a class="nav-link locked" id="navL2" onclick="window.selectLevel(2)">Lección 2 (Animales) 🔒</a>
+    <a class="nav-link locked" id="navL3" onclick="window.selectLevel(3)">Lección 3 (Colores) 🔒</a>
     <a href="#">Juegos</a>
-    <a href="#">Progreso</a>
   </nav>
 </header>
 
@@ -38,10 +48,16 @@
   <input type="text" id="usernameInput" placeholder="Nombre completo" />
   
   <p>— Datos de acceso —</p>
-  <input type="email" id="emailInput" placeholder="Correo electrónico" />
+  <input type="email" id="emailInput" placeholder="Correo electrónico (Gmail)" />
   <input type="password" id="passwordInput" placeholder="Contraseña (Mínimo 6 caracteres)" />
 
   <button type="button" id="loginBtn">Entrar / Registrarse</button>
+
+  <p style="text-align: center; margin-top: 15px;">
+    <a href="#" id="forgotPasswordLink" style="color: #666; font-size: 0.9em; text-decoration: underline;">
+       Forgot your password? / ¿Olvidaste tu contraseña?
+    </a>
+  </p>
 </section>
 
 <section class="card" id="teacherLogin" style="display:none;">
@@ -54,6 +70,12 @@
 
 <main id="mainContent" style="display:none;">
   <h3 id="userDisplay"></h3>
+  
+  <div style="width: 100%; background-color: #ddd; border-radius: 10px; margin-bottom: 10px;">
+      <div id="lessonProgressBar" style="width: 0%; height: 10px; background-color: #4CAF50; border-radius: 10px; transition: width 0.5s;"></div>
+  </div>
+  <p style="text-align:center; font-size:0.8em;">Progreso de lección: <span id="progressText">0/5</span></p>
+
   <section class="card">
     <h2 id="questionText">Pulsa para comenzar</h2>
     <p id="feedback" style="font-weight: bold; height: 20px;"></p>
@@ -68,7 +90,7 @@
   </section>
   <section class="card">
     <p id="scoreText">0 puntos</p>
-    <p id="levelText">Nivel 1</p>
+    <p id="levelText">Nivel Actual: 1</p>
   </section>
 </main>
 
@@ -79,13 +101,14 @@
       <select id="groupSelect"><option value="">Todos los grupos</option></select>
       <button type="button" id="refreshTeacher">🔄 Actualizar</button>
       <button type="button" id="exportBtn" style="background-color: #28a745; color: white;">📥 Excel</button>
+      <button type="button" id="viewStatsBtn" style="background-color: #673ab7; color: white;">📊 Ver Gráficas y Reporte</button>
       <button type="button" id="resetMonthlyBtn" style="background-color: #f44336; color: white;">🗓️ Reiniciar TODOS</button>
   </div>
   <div style="overflow-x: auto;">
       <table border="1" width="100%" style="border-collapse: collapse; text-align: center;">
         <thead>
           <tr style="background-color: #eee;">
-            <th>Alumno</th><th>Grado</th><th>Grupo</th><th>Puntos</th><th>Nivel</th><th>⭐</th><th>Tiempo</th><th>Acciones</th>
+            <th>Alumno</th><th>Grado</th><th>Grupo</th><th>Puntos</th><th>Nivel</th><th>Medallas</th><th>Acciones</th>
           </tr>
         </thead>
         <tbody id="studentsTable"></tbody>
@@ -94,6 +117,24 @@
   <br>
   <button type="button" id="closeTeacherPanel">Cerrar Sesión Maestro</button>
 </section>
+
+<div id="statsModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 9999; overflow-y: auto;">
+    <div style="background: white; margin: 2% auto; padding: 20px; width: 90%; max-width: 800px; border-radius: 10px;">
+        <div style="display:flex; justify-content:space-between;">
+            <h2>📊 Reporte de Progreso</h2>
+            <button onclick="document.getElementById('statsModal').style.display='none'" style="background:red; color:white;">X</button>
+        </div>
+        <button id="downloadPdfBtn" style="background: #007bff; color: white; margin-bottom:10px;">🖨️ Descargar PDF</button>
+        
+        <div id="reportContent">
+            <h3>Rendimiento del Grupo</h3>
+            <canvas id="groupChart" height="100"></canvas>
+            
+            <h3>🏆 Historial Reciente de Medallas</h3>
+            <ul id="historyList" style="list-style: none; padding: 0;"></ul>
+        </div>
+    </div>
+</div>
 
 <script type="module" src="js/app.js"></script>
 </body>
