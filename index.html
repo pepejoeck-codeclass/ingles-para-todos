@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - SONIDOS ACTIVOS</title>
+    <title>Inglés Para Todos - VERSIÓN FINAL</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -132,7 +132,7 @@
     </div>
 
     <script>
-        // --- 1. CONFIGURACIÓN FIREBASE ---
+        // 1. FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s",
             authDomain: "ingles-pepejoeck.firebaseapp.com",
@@ -148,13 +148,18 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // --- 2. CARGA DE SONIDOS ---
-        // Aquí cargamos tus sonidos para usarlos en el juego
-        const audioCorrecto = new Audio('assets/sounds/correct.mp3');
-        const audioError = new Audio('assets/sounds/wrong.mp3');
-        const audioLevelUp = new Audio('assets/sounds/levelup.mp3');
+        // 2. SONIDOS - Definición Robusta con Rutas Relativas
+        // Nota: Asegúrate que en GitHub la carpeta sea assets/sounds (minúsculas)
+        const audioCorrecto = new Audio('./assets/sounds/correct.mp3');
+        const audioError = new Audio('./assets/sounds/wrong.mp3');
+        const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
+        
+        // Precargar audios
+        audioCorrecto.load();
+        audioError.load();
+        audioLevelUp.load();
 
-        // --- 3. VARIABLES Y BASE DE DATOS ---
+        // 3. VARIABLES
         let usuarioActual = null;
         let datosUsuario = {};
         let nivelActual = 1;
@@ -168,10 +173,10 @@
             3: [{q:"Lunes",a:"monday"}, {q:"Martes",a:"tuesday"}, {q:"Sol",a:"sun"}, {q:"Luna",a:"moon"}, {q:"Agua",a:"water"}]
         };
 
-        // --- 4. DETECTOR DE SESIÓN ---
+        // 4. DETECTOR SESIÓN
         auth.onAuthStateChanged((user) => {
             if (user) {
-                console.log("Sesión iniciada:", user.email);
+                console.log("Sesión activa");
                 usuarioActual = user.uid;
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
@@ -180,7 +185,6 @@
                     }
                 });
             } else {
-                console.log("Sesión cerrada");
                 usuarioActual = null;
                 if(document.getElementById("teacherPanel").style.display === "none") {
                     mostrarLogin();
@@ -188,7 +192,7 @@
             }
         });
 
-        // --- 5. FUNCIONES DE PANTALLAS ---
+        // 5. NAVEGACION
         function mostrarLogin() {
             document.getElementById("loginCard").style.display = "block";
             document.getElementById("mainContent").style.display = "none";
@@ -217,7 +221,7 @@
             document.getElementById("loginCard").style.display = "block";
         }
 
-        // --- 6. LOGICA ALUMNO ---
+        // 6. LOGIN / REGISTRO ALUMNO
         function intentarLogin() {
             const email = document.getElementById("emailInput").value.trim();
             const pass = document.getElementById("passwordInput").value.trim();
@@ -229,10 +233,10 @@
 
             auth.signInWithEmailAndPassword(email, pass)
                 .catch((error) => {
-                    const erroresRegistro = ['auth/user-not-found', 'auth/wrong-password', 'auth/invalid-login-credentials', 'auth/invalid-credential'];
-                    if(erroresRegistro.includes(error.code)) {
+                    const errores = ['auth/user-not-found', 'auth/wrong-password', 'auth/invalid-login-credentials', 'auth/invalid-credential'];
+                    if(errores.includes(error.code)) {
                         if(!nombre || !grado || !grupo) {
-                            Swal.fire({icon: 'warning', title: 'Aviso', text: 'Usuario no encontrado. Si eres nuevo, llena Nombre, Grado y Grupo.'});
+                            Swal.fire({icon: 'warning', title: 'Aviso', text: 'Usuario no encontrado o contraseña mal. Si eres nuevo, llena Nombre, Grado y Grupo.'});
                             return;
                         }
                         auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
@@ -240,9 +244,7 @@
                                 uid: cred.user.uid,
                                 username: nombre, grade: grado, group: grupo, email: email, password: pass,
                                 score: 0, unlockedLevels: [1], totalCorrect: 0, medals: {gold:0, silver:0, bronze:0}
-                            }).then(() => {
-                                Swal.fire("¡Éxito!", "Cuenta creada", "success");
-                            });
+                            }).then(() => Swal.fire("¡Éxito!", "Cuenta creada", "success"));
                         }).catch(e => {
                             if(e.code === 'auth/email-already-in-use') Swal.fire("Error", "Correo ya registrado", "error");
                             else Swal.fire("Error", e.message, "error");
@@ -265,11 +267,9 @@
             }
         }
 
-        function cerrarSesion() {
-            auth.signOut().then(() => location.reload());
-        }
+        function cerrarSesion() { auth.signOut().then(() => location.reload()); }
 
-        // --- 7. LOGICA DE JUEGO Y SONIDOS ---
+        // 7. JUEGO Y SONIDOS
         function cargarPregunta() {
             const pool = preguntasDB[nivelActual];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
@@ -287,9 +287,10 @@
             const feed = document.getElementById("feedback");
 
             if(resp === preguntaActual.a) {
-                // REPRODUCIR SONIDO CORRECTO
-                audioCorrecto.currentTime = 0; // Reiniciar sonido
-                audioCorrecto.play().catch(e => console.log("Audio bloqueado por navegador"));
+                // INTENTO DE REPRODUCIR AUDIO
+                // .play() devuelve una promesa. Si falla (ej. ruta mal), lo cachamos en catch.
+                audioCorrecto.currentTime = 0;
+                audioCorrecto.play().catch(e => console.error("Error Audio Correcto:", e));
 
                 feed.textContent = "¡Correcto! 🔥"; feed.style.color = "green";
                 datosUsuario.score = (datosUsuario.score || 0) + 10;
@@ -300,9 +301,9 @@
                     totalCorrect: datosUsuario.totalCorrect
                 });
             } else {
-                // REPRODUCIR SONIDO ERROR
+                // INTENTO DE REPRODUCIR AUDIO
                 audioError.currentTime = 0;
-                audioError.play().catch(e => console.log("Audio bloqueado"));
+                audioError.play().catch(e => console.error("Error Audio Error:", e));
 
                 feed.textContent = "Incorrecto. Era: " + preguntaActual.a; feed.style.color = "red";
             }
@@ -320,9 +321,9 @@
         function finSesion() {
             let msg = "Bien hecho";
             if(aciertosSesion >= 4) {
-                // REPRODUCIR SONIDO LEVEL UP
+                // INTENTO DE REPRODUCIR AUDIO
                 audioLevelUp.currentTime = 0;
-                audioLevelUp.play().catch(e => console.log("Audio bloqueado"));
+                audioLevelUp.play().catch(e => console.error("Error Audio Nivel:", e));
 
                 msg = "¡Nivel Superado!";
                 const next = nivelActual + 1;
@@ -367,7 +368,7 @@
             }
         }
 
-        // --- 8. LOGICA MAESTRO ---
+        // 8. LOGICA MAESTRO
         function loginMaestro() {
             const u = document.getElementById("teacherUserImput").value.trim();
             const p = document.getElementById("teacherPassInput").value.trim();
@@ -388,38 +389,38 @@
 
         function cargarTablaAlumnos() {
             const tbody = document.getElementById("cuerpoTabla");
-            tbody.innerHTML = "<tr><td colspan='5'>Cargando datos...</td></tr>";
-            let totalAciertos = 0;
+            tbody.innerHTML = "<tr><td colspan='5'>Cargando...</td></tr>";
+            let total = 0;
             db.collection("students").get().then((querySnapshot) => {
                 tbody.innerHTML = "";
                 const alumnos = [];
                 querySnapshot.forEach((doc) => {
                     let d = doc.data(); d.uid = doc.id; alumnos.push(d);
-                    totalAciertos += (d.totalCorrect || 0);
+                    total += (d.totalCorrect || 0);
                 });
-                document.getElementById("totalAciertos").textContent = totalAciertos;
+                document.getElementById("totalAciertos").textContent = total;
                 alumnos.sort((a,b) => (b.score||0) - (a.score||0));
                 alumnos.forEach(alum => {
                     const tr = document.createElement("tr");
-                    const nivelMax = Math.max(...(alum.unlockedLevels || [1]));
-                    tr.innerHTML = `<td>${alum.username}</td><td>${alum.group}</td><td>${nivelMax}</td><td style="color:blue; font-weight:bold">${alum.score}</td><td><button onclick="borrarAlumno('${alum.uid}')" class="btn-delete action-btn">🗑️</button></td>`;
+                    const nm = Math.max(...(alum.unlockedLevels || [1]));
+                    tr.innerHTML = `<td>${alum.username}</td><td>${alum.group}</td><td>${nm}</td><td style="color:blue; font-weight:bold">${alum.score}</td><td><button onclick="borrarAlumno('${alum.uid}')" class="btn-delete action-btn">🗑️</button></td>`;
                     tbody.appendChild(tr);
                 });
             });
         }
 
         function borrarAlumno(id) {
-            if(confirm("¿Eliminar alumno permanentemente?")) {
+            if(confirm("¿Eliminar alumno?")) {
                 db.collection("students").doc(id).delete().then(() => cargarTablaAlumnos());
             }
         }
 
         function resetearTodo() {
-            const codigo = prompt("Escribe BORRAR para reiniciar a todos a cero:");
+            const codigo = prompt("Escribe BORRAR para reiniciar todo:");
             if(codigo === "BORRAR") {
                 db.collection("students").get().then(snapshot => {
                     snapshot.forEach(doc => { doc.ref.update({score:0, unlockedLevels:[1], totalCorrect:0}); });
-                    alert("Escuela Reiniciada"); cargarTablaAlumnos();
+                    alert("Reiniciado"); cargarTablaAlumnos();
                 });
             }
         }
