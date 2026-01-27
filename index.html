@@ -15,157 +15,154 @@
 
     <style>
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --white: #ffffff; }
-        body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #333; }
+        body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
+        .app-container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
+        .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; }
         
-        /* Contenedores */
-        .card { background: rgba(255, 255, 255, 0.95); padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 450px; text-align: center; margin: 20px auto; }
-        .game-container { max-width: 800px; width: 95%; }
-        
-        /* Inputs y Botones */
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); }
-        
-        .btn { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.2s; color: white; }
-        .btn-primary { background: linear-gradient(to right, #0052D4, #4364F7, #6FB1FC); }
-        .btn-teacher { background: #333; margin-top: 20px; font-size: 14px; padding: 8px; }
-        .btn-danger { background: #dc3545; }
-        .btn:active { transform: scale(0.98); }
+        /* CORRECCIÓN PARA TUS IMÁGENES .JPG.JPG */
+        .logo-img { width: 100%; max-width: 300px; margin-bottom: 10px; }
+        .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; margin: 10px auto; display: block; object-fit: cover; }
+        .teacher-header-img { width: 100%; max-height: 180px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 10px; }
 
-        /* Elementos del Juego */
-        .hud { display: flex; justify-content: space-between; margin-bottom: 20px; color: white; font-weight: bold; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; }
-        .question-box { background: white; padding: 30px; border-radius: 15px; margin-bottom: 20px; font-size: 1.5rem; font-weight: 900; color: var(--secondary); }
-        .feedback { height: 30px; margin: 10px 0; font-weight: bold; font-size: 1.2rem; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; color: white; text-transform: uppercase; }
+        .btn-primary { background: var(--primary); }
+        .btn-danger { background: var(--accent); }
+        .btn-secondary { background: #6c757d; }
         
+        /* Estilos del Juego */
+        .level-badge { background: var(--gold); padding: 5px 15px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
+        .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
+        .question-box { font-size: 22px; font-weight: bold; color: var(--secondary); margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 5px solid var(--primary); }
+        
+        /* Navegación */
+        .bottom-nav { display: flex; justify-content: space-around; background: white; padding: 10px; border-radius: 15px; margin-top: 10px; }
+        .nav-item { text-align: center; cursor: pointer; color: #aaa; font-size: 12px; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item.locked { opacity: 0.5; pointer-events: none; }
+
         /* Panel Maestro */
-        .teacher-panel { max-width: 1000px; width: 95%; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        .teacher-panel-container { width: 95%; max-width: 1000px; display: none; padding-bottom: 50px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
         th { background: var(--primary); color: white; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: #f8f9fa; padding: 10px; border-radius: 10px; text-align: center; }
         .action-btn { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; }
-        .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-reset { background: #ffc107; color: black; }
-        
-        /* Utilidades */
-        .hidden { display: none; }
-        .logo { width: 120px; margin-bottom: 10px; }
-        .nav-levels { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .level-btn { background: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; opacity: 0.7; }
-        .level-btn.active { opacity: 1; transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .level-btn.locked { background: #ccc; cursor: not-allowed; }
-        .progress-container { width: 100%; background: #eee; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px; }
-        .progress-bar { height: 100%; background: #28a745; width: 0%; transition: width 0.3s; }
+        .btn-info { background: #17a2b8; }
+        .btn-delete { background: #dc3545; }
+        .btn-group { background: #fd7e14; }
+        .btn-reset { background: #ffc107; color: black; }
     </style>
 </head>
 <body>
 
-    <div id="loginCard" class="card">
-        <div style="font-size: 3rem; color: var(--primary); margin-bottom: 10px;">
-            <i class="fas fa-graduation-cap"></i>
-        </div>
-        <h2 style="color: var(--secondary);">Student Access</h2>
-        <p style="color: #666; font-size: 0.9rem;">Ingresa tus datos para jugar</p>
+    <div id="loginCard" class="app-container">
+        <div class="card">
+            <img src="assets/images/logo_main.png.jpg" alt="Logo" class="logo-img">
+            
+            <h2>Identidad Secreta</h2>
+            <input type="email" id="emailInput" placeholder="Correo Electrónico">
+            <input type="password" id="passwordInput" placeholder="Contraseña">
+            
+            <hr>
+            <p style="font-size: 12px; color: #666;">* Si eres nuevo, llena esto también:</p>
+            <input type="text" id="usernameInput" placeholder="Nombre Real">
+            <div style="display: flex; gap: 10px;">
+                <input type="number" id="gradeInput" placeholder="Grado" style="width: 50%;">
+                <input type="text" id="groupInput" placeholder="Grupo" style="width: 50%;">
+            </div>
 
-        <input type="text" id="usernameInput" placeholder="Nombre Completo (Ej. Juan Pérez)">
-        <div style="display: flex; gap: 10px;">
-            <input type="number" id="gradeInput" placeholder="Grado (1-6)">
-            <input type="text" id="groupInput" placeholder="Grupo (A, B, C)">
+            <button id="loginBtn" class="btn btn-primary">DESPEGAR 🚀</button>
+            <div style="margin-top: 10px;"><a href="#" id="forgotPasswordLink">Olvidé contraseña</a></div>
         </div>
-        <input type="email" id="emailInput" placeholder="Correo Gmail">
-        <input type="password" id="passwordInput" placeholder="Contraseña (mín. 6 letras)">
 
-        <button id="loginBtn" class="btn btn-primary">🚀 DESPEGAR</button>
-        
-        <div style="margin-top: 15px;">
-            <a href="#" id="forgotPasswordLink" style="color: var(--primary); font-size: 0.85rem;">¿Olvidaste tu contraseña?</a>
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="color: white; font-size: 14px;">Acceso Maestro</p>
+            <img src="assets/images/super_teacher_btn.jpg.jpg" id="openTeacherBtn" class="teacher-badge-img">
         </div>
-        
-        <button id="openTeacherBtn" class="btn btn-teacher">Soy Maestro 👨‍🏫</button>
     </div>
 
-    <div id="teacherLogin" class="card hidden">
-        <h2 style="color: var(--secondary);">Teacher Access</h2>
-        <input type="text" id="teacherUser" placeholder="Usuario Maestro">
-        <input type="password" id="teacherPass" placeholder="Contraseña PIN">
-        <button id="teacherLoginBtn" class="btn btn-primary">Entrar al Panel</button>
-        <button id="closeTeacherLogin" class="btn btn-danger" style="margin-top: 10px;">Cancelar</button>
+    <div id="teacherLogin" class="app-container" style="display: none;">
+        <div class="card">
+            <img src="assets/images/teacher_header.jpg.jpg" class="teacher-header-img">
+            <h2>Solo Maestros</h2>
+            <input type="text" id="teacherUser" placeholder="Usuario">
+            <input type="password" id="teacherPass" placeholder="Contraseña">
+            <button id="teacherLoginBtn" class="btn btn-primary">Entrar</button>
+            <button id="closeTeacherLogin" class="btn btn-secondary">Cancelar</button>
+        </div>
     </div>
 
-    <div id="mainContent" class="hidden" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-        
-        <div style="width: 95%; max-width: 800px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div id="userDisplay" style="color: white; font-weight: bold; font-size: 1.2rem;"></div>
-            <button id="logoutBtn" class="btn btn-danger" style="width: auto; padding: 5px 15px; margin: 0;">Salir</button>
+    <div id="mainContent" class="app-container" style="display: none;">
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+            <div style="text-align: left;">
+                <div id="userDisplay" style="font-weight: bold; color: var(--primary);">Alumno</div>
+                <div id="scoreText" style="font-size: 12px;">Puntos: 0</div>
+                <div id="timeText" style="font-size: 12px;">⏱ 0m 0s</div>
+            </div>
+            <button id="logoutBtn" class="btn-danger" style="width: auto; padding: 5px 15px; margin:0; font-size: 12px;">Salir</button>
         </div>
 
-        <div class="card game-container">
-            <div class="hud">
-                <span id="levelText">Nivel: 1</span>
-                <span id="scoreText">0 Pts</span>
-                <span id="timeText">⏱ 0m 0s</span>
-                <span>🏅 <span id="medalsCount">0</span></span>
-            </div>
-
-            <div class="nav-levels">
-                <button class="level-btn active" onclick="selectLevel(1)" id="navL1">L1: Basics</button>
-                <button class="level-btn locked" onclick="selectLevel(2)" id="navL2"><i class="fas fa-lock"></i> Animals</button>
-                <button class="level-btn locked" onclick="selectLevel(3)" id="navL3"><i class="fas fa-lock"></i> Colors</button>
-            </div>
-
-            <div class="question-box">
-                <div id="questionText">Loading...</div>
-            </div>
-
-            <input type="text" id="answerInput" placeholder="Escribe tu respuesta aquí..." autocomplete="off">
+        <div class="card">
+            <span id="levelText" class="level-badge">Nivel 1</span>
+            <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
+            <div id="questionText" class="question-box">Cargando...</div>
+            <input type="text" id="answerInput" placeholder="Escribe en inglés..." autocomplete="off">
             <button id="checkAnswer" class="btn btn-primary">Comprobar</button>
-            
-            <div id="feedback" class="feedback"></div>
-            
-            <div class="progress-container">
-                <div id="lessonProgressBar" class="progress-bar"></div>
-            </div>
-            
-            <div style="margin-top:10px; font-size: 0.8rem; color: #999;">
-                Correctas: <span id="correctCount">0</span> | Incorrectas: <span id="wrongCount">0</span>
-            </div>
-            
-            <button id="startGame" style="display:none;"></button>
+            <button id="startGame" style="display:none;">Start</button> 
+            <div id="feedback" style="margin-top: 15px; font-weight: bold; height: 20px;"></div>
+        </div>
+
+        <div style="display:none;">
+            <span id="correctCount">0</span>
+            <span id="wrongCount">0</span>
+            <span id="medalsCount">0</span>
+        </div>
+
+        <div class="bottom-nav" id="nav">
+            <div class="nav-item active" onclick="selectLevel(1)"><i class="fas fa-star"></i> Nivel 1</div>
+            <div class="nav-item locked" id="navL2" onclick="selectLevel(2)"><i class="fas fa-lock"></i> Nivel 2</div>
+            <div class="nav-item locked" id="navL3" onclick="selectLevel(3)"><i class="fas fa-lock"></i> Nivel 3</div>
         </div>
     </div>
 
-    <div id="teacherPanel" class="hidden" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-        <div class="card teacher-panel">
+    <div id="teacherPanel" class="teacher-panel-container">
+        <div class="card" style="text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2>🎓 Panel de Control</h2>
-                <button id="closeTeacherPanel" class="btn btn-danger" style="width: auto;">Cerrar Panel</button>
+                <h2>Panel Maestro</h2>
+                <button id="closeTeacherPanel" class="btn-danger" style="width: auto; padding: 8px 20px; font-size: 14px; margin:0;">Cerrar</button>
+                <button id="teacherLogoutBtn" style="display:none;">Logout Real</button> 
             </div>
             
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
-                <select id="groupSelect" style="width: auto;"><option>Todos</option></select>
+            <div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px;">
+                <select id="groupSelect" style="padding: 8px; flex: 1;"><option value="">Todos</option></select>
                 <button id="refreshTeacher" class="action-btn btn-info"><i class="fas fa-sync"></i></button>
-                <button id="viewStatsBtn" class="action-btn btn-info">📊 Gráficas</button>
-                <button id="exportExcelBtn" class="action-btn" style="background: green;"><i class="fas fa-file-excel"></i> Excel</button>
-                <button id="teacherLogoutBtn" class="action-btn btn-delete">Salir</button>
+                <button id="exportExcelBtn" class="action-btn" style="background-color: #217346;"><i class="fas fa-file-excel"></i> Excel</button>
+                <button id="viewStatsBtn" class="action-btn btn-info"><i class="fas fa-chart-pie"></i> Gráficas</button>
+                <button id="resetMonthlyBtn" class="action-btn btn-delete"><i class="fas fa-bomb"></i> Reset Total</button>
             </div>
 
             <div style="overflow-x: auto;">
-                <tbody id="studentsTable">
-                    </tbody>
+                <table id="teacherTable">
+                    <thead><tr><th>Nombre</th><th>Gpo</th><th>Nivel</th><th>Tiempo</th><th>Pts</th><th>Acción</th></tr></thead>
+                    <tbody id="studentsTable"></tbody>
+                </table>
             </div>
-             <button id="resetMonthlyBtn" class="btn btn-danger" style="margin-top: 20px;">⚠️ REINICIAR MES</button>
         </div>
     </div>
 
-    <div id="statsModal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto;">
-        <div class="card" style="margin: 50px auto; max-width: 600px;">
-            <h3>Reporte de Progreso</h3>
-            <div id="reportContent">
-                <canvas id="groupChart"></canvas>
-                <div id="individualStatsArea" style="display: none; margin-top: 20px; border-top: 1px solid #ccc; padding-top: 20px;">
-                    <h4 id="individualName"></h4>
-                    <canvas id="individualChart"></canvas>
-                </div>
+    <div id="statsModal" class="app-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; max-width: 100%;">
+        <div class="card" style="width: 90%; max-width: 600px; margin: 50px auto; overflow-y: auto; max-height: 90vh;" id="reportContent">
+            <h3>Reporte</h3>
+            <canvas id="groupChart"></canvas>
+            <div id="individualStatsArea" style="display: none; margin-top: 20px;">
+                <h4 id="individualName"></h4>
+                <canvas id="individualChart"></canvas>
             </div>
-            <button id="downloadPdfBtn" class="btn btn-primary">Descargar PDF</button>
-            <button onclick="document.getElementById('statsModal').style.display='none'" class="btn btn-danger" style="margin-top: 10px;">Cerrar</button>
+            <button id="downloadPdfBtn" class="btn btn-primary" style="margin-top:10px;">Descargar PDF</button>
+            <button onclick="document.getElementById('statsModal').style.display='none'" class="btn btn-secondary" style="margin-top:5px">Cerrar</button>
         </div>
     </div>
 
