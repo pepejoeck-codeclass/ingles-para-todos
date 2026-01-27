@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Inglés Para Todos - Pro</title>
+  <title>Inglés Para Todos - Super Edition</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/styles.css">
   
@@ -10,137 +10,204 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   
   <style>
-    /* Estilos para el bloqueo y mejoras visuales */
-    .locked { opacity: 0.6; pointer-events: none; filter: grayscale(100%); }
-    .nav-link { cursor: pointer; user-select: none; }
-    .fa-lock { margin-left: 5px; color: #d9534f; }
-    .fa-unlock { margin-left: 5px; color: #5cb85c; }
+    /* --- TEMA SUPER HEROE (Azul, Rojo, Amarillo) --- */
+    :root {
+        --super-blue: #003D7A; /* Azul Superman */
+        --super-red: #B51808;  /* Rojo Superman */
+        --super-yellow: #F2C305; /* Amarillo Superman */
+        --bg-color: #f4f6f9;
+    }
+
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; }
     
-    /* Botones de acción en tabla maestro */
-    .action-btn { border: none; padding: 5px 8px; margin: 0 2px; border-radius: 4px; cursor: pointer; color: white; transition: 0.3s; }
-    .btn-group { background-color: #f0ad4e; } /* Naranja */
-    .btn-reset { background-color: #0275d8; } /* Azul */
-    .btn-delete { background-color: #d9534f; } /* Rojo */
-    .action-btn:hover { opacity: 0.8; transform: scale(1.05); }
+    /* Header estilizado */
+    header { background: var(--super-blue); color: white; padding: 15px; border-bottom: 5px solid var(--super-red); display: flex; flex-direction: column; align-items: center; }
+    header h1 { margin: 0; font-size: 1.8em; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #000; }
+
+    /* Navegación */
+    #nav { background: #00264d; width: 100%; display: flex; justify-content: center; gap: 15px; padding: 10px 0; margin-top: 10px; flex-wrap: wrap; }
+    .nav-link { color: white; cursor: pointer; padding: 8px 15px; border-radius: 20px; transition: 0.3s; font-weight: bold; }
+    .nav-link:hover { background: var(--super-yellow); color: #000; transform: scale(1.1); }
+    .locked { opacity: 0.5; pointer-events: none; }
+    
+    /* Tarjetas */
+    .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-width: 600px; margin: 20px auto; text-align: center; border-top: 5px solid var(--super-yellow); }
+    
+    /* Botones Generales */
+    button { cursor: pointer; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; transition: 0.3s; font-size: 1em; box-shadow: 0 3px 5px rgba(0,0,0,0.2); }
+    button:hover { transform: translateY(-3px); box-shadow: 0 5px 10px rgba(0,0,0,0.3); }
+    
+    #loginBtn, #checkAnswer { background: var(--super-blue); color: white; }
+    #startGame { background: var(--super-yellow); color: #000; }
+    
+    /* Inputs */
+    input { padding: 12px; margin: 8px 0; width: 80%; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; }
+    input:focus { border-color: var(--super-blue); outline: none; }
+
+    /* TABLA MAESTRO */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th { background: var(--super-red); color: white; padding: 10px; }
+    td { padding: 8px; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) { background-color: #f2f2f2; }
+    
+    /* Botones Tabla */
+    .action-btn { width: 35px; height: 35px; margin: 0 2px; border-radius: 5px; color: white; }
+    .btn-group { background: var(--super-yellow); color: black; }
+    .btn-reset { background: var(--super-blue); }
+    .btn-delete { background: var(--super-red); }
+    .btn-info { background: #17a2b8; }
+
+    /* Dashboard Alumno */
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+    .stat-box { background: #f8f9fa; padding: 10px; border-radius: 10px; border-left: 4px solid var(--super-blue); }
+    .stat-value { font-size: 1.4em; font-weight: bold; display: block; }
+    .stat-label { font-size: 0.8em; color: #666; text-transform: uppercase; }
+
+    /* Imágenes Branding */
+    .logo-img { max-width: 150px; margin-bottom: 15px; border-radius: 50%; border: 4px solid var(--super-red); }
+    .header-img { max-width: 120px; border-radius: 10px; box-shadow: 0 0 10px white; }
+
+    /* Maestro Header */
+    .teacher-header-controls { display: flex; justify-content: space-between; align-items: center; background: #eee; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Inglés Para Todos</h1>
-  <div class="header-buttons">
-    <button type="button" id="themeToggle" title="Cambiar Tema">🌙 / ☀️</button>
-    <button type="button" id="hamburger" class="hamburger">☰</button>
+  <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+    <img src="assets/images/TEACHING IS SUPER.jpg" alt="Logo" class="header-img">
+    <div>
+        <h1>Inglés Para Todos</h1>
+        <small style="color: #ffd700; font-weight: bold;">SUPER STUDENT EDITION</small>
+    </div>
   </div>
-  
-  <div style="margin-top: 10px;">
-      <button type="button" id="logoutBtn" style="display:none;">🚪 Cerrar Sesión</button>
-      <button type="button" id="openTeacherBtn">👨‍🏫 Modo Maestro</button>
+
+  <div style="margin-top: 5px;">
+      <button type="button" id="logoutBtn" style="display:none; background: #d9534f;">🚪 Salir</button>
+      <button type="button" id="openTeacherBtn" style="background: white; color: #333;">👨‍🏫 Modo Maestro</button>
   </div>
 
   <nav id="nav">
-    <a class="nav-link" id="navL1" onclick="window.selectLevel(1)">Lección 1 (Básicos)</a>
-    <a class="nav-link locked" id="navL2" onclick="window.selectLevel(2)">Lección 2 (Animales) <i class="fas fa-lock"></i></a>
-    <a class="nav-link locked" id="navL3" onclick="window.selectLevel(3)">Lección 3 (Colores) <i class="fas fa-lock"></i></a>
-    <a href="#">Juegos</a>
+    <a class="nav-link" id="navL1" onclick="window.selectLevel(1)">Nivel 1</a>
+    <a class="nav-link locked" id="navL2" onclick="window.selectLevel(2)">Nivel 2 <i class="fas fa-lock"></i></a>
+    <a class="nav-link locked" id="navL3" onclick="window.selectLevel(3)">Nivel 3 <i class="fas fa-lock"></i></a>
   </nav>
 </header>
 
 <section class="card" id="loginCard">
-  <h2>👤 Iniciar sesión / Registro</h2>
-  <p style="font-size: 0.9em; color: #666;">Ingresa tus datos. Si eres nuevo, tu cuenta se creará automáticamente.</p>
+  <img src="assets/images/SUPER TEACHER.jpg" alt="Super Teacher" class="logo-img">
   
+  <h2>👤 Iniciar Misión</h2>
   <input type="text" id="gradeInput" placeholder="Grado (ej. 1)" />
   <input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
-  <input type="text" id="usernameInput" placeholder="Nombre completo" />
+  <input type="text" id="usernameInput" placeholder="Nombre completo del Super Alumno" />
   
-  <p style="margin: 10px 0; font-weight:bold;">— Datos de Acceso —</p>
-  <input type="email" id="emailInput" placeholder="Correo electrónico (Gmail)" />
-  <input type="password" id="passwordInput" placeholder="Contraseña (Mínimo 6 caracteres)" />
+  <p style="margin: 10px 0; font-weight:bold; color: var(--super-blue);">— Credenciales Secretas —</p>
+  <input type="email" id="emailInput" placeholder="Correo electrónico" />
+  <input type="password" id="passwordInput" placeholder="Contraseña" />
 
-  <button type="button" id="loginBtn">Entrar / Registrarse</button>
-
-  <p style="text-align: center; margin-top: 15px;">
-    <a href="#" id="forgotPasswordLink" style="color: #666; font-size: 0.9em; text-decoration: underline;">
-       Forgot your password? / ¿Olvidaste tu contraseña?
-    </a>
-  </p>
+  <br><br>
+  <button type="button" id="loginBtn" style="width: 100%;">🚀 DESPEGAR</button>
+  <p style="margin-top:10px;"><a href="#" id="forgotPasswordLink" style="color: #666;">¿Olvidaste tu contraseña?</a></p>
 </section>
 
-<section class="card" id="teacherLogin" style="display:none;">
-  <h2>👨‍🏫 Acceso Maestro</h2>
-  <input type="text" id="teacherUser" placeholder="Usuario">
-  <input type="password" id="teacherPass" placeholder="Contraseña">
+<section class="card" id="teacherLogin" style="display:none; border-top-color: var(--super-red);">
+  <h2>👨‍🏫 Acceso Solo Maestros</h2>
+  <img src="assets/images/SUPER TEACHER.jpg" alt="Teacher" style="width: 80px; border-radius:50%; margin-bottom:10px;">
+  <br>
+  <input type="text" id="teacherUser" placeholder="Usuario Maestro">
+  <input type="password" id="teacherPass" placeholder="Contraseña Maestra">
+  <br><br>
   <button type="button" id="teacherLoginBtn">Entrar</button>
   <button type="button" id="closeTeacherLogin" style="background-color: #777;">Cancelar</button>
 </section>
 
 <main id="mainContent" style="display:none;">
-  <h3 id="userDisplay"></h3>
   
-  <div style="width: 100%; background-color: #e0e0e0; border-radius: 10px; margin-bottom: 10px; overflow: hidden;">
-      <div id="lessonProgressBar" style="width: 0%; height: 12px; background-color: #4CAF50; transition: width 0.5s;"></div>
+  <div style="max-width: 800px; margin: 0 auto; padding: 10px;">
+      <h3 id="userDisplay" style="text-align:center; color: var(--super-blue);"></h3>
+      
+      <div class="card" style="margin-top: 0; padding: 15px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+             <span id="levelText" style="font-weight:bold; color: var(--super-blue);">Nivel 1</span>
+             <span id="timeText" style="font-weight:bold; color: #333;">⏱ 0m 0s</span>
+        </div>
+        
+        <div style="width: 100%; background-color: #e0e0e0; border-radius: 10px; margin: 10px 0; overflow: hidden; height: 15px;">
+             <div id="lessonProgressBar" style="width: 0%; height: 100%; background-color: var(--super-red); transition: width 0.5s;"></div>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-box" style="border-color: #28a745;">
+                <span class="stat-value" id="correctCount" style="color: #28a745;">0</span>
+                <span class="stat-label">Correctas ✅</span>
+            </div>
+            <div class="stat-box" style="border-color: #dc3545;">
+                <span class="stat-value" id="wrongCount" style="color: #dc3545;">0</span>
+                <span class="stat-label">Incorrectas ❌</span>
+            </div>
+            <div class="stat-box" style="border-color: #ffc107;">
+                <span class="stat-value" id="medalsCount" style="color: #ffc107;">0</span>
+                <span class="stat-label">Medallas 🏅</span>
+            </div>
+            <div class="stat-box" style="border-color: var(--super-blue);">
+                <span class="stat-value" id="scoreText">0</span>
+                <span class="stat-label">Puntos Totales</span>
+            </div>
+        </div>
+      </div>
   </div>
-  <p style="text-align:center; font-size:0.8em; color:#666;">Progreso de lección: <span id="progressText">0/5</span></p>
 
   <section class="card">
-    <h2 id="questionText">Cargando...</h2>
+    <h2 id="questionText" style="font-size: 1.5em;">Cargando...</h2>
     <p id="feedback" style="font-weight: bold; height: 25px; margin-bottom:5px;"></p>
     
     <input type="text" id="answerInput" placeholder="Escribe tu respuesta..." autocomplete="off" />
     
     <div style="margin-top:15px; display:flex; gap:10px; justify-content:center;">
-        <button type="button" id="startGame" style="background:#17a2b8;">🔄 Otra</button>
-        <button type="button" id="checkAnswer" style="background:#28a745;">✅ Responder</button>
-    </div>
-    
-    <hr>
-    <div style="display:flex; justify-content:space-around; font-size:0.9em;">
-        <p id="starsText">⭐ Estrellas: 0</p>
-        <p id="timeText">⏱ 0m 0s</p>
-    </div>
-  </section>
-
-  <section class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-            <p id="scoreText" style="font-size:1.2em; font-weight:bold;">0 pts</p>
-            <p id="levelText" style="color:#666;">Nivel 1</p>
-        </div>
-        <div id="miniMedals" style="font-size:1.5em;"></div>
+        <button type="button" id="startGame">🔄 Saltar / Otra</button>
+        <button type="button" id="checkAnswer">✅ Responder</button>
     </div>
   </section>
 </main>
 
-<section id="teacherPanel" class="card" style="display:none; max-width: 95%;">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h2>👨‍🏫 Panel de Control</h2>
-      <button type="button" id="closeTeacherPanel" style="background:transparent; color:#333; font-size:1.5em; padding:0;">✖</button>
+<section id="teacherPanel" class="card" style="display:none; max-width: 95%; border-top-color: var(--super-red);">
+  <div class="teacher-header-controls">
+      <h2 style="margin:0;">👨‍🏫 Panel Super Maestro</h2>
+      <div>
+        <button type="button" id="teacherLogoutBtn" style="background: #333; color: white; font-size: 0.8em;">🔒 Cerrar Sesión Maestro</button>
+        <button type="button" id="closeTeacherPanel" style="background:transparent; color:#333; font-size:1.5em;">✖</button>
+      </div>
   </div>
 
-  <div style="margin-bottom: 15px; background:#f9f9f9; padding:10px; border-radius:8px;">
-      <label><b>Filtrar:</b></label>
-      <select id="groupSelect" style="padding:5px;"><option value="">Todos los grupos</option></select>
+  <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom: 15px; text-align: left;">
+      <label><b>Filtrar Grupo:</b></label>
+      <select id="groupSelect" style="padding:5px; margin-right: 10px;"><option value="">Todos</option></select>
       
-      <div style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;">
-          <button type="button" id="refreshTeacher">🔄 Actualizar</button>
-          <button type="button" id="viewStatsBtn" style="background-color: #6f42c1; color: white;">📊 Reporte Gráfico</button>
-          <button type="button" id="resetMonthlyBtn" style="background-color: #d9534f; color: white;">⚠ Reiniciar ESCUELA</button>
+      <hr style="margin: 10px 0;">
+      
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" id="refreshTeacher" style="background:#17a2b8; color:white;">🔄 Refrescar Tabla</button>
+          
+          <button type="button" id="exportExcelBtn" style="background:#28a745; color:white;">📗 Exportar Excel</button>
+          <button type="button" id="viewStatsBtn" style="background:#6f42c1; color:white;">📊 Reporte Gráfico</button>
+          <button type="button" id="resetMonthlyBtn" style="background:#d9534f; color:white;">⚠ Reiniciar ESCUELA</button>
       </div>
   </div>
 
   <div style="overflow-x: auto;">
-      <table border="1" width="100%" style="border-collapse: collapse; text-align: center; font-size:0.9em;">
+      <table border="1">
         <thead>
-          <tr style="background-color: #333; color:white;">
+          <tr>
             <th>Alumno</th>
             <th>Gpo</th>
-            <th>Pts</th>
             <th>Nivel</th>
-            <th>🥇/🥈/🥉</th>
-            <th style="min-width:120px;">Acciones</th>
+            <th>Tiempo ⏱</th>
+            <th>Correctas ✅</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="studentsTable"></tbody>
@@ -152,17 +219,19 @@
     <div style="background: white; margin: 5% auto; padding: 25px; width: 90%; max-width: 800px; border-radius: 10px; position:relative;">
         <button onclick="document.getElementById('statsModal').style.display='none'" style="position:absolute; top:10px; right:10px; background:red; color:white; border:none; padding:5px 10px; border-radius:50%;">X</button>
         
-        <h2>📊 Reporte de Rendimiento Escolar</h2>
-        <button id="downloadPdfBtn" style="background: #007bff; color: white; margin-bottom:15px;">🖨️ Descargar PDF</button>
+        <h2>📊 Reporte de Rendimiento</h2>
+        <button id="downloadPdfBtn" style="background: var(--super-red); color: white; margin-bottom:15px;">🖨️ Descargar PDF</button>
         
         <div id="reportContent">
+            <div id="individualStatsArea" style="display:none; margin-bottom: 20px; background: #e3f2fd; padding: 10px; border-radius: 8px;">
+                <h3 id="individualName">Detalle Alumno</h3>
+                <canvas id="individualChart" style="max-height: 200px;"></canvas>
+            </div>
+
             <div style="text-align:center; margin-bottom:20px;">
-                <h3>Resumen de Medallas (Global)</h3>
+                <h3>Resumen Grupal (Medallas)</h3>
                 <canvas id="groupChart" style="max-height:300px;"></canvas>
             </div>
-            <hr>
-            <h3>📜 Historial Reciente de Logros</h3>
-            <ul id="historyList" style="list-style: none; padding: 0; font-size:0.9em;"></ul>
         </div>
     </div>
 </div>
