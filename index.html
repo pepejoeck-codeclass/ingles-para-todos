@@ -30,13 +30,18 @@
 </header>
 
 <section class="card" id="loginCard">
-  <h2>👤 Iniciar sesión</h2>
-  <input type="text" id="gradeInput" placeholder="Grado" />
-  <input type="text" id="groupInput" placeholder="Grupo" />
+  <h2>👤 Iniciar sesión / Registro</h2>
+  <p style="font-size: 0.9em; color: #666;">Si es tu primera vez, escribe tus datos y se creará tu cuenta automáticamente.</p>
+  
+  <input type="text" id="gradeInput" placeholder="Grado (ej. 1)" />
+  <input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
   <input type="text" id="usernameInput" placeholder="Nombre completo" />
-  <p>— o —</p>
-  <input type="email" id="emailInput" placeholder="Correo" />
-  <button type="button" id="loginBtn">Entrar</button>
+  
+  <p>— Datos de acceso —</p>
+  <input type="email" id="emailInput" placeholder="Correo electrónico" />
+  <input type="password" id="passwordInput" placeholder="Contraseña (Mínimo 6 caracteres)" />
+
+  <button type="button" id="loginBtn">Entrar / Registrarse</button>
 </section>
 
 <section class="card" id="teacherLogin" style="display:none;">
@@ -68,11 +73,11 @@
 </main>
 
 <section id="teacherPanel" class="card" style="display:none;">
-  <h2>👨‍🏫 Panel Maestro</h2>
+  <h2>👨‍🏫 Panel Maestro (Nube)</h2>
   <div style="margin-bottom: 15px;">
       <label>Filtrar por Grupo:</label>
       <select id="groupSelect"><option value="">Todos los grupos</option></select>
-      <button type="button" id="refreshTeacher">🔄 Actualizar</button>
+      <button type="button" id="refreshTeacher">🔄 Actualizar datos</button>
       <button type="button" id="exportBtn" style="background-color: #28a745; color: white;">📥 Exportar a Excel</button>
   </div>
   <div style="overflow-x: auto;">
@@ -89,6 +94,6 @@
   <button type="button" id="closeTeacherPanel">Cerrar Sesión Maestro</button>
 </section>
 
-<script src="js/app.js"></script>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
