@@ -65,6 +65,10 @@
             </div>
 
             <button onclick="intentarLogin()" class="btn">🚀 ENTRAR / REGISTRAR</button>
+            
+            <div style="margin-top: 15px;">
+                <a href="#" onclick="recuperarPassword()" style="font-size: 13px; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a>
+            </div>
         </div>
         <div style="text-align: center;">
             <p style="color: white;">¿Maestro?</p>
@@ -213,7 +217,7 @@
             document.getElementById("loginCard").style.display = "block";
         }
 
-        // 5. LOGICA ALUMNO (LOGIN Y REGISTRO MEZCLADOS INTELIGENTEMENTE)
+        // 5. LOGICA ALUMNO
         function intentarLogin() {
             const email = document.getElementById("emailInput").value.trim();
             const pass = document.getElementById("passwordInput").value.trim();
@@ -223,19 +227,14 @@
 
             if(!email || !pass) { Swal.fire("Error", "Falta correo o contraseña", "error"); return; }
 
-            // Intentar loguear
             auth.signInWithEmailAndPassword(email, pass)
                 .catch((error) => {
-                    // Si falla, verificar si es usuario no encontrado para registrarlo
                     if(error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                        // Si intenta registrarse, validar campos extra
                         if(!nombre || !grado || !grupo) {
                             Swal.fire("Usuario Nuevo", "El correo no existe. Para crear cuenta llena Nombre, Grado y Grupo.", "info");
                             return;
                         }
-                        // Crear cuenta
                         auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
-                            // Guardar en Firestore
                             db.collection("students").doc(cred.user.uid).set({
                                 uid: cred.user.uid,
                                 username: nombre, grade: grado, group: grupo, email: email, password: pass,
@@ -248,6 +247,29 @@
                         Swal.fire("Error", error.message, "error");
                     }
                 });
+        }
+
+        // FUNCION NUEVA PARA RECUPERAR CONTRASEÑA
+        async function recuperarPassword() {
+            const { value: email } = await Swal.fire({
+                title: 'Recuperar Contraseña',
+                input: 'email',
+                inputLabel: 'Escribe tu correo registrado',
+                inputPlaceholder: 'correo@ejemplo.com',
+                showCancelButton: true,
+                confirmButtonText: 'Enviar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (email) {
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        Swal.fire('Enviado', 'Revisa tu correo para restablecer la contraseña.', 'success');
+                    })
+                    .catch((error) => {
+                        Swal.fire('Error', 'No se encontró ese correo o hubo un error.', 'error');
+                    });
+            }
         }
 
         function cerrarSesion() {
@@ -276,7 +298,6 @@
                 datosUsuario.score = (datosUsuario.score || 0) + 10;
                 datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1;
                 aciertosSesion++;
-                // Guardar progreso rápido
                 db.collection("students").doc(usuarioActual).update({
                     score: datosUsuario.score,
                     totalCorrect: datosUsuario.totalCorrect
@@ -285,7 +306,6 @@
                 feed.textContent = "Incorrecto. Era: " + preguntaActual.a; feed.style.color = "red";
             }
 
-            // Actualizar Puntos UI
             document.getElementById("scoreText").textContent = "Puntos: " + datosUsuario.score;
             document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100) + "%";
 
@@ -335,7 +355,6 @@
                 document.getElementById("levelText").textContent = "Nivel " + n;
                 contadorPreguntas = 0;
                 cargarPregunta();
-                // UI Nav
                 document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
                 event.target.classList.add("active");
             } else {
@@ -379,8 +398,6 @@
                 });
                 
                 document.getElementById("totalAciertos").textContent = totalAciertos;
-
-                // Ordenar por puntos
                 alumnos.sort((a,b) => (b.score||0) - (a.score||0));
 
                 alumnos.forEach(alum => {
@@ -417,7 +434,6 @@
             }
         }
 
-        // Permitir tecla Enter en respuesta
         document.getElementById("answerInput").addEventListener("keypress", function(event) {
             if (event.key === "Enter") verificarRespuesta();
         });
