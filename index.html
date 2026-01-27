@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - PRO VERSION</title>
+    <title>Inglés Para Todos - MASTER VERSION</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,20 +14,29 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
-        .app-container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
+        .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; } /* Más ancho para el maestro */
+        .login-width { max-width: 500px; margin: 0 auto; } /* Login se queda angosto */
+        
         .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; position: relative; }
+        
+        /* IMAGENES */
         .logo-img { width: 100%; max-width: 300px; margin-bottom: 10px; }
         .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; margin: 10px auto; display: block; object-fit: cover; }
         .teacher-header-img { width: 100%; max-height: 180px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 10px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        
+        /* FORMULARIOS */
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
         .btn { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; background: var(--primary); }
         .btn-danger { background: var(--accent); } .btn-secondary { background: #6c757d; }
+        .btn-excel { background: #217346; } .btn-pdf { background: #b30b00; }
+        
+        /* JUEGO */
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
         .question-box { font-size: 22px; font-weight: bold; color: var(--secondary); margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 5px solid var(--primary); }
@@ -36,22 +45,35 @@
         .nav-item.active { color: var(--primary); font-weight: bold; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
         
-        /* ESTILOS TABLA MAESTRO */
-        .teacher-panel-container { width: 95%; max-width: 1000px; display: none; padding-bottom: 50px; }
+        /* HUD ALUMNO */
+        .hud-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 12px; font-weight: bold; background: #f0f2f5; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
+        .hud-item { display: flex; flex-direction: column; align-items: center; }
+        
+        /* TABLA MAESTRO */
+        .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: center; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
         th { background: var(--primary); color: white; }
         td { vertical-align: middle; }
-        .action-btn { padding: 5px 8px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 1px; font-size: 12px; }
-        .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } 
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
-        .stat-card { background: white; padding: 10px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .timer-badge { background: #333; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 11px; display: inline-block; }
+        
+        .action-btn { padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; font-size: 14px; }
+        .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-edit { background: #ffc107; color: black; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
+        .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
+        
+        /* MODAL GRAFICA */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; text-align: center; }
+
+        /* HEADER MAESTRO CONTROLES */
+        .teacher-controls { display: flex; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 15px; align-items: center; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
-    <div id="loginCard" class="app-container">
+    <div id="loginCard" class="app-container login-width">
         <div class="card">
             <img src="assets/images/logo_main.png.jpg" alt="Logo" class="logo-img">
             <h2>Inglés Para Todos</h2>
@@ -78,7 +100,7 @@
         </div>
     </div>
 
-    <div id="teacherLogin" class="app-container" style="display: none;">
+    <div id="teacherLogin" class="app-container login-width" style="display: none;">
         <div class="card">
             <img src="assets/images/teacher_header.jpg.jpg" class="teacher-header-img">
             <h2>Modo Maestro</h2>
@@ -89,17 +111,23 @@
         </div>
     </div>
 
-    <div id="mainContent" class="app-container" style="display: none;">
-        <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px;">
-            <div style="text-align: left;">
-                <div id="userDisplay" style="font-weight: bold; color: var(--primary); font-size: 14px;">Alumno</div>
-                <div style="display: flex; gap: 10px; margin-top: 5px;">
-                    <div id="scoreText" style="font-size: 12px; font-weight: bold;">Pts: 0</div>
-                    <div id="timerDisplay" class="timer-badge">🕓 0m 0s</div>
-                </div>
+    <div id="mainContent" class="app-container login-width" style="display: none;">
+        <div class="card" style="padding: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div id="userDisplay" style="font-weight: bold; color: var(--primary);">Alumno</div>
+                <button onclick="cerrarSesion()" class="btn-danger" style="width: auto; padding: 5px 15px; font-size: 12px; margin:0;">Salir</button>
             </div>
-            <button onclick="cerrarSesion()" class="btn-danger" style="width: auto; padding: 5px 15px; font-size: 12px; margin:0;">Salir</button>
+            
+            <div class="hud-grid">
+                <div class="hud-item"><span style="color:blue">🕓</span><span id="timerDisplay">0m</span></div>
+                <div class="hud-item"><span style="color:green">✅</span><span id="correctDisplay">0</span></div>
+                <div class="hud-item"><span style="color:red">❌</span><span id="wrongDisplay">0</span></div>
+                <div class="hud-item"><span style="color:gold">🥇</span><span id="medalDisplay">0</span></div>
+            </div>
+
+            <div style="font-size: 12px; color: #666; margin-bottom:5px;">Puntos Totales: <span id="scoreText">0</span></div>
         </div>
+
         <div class="card">
             <span id="levelText" style="background:#ffd700; padding:5px 10px; border-radius:10px; font-weight:bold;">Nivel 1</span>
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
@@ -117,31 +145,67 @@
 
     <div id="teacherPanel" class="teacher-panel-container">
         <div class="card" style="text-align: left;">
-            <div style="display: flex; justify-content: space-between;">
-                <h2>Panel Maestro</h2>
-                <button onclick="cerrarSesionMaestro()" class="btn-danger" style="width:auto; padding:5px 10px;">Salir</button>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2><i class="fas fa-chalkboard-teacher"></i> Panel de Control</h2>
+                <button onclick="cerrarSesionMaestro()" class="btn-danger" style="width:auto; padding:8px 20px;">Cerrar Sesión</button>
             </div>
             <hr>
+            
             <div class="dashboard-grid">
-                <div class="stat-card"><div class="stat-number" id="totalAciertos">0</div>Aciertos</div>
-                <div class="stat-card" style="border: 2px solid gold"><div class="stat-number" id="totalOro">0</div>🥇</div>
-                <div class="stat-card" style="border: 2px solid silver"><div class="stat-number" id="totalPlata">0</div>🥈</div>
-                <div class="stat-card" style="border: 2px solid #CD7F32"><div class="stat-number" id="totalBronce">0</div>🥉</div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalAlumnos">0</div>Alumnos
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="promedioAciertos">0</div>Aciertos Totales
+                </div>
+                <div class="stat-card">
+                    <canvas id="globalChart" style="max-height: 100px;"></canvas>
+                </div>
             </div>
-            <br>
-            <button onclick="cargarTablaAlumnos()" class="action-btn btn-info">🔄 Actualizar</button>
-            <button onclick="resetearTodo()" class="action-btn btn-delete">⚠️ RESET TOTAL</button>
-            <div style="overflow-x: auto;">
+
+            <div class="teacher-controls">
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="font-size: 12px; font-weight: bold;">Filtrar por Grupo:</label>
+                    <select id="groupFilter" onchange="renderizarTabla()">
+                        <option value="todos">Todos los Grupos</option>
+                    </select>
+                </div>
+                <button onclick="cargarTablaAlumnos()" class="action-btn btn-info" style="font-size: 16px;"><i class="fas fa-sync"></i> Refrescar</button>
+                <button onclick="exportarExcel()" class="action-btn btn-excel" style="font-size: 16px;"><i class="fas fa-file-excel"></i> Excel</button>
+                <button onclick="exportarPDF()" class="action-btn btn-pdf" style="font-size: 16px;"><i class="fas fa-file-pdf"></i> PDF</button>
+            </div>
+
+            <div style="overflow-x: auto;" id="tableContainer">
                 <table id="tablaAlumnos">
-                    <thead><tr><th>Nombre</th><th>Gpo</th><th>Nivel</th><th>🕓 Tiempo</th><th>🥇</th><th>🥈</th><th>🥉</th><th>Acción</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Gpo</th>
+                            <th>Nivel</th>
+                            <th>🕓 Tiempo</th>
+                            <th>✅</th>
+                            <th>❌</th>
+                            <th>🥇</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
                     <tbody id="cuerpoTabla"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <div id="modalGrafica" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalNombre">Estadísticas</h3>
+            <canvas id="studentChart"></canvas>
+            <br>
+            <button onclick="cerrarModal()" class="btn btn-secondary">Cerrar</button>
+        </div>
+    </div>
+
     <script>
-        // 1. FIREBASE CONFIG
+        // 1. CONFIGURACIÓN
         const firebaseConfig = {
             apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s",
             authDomain: "ingles-pepejoeck.firebaseapp.com",
@@ -157,11 +221,11 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // 2. SONIDOS (Rutas correctas)
+        // 2. SONIDOS
         const audioCorrecto = new Audio('./assets/sounds/correct.mp3');
         const audioError = new Audio('./assets/sounds/wrong.mp3');
         const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
-        
+
         // 3. VARIABLES
         let usuarioActual = null;
         let datosUsuario = {};
@@ -169,7 +233,10 @@
         let preguntaActual = null;
         let contadorPreguntas = 0;
         let aciertosSesion = 0;
-        let timerInterval = null; // Para el cronómetro
+        let timerInterval = null;
+        let listaAlumnosCache = []; // Para guardar datos del maestro
+        let chartGlobalInstance = null;
+        let chartStudentInstance = null;
         
         const preguntasDB = {
             1: [{q:"Hola",a:"hello"}, {q:"Adiós",a:"goodbye"}, {q:"Gracias",a:"thank you"}, {q:"Por favor",a:"please"}, {q:"Rojo",a:"red"}],
@@ -177,16 +244,17 @@
             3: [{q:"Lunes",a:"monday"}, {q:"Martes",a:"tuesday"}, {q:"Sol",a:"sun"}, {q:"Luna",a:"moon"}, {q:"Agua",a:"water"}]
         };
 
-        // 4. DETECTOR SESIÓN
+        // 4. DETECTOR DE SESIÓN
         auth.onAuthStateChanged((user) => {
             if (user) {
-                console.log("Sesión activa:", user.uid);
                 usuarioActual = user.uid;
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
-                        // Inicializar valores nuevos si no existen
+                        // Inicializadores
                         if(!datosUsuario.timeWorked) datosUsuario.timeWorked = 0;
+                        if(!datosUsuario.totalCorrect) datosUsuario.totalCorrect = 0;
+                        if(!datosUsuario.totalWrong) datosUsuario.totalWrong = 0;
                         if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
                         mostrarJuego();
                     }
@@ -206,29 +274,36 @@
             timerInterval = setInterval(() => {
                 datosUsuario.timeWorked = (datosUsuario.timeWorked || 0) + 1;
                 actualizarUI();
-                
-                // Guardado automático cada 10 segundos
                 if(datosUsuario.timeWorked % 10 === 0) {
                     db.collection("students").doc(usuarioActual).update({timeWorked: datosUsuario.timeWorked});
                 }
             }, 1000);
         }
+        function detenerCronometro() { clearInterval(timerInterval); }
 
-        function detenerCronometro() {
-            if(timerInterval) clearInterval(timerInterval);
-            timerInterval = null;
+        function formatearTiempo(segundos) {
+            const h = Math.floor(segundos / 3600);
+            const m = Math.floor((segundos % 3600) / 60);
+            const s = segundos % 60;
+            if (h > 0) return `${h}h ${m}m ${s}s`;
+            return `${m}m ${s}s`;
         }
 
+        // 6. UI ALUMNO
         function actualizarUI() {
-            // Formatear tiempo
-            const min = Math.floor((datosUsuario.timeWorked || 0) / 60);
-            const sec = (datosUsuario.timeWorked || 0) % 60;
-            document.getElementById("timerDisplay").textContent = `🕓 ${min}m ${sec}s`;
+            document.getElementById("timerDisplay").textContent = formatearTiempo(datosUsuario.timeWorked || 0);
+            document.getElementById("correctDisplay").textContent = datosUsuario.totalCorrect || 0;
+            document.getElementById("wrongDisplay").textContent = datosUsuario.totalWrong || 0;
             
-            document.getElementById("scoreText").textContent = "Pts: " + (datosUsuario.score || 0);
+            // Total medallas
+            const m = datosUsuario.medals || {gold:0, silver:0, bronze:0};
+            const totalM = m.gold + m.silver + m.bronze;
+            document.getElementById("medalDisplay").textContent = totalM;
+            
+            document.getElementById("scoreText").textContent = datosUsuario.score || 0;
         }
 
-        // 6. NAVEGACION
+        // 7. PANTALLAS
         function mostrarLogin() {
             document.getElementById("loginCard").style.display = "block";
             document.getElementById("mainContent").style.display = "none";
@@ -238,7 +313,6 @@
 
         function mostrarJuego() {
             document.getElementById("loginCard").style.display = "none";
-            document.getElementById("teacherLogin").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
             document.getElementById("userDisplay").textContent = "Alumno: " + (datosUsuario.username || "Héroe");
             actualizarUI();
@@ -251,14 +325,12 @@
             document.getElementById("loginCard").style.display = "none";
             document.getElementById("teacherLogin").style.display = "block";
         }
-
         function volverInicio() {
             document.getElementById("teacherLogin").style.display = "none";
-            document.getElementById("teacherPanel").style.display = "none";
             document.getElementById("loginCard").style.display = "block";
         }
 
-        // 7. LOGIN / REGISTRO
+        // 8. LOGIN ALUMNO
         function intentarLogin() {
             const email = document.getElementById("emailInput").value.trim();
             const pass = document.getElementById("passwordInput").value.trim();
@@ -266,51 +338,37 @@
             const grado = document.getElementById("gradeInput").value.trim();
             const grupo = document.getElementById("groupInput").value.trim().toUpperCase();
 
-            if(!email || !pass) { Swal.fire("Error", "Falta correo o contraseña", "error"); return; }
+            if(!email || !pass) { Swal.fire("Error", "Faltan datos", "error"); return; }
 
-            auth.signInWithEmailAndPassword(email, pass)
-                .catch((error) => {
-                    const errores = ['auth/user-not-found', 'auth/wrong-password', 'auth/invalid-login-credentials', 'auth/invalid-credential'];
-                    if(errores.includes(error.code)) {
-                        if(!nombre || !grado || !grupo) {
-                            Swal.fire({icon: 'warning', title: 'Acceso', text: 'Usuario no encontrado. Si eres nuevo, llena todos los campos.'});
-                            return;
-                        }
-                        auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
-                            db.collection("students").doc(cred.user.uid).set({
-                                uid: cred.user.uid,
-                                username: nombre, grade: grado, group: grupo, email: email, password: pass,
-                                score: 0, unlockedLevels: [1], totalCorrect: 0, 
-                                timeWorked: 0, medals: {gold:0, silver:0, bronze:0}
-                            }).then(() => Swal.fire("¡Éxito!", "Cuenta creada", "success"));
-                        }).catch(e => {
-                            if(e.code === 'auth/email-already-in-use') Swal.fire("Error", "Correo ocupado", "error");
-                            else Swal.fire("Error", e.message, "error");
-                        });
-                    } else {
-                        Swal.fire("Error", error.message, "error");
+            auth.signInWithEmailAndPassword(email, pass).catch((error) => {
+                const errores = ['auth/user-not-found', 'auth/wrong-password', 'auth/invalid-login-credentials', 'auth/invalid-credential'];
+                if(errores.includes(error.code)) {
+                    if(!nombre || !grado || !grupo) {
+                        Swal.fire({icon: 'warning', title: 'Acceso', text: 'Si eres nuevo, llena Nombre, Grado y Grupo.'});
+                        return;
                     }
-                });
+                    auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
+                        db.collection("students").doc(cred.user.uid).set({
+                            uid: cred.user.uid, username: nombre, grade: grado, group: grupo, email: email, password: pass,
+                            score: 0, unlockedLevels: [1], totalCorrect: 0, totalWrong: 0, timeWorked: 0,
+                            medals: {gold:0, silver:0, bronze:0}
+                        }).then(() => Swal.fire("Creado", "Bienvenido", "success"));
+                    }).catch(e => Swal.fire("Error", e.message, "error"));
+                } else {
+                    Swal.fire("Error", error.message, "error");
+                }
+            });
         }
-
         async function recuperarPassword() {
-            const { value: email } = await Swal.fire({
-                title: 'Recuperar', input: 'email', inputLabel: 'Tu correo:', showCancelButton: true
-            });
-            if (email) {
-                auth.sendPasswordResetEmail(email)
-                    .then(() => Swal.fire('Enviado', 'Revisa tu correo.', 'success'))
-                    .catch(() => Swal.fire('Error', 'No encontrado.', 'error'));
-            }
+            const { value: email } = await Swal.fire({ title: 'Recuperar', input: 'email', showCancelButton: true });
+            if (email) auth.sendPasswordResetEmail(email).then(() => Swal.fire('Enviado', 'Revisa tu correo', 'success'));
+        }
+        function cerrarSesion() {
+            db.collection("students").doc(usuarioActual).update({timeWorked: datosUsuario.timeWorked})
+            .then(() => auth.signOut().then(() => location.reload()));
         }
 
-        function cerrarSesion() { 
-            db.collection("students").doc(usuarioActual).update({timeWorked: datosUsuario.timeWorked}).then(() => {
-                auth.signOut().then(() => location.reload());
-            });
-        }
-
-        // 8. JUEGO (LOGICA PRO)
+        // 9. LÓGICA JUEGO
         function cargarPregunta() {
             const pool = preguntasDB[nivelActual];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
@@ -323,221 +381,260 @@
         function verificarRespuesta() {
             const resp = document.getElementById("answerInput").value.trim().toLowerCase();
             if(!resp) return;
-            
             contadorPreguntas++;
             const feed = document.getElementById("feedback");
 
             if(resp === preguntaActual.a) {
-                audioCorrecto.currentTime = 0; audioCorrecto.play().catch(e=>{});
+                audioCorrecto.currentTime = 0; audioCorrecto.play().catch(()=>{});
                 feed.textContent = "CORRECT! 🔥"; feed.style.color = "green";
-                datosUsuario.score = (datosUsuario.score || 0) + 10;
-                datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1;
+                datosUsuario.score += 10;
+                datosUsuario.totalCorrect++;
                 aciertosSesion++;
-                db.collection("students").doc(usuarioActual).update({
-                    score: datosUsuario.score, totalCorrect: datosUsuario.totalCorrect
-                });
             } else {
-                audioError.currentTime = 0; audioError.play().catch(e=>{});
+                audioError.currentTime = 0; audioError.play().catch(()=>{});
                 feed.textContent = "WRONG. Answer: " + preguntaActual.a; feed.style.color = "red";
+                datosUsuario.totalWrong++;
             }
-
+            // Guardado parcial
+            db.collection("students").doc(usuarioActual).update({
+                score: datosUsuario.score, totalCorrect: datosUsuario.totalCorrect, totalWrong: datosUsuario.totalWrong
+            });
             actualizarUI();
             document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100) + "%";
 
-            if(contadorPreguntas >= 5) {
-                setTimeout(finSesion, 1500);
-            } else {
-                setTimeout(cargarPregunta, 1500);
-            }
+            if(contadorPreguntas >= 5) setTimeout(finSesion, 1500);
+            else setTimeout(cargarPregunta, 1500);
         }
 
         function finSesion() {
-            let msg = "";
-            let medalEarned = "";
-            
-            // LÓGICA DE MEDALLAS Y DESBLOQUEO ESTRICTA
+            let msg = "", medal = "";
             if(aciertosSesion === 5) {
-                // ORO: 100% CORRECTAS -> DESBLOQUEA
-                msg = "🏆 PERFECT! LEVEL UP! 🥇";
-                medalEarned = "gold";
+                msg = "🏆 PERFECT! LEVEL UP!"; medal = "gold";
                 datosUsuario.medals.gold++;
-                
-                audioLevelUp.currentTime = 0; audioLevelUp.play().catch(e=>{});
-
+                audioLevelUp.currentTime = 0; audioLevelUp.play().catch(()=>{});
                 const next = nivelActual + 1;
-                if(!datosUsuario.unlockedLevels.includes(next) && next <= 3) {
-                    datosUsuario.unlockedLevels.push(next);
-                    Swal.fire("LEVEL UP!", "Next level unlocked!", "success");
-                }
+                if(!datosUsuario.unlockedLevels.includes(next) && next <= 3) datosUsuario.unlockedLevels.push(next);
             } else if (aciertosSesion === 4) {
-                // PLATA: 80% CORRECTAS -> GANA MEDALLA PERO NO AVANZA
-                msg = "🥈 Good job! But you need 100% to advance.";
-                medalEarned = "silver";
-                datosUsuario.medals.silver++;
+                msg = "🥈 Good! Need 100% to advance."; medal = "silver"; datosUsuario.medals.silver++;
             } else {
-                // BRONCE: <80% -> GANA MEDALLA PERO NO AVANZA
-                msg = "🥉 Keep practicing. Try again.";
-                medalEarned = "bronze";
-                datosUsuario.medals.bronze++;
+                msg = "🥉 Try again."; medal = "bronze"; datosUsuario.medals.bronze++;
             }
 
-            // Guardar progreso (medallas y niveles)
             db.collection("students").doc(usuarioActual).update({ 
-                unlockedLevels: datosUsuario.unlockedLevels,
-                medals: datosUsuario.medals
+                unlockedLevels: datosUsuario.unlockedLevels, medals: datosUsuario.medals 
             });
-            
             actualizarCandados();
-            
-            Swal.fire({
-                title: msg,
-                text: `Score: ${aciertosSesion}/5`,
-                icon: medalEarned === 'gold' ? 'success' : 'info',
-                confirmButtonText: 'CONTINUE'
-            }).then(() => {
+            Swal.fire({ title: msg, icon: medal === 'gold' ? 'success':'info', confirmButtonText: 'OK' }).then(() => {
                 contadorPreguntas = 0; aciertosSesion = 0;
                 document.getElementById("lessonProgressBar").style.width = "0%";
-                // SI NO FUE ORO, SE QUEDA EN EL MISMO NIVEL (REPETIR)
                 cargarPregunta();
             });
         }
 
         function actualizarCandados() {
-            if(datosUsuario.unlockedLevels.includes(2)) {
-                document.getElementById("navL2").classList.remove("locked");
-                document.getElementById("navL2").innerHTML = "Nivel 2";
-            } else {
-                document.getElementById("navL2").classList.add("locked");
-                document.getElementById("navL2").innerHTML = "🔐 Nivel 2";
-            }
-
-            if(datosUsuario.unlockedLevels.includes(3)) {
-                document.getElementById("navL3").classList.remove("locked");
-                document.getElementById("navL3").innerHTML = "Nivel 3";
-            } else {
-                document.getElementById("navL3").classList.add("locked");
-                document.getElementById("navL3").innerHTML = "🔐 Nivel 3";
+            for(let i=2; i<=3; i++) {
+                const el = document.getElementById(`navL${i}`);
+                if(datosUsuario.unlockedLevels.includes(i)) { el.classList.remove("locked"); el.innerHTML = `Nivel ${i}`; }
+                else { el.classList.add("locked"); el.innerHTML = `🔐 Nivel ${i}`; }
             }
         }
-
         function cambiarNivel(n) {
             if(datosUsuario.unlockedLevels.includes(n)) {
-                nivelActual = n;
-                document.getElementById("levelText").textContent = "Nivel " + n;
-                contadorPreguntas = 0; aciertosSesion = 0;
-                document.getElementById("lessonProgressBar").style.width = "0%";
+                nivelActual = n; document.getElementById("levelText").textContent = "Nivel "+n;
+                contadorPreguntas = 0; aciertosSesion = 0; document.getElementById("lessonProgressBar").style.width="0%";
                 cargarPregunta();
-                document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+                document.querySelectorAll(".nav-item").forEach(el=>el.classList.remove("active"));
                 event.target.classList.add("active");
-            } else {
-                Swal.fire("LOCKED 🔐", "You need GOLD 🥇 in previous level.", "error");
-            }
+            } else Swal.fire("LOCKED 🔐", "You need GOLD in previous level.", "error");
         }
 
-        // 9. LOGICA MAESTRO
+        // 10. MAESTRO LOGIC
         function loginMaestro() {
             const u = document.getElementById("teacherUserImput").value.trim();
             const p = document.getElementById("teacherPassInput").value.trim();
-            
             if(u === "Jose de Jesus Ramos Flores" && p === "161286") {
                 document.getElementById("teacherLogin").style.display = "none";
                 document.getElementById("teacherPanel").style.display = "block";
                 cargarTablaAlumnos();
-            } else {
-                Swal.fire("Error", "Datos incorrectos", "error");
-            }
+            } else Swal.fire("Error", "Datos incorrectos", "error");
         }
-
         function cerrarSesionMaestro() {
             document.getElementById("teacherPanel").style.display = "none";
             document.getElementById("loginCard").style.display = "block";
         }
 
         function cargarTablaAlumnos() {
-            const tbody = document.getElementById("cuerpoTabla");
-            tbody.innerHTML = "<tr><td colspan='8'>Cargando datos...</td></tr>";
+            document.getElementById("cuerpoTabla").innerHTML = "<tr><td colspan='8'>Cargando...</td></tr>";
             
-            let tOro=0, tPlata=0, tBronce=0, tAciertos=0;
-
             db.collection("students").get().then((querySnapshot) => {
-                tbody.innerHTML = "";
-                const alumnos = [];
+                listaAlumnosCache = [];
                 querySnapshot.forEach((doc) => {
-                    let d = doc.data(); d.uid = doc.id; alumnos.push(d);
-                    
-                    // Sumar contadores globales
-                    tAciertos += (d.totalCorrect || 0);
-                    if(d.medals) {
-                        tOro += (d.medals.gold || 0);
-                        tPlata += (d.medals.silver || 0);
-                        tBronce += (d.medals.bronze || 0);
-                    }
+                    let d = doc.data(); d.uid = doc.id;
+                    listaAlumnosCache.push(d);
                 });
                 
-                // Actualizar contadores dashboard
-                document.getElementById("totalAciertos").textContent = tAciertos;
-                document.getElementById("totalOro").textContent = tOro;
-                document.getElementById("totalPlata").textContent = tPlata;
-                document.getElementById("totalBronce").textContent = tBronce;
-
-                // Ordenar por Oro primero, luego Plata
-                alumnos.sort((a,b) => {
-                    let goldA = a.medals ? a.medals.gold : 0;
-                    let goldB = b.medals ? b.medals.gold : 0;
-                    return goldB - goldA;
+                // Actualizar Filtro de Grupos
+                const grupos = [...new Set(listaAlumnosCache.map(s => s.group))].sort();
+                const select = document.getElementById("groupFilter");
+                select.innerHTML = '<option value="todos">Todos los Grupos</option>';
+                grupos.forEach(g => {
+                    if(g) select.innerHTML += `<option value="${g}">Grupo ${g}</option>`;
                 });
 
-                alumnos.forEach(alum => {
-                    const tr = document.createElement("tr");
-                    const nm = Math.max(...(alum.unlockedLevels || [1]));
-                    
-                    // Calcular tiempo
-                    let min = Math.floor((alum.timeWorked || 0) / 60);
-                    let sec = (alum.timeWorked || 0) % 60;
-                    let timeStr = `${min}m ${sec}s`;
-
-                    let mGold = alum.medals ? alum.medals.gold : 0;
-                    let mSilver = alum.medals ? alum.medals.silver : 0;
-                    let mBronze = alum.medals ? alum.medals.bronze : 0;
-
-                    tr.innerHTML = `
-                        <td>${alum.username}</td>
-                        <td>${alum.group}</td>
-                        <td>${nm}</td>
-                        <td style="color:blue;">${timeStr}</td>
-                        <td style="color:#d4af37; font-weight:bold">${mGold}</td>
-                        <td style="color:#C0C0C0; font-weight:bold">${mSilver}</td>
-                        <td style="color:#CD7F32; font-weight:bold">${mBronze}</td>
-                        <td><button onclick="borrarAlumno('${alum.uid}')" class="btn-delete action-btn">🗑️</button></td>`;
-                    tbody.appendChild(tr);
-                });
+                renderizarTabla();
             });
         }
 
-        function borrarAlumno(id) {
-            if(confirm("¿Eliminar alumno?")) {
-                db.collection("students").doc(id).delete().then(() => cargarTablaAlumnos());
+        function renderizarTabla() {
+            const filtro = document.getElementById("groupFilter").value;
+            let alumnosFiltrados = listaAlumnosCache;
+
+            if(filtro !== "todos") {
+                alumnosFiltrados = listaAlumnosCache.filter(s => s.group === filtro);
             }
+
+            // Ordenar por Puntos
+            alumnosFiltrados.sort((a,b) => (b.score||0) - (a.score||0));
+
+            // Actualizar Stats Globales
+            document.getElementById("totalAlumnos").textContent = alumnosFiltrados.length;
+            const totalAciertos = alumnosFiltrados.reduce((sum, s) => sum + (s.totalCorrect||0), 0);
+            document.getElementById("promedioAciertos").textContent = totalAciertos;
+
+            // Renderizar Gráfica Global
+            renderizarGraficaGlobal(alumnosFiltrados);
+
+            const tbody = document.getElementById("cuerpoTabla");
+            tbody.innerHTML = "";
+
+            alumnosFiltrados.forEach(alum => {
+                const tr = document.createElement("tr");
+                const nivel = Math.max(...(alum.unlockedLevels || [1]));
+                const tiempo = formatearTiempo(alum.timeWorked || 0);
+                const m = alum.medals || {gold:0, silver:0, bronze:0};
+
+                tr.innerHTML = `
+                    <td style="text-align:left; font-weight:bold">${alum.username}</td>
+                    <td>${alum.group}</td>
+                    <td>${nivel}</td>
+                    <td style="color:blue">${tiempo}</td>
+                    <td style="color:green">${alum.totalCorrect||0}</td>
+                    <td style="color:red">${alum.totalWrong||0}</td>
+                    <td style="color:#d4af37">${m.gold}</td>
+                    <td>
+                        <button onclick="verGrafica('${alum.uid}')" class="action-btn btn-info" title="Gráfica">📊</button>
+                        <button onclick="cambiarGrupo('${alum.uid}')" class="action-btn btn-edit" title="Cambiar Grupo">📂</button>
+                        <button onclick="resetearAlumno('${alum.uid}')" class="action-btn btn-edit" title="Reiniciar">🔄</button>
+                        <button onclick="borrarAlumno('${alum.uid}')" class="action-btn btn-delete" title="Borrar">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
+        // ACCIONES MAESTRO
+        async function cambiarGrupo(uid) {
+            const { value: nuevoGrupo } = await Swal.fire({ title: 'Nuevo Grupo', input: 'text', showCancelButton: true });
+            if (nuevoGrupo) {
+                await db.collection("students").doc(uid).update({group: nuevoGrupo.toUpperCase()});
+                cargarTablaAlumnos();
+            }
+        }
+        function resetearAlumno(uid) {
+            if(confirm("¿Reiniciar alumno a cero?")) {
+                db.collection("students").doc(uid).update({
+                    score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}
+                }).then(()=>cargarTablaAlumnos());
+            }
+        }
+        function borrarAlumno(uid) {
+            if(confirm("¿ELIMINAR ALUMNO?")) {
+                db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos());
+            }
+        }
         function resetearTodo() {
-            const codigo = prompt("Escribe BORRAR para reiniciar todo:");
-            if(codigo === "BORRAR") {
-                db.collection("students").get().then(snapshot => {
-                    snapshot.forEach(doc => { 
-                        doc.ref.update({
-                            score:0, unlockedLevels:[1], totalCorrect:0, 
-                            timeWorked:0, medals:{gold:0, silver:0, bronze:0}
-                        }); 
+            const code = prompt("Escribe BORRAR para reiniciar a TODOS:");
+            if(code === "BORRAR") {
+                listaAlumnosCache.forEach(s => {
+                    db.collection("students").doc(s.uid).update({
+                        score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}
                     });
-                    alert("Reiniciado"); cargarTablaAlumnos();
                 });
+                alert("Escuela Reiniciada"); setTimeout(cargarTablaAlumnos, 2000);
             }
         }
 
-        document.getElementById("answerInput").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") verificarRespuesta();
-        });
+        // GRÁFICAS Y EXPORTAR
+        function renderizarGraficaGlobal(data) {
+            const ctx = document.getElementById('globalChart').getContext('2d');
+            if(chartGlobalInstance) chartGlobalInstance.destroy();
+            
+            const grupos = [...new Set(data.map(s => s.group))];
+            const promedios = grupos.map(g => {
+                const groupStudents = data.filter(s => s.group === g);
+                const totalScore = groupStudents.reduce((sum, s) => sum + (s.score || 0), 0);
+                return totalScore / groupStudents.length;
+            });
+
+            chartGlobalInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: grupos,
+                    datasets: [{ label: 'Promedio Puntos por Grupo', data: promedios, backgroundColor: '#004e92' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function verGrafica(uid) {
+            const alumno = listaAlumnosCache.find(s => s.uid === uid);
+            if(!alumno) return;
+            
+            document.getElementById("modalGrafica").style.display = "flex";
+            document.getElementById("modalNombre").textContent = alumno.username;
+            
+            const ctx = document.getElementById('studentChart').getContext('2d');
+            if(chartStudentInstance) chartStudentInstance.destroy();
+
+            chartStudentInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Correctas', 'Incorrectas'],
+                    datasets: [{
+                        data: [alumno.totalCorrect || 0, alumno.totalWrong || 0],
+                        backgroundColor: ['#28a745', '#dc3545']
+                    }]
+                }
+            });
+        }
+        function cerrarModal() { document.getElementById("modalGrafica").style.display = "none"; }
+
+        // EXPORTAR
+        function exportarExcel() {
+            const filtro = document.getElementById("groupFilter").value;
+            let data = listaAlumnosCache;
+            if(filtro !== "todos") data = data.filter(s => s.group === filtro);
+            
+            const cleanData = data.map(s => ({
+                Nombre: s.username, Grupo: s.group, Puntos: s.score, 
+                Tiempo: formatearTiempo(s.timeWorked||0),
+                Correctas: s.totalCorrect, Incorrectas: s.totalWrong,
+                Oro: s.medals?.gold, Plata: s.medals?.silver, Bronce: s.medals?.bronze
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(cleanData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+            XLSX.writeFile(wb, "Reporte_Alumnos.xlsx");
+        }
+
+        function exportarPDF() {
+            const element = document.getElementById('teacherPanel');
+            const opt = { margin: 5, filename: 'Reporte_Grupo.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        document.getElementById("answerInput").addEventListener("keypress", function(e) { if (e.key === "Enter") verificarRespuesta(); });
     </script>
 </body>
 </html>
