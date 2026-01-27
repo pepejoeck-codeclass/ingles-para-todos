@@ -4,7 +4,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 import { getFirestore, doc, setDoc, getDoc, getDocs, collection, updateDoc, deleteDoc, writeBatch, query, where } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Configuración de Firebase
+// --- CONFIGURACIÓN DE FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s",
   authDomain: "ingles-pepejoeck.firebaseapp.com",
@@ -20,13 +20,13 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// --- VARIABLES ---
+// --- VARIABLES GLOBALES DEL JUEGO ---
 let currentLevel = 1;
 let questionsInSession = 0;
 let correctInSession = 0;
-const SESSION_LENGTH = 5;
+const SESSION_LENGTH = 5; // Preguntas por ronda
 
-// PREGUNTAS
+// --- BASE DE DATOS DE PREGUNTAS ---
 const questionsDB = {
     1: [ 
         { q: "How do you say 'Hola' in English?", a: "hello" },
@@ -53,67 +53,77 @@ const questionsDB = {
 
 document.addEventListener("DOMContentLoaded", () => {
     
-    // SONIDOS
+    // --- SONIDOS ---
+    // Asegúrate de que la carpeta "assets/sounds/" exista en tu proyecto
     const soundCorrect = new Audio("assets/sounds/correct.mp3");
     const soundError = new Audio("assets/sounds/wrong.mp3");
     const soundLevelUp = new Audio("assets/sounds/levelup.mp3"); 
 
+    // --- CREDENCIALES MAESTRO ---
     const TEACHER_USER = "Jose de Jesus Ramos Flores";
     const TEACHER_PASS = "161286";
 
-    // DOM Elements
-    const loginCard = document.getElementById("loginCard"),
-          mainContent = document.getElementById("mainContent"),
-          teacherPanel = document.getElementById("teacherPanel"),
-          teacherLogin = document.getElementById("teacherLogin");
+    // --- ELEMENTOS DEL DOM (REFERENCIAS HTML) ---
+    // Pantallas Principales
+    const loginCard = document.getElementById("loginCard");
+    const mainContent = document.getElementById("mainContent");
+    const teacherPanel = document.getElementById("teacherPanel");
+    const teacherLogin = document.getElementById("teacherLogin");
 
-    const logoutBtn = document.getElementById("logoutBtn"),
-          openTeacherBtn = document.getElementById("openTeacherBtn"),
-          loginBtn = document.getElementById("loginBtn"),
-          teacherLoginBtn = document.getElementById("teacherLoginBtn"),
-          closeTeacherLogin = document.getElementById("closeTeacherLogin"),
-          closeTeacherPanel = document.getElementById("closeTeacherPanel"),
-          teacherLogoutBtn = document.getElementById("teacherLogoutBtn"), // NUEVO
-          refreshTeacherBtn = document.getElementById("refreshTeacher"),
-          viewStatsBtn = document.getElementById("viewStatsBtn"),
-          downloadPdfBtn = document.getElementById("downloadPdfBtn"),
-          exportExcelBtn = document.getElementById("exportExcelBtn"), // NUEVO
-          resetMonthlyBtn = document.getElementById("resetMonthlyBtn"),
-          startBtn = document.getElementById("startGame"),
-          checkBtn = document.getElementById("checkAnswer"),
-          nav = document.getElementById("nav"),
-          groupSelect = document.getElementById("groupSelect"),
-          studentsTable = document.getElementById("studentsTable"),
-          forgotPasswordLink = document.getElementById("forgotPasswordLink");
+    // Botones de Navegación y Acción
+    const logoutBtn = document.getElementById("logoutBtn");
+    const openTeacherBtn = document.getElementById("openTeacherBtn");
+    const loginBtn = document.getElementById("loginBtn");
+    const teacherLoginBtn = document.getElementById("teacherLoginBtn");
+    const closeTeacherLogin = document.getElementById("closeTeacherLogin");
+    const closeTeacherPanel = document.getElementById("closeTeacherPanel");
+    const teacherLogoutBtn = document.getElementById("teacherLogoutBtn");
+    const refreshTeacherBtn = document.getElementById("refreshTeacher");
+    const viewStatsBtn = document.getElementById("viewStatsBtn");
+    const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+    const exportExcelBtn = document.getElementById("exportExcelBtn");
+    const resetMonthlyBtn = document.getElementById("resetMonthlyBtn");
+    const startBtn = document.getElementById("startGame");
+    const checkBtn = document.getElementById("checkAnswer");
+    const forgotPasswordLink = document.getElementById("forgotPasswordLink");
 
-    // Inputs y Textos
-    const gradeInput = document.getElementById("gradeInput"),
-          groupInput = document.getElementById("groupInput"),
-          usernameInput = document.getElementById("usernameInput"),
-          emailInput = document.getElementById("emailInput"),
-          passwordInput = document.getElementById("passwordInput"),
-          userDisplay = document.getElementById("userDisplay"),
-          teacherUser = document.getElementById("teacherUser"),
-          teacherPass = document.getElementById("teacherPass"),
-          questionText = document.getElementById("questionText"),
-          answerInput = document.getElementById("answerInput"),
-          feedback = document.getElementById("feedback"),
-          scoreText = document.getElementById("scoreText"),
-          levelText = document.getElementById("levelText"),
-          timeText = document.getElementById("timeText"),
-          lessonProgressBar = document.getElementById("lessonProgressBar");
+    // Inputs de Login
+    const gradeInput = document.getElementById("gradeInput");
+    const groupInput = document.getElementById("groupInput");
+    const usernameInput = document.getElementById("usernameInput");
+    const emailInput = document.getElementById("emailInput");
+    const passwordInput = document.getElementById("passwordInput");
 
-    // NUEVOS CAMPOS DASHBOARD
+    // Inputs Maestro
+    const teacherUser = document.getElementById("teacherUser");
+    const teacherPass = document.getElementById("teacherPass");
+    const groupSelect = document.getElementById("groupSelect");
+    const studentsTable = document.getElementById("studentsTable");
+
+    // Elementos del Juego (HUD)
+    const userDisplay = document.getElementById("userDisplay");
+    const questionText = document.getElementById("questionText");
+    const answerInput = document.getElementById("answerInput");
+    const feedback = document.getElementById("feedback");
+    const scoreText = document.getElementById("scoreText");
+    const levelText = document.getElementById("levelText");
+    const timeText = document.getElementById("timeText");
+    const lessonProgressBar = document.getElementById("lessonProgressBar");
+
+    // Contadores del Dashboard
     const correctCountDisplay = document.getElementById("correctCount");
     const wrongCountDisplay = document.getElementById("wrongCount");
     const medalsCountDisplay = document.getElementById("medalsCount");
 
+    // Variables de Estado
     let currentUserId = null; 
     let currentUserData = {};
     let timerInterval = null;
     let currentQuestion = null;
 
-    // --- 1. AUTENTICACIÓN ---
+    // ==========================================
+    // 1. SISTEMA DE AUTENTICACIÓN
+    // ==========================================
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -146,6 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
+            // Si el usuario no existe o hay error, intentamos registrarlo si llenó los datos
             if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
                 if (!name || !grade || !group) {
                     Swal.fire("Usuario Nuevo", "Para crear tu cuenta, llena Nombre, Grado y Grupo arriba.", "info");
@@ -157,13 +168,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
                     
+                    // Crear documento inicial en Firestore
                     await setDoc(doc(db, "students", user.uid), {
                         uid: user.uid,
                         username: name, grade: grade, group: group, email: email,
-                        password: password,
+                        password: password, // Nota: Guardar pass en texto plano no es ideal, pero funcional para este uso escolar
                         score: 0, level: 1, stars: 0, timeWorked: 0,
-                        totalCorrect: 0, // NUEVO
-                        totalWrong: 0,   // NUEVO
+                        totalCorrect: 0,
+                        totalWrong: 0,
                         medals: { gold: 0, silver: 0, bronze: 0 },
                         history: [],
                         unlockedLevels: [1],
@@ -201,14 +213,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // --- 2. JUEGO Y DATOS ---
+    // ==========================================
+    // 2. LÓGICA DEL JUEGO Y DATOS
+    // ==========================================
 
     async function loadUserData(uid) {
         const docRef = doc(db, "students", uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             currentUserData = docSnap.data();
-            // Inicializar nuevos campos si no existen
+            // Inicializar campos si faltan (para usuarios antiguos)
             if(!currentUserData.medals) currentUserData.medals = { gold:0, silver:0, bronze:0 };
             if(!currentUserData.unlockedLevels) currentUserData.unlockedLevels = [1];
             if(!currentUserData.totalCorrect) currentUserData.totalCorrect = 0;
@@ -231,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
         scoreText.textContent = `${currentUserData.score || 0}`;
         levelText.textContent = `Nivel: ${currentLevel}`;
         
-        // CONTADORES NUEVOS
+        // Actualizar contadores nuevos
         correctCountDisplay.textContent = currentUserData.totalCorrect || 0;
         wrongCountDisplay.textContent = currentUserData.totalWrong || 0;
         
@@ -276,18 +290,18 @@ document.addEventListener("DOMContentLoaded", () => {
         
         if (userAns === currentQuestion.a) {
             feedback.textContent = "🔥 ¡Correcto!";
-            feedback.style.color = "green";
+            feedback.style.color = "#28a745";
             soundCorrect.play().catch(()=>{});
             
             currentUserData.score += 10;
-            currentUserData.totalCorrect = (currentUserData.totalCorrect || 0) + 1; // Suma acumulada
+            currentUserData.totalCorrect = (currentUserData.totalCorrect || 0) + 1;
             correctInSession++;
         } else {
             feedback.textContent = `❌ Era: ${currentQuestion.a}`;
-            feedback.style.color = "red";
+            feedback.style.color = "#dc3545";
             soundError.play().catch(()=>{});
             
-            currentUserData.totalWrong = (currentUserData.totalWrong || 0) + 1; // Suma acumulada
+            currentUserData.totalWrong = (currentUserData.totalWrong || 0) + 1;
         }
 
         updateProgressBar();
@@ -296,9 +310,18 @@ document.addEventListener("DOMContentLoaded", () => {
         if (questionsInSession >= SESSION_LENGTH) {
             await finishSession();
         } else {
+            // Pequeña pausa antes de la siguiente pregunta
             setTimeout(startQuestion, 1500);
         }
         await saveProgress(); 
+    });
+
+    // Permitir enviar respuesta con Enter
+    answerInput.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            checkBtn.click();
+        }
     });
 
     function updateProgressBar() {
@@ -325,7 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
             unlockNextLevel();
         } else {
             medal = "bronze";
-            msg = "🥉 Sigue practicando. Bronce.";
+            msg = "🥉 Sigue practicando. Medalla de Bronce.";
             currentUserData.medals.bronze++;
         }
 
@@ -335,11 +358,12 @@ document.addEventListener("DOMContentLoaded", () => {
             score: percentage,
             medal: medal
         };
+        
         if(!currentUserData.history) currentUserData.history = [];
         currentUserData.history.push(historyRecord);
 
         await saveProgress();
-        updateDisplay(); // Actualiza contadores de medallas
+        updateDisplay();
         updateLevelLocks();
 
         Swal.fire({
@@ -365,12 +389,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function updateLevelLocks() {
         if(!currentUserData.unlockedLevels) return;
+        // Asumiendo que tienes elementos en HTML con id="navL2", "navL3"
         [2, 3].forEach(lvl => {
             const el = document.getElementById(`navL${lvl}`);
-            if(currentUserData.unlockedLevels.includes(lvl)) {
-                el.classList.remove("locked");
-                const icon = el.querySelector('i');
-                if(icon) { icon.classList.remove('fa-lock'); icon.classList.add('fa-unlock'); }
+            if(el) {
+                if(currentUserData.unlockedLevels.includes(lvl)) {
+                    el.classList.remove("locked");
+                    const icon = el.querySelector('i');
+                    if(icon) { icon.classList.remove('fa-lock'); icon.classList.add('fa-unlock'); }
+                } else {
+                    el.classList.add("locked");
+                }
             }
         });
     }
@@ -384,10 +413,13 @@ document.addEventListener("DOMContentLoaded", () => {
             if (currentUserData.timeWorked % 30 === 0) saveProgress();
         }, 1000);
     }
+    
     function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
 
 
-    // --- 3. PANEL MAESTRO (SUPER EDICIÓN) ---
+    // ==========================================
+    // 3. PANEL DE MAESTRO (ADMINISTRACIÓN)
+    // ==========================================
 
     teacherLoginBtn.addEventListener("click", () => {
         if (teacherUser.value === TEACHER_USER && teacherPass.value === TEACHER_PASS) {
@@ -397,7 +429,6 @@ document.addEventListener("DOMContentLoaded", () => {
         } else { Swal.fire("Error", "Credenciales Incorrectas", "error"); }
     });
 
-    // BOTÓN CERRAR SESIÓN MAESTRO (RESTAURADO)
     teacherLogoutBtn.addEventListener("click", () => {
         teacherPanel.style.display = "none";
         teacherUser.value = "";
@@ -406,7 +437,7 @@ document.addEventListener("DOMContentLoaded", () => {
         Swal.fire("Sesión Cerrada", "Modo maestro finalizado", "info");
     });
 
-    // Funciones globales de botones tabla
+    // --- Funciones Globales para Botones en Tabla ---
     window.changeGroup = async (uid) => {
         const { value: newGroup } = await Swal.fire({
             title: 'Cambiar Grupo',
@@ -438,29 +469,34 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // VER DETALLES INDIVIDUALES (REPORTE)
     window.viewStudentStats = (uid) => {
         const student = window.allStudentsData.find(s => s.uid === uid);
         if(!student) return;
 
         document.getElementById("statsModal").style.display = "block";
-        document.getElementById("individualStatsArea").style.display = "block";
-        document.getElementById("individualName").textContent = `Detalle: ${student.username}`;
+        const indArea = document.getElementById("individualStatsArea");
+        if(indArea) indArea.style.display = "block";
+        
+        const nameLabel = document.getElementById("individualName");
+        if(nameLabel) nameLabel.textContent = `Detalle: ${student.username}`;
 
         // Gráfica Individual
-        const ctx = document.getElementById('individualChart').getContext('2d');
-        if(window.indChart) window.indChart.destroy();
-        
-        window.indChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Correctas ✅', 'Incorrectas ❌'],
-                datasets: [{
-                    data: [student.totalCorrect || 0, student.totalWrong || 0],
-                    backgroundColor: ['#28a745', '#dc3545']
-                }]
-            }
-        });
+        const chartCanvas = document.getElementById('individualChart');
+        if(chartCanvas) {
+            const ctx = chartCanvas.getContext('2d');
+            if(window.indChart instanceof Chart) window.indChart.destroy();
+            
+            window.indChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Correctas ✅', 'Incorrectas ❌'],
+                    datasets: [{
+                        data: [student.totalCorrect || 0, student.totalWrong || 0],
+                        backgroundColor: ['#28a745', '#dc3545']
+                    }]
+                }
+            });
+        }
         renderCharts(); // Renderiza también la global
     };
 
@@ -477,6 +513,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.allStudentsData.push(data); 
         });
 
+        // Llenar select de grupos
         const groups = [...new Set(window.allStudentsData.map(s => s.group))].sort();
         groupSelect.innerHTML = '<option value="">Todos</option>';
         groups.forEach(g => {
@@ -493,7 +530,6 @@ document.addEventListener("DOMContentLoaded", () => {
         studentsTable.innerHTML = "";
         
         filtered.forEach(s => {
-            // Cálculo de tiempo para la tabla
             const min = Math.floor((s.timeWorked || 0) / 60);
             const sec = (s.timeWorked || 0) % 60;
             const timeStr = `${min}m ${sec}s`;
@@ -516,21 +552,22 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- GRÁFICAS, PDF Y EXCEL ---
+    // ==========================================
+    // 4. EXPORTACIÓN Y GRÁFICAS
+    // ==========================================
 
-    // 1. Exportar a Excel
+    // Exportar a Excel
     exportExcelBtn.addEventListener("click", () => {
         if(!window.allStudentsData || window.allStudentsData.length === 0) {
             Swal.fire("Vacío", "No hay datos para exportar", "warning");
             return;
         }
         
-        // Crear datos limpios para Excel
         const dataForExcel = window.allStudentsData.map(s => ({
             Nombre: s.username,
             Grupo: s.group,
             Correo: s.email,
-            Contraseña: s.password || "Oculta", // Si quieres mostrarla
+            Contraseña: s.password || "Oculta",
             Puntos: s.score,
             Nivel_Juego: Math.max(...(s.unlockedLevels || [1])),
             Tiempo_Minutos: ((s.timeWorked||0)/60).toFixed(2),
@@ -548,13 +585,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     viewStatsBtn.addEventListener("click", () => {
-        document.getElementById("statsModal").style.display = "block";
-        document.getElementById("individualStatsArea").style.display = "none"; // Ocultar individual al abrir general
+        const modal = document.getElementById("statsModal");
+        if(modal) modal.style.display = "block";
+        const indArea = document.getElementById("individualStatsArea");
+        if(indArea) indArea.style.display = "none"; // Ocultar individual al abrir general
         setTimeout(renderCharts, 200);
     });
 
+    // Cerrar modales (clic fuera del modal)
+    window.onclick = function(event) {
+        const modal = document.getElementById("statsModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    };
+
     function renderCharts() {
-        const ctx = document.getElementById('groupChart').getContext('2d');
+        const chartCanvas = document.getElementById('groupChart');
+        if(!chartCanvas) return;
+        
+        const ctx = chartCanvas.getContext('2d');
         let totalGold = 0, totalSilver = 0, totalBronze = 0;
         
         window.allStudentsData.forEach(s => {
@@ -565,7 +615,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        if(window.myChart) window.myChart.destroy();
+        if(window.myChart instanceof Chart) window.myChart.destroy();
 
         window.myChart = new Chart(ctx, {
             type: 'bar',
@@ -583,7 +633,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     downloadPdfBtn.addEventListener("click", () => {
         const element = document.getElementById('reportContent');
-        const opt = { margin: 10, filename: 'Reporte_Grafico.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        const opt = { 
+            margin: 10, 
+            filename: 'Reporte_Grafico.pdf', 
+            image: { type: 'jpeg', quality: 0.98 }, 
+            html2canvas: { scale: 2 }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+        };
         html2pdf().set(opt).from(element).save();
     });
 
@@ -610,14 +666,29 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // --- UTILS UI ---
+    // ==========================================
+    // 5. UTILIDADES DE INTERFAZ (UI)
+    // ==========================================
+
     logoutBtn.addEventListener("click", () => {
         saveProgress(); stopTimer();
         signOut(auth).then(() => { location.reload(); });
     });
-    openTeacherBtn.addEventListener("click", () => { loginCard.style.display = "none"; teacherLogin.style.display = "block"; });
-    closeTeacherPanel.addEventListener("click", () => { teacherPanel.style.display = "none"; loginCard.style.display = "block"; });
-    closeTeacherLogin.addEventListener("click", () => { teacherLogin.style.display = "none"; loginCard.style.display = "block"; });
+
+    openTeacherBtn.addEventListener("click", () => { 
+        loginCard.style.display = "none"; 
+        teacherLogin.style.display = "block"; 
+    });
+
+    closeTeacherPanel.addEventListener("click", () => { 
+        teacherPanel.style.display = "none"; 
+        loginCard.style.display = "block"; 
+    });
+    
+    closeTeacherLogin.addEventListener("click", () => { 
+        teacherLogin.style.display = "none"; 
+        loginCard.style.display = "block"; 
+    });
     
     function showStudentInterface() {
         loginCard.style.display = "none";
