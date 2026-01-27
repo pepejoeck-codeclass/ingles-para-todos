@@ -150,7 +150,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // 2. VARIABLES
+        // 2. VARIABLES GLOBALES
         let usuarioActual = null;
         let datosUsuario = {};
         let nivelActual = 1;
@@ -217,7 +217,7 @@
             document.getElementById("loginCard").style.display = "block";
         }
 
-        // 5. LOGICA ALUMNO
+        // 5. LOGICA ALUMNO (SOLUCIÓN ERROR CREDENTIALS)
         function intentarLogin() {
             const email = document.getElementById("emailInput").value.trim();
             const pass = document.getElementById("passwordInput").value.trim();
@@ -229,27 +229,50 @@
 
             auth.signInWithEmailAndPassword(email, pass)
                 .catch((error) => {
-                    if(error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    console.log("Error:", error.code);
+                    // Lista de errores que indican "no se pudo entrar, tal vez quieres registrarte"
+                    const erroresRegistro = [
+                        'auth/user-not-found', 
+                        'auth/wrong-password', 
+                        'auth/invalid-login-credentials', 
+                        'auth/invalid-credential'
+                    ];
+
+                    if(erroresRegistro.includes(error.code)) {
+                        // Si falta nombre, es que solo quería login y falló
                         if(!nombre || !grado || !grupo) {
-                            Swal.fire("Usuario Nuevo", "El correo no existe. Para crear cuenta llena Nombre, Grado y Grupo.", "info");
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Atención',
+                                text: 'Si ya tienes cuenta: Tu contraseña es incorrecta.\n\nSi eres NUEVO: Llena Nombre, Grado y Grupo para registrarte.'
+                            });
                             return;
                         }
+                        
+                        // Si tiene nombre, creamos la cuenta
                         auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
                             db.collection("students").doc(cred.user.uid).set({
                                 uid: cred.user.uid,
                                 username: nombre, grade: grado, group: grupo, email: email, password: pass,
-                                score: 0, unlockedLevels: [1], totalCorrect: 0
+                                score: 0, unlockedLevels: [1], totalCorrect: 0,
+                                medals: {gold:0, silver:0, bronze:0}
                             }).then(() => {
-                                Swal.fire("¡Creado!", "Bienvenido al juego", "success");
+                                Swal.fire("¡Bienvenido!", "Cuenta creada exitosamente.", "success");
                             });
-                        }).catch(e => Swal.fire("Error Registro", e.message, "error"));
+                        }).catch(e => {
+                            if(e.code === 'auth/email-already-in-use') {
+                                Swal.fire("Error", "Este correo ya está registrado.", "error");
+                            } else {
+                                Swal.fire("Error Registro", e.message, "error");
+                            }
+                        });
                     } else {
                         Swal.fire("Error", error.message, "error");
                     }
                 });
         }
 
-        // FUNCION NUEVA PARA RECUPERAR CONTRASEÑA
+        // Recuperar Contraseña
         async function recuperarPassword() {
             const { value: email } = await Swal.fire({
                 title: 'Recuperar Contraseña',
@@ -257,14 +280,14 @@
                 inputLabel: 'Escribe tu correo registrado',
                 inputPlaceholder: 'correo@ejemplo.com',
                 showCancelButton: true,
-                confirmButtonText: 'Enviar',
+                confirmButtonText: 'Enviar Link',
                 cancelButtonText: 'Cancelar'
             });
 
             if (email) {
                 auth.sendPasswordResetEmail(email)
                     .then(() => {
-                        Swal.fire('Enviado', 'Revisa tu correo para restablecer la contraseña.', 'success');
+                        Swal.fire('¡Enviado!', 'Revisa tu correo (y SPAM) para restablecer la contraseña.', 'success');
                     })
                     .catch((error) => {
                         Swal.fire('Error', 'No se encontró ese correo o hubo un error.', 'error');
