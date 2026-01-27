@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
           closeTeacherPanel = document.getElementById("closeTeacherPanel"),
           refreshTeacherBtn = document.getElementById("refreshTeacher"),
           exportBtn = document.getElementById("exportBtn"),
-          resetMonthlyBtn = document.getElementById("resetMonthlyBtn"), // Referencia al nuevo botón
+          resetMonthlyBtn = document.getElementById("resetMonthlyBtn"),
           startBtn = document.getElementById("startGame"),
           checkBtn = document.getElementById("checkAnswer"),
           themeToggle = document.getElementById("themeToggle"),
@@ -210,6 +210,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // --- ACCIONES MAESTRO ---
+
+    // 1. Cambiar Grupo
     window.changeGroup = async (uid) => {
         const newGroup = prompt("Escribe el nuevo grupo:");
         if (newGroup) {
@@ -221,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    // 2. Borrar Alumno
     window.deleteStudent = async (uid, name) => {
         if (confirm(`¿Eliminar a ${name}? Se perderá todo su progreso.`)) {
             try {
@@ -231,35 +234,37 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // FUNCIÓN PARA REINICIAR PUNTOS DE TODOS
+    // 3. Reiniciar Alumno Individual (NUEVO)
+    window.resetStudent = async (uid, name) => {
+        if (confirm(`¿Reiniciar puntos de ${name} a cero?`)) {
+            try {
+                await updateDoc(doc(db, "students", uid), {
+                    score: 0, stars: 0, level: 1, timeWorked: 0
+                });
+                alert(`Progreso de ${name} reiniciado.`);
+                loadTeacherPanel();
+            } catch (e) { alert("Error al reiniciar alumno"); }
+        }
+    };
+
+    // 4. Reiniciar TODOS
     resetMonthlyBtn.addEventListener("click", async () => {
-        if (confirm("⚠️ ¿ESTÁS SEGURO? Esto pondrá los puntos, estrellas y nivel de TODOS los alumnos en 0. Esta acción no se puede deshacer.")) {
+        if (confirm("⚠️ ¿REINICIAR A TODOS? Esto pondrá los puntos de TODOS los alumnos en 0.")) {
             resetMonthlyBtn.disabled = true;
-            resetMonthlyBtn.textContent = "Reiniciando...";
-            
+            resetMonthlyBtn.textContent = "Procesando...";
             try {
                 const querySnapshot = await getDocs(collection(db, "students"));
-                const batch = writeBatch(db); // Usamos un batch para actualizar todos de un golpe
-
+                const batch = writeBatch(db);
                 querySnapshot.forEach((documento) => {
                     const studentRef = doc(db, "students", documento.id);
-                    batch.update(studentRef, {
-                        score: 0,
-                        stars: 0,
-                        level: 1,
-                        timeWorked: 0
-                    });
+                    batch.update(studentRef, { score: 0, stars: 0, level: 1, timeWorked: 0 });
                 });
-
                 await batch.commit();
-                alert("✅ ¡Todo el progreso ha sido reiniciado para el nuevo mes!");
+                alert("✅ ¡Todo el progreso ha sido reiniciado!");
                 loadTeacherPanel();
-            } catch (e) {
-                console.error(e);
-                alert("Error al reiniciar los datos.");
-            }
+            } catch (e) { alert("Error al reiniciar."); }
             resetMonthlyBtn.disabled = false;
-            resetMonthlyBtn.textContent = "🗓️ Reiniciar Mes";
+            resetMonthlyBtn.textContent = "🗓️ Reiniciar TODOS";
         }
     });
 
@@ -293,8 +298,9 @@ document.addEventListener("DOMContentLoaded", () => {
             row.innerHTML = `
                 <td>${s.username}</td><td>${s.grade}</td><td>${s.group}</td><td>${s.score}</td><td>${s.level}</td><td>${s.stars}</td><td>${min}m ${sec}s</td>
                 <td>
-                    <button onclick="changeGroup('${s.uid}')" style="background:#ffc107; border:none; padding:3px 7px; cursor:pointer;">Gr.</button>
-                    <button onclick="deleteStudent('${s.uid}', '${s.username}')" style="background:#dc3545; color:white; border:none; padding:3px 7px; cursor:pointer;">X</button>
+                    <button onclick="changeGroup('${s.uid}')" style="background:#ffc107; border:none; padding:3px 5px; cursor:pointer;" title="Cambiar Grupo">Gr.</button>
+                    <button onclick="resetStudent('${s.uid}', '${s.username}')" style="background:#007bff; color:white; border:none; padding:3px 5px; cursor:pointer;" title="Reiniciar puntos">🔄</button>
+                    <button onclick="deleteStudent('${s.uid}', '${s.username}')" style="background:#dc3545; color:white; border:none; padding:3px 5px; cursor:pointer;" title="Borrar alumno">X</button>
                 </td>`;
             studentsTable.appendChild(row);
         });
