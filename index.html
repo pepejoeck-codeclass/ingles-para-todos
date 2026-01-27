@@ -2,19 +2,28 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Inglés Para Todos - Premium</title>
+  <title>Inglés Para Todos - Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   
   <style>
-    /* Estilos extra para las nuevas funciones */
-    .locked { opacity: 0.5; pointer-events: none; cursor: not-allowed; }
-    .nav-link { cursor: pointer; }
-    .medal-icon { font-size: 2em; margin: 0 5px; }
+    /* Estilos para el bloqueo y mejoras visuales */
+    .locked { opacity: 0.6; pointer-events: none; filter: grayscale(100%); }
+    .nav-link { cursor: pointer; user-select: none; }
+    .fa-lock { margin-left: 5px; color: #d9534f; }
+    .fa-unlock { margin-left: 5px; color: #5cb85c; }
+    
+    /* Botones de acción en tabla maestro */
+    .action-btn { border: none; padding: 5px 8px; margin: 0 2px; border-radius: 4px; cursor: pointer; color: white; transition: 0.3s; }
+    .btn-group { background-color: #f0ad4e; } /* Naranja */
+    .btn-reset { background-color: #0275d8; } /* Azul */
+    .btn-delete { background-color: #d9534f; } /* Rojo */
+    .action-btn:hover { opacity: 0.8; transform: scale(1.05); }
   </style>
 </head>
 <body>
@@ -22,7 +31,7 @@
 <header>
   <h1>Inglés Para Todos</h1>
   <div class="header-buttons">
-    <button type="button" id="themeToggle">🌙 / ☀️</button>
+    <button type="button" id="themeToggle" title="Cambiar Tema">🌙 / ☀️</button>
     <button type="button" id="hamburger" class="hamburger">☰</button>
   </div>
   
@@ -33,21 +42,21 @@
 
   <nav id="nav">
     <a class="nav-link" id="navL1" onclick="window.selectLevel(1)">Lección 1 (Básicos)</a>
-    <a class="nav-link locked" id="navL2" onclick="window.selectLevel(2)">Lección 2 (Animales) 🔒</a>
-    <a class="nav-link locked" id="navL3" onclick="window.selectLevel(3)">Lección 3 (Colores) 🔒</a>
+    <a class="nav-link locked" id="navL2" onclick="window.selectLevel(2)">Lección 2 (Animales) <i class="fas fa-lock"></i></a>
+    <a class="nav-link locked" id="navL3" onclick="window.selectLevel(3)">Lección 3 (Colores) <i class="fas fa-lock"></i></a>
     <a href="#">Juegos</a>
   </nav>
 </header>
 
 <section class="card" id="loginCard">
   <h2>👤 Iniciar sesión / Registro</h2>
-  <p style="font-size: 0.9em; color: #666;">Si es tu primera vez, escribe tus datos y se creará tu cuenta automáticamente.</p>
+  <p style="font-size: 0.9em; color: #666;">Ingresa tus datos. Si eres nuevo, tu cuenta se creará automáticamente.</p>
   
   <input type="text" id="gradeInput" placeholder="Grado (ej. 1)" />
   <input type="text" id="groupInput" placeholder="Grupo (ej. A)" />
   <input type="text" id="usernameInput" placeholder="Nombre completo" />
   
-  <p>— Datos de acceso —</p>
+  <p style="margin: 10px 0; font-weight:bold;">— Datos de Acceso —</p>
   <input type="email" id="emailInput" placeholder="Correo electrónico (Gmail)" />
   <input type="password" id="passwordInput" placeholder="Contraseña (Mínimo 6 caracteres)" />
 
@@ -65,73 +74,95 @@
   <input type="text" id="teacherUser" placeholder="Usuario">
   <input type="password" id="teacherPass" placeholder="Contraseña">
   <button type="button" id="teacherLoginBtn">Entrar</button>
-  <button type="button" id="closeTeacherLogin">Cancelar</button>
+  <button type="button" id="closeTeacherLogin" style="background-color: #777;">Cancelar</button>
 </section>
 
 <main id="mainContent" style="display:none;">
   <h3 id="userDisplay"></h3>
   
-  <div style="width: 100%; background-color: #ddd; border-radius: 10px; margin-bottom: 10px;">
-      <div id="lessonProgressBar" style="width: 0%; height: 10px; background-color: #4CAF50; border-radius: 10px; transition: width 0.5s;"></div>
+  <div style="width: 100%; background-color: #e0e0e0; border-radius: 10px; margin-bottom: 10px; overflow: hidden;">
+      <div id="lessonProgressBar" style="width: 0%; height: 12px; background-color: #4CAF50; transition: width 0.5s;"></div>
   </div>
-  <p style="text-align:center; font-size:0.8em;">Progreso de lección: <span id="progressText">0/5</span></p>
+  <p style="text-align:center; font-size:0.8em; color:#666;">Progreso de lección: <span id="progressText">0/5</span></p>
 
   <section class="card">
-    <h2 id="questionText">Pulsa para comenzar</h2>
-    <p id="feedback" style="font-weight: bold; height: 20px;"></p>
-    <input type="text" id="answerInput" placeholder="Respuesta..." autocomplete="off" />
-    <div style="margin-top:10px;">
-        <button type="button" id="startGame">Nueva Pregunta</button>
-        <button type="button" id="checkAnswer">Responder</button>
+    <h2 id="questionText">Cargando...</h2>
+    <p id="feedback" style="font-weight: bold; height: 25px; margin-bottom:5px;"></p>
+    
+    <input type="text" id="answerInput" placeholder="Escribe tu respuesta..." autocomplete="off" />
+    
+    <div style="margin-top:15px; display:flex; gap:10px; justify-content:center;">
+        <button type="button" id="startGame" style="background:#17a2b8;">🔄 Otra</button>
+        <button type="button" id="checkAnswer" style="background:#28a745;">✅ Responder</button>
     </div>
+    
     <hr>
-    <p id="starsText">⭐ Estrellas: 0</p>
-    <p id="timeText">⏱ Tiempo: 0 min 0 s</p>
+    <div style="display:flex; justify-content:space-around; font-size:0.9em;">
+        <p id="starsText">⭐ Estrellas: 0</p>
+        <p id="timeText">⏱ 0m 0s</p>
+    </div>
   </section>
+
   <section class="card">
-    <p id="scoreText">0 puntos</p>
-    <p id="levelText">Nivel Actual: 1</p>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <p id="scoreText" style="font-size:1.2em; font-weight:bold;">0 pts</p>
+            <p id="levelText" style="color:#666;">Nivel 1</p>
+        </div>
+        <div id="miniMedals" style="font-size:1.5em;"></div>
+    </div>
   </section>
 </main>
 
-<section id="teacherPanel" class="card" style="display:none;">
-  <h2>👨‍🏫 Panel Maestro (Nube)</h2>
-  <div style="margin-bottom: 15px;">
-      <label>Filtrar por Grupo:</label>
-      <select id="groupSelect"><option value="">Todos los grupos</option></select>
-      <button type="button" id="refreshTeacher">🔄 Actualizar</button>
-      <button type="button" id="exportBtn" style="background-color: #28a745; color: white;">📥 Excel</button>
-      <button type="button" id="viewStatsBtn" style="background-color: #673ab7; color: white;">📊 Ver Gráficas y Reporte</button>
-      <button type="button" id="resetMonthlyBtn" style="background-color: #f44336; color: white;">🗓️ Reiniciar TODOS</button>
+<section id="teacherPanel" class="card" style="display:none; max-width: 95%;">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>👨‍🏫 Panel de Control</h2>
+      <button type="button" id="closeTeacherPanel" style="background:transparent; color:#333; font-size:1.5em; padding:0;">✖</button>
   </div>
+
+  <div style="margin-bottom: 15px; background:#f9f9f9; padding:10px; border-radius:8px;">
+      <label><b>Filtrar:</b></label>
+      <select id="groupSelect" style="padding:5px;"><option value="">Todos los grupos</option></select>
+      
+      <div style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;">
+          <button type="button" id="refreshTeacher">🔄 Actualizar</button>
+          <button type="button" id="viewStatsBtn" style="background-color: #6f42c1; color: white;">📊 Reporte Gráfico</button>
+          <button type="button" id="resetMonthlyBtn" style="background-color: #d9534f; color: white;">⚠ Reiniciar ESCUELA</button>
+      </div>
+  </div>
+
   <div style="overflow-x: auto;">
-      <table border="1" width="100%" style="border-collapse: collapse; text-align: center;">
+      <table border="1" width="100%" style="border-collapse: collapse; text-align: center; font-size:0.9em;">
         <thead>
-          <tr style="background-color: #eee;">
-            <th>Alumno</th><th>Grado</th><th>Grupo</th><th>Puntos</th><th>Nivel</th><th>Medallas</th><th>Acciones</th>
+          <tr style="background-color: #333; color:white;">
+            <th>Alumno</th>
+            <th>Gpo</th>
+            <th>Pts</th>
+            <th>Nivel</th>
+            <th>🥇/🥈/🥉</th>
+            <th style="min-width:120px;">Acciones</th>
           </tr>
         </thead>
         <tbody id="studentsTable"></tbody>
       </table>
   </div>
-  <br>
-  <button type="button" id="closeTeacherPanel">Cerrar Sesión Maestro</button>
 </section>
 
-<div id="statsModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 9999; overflow-y: auto;">
-    <div style="background: white; margin: 2% auto; padding: 20px; width: 90%; max-width: 800px; border-radius: 10px;">
-        <div style="display:flex; justify-content:space-between;">
-            <h2>📊 Reporte de Progreso</h2>
-            <button onclick="document.getElementById('statsModal').style.display='none'" style="background:red; color:white;">X</button>
-        </div>
-        <button id="downloadPdfBtn" style="background: #007bff; color: white; margin-bottom:10px;">🖨️ Descargar PDF</button>
+<div id="statsModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 10000; overflow-y: auto;">
+    <div style="background: white; margin: 5% auto; padding: 25px; width: 90%; max-width: 800px; border-radius: 10px; position:relative;">
+        <button onclick="document.getElementById('statsModal').style.display='none'" style="position:absolute; top:10px; right:10px; background:red; color:white; border:none; padding:5px 10px; border-radius:50%;">X</button>
+        
+        <h2>📊 Reporte de Rendimiento Escolar</h2>
+        <button id="downloadPdfBtn" style="background: #007bff; color: white; margin-bottom:15px;">🖨️ Descargar PDF</button>
         
         <div id="reportContent">
-            <h3>Rendimiento del Grupo</h3>
-            <canvas id="groupChart" height="100"></canvas>
-            
-            <h3>🏆 Historial Reciente de Medallas</h3>
-            <ul id="historyList" style="list-style: none; padding: 0;"></ul>
+            <div style="text-align:center; margin-bottom:20px;">
+                <h3>Resumen de Medallas (Global)</h3>
+                <canvas id="groupChart" style="max-height:300px;"></canvas>
+            </div>
+            <hr>
+            <h3>📜 Historial Reciente de Logros</h3>
+            <ul id="historyList" style="list-style: none; padding: 0; font-size:0.9em;"></ul>
         </div>
     </div>
 </div>
