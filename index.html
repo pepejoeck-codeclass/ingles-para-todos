@@ -3,162 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - Super Student</title>
+    <title>Inglés Para Todos - FUNCIONAL</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --white: #ffffff; --text-dark: #333333; }
-        body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: var(--text-dark); display: flex; flex-direction: column; align-items: center; }
+        :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --white: #ffffff; }
+        body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
-        .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* IMÁGENES */
-        .logo-img { width: 100%; max-width: 300px; margin-bottom: 10px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
-        .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; transition: transform 0.2s; margin: 10px auto; display: block; object-fit: cover; }
-        .teacher-badge-img:hover { transform: scale(1.1); }
+        .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; }
+        .logo-img { width: 100%; max-width: 300px; margin-bottom: 10px; }
+        .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; margin: 10px auto; display: block; object-fit: cover; }
         .teacher-header-img { width: 100%; max-height: 180px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 10px; }
-
-        h2 { color: var(--primary); margin-bottom: 15px; text-transform: uppercase; font-weight: 900; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; font-family: 'Nunito', sans-serif; transition: 0.3s; }
-        input:focus { border-color: var(--primary); outline: none; }
-        .btn { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; transition: transform 0.1s; }
-        .btn-primary { background: var(--primary); box-shadow: 0 4px 0 #003366; }
-        .btn-primary:active { transform: translateY(4px); box-shadow: none; }
-        .btn-danger { background: var(--accent); box-shadow: 0 4px 0 #990000; }
-        .btn-secondary { background: #6c757d; }
-        
-        /* JUEGO & UI */
-        .level-badge { background: var(--gold); color: #000; padding: 5px 15px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; background: var(--primary); }
+        .btn-danger { background: var(--accent); } .btn-secondary { background: #6c757d; }
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, #00c6ff, #0072ff); width: 0%; transition: width 0.3s; }
+        .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
         .question-box { font-size: 22px; font-weight: bold; color: var(--secondary); margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 5px solid var(--primary); }
-        .bottom-nav { display: flex; justify-content: space-around; background: white; padding: 10px; border-radius: 15px; margin-top: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
-        .nav-item { text-align: center; cursor: pointer; color: #aaa; font-size: 12px; }
+        .bottom-nav { display: flex; justify-content: space-around; background: white; padding: 10px; border-radius: 15px; margin-top: 10px; }
+        .nav-item { cursor: pointer; color: #aaa; font-size: 12px; text-align: center; }
         .nav-item.active { color: var(--primary); font-weight: bold; }
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 3px; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
-
         /* MAESTRO */
         .teacher-panel-container { width: 95%; max-width: 1000px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
-        th { background-color: var(--primary); color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
+        th { background: var(--primary); color: white; }
         .action-btn { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; }
         .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-reset { background: #ffc107; color: black; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
     <div id="loginCard" class="app-container">
         <div class="card">
-            <img src="assets/images/logo_main.png.jpg" alt="Inglés Para Todos" class="logo-img">
+            <img src="assets/images/logo_main.png.jpg" alt="Logo" class="logo-img">
+            <h2>Inglés Para Todos</h2>
             
-            <h2>Identidad Secreta</h2>
             <input type="email" id="emailInput" placeholder="Correo Electrónico">
-            <input type="password" id="passwordInput" placeholder="Contraseña Secreta">
+            <input type="password" id="passwordInput" placeholder="Contraseña">
             
-            <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
-            <p style="font-size: 12px; color: #666; margin-bottom: 5px;">* ¿Nuevo? Llena también esto:</p>
-            <input type="text" id="usernameInput" placeholder="Tu Nombre Real">
+            <hr>
+            <p style="font-size: 12px;">* ¿Nuevo? Llena esto:</p>
+            <input type="text" id="usernameInput" placeholder="Nombre Completo">
             <div style="display: flex; gap: 10px;">
-                <input type="number" id="gradeInput" placeholder="Grado" style="width: 50%;">
-                <input type="text" id="groupInput" placeholder="Grupo" style="width: 50%;">
+                <input type="number" id="gradeInput" placeholder="Grado" style="width:50%">
+                <input type="text" id="groupInput" placeholder="Grupo" style="width:50%">
             </div>
 
-            <button id="loginBtn" class="btn btn-primary"><i class="fas fa-rocket"></i> DESPEGAR</button>
-            <div style="margin-top: 15px;"><a href="#" id="forgotPasswordLink" style="font-size: 13px; color: var(--primary);">¿Olvidaste tu contraseña?</a></div>
+            <button onclick="intentarLogin()" class="btn">🚀 ENTRAR / REGISTRAR</button>
         </div>
-        <div style="text-align: center; margin-top: 20px;">
-            <p style="color: white; font-size: 14px; margin-bottom: 5px;">¿Eres el Maestro?</p>
-            <img src="assets/images/super_teacher_btn.jpg.jpg" id="openTeacherBtn" class="teacher-badge-img" alt="Acceso Maestro">
+        <div style="text-align: center;">
+            <p style="color: white;">¿Maestro?</p>
+            <img src="assets/images/super_teacher_btn.jpg.jpg" onclick="mostrarLoginMaestro()" class="teacher-badge-img">
         </div>
     </div>
 
     <div id="teacherLogin" class="app-container" style="display: none;">
         <div class="card">
-            <img src="assets/images/teacher_header.jpg.jpg" class="teacher-header-img" alt="Teaching is Super">
-            <h2>Acceso Restringido</h2>
-            
-            <input type="text" id="inputMaestroUsuario" placeholder="Usuario Maestro">
-            <input type="password" id="inputMaestroPass" placeholder="Contraseña Maestra">
-            
-            <button id="teacherLoginBtn" class="btn btn-primary">Entrar al Cuartel</button>
-            <button id="closeTeacherLogin" class="btn btn-secondary" style="margin-top: 10px;">Cancelar</button>
+            <img src="assets/images/teacher_header.jpg.jpg" class="teacher-header-img">
+            <h2>Modo Maestro</h2>
+            <input type="text" id="teacherUserImput" placeholder="Usuario">
+            <input type="password" id="teacherPassInput" placeholder="Contraseña">
+            <button onclick="loginMaestro()" class="btn">Entrar</button>
+            <button onclick="volverInicio()" class="btn btn-secondary" style="margin-top:10px">Cancelar</button>
         </div>
     </div>
 
     <div id="mainContent" class="app-container" style="display: none;">
-        <div class="card" style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px;">
             <div style="text-align: left;">
-                <div id="userDisplay" style="font-weight: bold; color: var(--primary);">Héroe: ...</div>
-                <div id="scoreText" style="font-size: 12px; color: #666;">Puntos: 0</div>
-                <div id="timeText" style="font-size: 12px; color: #666;">⏱ 0m 0s</div>
+                <div id="userDisplay" style="font-weight: bold; color: var(--primary);">Alumno</div>
+                <div id="scoreText" style="font-size: 12px;">Puntos: 0</div>
             </div>
-            <button id="logoutBtn" class="btn-danger" style="width: auto; padding: 5px 15px; font-size: 12px; margin:0;"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            <button onclick="cerrarSesion()" class="btn-danger" style="width: auto; padding: 5px 15px; font-size: 12px; margin:0;">Salir</button>
         </div>
         <div class="card">
-            <span id="levelText" class="level-badge">Nivel 1</span>
+            <span id="levelText" style="background:#ffd700; padding:5px 10px; border-radius:10px; font-weight:bold;">Nivel 1</span>
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
-            <div id="questionText" class="question-box">Cargando...</div>
-            <input type="text" id="answerInput" placeholder="Respuesta..." autocomplete="off">
-            <button id="checkAnswer" class="btn btn-primary">Comprobar</button>
+            <div id="questionText" class="question-box">...</div>
+            <input type="text" id="answerInput" placeholder="Respuesta...">
+            <button onclick="verificarRespuesta()" class="btn">Comprobar</button>
             <div id="feedback" style="margin-top: 15px; font-weight: bold; height: 20px;"></div>
         </div>
-        <div class="bottom-nav" id="nav">
-            <div class="nav-item active" onclick="selectLevel(1)"><i class="fas fa-star"></i> Nivel 1</div>
-            <div class="nav-item locked" id="navL2" onclick="selectLevel(2)"><i class="fas fa-lock"></i> Nivel 2</div>
-            <div class="nav-item locked" id="navL3" onclick="selectLevel(3)"><i class="fas fa-lock"></i> Nivel 3</div>
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="cambiarNivel(1)">Nivel 1</div>
+            <div class="nav-item locked" id="navL2" onclick="cambiarNivel(2)">Nivel 2 🔒</div>
+            <div class="nav-item locked" id="navL3" onclick="cambiarNivel(3)">Nivel 3 🔒</div>
         </div>
     </div>
 
     <div id="teacherPanel" class="teacher-panel-container">
         <div class="card" style="text-align: left;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2><i class="fas fa-chalkboard-teacher"></i> Cuartel General</h2>
-                <button id="teacherLogoutBtn" class="btn-danger" style="width: auto; padding: 8px 20px; font-size: 14px; margin:0;">Cerrar</button>
+            <div style="display: flex; justify-content: space-between;">
+                <h2>Panel Maestro</h2>
+                <button onclick="cerrarSesionMaestro()" class="btn-danger" style="width:auto; padding:5px 10px;">Salir</button>
             </div>
             <hr>
             <div class="dashboard-grid">
-                <div class="stat-card"><div class="stat-number" id="medalsCount">0</div><div>Medallas</div></div>
-                <div class="stat-card"><div class="stat-number" id="correctCount">0</div><div>Aciertos</div></div>
-                <div class="stat-card"><div class="stat-number" id="wrongCount">0</div><div>Errores</div></div>
+                <div class="stat-card"><div class="stat-number" id="totalAciertos">0</div>Aciertos Totales</div>
             </div>
-            <div style="background: #f1f1f1; padding: 10px; border-radius: 10px; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <select id="groupSelect" style="padding: 8px; border-radius: 5px; flex: 1;"><option value="">Cargando...</option></select>
-                <button id="refreshTeacher" class="action-btn btn-info"><i class="fas fa-sync"></i></button>
-                <button id="exportExcelBtn" class="action-btn" style="background-color: #217346;"><i class="fas fa-file-excel"></i> Excel</button>
-                <button id="resetMonthlyBtn" class="action-btn btn-reset" style="background-color: #ffc107; color: black; font-weight:bold">⚠️ RESET GLOBAL</button>
-            </div>
+            <br>
+            <button onclick="cargarTablaAlumnos()" class="action-btn btn-info">🔄 Actualizar</button>
+            <button onclick="resetearTodo()" class="action-btn btn-delete">⚠️ BORRAR TODO</button>
             <div style="overflow-x: auto;">
-                <table id="teacherTable">
-                    <thead><tr><th>Nombre</th><th>Gpo</th><th>Nivel</th><th>Puntos</th><th>Aciertos</th><th>Acciones</th></tr></thead>
-                    <tbody id="studentsTable"></tbody>
+                <table id="tablaAlumnos">
+                    <thead><tr><th>Nombre</th><th>Gpo</th><th>Nivel</th><th>Pts</th><th>Acción</th></tr></thead>
+                    <tbody id="cuerpoTabla"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div id="statsModal" class="app-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; max-width: 100%;">
-        <div class="card" style="width: 90%; max-width: 600px; margin: 50px auto; overflow-y: auto; max-height: 90vh;" id="reportContent">
-            <h3>Reporte</h3>
-            <canvas id="groupChart"></canvas>
-            <div id="individualStatsArea" style="display: none; margin-top: 20px;"><h4 id="individualName"></h4><canvas id="individualChart"></canvas></div>
-            <button onclick="document.getElementById('statsModal').style.display='none'" class="btn btn-secondary" style="margin-top:15px">Cerrar</button>
-        </div>
-    </div>
+    <script>
+        // 1. CONFIGURACION DE FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s",
+            authDomain: "ingles-pepejoeck.firebaseapp.com",
+            databaseURL: "https://ingles-pepejoeck-default-rtdb.firebaseio.com",
+            projectId: "ingles-pepejoeck",
+            storageBucket: "ingles-pepejoeck.firebasestorage.app",
+            messagingSenderId: "519995763844",
+            appId: "1:519995763844:web:350df130a6673b4002a6d1",
+            measurementId: "G-5MEQGW13ZE"
+        };
+        
+        // Inicializar Firebase (MODO COMPAT)
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-    <script type="module" src="app.js"></script>
+        // 2. VARIABLES
+        let usuarioActual = null;
+        let datosUsuario = {};
+        let nivelActual = 1;
+        let preguntaActual = null;
+        let contadorPreguntas = 0;
+        let aciertosSesion = 0;
+        
+        const preguntasDB = {
+            1: [{q:"Hola",a:"hello"}, {q:"Adiós",a:"goodbye"}, {q:"Gracias",a:"thank you"}, {q:"Por favor",a:"please"}, {q:"Rojo",a:"red"}],
+            2: [{q:"Gato",a:"cat"}, {q:"Perro",a:"dog"}, {q:"Azul",a:"blue"}, {q:"Uno",a:"one"}, {q:"Dos",a:"two"}],
+            3: [{q:"Lunes",a:"monday"}, {q:"Martes",a:"tuesday"}, {q:"Sol",a:"sun"}, {q:"Luna",a:"moon"}, {q:"Agua",a:"water"}]
+        };
+
+        // 3. DETECTOR DE SESION
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log("Usuario detectado:", user.email);
+                usuarioActual = user.uid;
+                // Cargar datos
+                db.collection("students").doc(user.uid).get().then((doc) => {
+                    if (doc.exists) {
+                        datosUsuario = doc.data();
+                        mostrarJuego();
+                    }
+                });
+            } else {
+                console.log("Sin sesión");
+                usuarioActual = null;
+                // Solo mostrar login si no estamos en panel maestro
+                if(document.getElementById("teacherPanel").style.display === "none") {
+                    mostrarLogin();
+                }
+            }
+        });
+
+        // 4. FUNCIONES DE INTERFAZ
+        function mostrarLogin() {
+            document.getElementById("loginCard").style.display = "block";
+            document.getElementById("mainContent").style.display = "none";
+            document.getElementById("teacherPanel").style.display = "none";
+            document.getElementById("teacherLogin").style.display = "none";
+        }
+
+        function mostrarJuego() {
+            document.getElementById("loginCard").style.display = "none";
+            document.getElementById("teacherLogin").style.display = "none";
+            document.getElementById("mainContent").style.display = "block";
+            
+            // Actualizar UI
+            document.getElementById("userDisplay").textContent = "Alumno: " + (datosUsuario.username || "Héroe");
+            document.getElementById("scoreText").textContent = "Puntos: " + (datosUsuario.score || 0);
+            actualizarCandados();
+            cargarPregunta();
+        }
+
+        function mostrarLoginMaestro() {
+            document.getElementById("loginCard").style.display = "none";
+            document.getElementById("teacherLogin").style.display = "block";
+        }
+
+        function volverInicio() {
+            document.getElementById("teacherLogin").style.display = "none";
+            document.getElementById("teacherPanel").style.display = "none";
+            document.getElementById("loginCard").style.display = "block";
+        }
+
+        // 5. LOGICA ALUMNO (LOGIN Y REGISTRO MEZCLADOS INTELIGENTEMENTE)
+        function intentarLogin() {
+            const email = document.getElementById("emailInput").value.trim();
+            const pass = document.getElementById("passwordInput").value.trim();
+            const nombre = document.getElementById("usernameInput").value.trim();
+            const grado = document.getElementById("gradeInput").value.trim();
+            const grupo = document.getElementById("groupInput").value.trim().toUpperCase();
+
+            if(!email || !pass) { Swal.fire("Error", "Falta correo o contraseña", "error"); return; }
+
+            // Intentar loguear
+            auth.signInWithEmailAndPassword(email, pass)
+                .catch((error) => {
+                    // Si falla, verificar si es usuario no encontrado para registrarlo
+                    if(error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                        // Si intenta registrarse, validar campos extra
+                        if(!nombre || !grado || !grupo) {
+                            Swal.fire("Usuario Nuevo", "El correo no existe. Para crear cuenta llena Nombre, Grado y Grupo.", "info");
+                            return;
+                        }
+                        // Crear cuenta
+                        auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
+                            // Guardar en Firestore
+                            db.collection("students").doc(cred.user.uid).set({
+                                uid: cred.user.uid,
+                                username: nombre, grade: grado, group: grupo, email: email, password: pass,
+                                score: 0, unlockedLevels: [1], totalCorrect: 0
+                            }).then(() => {
+                                Swal.fire("¡Creado!", "Bienvenido al juego", "success");
+                            });
+                        }).catch(e => Swal.fire("Error Registro", e.message, "error"));
+                    } else {
+                        Swal.fire("Error", error.message, "error");
+                    }
+                });
+        }
+
+        function cerrarSesion() {
+            auth.signOut().then(() => location.reload());
+        }
+
+        // 6. LOGICA DE JUEGO
+        function cargarPregunta() {
+            const pool = preguntasDB[nivelActual];
+            preguntaActual = pool[Math.floor(Math.random() * pool.length)];
+            document.getElementById("questionText").textContent = "Traduce: " + preguntaActual.q;
+            document.getElementById("feedback").textContent = "";
+            document.getElementById("answerInput").value = "";
+            document.getElementById("answerInput").focus();
+        }
+
+        function verificarRespuesta() {
+            const resp = document.getElementById("answerInput").value.trim().toLowerCase();
+            if(!resp) return;
+            
+            contadorPreguntas++;
+            const feed = document.getElementById("feedback");
+
+            if(resp === preguntaActual.a) {
+                feed.textContent = "¡Correcto! 🔥"; feed.style.color = "green";
+                datosUsuario.score = (datosUsuario.score || 0) + 10;
+                datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1;
+                aciertosSesion++;
+                // Guardar progreso rápido
+                db.collection("students").doc(usuarioActual).update({
+                    score: datosUsuario.score,
+                    totalCorrect: datosUsuario.totalCorrect
+                });
+            } else {
+                feed.textContent = "Incorrecto. Era: " + preguntaActual.a; feed.style.color = "red";
+            }
+
+            // Actualizar Puntos UI
+            document.getElementById("scoreText").textContent = "Puntos: " + datosUsuario.score;
+            document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100) + "%";
+
+            if(contadorPreguntas >= 5) {
+                setTimeout(finSesion, 1000);
+            } else {
+                setTimeout(cargarPregunta, 1500);
+            }
+        }
+
+        function finSesion() {
+            let msg = "Bien hecho";
+            if(aciertosSesion >= 4) {
+                msg = "¡Nivel Superado!";
+                const next = nivelActual + 1;
+                if(!datosUsuario.unlockedLevels.includes(next) && next <= 3) {
+                    datosUsuario.unlockedLevels.push(next);
+                    db.collection("students").doc(usuarioActual).update({ unlockedLevels: datosUsuario.unlockedLevels });
+                    Swal.fire("¡Desbloqueado!", "Nivel " + next + " abierto", "success");
+                }
+            } else {
+                msg = "Sigue practicando";
+            }
+            
+            actualizarCandados();
+            Swal.fire("Fin de ronda", msg + ". Aciertos: " + aciertosSesion + "/5", "info").then(() => {
+                contadorPreguntas = 0; aciertosSesion = 0;
+                document.getElementById("lessonProgressBar").style.width = "0%";
+                cargarPregunta();
+            });
+        }
+
+        function actualizarCandados() {
+            if(datosUsuario.unlockedLevels.includes(2)) {
+                document.getElementById("navL2").classList.remove("locked");
+                document.getElementById("navL2").textContent = "Nivel 2 🔓";
+            }
+            if(datosUsuario.unlockedLevels.includes(3)) {
+                document.getElementById("navL3").classList.remove("locked");
+                document.getElementById("navL3").textContent = "Nivel 3 🔓";
+            }
+        }
+
+        function cambiarNivel(n) {
+            if(datosUsuario.unlockedLevels.includes(n)) {
+                nivelActual = n;
+                document.getElementById("levelText").textContent = "Nivel " + n;
+                contadorPreguntas = 0;
+                cargarPregunta();
+                // UI Nav
+                document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+                event.target.classList.add("active");
+            } else {
+                Swal.fire("Bloqueado", "Supera el nivel anterior primero", "warning");
+            }
+        }
+
+        // 7. LOGICA MAESTRO
+        function loginMaestro() {
+            const u = document.getElementById("teacherUserImput").value.trim();
+            const p = document.getElementById("teacherPassInput").value.trim();
+            
+            if(u === "Jose de Jesus Ramos Flores" && p === "161286") {
+                document.getElementById("teacherLogin").style.display = "none";
+                document.getElementById("teacherPanel").style.display = "block";
+                cargarTablaAlumnos();
+            } else {
+                Swal.fire("Error", "Datos incorrectos", "error");
+            }
+        }
+
+        function cerrarSesionMaestro() {
+            document.getElementById("teacherPanel").style.display = "none";
+            document.getElementById("loginCard").style.display = "block";
+        }
+
+        function cargarTablaAlumnos() {
+            const tbody = document.getElementById("cuerpoTabla");
+            tbody.innerHTML = "<tr><td colspan='5'>Cargando datos...</td></tr>";
+            
+            let totalAciertos = 0;
+
+            db.collection("students").get().then((querySnapshot) => {
+                tbody.innerHTML = "";
+                const alumnos = [];
+                querySnapshot.forEach((doc) => {
+                    let d = doc.data();
+                    d.uid = doc.id;
+                    alumnos.push(d);
+                    totalAciertos += (d.totalCorrect || 0);
+                });
+                
+                document.getElementById("totalAciertos").textContent = totalAciertos;
+
+                // Ordenar por puntos
+                alumnos.sort((a,b) => (b.score||0) - (a.score||0));
+
+                alumnos.forEach(alum => {
+                    const tr = document.createElement("tr");
+                    const nivelMax = Math.max(...(alum.unlockedLevels || [1]));
+                    tr.innerHTML = `
+                        <td>${alum.username}</td>
+                        <td>${alum.group}</td>
+                        <td>${nivelMax}</td>
+                        <td style="color:blue; font-weight:bold">${alum.score}</td>
+                        <td><button onclick="borrarAlumno('${alum.uid}')" class="btn-delete action-btn">🗑️</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        function borrarAlumno(id) {
+            if(confirm("¿Eliminar alumno permanentemente?")) {
+                db.collection("students").doc(id).delete().then(() => cargarTablaAlumnos());
+            }
+        }
+
+        function resetearTodo() {
+            const codigo = prompt("Escribe BORRAR para reiniciar a todos a cero:");
+            if(codigo === "BORRAR") {
+                db.collection("students").get().then(snapshot => {
+                    snapshot.forEach(doc => {
+                        doc.ref.update({score:0, unlockedLevels:[1], totalCorrect:0});
+                    });
+                    alert("Escuela Reiniciada");
+                    cargarTablaAlumnos();
+                });
+            }
+        }
+
+        // Permitir tecla Enter en respuesta
+        document.getElementById("answerInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") verificarRespuesta();
+        });
+
+    </script>
 </body>
 </html>
