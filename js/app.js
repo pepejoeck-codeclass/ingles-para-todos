@@ -54,7 +54,6 @@ const questionsDB = {
 document.addEventListener("DOMContentLoaded", () => {
     
     // --- SONIDOS ---
-    // Asegúrate de que la carpeta "assets/sounds/" exista en tu proyecto
     const soundCorrect = new Audio("assets/sounds/correct.mp3");
     const soundError = new Audio("assets/sounds/wrong.mp3");
     const soundLevelUp = new Audio("assets/sounds/levelup.mp3"); 
@@ -138,80 +137,84 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    loginBtn.addEventListener("click", async () => {
-        const email = emailInput.value.trim();
-        const password = passwordInput.value.trim();
-        const name = usernameInput.value.trim();
-        const grade = gradeInput.value.trim();
-        const group = groupInput.value.trim().toUpperCase();
+    if(loginBtn) {
+        loginBtn.addEventListener("click", async () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            const name = usernameInput.value.trim();
+            const grade = gradeInput.value.trim();
+            const group = groupInput.value.trim().toUpperCase();
 
-        if (!email || !password || password.length < 6) {
-            Swal.fire("Error", "Ingresa correo y contraseña (min 6 caracteres).", "warning");
-            return;
-        }
-
-        loginBtn.disabled = true;
-        loginBtn.textContent = "🚀 Verificando...";
-
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            // Si el usuario no existe o hay error, intentamos registrarlo si llenó los datos
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-                if (!name || !grade || !group) {
-                    Swal.fire("Usuario Nuevo", "Para crear tu cuenta, llena Nombre, Grado y Grupo arriba.", "info");
-                    loginBtn.disabled = false;
-                    loginBtn.textContent = "🚀 DESPEGAR";
-                    return;
-                }
-                try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    
-                    // Crear documento inicial en Firestore
-                    await setDoc(doc(db, "students", user.uid), {
-                        uid: user.uid,
-                        username: name, grade: grade, group: group, email: email,
-                        password: password, // Nota: Guardar pass en texto plano no es ideal, pero funcional para este uso escolar
-                        score: 0, level: 1, stars: 0, timeWorked: 0,
-                        totalCorrect: 0,
-                        totalWrong: 0,
-                        medals: { gold: 0, silver: 0, bronze: 0 },
-                        history: [],
-                        unlockedLevels: [1],
-                        lastLogin: new Date().toISOString()
-                    });
-                    Swal.fire("¡Bienvenido!", "Cuenta creada exitosamente.", "success");
-                } catch (regError) { 
-                    Swal.fire("Error Registro", regError.message, "error"); 
-                }
-            } else { 
-                Swal.fire("Error Acceso", error.message, "error"); 
+            if (!email || !password || password.length < 6) {
+                Swal.fire("Error", "Ingresa correo y contraseña (min 6 caracteres).", "warning");
+                return;
             }
-        }
-        loginBtn.disabled = false;
-        loginBtn.textContent = "🚀 DESPEGAR";
-    });
 
-    forgotPasswordLink.addEventListener("click", async (e) => {
-        e.preventDefault();
-        const { value: email } = await Swal.fire({
-            title: 'Recuperar Contraseña',
-            input: 'email',
-            inputLabel: 'Escribe tu correo registrado',
-            showCancelButton: true
+            loginBtn.disabled = true;
+            loginBtn.textContent = "🚀 Verificando...";
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                // Si el usuario no existe o hay error, intentamos registrarlo si llenó los datos
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+                    if (!name || !grade || !group) {
+                        Swal.fire("Usuario Nuevo", "Para crear tu cuenta, llena Nombre, Grado y Grupo arriba.", "info");
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = "🚀 DESPEGAR";
+                        return;
+                    }
+                    try {
+                        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                        const user = userCredential.user;
+                        
+                        // Crear documento inicial en Firestore
+                        await setDoc(doc(db, "students", user.uid), {
+                            uid: user.uid,
+                            username: name, grade: grade, group: group, email: email,
+                            password: password, 
+                            score: 0, level: 1, stars: 0, timeWorked: 0,
+                            totalCorrect: 0,
+                            totalWrong: 0,
+                            medals: { gold: 0, silver: 0, bronze: 0 },
+                            history: [],
+                            unlockedLevels: [1],
+                            lastLogin: new Date().toISOString()
+                        });
+                        Swal.fire("¡Bienvenido!", "Cuenta creada exitosamente.", "success");
+                    } catch (regError) { 
+                        Swal.fire("Error Registro", regError.message, "error"); 
+                    }
+                } else { 
+                    Swal.fire("Error Acceso", error.message, "error"); 
+                }
+            }
+            loginBtn.disabled = false;
+            loginBtn.textContent = "🚀 DESPEGAR";
         });
+    }
 
-        if (email) {
-            const q = query(collection(db, "students"), where("email", "==", email));
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                const userData = querySnapshot.docs[0].data();
-                if(userData.password) Swal.fire(`Hola ${userData.username}`, `Tu contraseña es: <b>${userData.password}</b>`, 'info');
-                else Swal.fire('Atención', 'Usuario antiguo. Pide al maestro restablecer.', 'warning');
-            } else { Swal.fire('Error', 'Correo no encontrado.', 'error'); }
-        }
-    });
+    if(forgotPasswordLink) {
+        forgotPasswordLink.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const { value: email } = await Swal.fire({
+                title: 'Recuperar Contraseña',
+                input: 'email',
+                inputLabel: 'Escribe tu correo registrado',
+                showCancelButton: true
+            });
+
+            if (email) {
+                const q = query(collection(db, "students"), where("email", "==", email));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    const userData = querySnapshot.docs[0].data();
+                    if(userData.password) Swal.fire(`Hola ${userData.username}`, `Tu contraseña es: <b>${userData.password}</b>`, 'info');
+                    else Swal.fire('Atención', 'Usuario antiguo. Pide al maestro restablecer.', 'warning');
+                } else { Swal.fire('Error', 'Correo no encontrado.', 'error'); }
+            }
+        });
+    }
 
     // ==========================================
     // 2. LÓGICA DEL JUEGO Y DATOS
@@ -281,48 +284,52 @@ document.addEventListener("DOMContentLoaded", () => {
         answerInput.focus();
     }
 
-    startBtn.addEventListener("click", startQuestion);
+    if(startBtn) startBtn.addEventListener("click", startQuestion);
 
-    checkBtn.addEventListener("click", async () => {
-        if (!currentQuestion) return;
-        const userAns = answerInput.value.trim().toLowerCase();
-        questionsInSession++;
-        
-        if (userAns === currentQuestion.a) {
-            feedback.textContent = "🔥 ¡Correcto!";
-            feedback.style.color = "#28a745";
-            soundCorrect.play().catch(()=>{});
+    if(checkBtn) {
+        checkBtn.addEventListener("click", async () => {
+            if (!currentQuestion) return;
+            const userAns = answerInput.value.trim().toLowerCase();
+            questionsInSession++;
             
-            currentUserData.score += 10;
-            currentUserData.totalCorrect = (currentUserData.totalCorrect || 0) + 1;
-            correctInSession++;
-        } else {
-            feedback.textContent = `❌ Era: ${currentQuestion.a}`;
-            feedback.style.color = "#dc3545";
-            soundError.play().catch(()=>{});
-            
-            currentUserData.totalWrong = (currentUserData.totalWrong || 0) + 1;
-        }
+            if (userAns === currentQuestion.a) {
+                feedback.textContent = "🔥 ¡Correcto!";
+                feedback.style.color = "#28a745";
+                soundCorrect.play().catch(()=>{});
+                
+                currentUserData.score += 10;
+                currentUserData.totalCorrect = (currentUserData.totalCorrect || 0) + 1;
+                correctInSession++;
+            } else {
+                feedback.textContent = `❌ Era: ${currentQuestion.a}`;
+                feedback.style.color = "#dc3545";
+                soundError.play().catch(()=>{});
+                
+                currentUserData.totalWrong = (currentUserData.totalWrong || 0) + 1;
+            }
 
-        updateProgressBar();
-        updateDisplay();
+            updateProgressBar();
+            updateDisplay();
 
-        if (questionsInSession >= SESSION_LENGTH) {
-            await finishSession();
-        } else {
-            // Pequeña pausa antes de la siguiente pregunta
-            setTimeout(startQuestion, 1500);
-        }
-        await saveProgress(); 
-    });
+            if (questionsInSession >= SESSION_LENGTH) {
+                await finishSession();
+            } else {
+                // Pequeña pausa antes de la siguiente pregunta
+                setTimeout(startQuestion, 1500);
+            }
+            await saveProgress(); 
+        });
+    }
 
     // Permitir enviar respuesta con Enter
-    answerInput.addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            checkBtn.click();
-        }
-    });
+    if(answerInput) {
+        answerInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                checkBtn.click();
+            }
+        });
+    }
 
     function updateProgressBar() {
         const pct = (questionsInSession / SESSION_LENGTH) * 100;
@@ -389,7 +396,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function updateLevelLocks() {
         if(!currentUserData.unlockedLevels) return;
-        // Asumiendo que tienes elementos en HTML con id="navL2", "navL3"
         [2, 3].forEach(lvl => {
             const el = document.getElementById(`navL${lvl}`);
             if(el) {
@@ -421,21 +427,25 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3. PANEL DE MAESTRO (ADMINISTRACIÓN)
     // ==========================================
 
-    teacherLoginBtn.addEventListener("click", () => {
-        if (teacherUser.value === TEACHER_USER && teacherPass.value === TEACHER_PASS) {
-            teacherLogin.style.display = "none";
-            teacherPanel.style.display = "block";
-            loadTeacherPanel();
-        } else { Swal.fire("Error", "Credenciales Incorrectas", "error"); }
-    });
+    if(teacherLoginBtn) {
+        teacherLoginBtn.addEventListener("click", () => {
+            if (teacherUser.value === TEACHER_USER && teacherPass.value === TEACHER_PASS) {
+                teacherLogin.style.display = "none";
+                teacherPanel.style.display = "block";
+                loadTeacherPanel();
+            } else { Swal.fire("Error", "Credenciales Incorrectas", "error"); }
+        });
+    }
 
-    teacherLogoutBtn.addEventListener("click", () => {
-        teacherPanel.style.display = "none";
-        teacherUser.value = "";
-        teacherPass.value = "";
-        loginCard.style.display = "block";
-        Swal.fire("Sesión Cerrada", "Modo maestro finalizado", "info");
-    });
+    if(teacherLogoutBtn) {
+        teacherLogoutBtn.addEventListener("click", () => {
+            teacherPanel.style.display = "none";
+            teacherUser.value = "";
+            teacherPass.value = "";
+            loginCard.style.display = "block";
+            Swal.fire("Sesión Cerrada", "Modo maestro finalizado", "info");
+        });
+    }
 
     // --- Funciones Globales para Botones en Tabla ---
     window.changeGroup = async (uid) => {
@@ -557,40 +567,44 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
 
     // Exportar a Excel
-    exportExcelBtn.addEventListener("click", () => {
-        if(!window.allStudentsData || window.allStudentsData.length === 0) {
-            Swal.fire("Vacío", "No hay datos para exportar", "warning");
-            return;
-        }
-        
-        const dataForExcel = window.allStudentsData.map(s => ({
-            Nombre: s.username,
-            Grupo: s.group,
-            Correo: s.email,
-            Contraseña: s.password || "Oculta",
-            Puntos: s.score,
-            Nivel_Juego: Math.max(...(s.unlockedLevels || [1])),
-            Tiempo_Minutos: ((s.timeWorked||0)/60).toFixed(2),
-            Total_Correctas: s.totalCorrect || 0,
-            Total_Incorrectas: s.totalWrong || 0,
-            Medallas_Oro: (s.medals?.gold || 0),
-            Medallas_Plata: (s.medals?.silver || 0),
-            Medallas_Bronce: (s.medals?.bronze || 0)
-        }));
+    if(exportExcelBtn) {
+        exportExcelBtn.addEventListener("click", () => {
+            if(!window.allStudentsData || window.allStudentsData.length === 0) {
+                Swal.fire("Vacío", "No hay datos para exportar", "warning");
+                return;
+            }
+            
+            const dataForExcel = window.allStudentsData.map(s => ({
+                Nombre: s.username,
+                Grupo: s.group,
+                Correo: s.email,
+                Contraseña: s.password || "Oculta",
+                Puntos: s.score,
+                Nivel_Juego: Math.max(...(s.unlockedLevels || [1])),
+                Tiempo_Minutos: ((s.timeWorked||0)/60).toFixed(2),
+                Total_Correctas: s.totalCorrect || 0,
+                Total_Incorrectas: s.totalWrong || 0,
+                Medallas_Oro: (s.medals?.gold || 0),
+                Medallas_Plata: (s.medals?.silver || 0),
+                Medallas_Bronce: (s.medals?.bronze || 0)
+            }));
 
-        const ws = XLSX.utils.json_to_sheet(dataForExcel);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Reporte Alumnos");
-        XLSX.writeFile(wb, "Reporte_Escuela_Ingles.xlsx");
-    });
+            const ws = XLSX.utils.json_to_sheet(dataForExcel);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Reporte Alumnos");
+            XLSX.writeFile(wb, "Reporte_Escuela_Ingles.xlsx");
+        });
+    }
 
-    viewStatsBtn.addEventListener("click", () => {
-        const modal = document.getElementById("statsModal");
-        if(modal) modal.style.display = "block";
-        const indArea = document.getElementById("individualStatsArea");
-        if(indArea) indArea.style.display = "none"; // Ocultar individual al abrir general
-        setTimeout(renderCharts, 200);
-    });
+    if(viewStatsBtn) {
+        viewStatsBtn.addEventListener("click", () => {
+            const modal = document.getElementById("statsModal");
+            if(modal) modal.style.display = "block";
+            const indArea = document.getElementById("individualStatsArea");
+            if(indArea) indArea.style.display = "none"; // Ocultar individual al abrir general
+            setTimeout(renderCharts, 200);
+        });
+    }
 
     // Cerrar modales (clic fuera del modal)
     window.onclick = function(event) {
@@ -631,68 +645,80 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    downloadPdfBtn.addEventListener("click", () => {
-        const element = document.getElementById('reportContent');
-        const opt = { 
-            margin: 10, 
-            filename: 'Reporte_Grafico.pdf', 
-            image: { type: 'jpeg', quality: 0.98 }, 
-            html2canvas: { scale: 2 }, 
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-        };
-        html2pdf().set(opt).from(element).save();
-    });
+    if(downloadPdfBtn) {
+        downloadPdfBtn.addEventListener("click", () => {
+            const element = document.getElementById('reportContent');
+            const opt = { 
+                margin: 10, 
+                filename: 'Reporte_Grafico.pdf', 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2 }, 
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+            };
+            html2pdf().set(opt).from(element).save();
+        });
+    }
 
-    refreshTeacherBtn.addEventListener("click", loadTeacherPanel);
-    groupSelect.addEventListener("change", loadTeacherPanel);
+    if(refreshTeacherBtn) refreshTeacherBtn.addEventListener("click", loadTeacherPanel);
+    if(groupSelect) groupSelect.addEventListener("change", loadTeacherPanel);
 
-    resetMonthlyBtn.addEventListener("click", async () => {
-        const confirmCode = prompt("Escribe 'BORRAR' para reiniciar a TODOS los alumnos a cero:");
-        if (confirmCode === "BORRAR") {
-            const querySnapshot = await getDocs(collection(db, "students"));
-            const batch = writeBatch(db);
-            querySnapshot.forEach((documento) => {
-                const ref = doc(db, "students", documento.id);
-                batch.update(ref, { 
-                    score: 0, stars: 0, level: 1, timeWorked: 0, 
-                    totalCorrect: 0, totalWrong: 0,
-                    medals: {gold:0, silver:0, bronze:0}, 
-                    unlockedLevels: [1], history: [] 
+    if(resetMonthlyBtn) {
+        resetMonthlyBtn.addEventListener("click", async () => {
+            const confirmCode = prompt("Escribe 'BORRAR' para reiniciar a TODOS los alumnos a cero:");
+            if (confirmCode === "BORRAR") {
+                const querySnapshot = await getDocs(collection(db, "students"));
+                const batch = writeBatch(db);
+                querySnapshot.forEach((documento) => {
+                    const ref = doc(db, "students", documento.id);
+                    batch.update(ref, { 
+                        score: 0, stars: 0, level: 1, timeWorked: 0, 
+                        totalCorrect: 0, totalWrong: 0,
+                        medals: {gold:0, silver:0, bronze:0}, 
+                        unlockedLevels: [1], history: [] 
+                    });
                 });
-            });
-            await batch.commit();
-            Swal.fire("Reiniciado", "Escuela reiniciada.", "success");
-            loadTeacherPanel();
-        }
-    });
+                await batch.commit();
+                Swal.fire("Reiniciado", "Escuela reiniciada.", "success");
+                loadTeacherPanel();
+            }
+        });
+    }
 
     // ==========================================
     // 5. UTILIDADES DE INTERFAZ (UI)
     // ==========================================
 
-    logoutBtn.addEventListener("click", () => {
-        saveProgress(); stopTimer();
-        signOut(auth).then(() => { location.reload(); });
-    });
+    if(logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            saveProgress(); stopTimer();
+            signOut(auth).then(() => { location.reload(); });
+        });
+    }
 
-    openTeacherBtn.addEventListener("click", () => { 
-        loginCard.style.display = "none"; 
-        teacherLogin.style.display = "block"; 
-    });
+    if(openTeacherBtn) {
+        openTeacherBtn.addEventListener("click", () => { 
+            loginCard.style.display = "none"; 
+            teacherLogin.style.display = "block"; 
+        });
+    }
 
-    closeTeacherPanel.addEventListener("click", () => { 
-        teacherPanel.style.display = "none"; 
-        loginCard.style.display = "block"; 
-    });
+    if(closeTeacherPanel) {
+        closeTeacherPanel.addEventListener("click", () => { 
+            teacherPanel.style.display = "none"; 
+            loginCard.style.display = "block"; 
+        });
+    }
     
-    closeTeacherLogin.addEventListener("click", () => { 
-        teacherLogin.style.display = "none"; 
-        loginCard.style.display = "block"; 
-    });
+    if(closeTeacherLogin) {
+        closeTeacherLogin.addEventListener("click", () => { 
+            teacherLogin.style.display = "none"; 
+            loginCard.style.display = "block"; 
+        });
+    }
     
     function showStudentInterface() {
         loginCard.style.display = "none";
-        mainContent.style.display = "block";
+        mainContent.style.display = "flex"; // Ajuste para flexbox
         logoutBtn.style.display = "inline-block";
         startTimer();
         startQuestion();
