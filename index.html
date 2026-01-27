@@ -7,6 +7,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -52,6 +53,7 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* IMÁGENES */
         .logo-img {
             width: 100%;
             max-width: 300px;
@@ -115,6 +117,7 @@
         .btn-danger:active { transform: translateY(4px); box-shadow: none; }
         .btn-secondary { background: #6c757d; }
 
+        /* JUEGO */
         .level-badge {
             background: var(--gold);
             color: #000;
@@ -152,6 +155,7 @@
             border-left: 5px solid var(--primary);
         }
 
+        /* NAVEGACIÓN */
         .bottom-nav {
             display: flex;
             justify-content: space-around;
@@ -166,7 +170,7 @@
         .nav-item i { font-size: 20px; display: block; margin-bottom: 3px; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
 
-        /* TEACHER PANEL */
+        /* PANEL MAESTRO */
         .teacher-panel-container {
             width: 95%;
             max-width: 1000px;
@@ -203,7 +207,7 @@
 
     <div id="loginCard" class="app-container">
         <div class="card">
-            <img src="assets/images/logo_main.png" alt="Inglés Para Todos" class="logo-img" onerror="this.style.display='none'">
+            <img src="assets/images/logo_main.png.jpg" alt="Inglés Para Todos" class="logo-img" onerror="this.style.display='none'; alert('Error cargando imagen. Verifica que el archivo assets/images/logo_main.png.jpg existe en GitHub')">
             
             <h2>Identidad Secreta</h2>
             
@@ -211,7 +215,7 @@
             <input type="password" id="passwordInput" placeholder="Contraseña Secreta">
             
             <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
-            <p style="font-size: 12px; color: #666; margin-bottom: 5px;">* ¿Nuevo? Llena esto para registrarte:</p>
+            <p style="font-size: 12px; color: #666; margin-bottom: 5px;">* ¿Nuevo? Llena también esto:</p>
             
             <input type="text" id="usernameInput" placeholder="Tu Nombre Real">
             <div style="display: flex; gap: 10px;">
@@ -229,17 +233,17 @@
 
         <div style="text-align: center; margin-top: 20px;">
             <p style="color: white; font-size: 14px; margin-bottom: 5px;">¿Eres el Maestro?</p>
-            <img src="assets/images/super_teacher_btn.jpg" id="openTeacherBtn" class="teacher-badge-img" alt="Acceso Maestro" onerror="this.style.display='none'">
+            <img src="assets/images/super_teacher_btn.jpg.jpg" id="openTeacherBtn" class="teacher-badge-img" alt="Acceso Maestro" onerror="this.style.display='none'">
         </div>
     </div>
 
     <div id="teacherLogin" class="app-container" style="display: none;">
         <div class="card">
-            <img src="assets/images/teacher_header.jpg" class="teacher-header-img" alt="Teaching is Super" onerror="this.style.display='none'">
+            <img src="assets/images/teacher_header.jpg.jpg" class="teacher-header-img" alt="Teaching is Super" onerror="this.style.display='none'">
             
             <h2>Acceso Restringido</h2>
-            <input type="text" id="teacherUser" placeholder="Usuario Maestro">
-            <input type="password" id="teacherPass" placeholder="Contraseña Maestra">
+            <input type="text" id="teacherUserInputHTML" placeholder="Usuario Maestro">
+            <input type="password" id="teacherPassInputHTML" placeholder="Contraseña Maestra">
             <button id="teacherLoginBtn" class="btn btn-primary">Entrar al Cuartel</button>
             <button id="closeTeacherLogin" class="btn btn-secondary" style="margin-top: 10px;">Cancelar</button>
         </div>
