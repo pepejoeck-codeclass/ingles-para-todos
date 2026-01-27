@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - VERSIÓN FINAL</title>
+    <title>Inglés Para Todos - PRO VERSION</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,10 +18,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --white: #ffffff; }
+        :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
-        .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; }
+        .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; position: relative; }
         .logo-img { width: 100%; max-width: 300px; margin-bottom: 10px; }
         .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; margin: 10px auto; display: block; object-fit: cover; }
         .teacher-header-img { width: 100%; max-height: 180px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 10px; }
@@ -35,15 +35,18 @@
         .nav-item { cursor: pointer; color: #aaa; font-size: 12px; text-align: center; }
         .nav-item.active { color: var(--primary); font-weight: bold; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
-        /* MAESTRO */
+        
+        /* ESTILOS TABLA MAESTRO */
         .teacher-panel-container { width: 95%; max-width: 1000px; display: none; padding-bottom: 50px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: center; }
         th { background: var(--primary); color: white; }
-        .action-btn { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; }
-        .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-reset { background: #ffc107; color: black; }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
-        .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        td { vertical-align: middle; }
+        .action-btn { padding: 5px 8px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 1px; font-size: 12px; }
+        .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } 
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+        .stat-card { background: white; padding: 10px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .timer-badge { background: #333; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 11px; display: inline-block; }
     </style>
 </head>
 <body>
@@ -89,8 +92,11 @@
     <div id="mainContent" class="app-container" style="display: none;">
         <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px;">
             <div style="text-align: left;">
-                <div id="userDisplay" style="font-weight: bold; color: var(--primary);">Alumno</div>
-                <div id="scoreText" style="font-size: 12px;">Puntos: 0</div>
+                <div id="userDisplay" style="font-weight: bold; color: var(--primary); font-size: 14px;">Alumno</div>
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <div id="scoreText" style="font-size: 12px; font-weight: bold;">Pts: 0</div>
+                    <div id="timerDisplay" class="timer-badge">🕓 0m 0s</div>
+                </div>
             </div>
             <button onclick="cerrarSesion()" class="btn-danger" style="width: auto; padding: 5px 15px; font-size: 12px; margin:0;">Salir</button>
         </div>
@@ -98,14 +104,14 @@
             <span id="levelText" style="background:#ffd700; padding:5px 10px; border-radius:10px; font-weight:bold;">Nivel 1</span>
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
             <div id="questionText" class="question-box">...</div>
-            <input type="text" id="answerInput" placeholder="Respuesta...">
-            <button onclick="verificarRespuesta()" class="btn">Comprobar</button>
+            <input type="text" id="answerInput" placeholder="Respuesta..." autocomplete="off">
+            <button onclick="verificarRespuesta()" class="btn">CHECK</button>
             <div id="feedback" style="margin-top: 15px; font-weight: bold; height: 20px;"></div>
         </div>
         <div class="bottom-nav">
             <div class="nav-item active" onclick="cambiarNivel(1)">Nivel 1</div>
-            <div class="nav-item locked" id="navL2" onclick="cambiarNivel(2)">Nivel 2 🔒</div>
-            <div class="nav-item locked" id="navL3" onclick="cambiarNivel(3)">Nivel 3 🔒</div>
+            <div class="nav-item locked" id="navL2" onclick="cambiarNivel(2)">🔐 Nivel 2</div>
+            <div class="nav-item locked" id="navL3" onclick="cambiarNivel(3)">🔐 Nivel 3</div>
         </div>
     </div>
 
@@ -117,14 +123,17 @@
             </div>
             <hr>
             <div class="dashboard-grid">
-                <div class="stat-card"><div class="stat-number" id="totalAciertos">0</div>Aciertos Totales</div>
+                <div class="stat-card"><div class="stat-number" id="totalAciertos">0</div>Aciertos</div>
+                <div class="stat-card" style="border: 2px solid gold"><div class="stat-number" id="totalOro">0</div>🥇</div>
+                <div class="stat-card" style="border: 2px solid silver"><div class="stat-number" id="totalPlata">0</div>🥈</div>
+                <div class="stat-card" style="border: 2px solid #CD7F32"><div class="stat-number" id="totalBronce">0</div>🥉</div>
             </div>
             <br>
             <button onclick="cargarTablaAlumnos()" class="action-btn btn-info">🔄 Actualizar</button>
-            <button onclick="resetearTodo()" class="action-btn btn-delete">⚠️ BORRAR TODO</button>
+            <button onclick="resetearTodo()" class="action-btn btn-delete">⚠️ RESET TOTAL</button>
             <div style="overflow-x: auto;">
                 <table id="tablaAlumnos">
-                    <thead><tr><th>Nombre</th><th>Gpo</th><th>Nivel</th><th>Pts</th><th>Acción</th></tr></thead>
+                    <thead><tr><th>Nombre</th><th>Gpo</th><th>Nivel</th><th>🕓 Tiempo</th><th>🥇</th><th>🥈</th><th>🥉</th><th>Acción</th></tr></thead>
                     <tbody id="cuerpoTabla"></tbody>
                 </table>
             </div>
@@ -148,17 +157,11 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // 2. SONIDOS - Definición Robusta con Rutas Relativas
-        // Nota: Asegúrate que en GitHub la carpeta sea assets/sounds (minúsculas)
+        // 2. SONIDOS (Rutas correctas)
         const audioCorrecto = new Audio('./assets/sounds/correct.mp3');
         const audioError = new Audio('./assets/sounds/wrong.mp3');
         const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
         
-        // Precargar audios
-        audioCorrecto.load();
-        audioError.load();
-        audioLevelUp.load();
-
         // 3. VARIABLES
         let usuarioActual = null;
         let datosUsuario = {};
@@ -166,6 +169,7 @@
         let preguntaActual = null;
         let contadorPreguntas = 0;
         let aciertosSesion = 0;
+        let timerInterval = null; // Para el cronómetro
         
         const preguntasDB = {
             1: [{q:"Hola",a:"hello"}, {q:"Adiós",a:"goodbye"}, {q:"Gracias",a:"thank you"}, {q:"Por favor",a:"please"}, {q:"Rojo",a:"red"}],
@@ -176,23 +180,55 @@
         // 4. DETECTOR SESIÓN
         auth.onAuthStateChanged((user) => {
             if (user) {
-                console.log("Sesión activa");
+                console.log("Sesión activa:", user.uid);
                 usuarioActual = user.uid;
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
+                        // Inicializar valores nuevos si no existen
+                        if(!datosUsuario.timeWorked) datosUsuario.timeWorked = 0;
+                        if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
                         mostrarJuego();
                     }
                 });
             } else {
                 usuarioActual = null;
+                detenerCronometro();
                 if(document.getElementById("teacherPanel").style.display === "none") {
                     mostrarLogin();
                 }
             }
         });
 
-        // 5. NAVEGACION
+        // 5. CRONÓMETRO
+        function iniciarCronometro() {
+            if(timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                datosUsuario.timeWorked = (datosUsuario.timeWorked || 0) + 1;
+                actualizarUI();
+                
+                // Guardado automático cada 10 segundos
+                if(datosUsuario.timeWorked % 10 === 0) {
+                    db.collection("students").doc(usuarioActual).update({timeWorked: datosUsuario.timeWorked});
+                }
+            }, 1000);
+        }
+
+        function detenerCronometro() {
+            if(timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function actualizarUI() {
+            // Formatear tiempo
+            const min = Math.floor((datosUsuario.timeWorked || 0) / 60);
+            const sec = (datosUsuario.timeWorked || 0) % 60;
+            document.getElementById("timerDisplay").textContent = `🕓 ${min}m ${sec}s`;
+            
+            document.getElementById("scoreText").textContent = "Pts: " + (datosUsuario.score || 0);
+        }
+
+        // 6. NAVEGACION
         function mostrarLogin() {
             document.getElementById("loginCard").style.display = "block";
             document.getElementById("mainContent").style.display = "none";
@@ -205,9 +241,10 @@
             document.getElementById("teacherLogin").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
             document.getElementById("userDisplay").textContent = "Alumno: " + (datosUsuario.username || "Héroe");
-            document.getElementById("scoreText").textContent = "Puntos: " + (datosUsuario.score || 0);
+            actualizarUI();
             actualizarCandados();
             cargarPregunta();
+            iniciarCronometro();
         }
 
         function mostrarLoginMaestro() {
@@ -221,7 +258,7 @@
             document.getElementById("loginCard").style.display = "block";
         }
 
-        // 6. LOGIN / REGISTRO ALUMNO
+        // 7. LOGIN / REGISTRO
         function intentarLogin() {
             const email = document.getElementById("emailInput").value.trim();
             const pass = document.getElementById("passwordInput").value.trim();
@@ -236,17 +273,18 @@
                     const errores = ['auth/user-not-found', 'auth/wrong-password', 'auth/invalid-login-credentials', 'auth/invalid-credential'];
                     if(errores.includes(error.code)) {
                         if(!nombre || !grado || !grupo) {
-                            Swal.fire({icon: 'warning', title: 'Aviso', text: 'Usuario no encontrado o contraseña mal. Si eres nuevo, llena Nombre, Grado y Grupo.'});
+                            Swal.fire({icon: 'warning', title: 'Acceso', text: 'Usuario no encontrado. Si eres nuevo, llena todos los campos.'});
                             return;
                         }
                         auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
                             db.collection("students").doc(cred.user.uid).set({
                                 uid: cred.user.uid,
                                 username: nombre, grade: grado, group: grupo, email: email, password: pass,
-                                score: 0, unlockedLevels: [1], totalCorrect: 0, medals: {gold:0, silver:0, bronze:0}
+                                score: 0, unlockedLevels: [1], totalCorrect: 0, 
+                                timeWorked: 0, medals: {gold:0, silver:0, bronze:0}
                             }).then(() => Swal.fire("¡Éxito!", "Cuenta creada", "success"));
                         }).catch(e => {
-                            if(e.code === 'auth/email-already-in-use') Swal.fire("Error", "Correo ya registrado", "error");
+                            if(e.code === 'auth/email-already-in-use') Swal.fire("Error", "Correo ocupado", "error");
                             else Swal.fire("Error", e.message, "error");
                         });
                     } else {
@@ -257,19 +295,22 @@
 
         async function recuperarPassword() {
             const { value: email } = await Swal.fire({
-                title: 'Recuperar', input: 'email', inputLabel: 'Tu correo registrado:',
-                showCancelButton: true, confirmButtonText: 'Enviar'
+                title: 'Recuperar', input: 'email', inputLabel: 'Tu correo:', showCancelButton: true
             });
             if (email) {
                 auth.sendPasswordResetEmail(email)
                     .then(() => Swal.fire('Enviado', 'Revisa tu correo.', 'success'))
-                    .catch(() => Swal.fire('Error', 'Correo no encontrado.', 'error'));
+                    .catch(() => Swal.fire('Error', 'No encontrado.', 'error'));
             }
         }
 
-        function cerrarSesion() { auth.signOut().then(() => location.reload()); }
+        function cerrarSesion() { 
+            db.collection("students").doc(usuarioActual).update({timeWorked: datosUsuario.timeWorked}).then(() => {
+                auth.signOut().then(() => location.reload());
+            });
+        }
 
-        // 7. JUEGO Y SONIDOS
+        // 8. JUEGO (LOGICA PRO)
         function cargarPregunta() {
             const pool = preguntasDB[nivelActual];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
@@ -287,59 +328,76 @@
             const feed = document.getElementById("feedback");
 
             if(resp === preguntaActual.a) {
-                // INTENTO DE REPRODUCIR AUDIO
-                // .play() devuelve una promesa. Si falla (ej. ruta mal), lo cachamos en catch.
-                audioCorrecto.currentTime = 0;
-                audioCorrecto.play().catch(e => console.error("Error Audio Correcto:", e));
-
-                feed.textContent = "¡Correcto! 🔥"; feed.style.color = "green";
+                audioCorrecto.currentTime = 0; audioCorrecto.play().catch(e=>{});
+                feed.textContent = "CORRECT! 🔥"; feed.style.color = "green";
                 datosUsuario.score = (datosUsuario.score || 0) + 10;
                 datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1;
                 aciertosSesion++;
                 db.collection("students").doc(usuarioActual).update({
-                    score: datosUsuario.score,
-                    totalCorrect: datosUsuario.totalCorrect
+                    score: datosUsuario.score, totalCorrect: datosUsuario.totalCorrect
                 });
             } else {
-                // INTENTO DE REPRODUCIR AUDIO
-                audioError.currentTime = 0;
-                audioError.play().catch(e => console.error("Error Audio Error:", e));
-
-                feed.textContent = "Incorrecto. Era: " + preguntaActual.a; feed.style.color = "red";
+                audioError.currentTime = 0; audioError.play().catch(e=>{});
+                feed.textContent = "WRONG. Answer: " + preguntaActual.a; feed.style.color = "red";
             }
 
-            document.getElementById("scoreText").textContent = "Puntos: " + datosUsuario.score;
+            actualizarUI();
             document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100) + "%";
 
             if(contadorPreguntas >= 5) {
-                setTimeout(finSesion, 1000);
+                setTimeout(finSesion, 1500);
             } else {
                 setTimeout(cargarPregunta, 1500);
             }
         }
 
         function finSesion() {
-            let msg = "Bien hecho";
-            if(aciertosSesion >= 4) {
-                // INTENTO DE REPRODUCIR AUDIO
-                audioLevelUp.currentTime = 0;
-                audioLevelUp.play().catch(e => console.error("Error Audio Nivel:", e));
+            let msg = "";
+            let medalEarned = "";
+            
+            // LÓGICA DE MEDALLAS Y DESBLOQUEO ESTRICTA
+            if(aciertosSesion === 5) {
+                // ORO: 100% CORRECTAS -> DESBLOQUEA
+                msg = "🏆 PERFECT! LEVEL UP! 🥇";
+                medalEarned = "gold";
+                datosUsuario.medals.gold++;
+                
+                audioLevelUp.currentTime = 0; audioLevelUp.play().catch(e=>{});
 
-                msg = "¡Nivel Superado!";
                 const next = nivelActual + 1;
                 if(!datosUsuario.unlockedLevels.includes(next) && next <= 3) {
                     datosUsuario.unlockedLevels.push(next);
-                    db.collection("students").doc(usuarioActual).update({ unlockedLevels: datosUsuario.unlockedLevels });
-                    Swal.fire("¡Desbloqueado!", "Nivel " + next + " abierto", "success");
+                    Swal.fire("LEVEL UP!", "Next level unlocked!", "success");
                 }
+            } else if (aciertosSesion === 4) {
+                // PLATA: 80% CORRECTAS -> GANA MEDALLA PERO NO AVANZA
+                msg = "🥈 Good job! But you need 100% to advance.";
+                medalEarned = "silver";
+                datosUsuario.medals.silver++;
             } else {
-                msg = "Sigue practicando";
+                // BRONCE: <80% -> GANA MEDALLA PERO NO AVANZA
+                msg = "🥉 Keep practicing. Try again.";
+                medalEarned = "bronze";
+                datosUsuario.medals.bronze++;
             }
+
+            // Guardar progreso (medallas y niveles)
+            db.collection("students").doc(usuarioActual).update({ 
+                unlockedLevels: datosUsuario.unlockedLevels,
+                medals: datosUsuario.medals
+            });
             
             actualizarCandados();
-            Swal.fire("Fin de ronda", msg + ". Aciertos: " + aciertosSesion + "/5", "info").then(() => {
+            
+            Swal.fire({
+                title: msg,
+                text: `Score: ${aciertosSesion}/5`,
+                icon: medalEarned === 'gold' ? 'success' : 'info',
+                confirmButtonText: 'CONTINUE'
+            }).then(() => {
                 contadorPreguntas = 0; aciertosSesion = 0;
                 document.getElementById("lessonProgressBar").style.width = "0%";
+                // SI NO FUE ORO, SE QUEDA EN EL MISMO NIVEL (REPETIR)
                 cargarPregunta();
             });
         }
@@ -347,11 +405,18 @@
         function actualizarCandados() {
             if(datosUsuario.unlockedLevels.includes(2)) {
                 document.getElementById("navL2").classList.remove("locked");
-                document.getElementById("navL2").textContent = "Nivel 2 🔓";
+                document.getElementById("navL2").innerHTML = "Nivel 2";
+            } else {
+                document.getElementById("navL2").classList.add("locked");
+                document.getElementById("navL2").innerHTML = "🔐 Nivel 2";
             }
+
             if(datosUsuario.unlockedLevels.includes(3)) {
                 document.getElementById("navL3").classList.remove("locked");
-                document.getElementById("navL3").textContent = "Nivel 3 🔓";
+                document.getElementById("navL3").innerHTML = "Nivel 3";
+            } else {
+                document.getElementById("navL3").classList.add("locked");
+                document.getElementById("navL3").innerHTML = "🔐 Nivel 3";
             }
         }
 
@@ -359,16 +424,17 @@
             if(datosUsuario.unlockedLevels.includes(n)) {
                 nivelActual = n;
                 document.getElementById("levelText").textContent = "Nivel " + n;
-                contadorPreguntas = 0;
+                contadorPreguntas = 0; aciertosSesion = 0;
+                document.getElementById("lessonProgressBar").style.width = "0%";
                 cargarPregunta();
                 document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
                 event.target.classList.add("active");
             } else {
-                Swal.fire("Bloqueado", "Supera el nivel anterior primero", "warning");
+                Swal.fire("LOCKED 🔐", "You need GOLD 🥇 in previous level.", "error");
             }
         }
 
-        // 8. LOGICA MAESTRO
+        // 9. LOGICA MAESTRO
         function loginMaestro() {
             const u = document.getElementById("teacherUserImput").value.trim();
             const p = document.getElementById("teacherPassInput").value.trim();
@@ -389,21 +455,60 @@
 
         function cargarTablaAlumnos() {
             const tbody = document.getElementById("cuerpoTabla");
-            tbody.innerHTML = "<tr><td colspan='5'>Cargando...</td></tr>";
-            let total = 0;
+            tbody.innerHTML = "<tr><td colspan='8'>Cargando datos...</td></tr>";
+            
+            let tOro=0, tPlata=0, tBronce=0, tAciertos=0;
+
             db.collection("students").get().then((querySnapshot) => {
                 tbody.innerHTML = "";
                 const alumnos = [];
                 querySnapshot.forEach((doc) => {
                     let d = doc.data(); d.uid = doc.id; alumnos.push(d);
-                    total += (d.totalCorrect || 0);
+                    
+                    // Sumar contadores globales
+                    tAciertos += (d.totalCorrect || 0);
+                    if(d.medals) {
+                        tOro += (d.medals.gold || 0);
+                        tPlata += (d.medals.silver || 0);
+                        tBronce += (d.medals.bronze || 0);
+                    }
                 });
-                document.getElementById("totalAciertos").textContent = total;
-                alumnos.sort((a,b) => (b.score||0) - (a.score||0));
+                
+                // Actualizar contadores dashboard
+                document.getElementById("totalAciertos").textContent = tAciertos;
+                document.getElementById("totalOro").textContent = tOro;
+                document.getElementById("totalPlata").textContent = tPlata;
+                document.getElementById("totalBronce").textContent = tBronce;
+
+                // Ordenar por Oro primero, luego Plata
+                alumnos.sort((a,b) => {
+                    let goldA = a.medals ? a.medals.gold : 0;
+                    let goldB = b.medals ? b.medals.gold : 0;
+                    return goldB - goldA;
+                });
+
                 alumnos.forEach(alum => {
                     const tr = document.createElement("tr");
                     const nm = Math.max(...(alum.unlockedLevels || [1]));
-                    tr.innerHTML = `<td>${alum.username}</td><td>${alum.group}</td><td>${nm}</td><td style="color:blue; font-weight:bold">${alum.score}</td><td><button onclick="borrarAlumno('${alum.uid}')" class="btn-delete action-btn">🗑️</button></td>`;
+                    
+                    // Calcular tiempo
+                    let min = Math.floor((alum.timeWorked || 0) / 60);
+                    let sec = (alum.timeWorked || 0) % 60;
+                    let timeStr = `${min}m ${sec}s`;
+
+                    let mGold = alum.medals ? alum.medals.gold : 0;
+                    let mSilver = alum.medals ? alum.medals.silver : 0;
+                    let mBronze = alum.medals ? alum.medals.bronze : 0;
+
+                    tr.innerHTML = `
+                        <td>${alum.username}</td>
+                        <td>${alum.group}</td>
+                        <td>${nm}</td>
+                        <td style="color:blue;">${timeStr}</td>
+                        <td style="color:#d4af37; font-weight:bold">${mGold}</td>
+                        <td style="color:#C0C0C0; font-weight:bold">${mSilver}</td>
+                        <td style="color:#CD7F32; font-weight:bold">${mBronze}</td>
+                        <td><button onclick="borrarAlumno('${alum.uid}')" class="btn-delete action-btn">🗑️</button></td>`;
                     tbody.appendChild(tr);
                 });
             });
@@ -419,7 +524,12 @@
             const codigo = prompt("Escribe BORRAR para reiniciar todo:");
             if(codigo === "BORRAR") {
                 db.collection("students").get().then(snapshot => {
-                    snapshot.forEach(doc => { doc.ref.update({score:0, unlockedLevels:[1], totalCorrect:0}); });
+                    snapshot.forEach(doc => { 
+                        doc.ref.update({
+                            score:0, unlockedLevels:[1], totalCorrect:0, 
+                            timeWorked:0, medals:{gold:0, silver:0, bronze:0}
+                        }); 
+                    });
                     alert("Reiniciado"); cargarTablaAlumnos();
                 });
             }
