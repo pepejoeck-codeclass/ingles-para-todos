@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, updateDoc, deleteDoc } 
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, updateDoc, deleteDoc, writeBatch } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
           closeTeacherPanel = document.getElementById("closeTeacherPanel"),
           refreshTeacherBtn = document.getElementById("refreshTeacher"),
           exportBtn = document.getElementById("exportBtn"),
+          resetMonthlyBtn = document.getElementById("resetMonthlyBtn"), // Referencia al nuevo botón
           startBtn = document.getElementById("startGame"),
           checkBtn = document.getElementById("checkAnswer"),
           themeToggle = document.getElementById("themeToggle"),
@@ -121,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
                     await setDoc(doc(db, "students", user.uid), {
-                        uid: user.uid, // Guardamos el ID para poder borrar/editar luego
+                        uid: user.uid,
                         username: name, grade: grade, group: group, email: email,
                         score: 0, level: 1, stars: 0, timeWorked: 0,
                         lastLogin: new Date().toISOString()
@@ -154,15 +155,13 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (e) { console.error("Error guardando", e); }
     }
 
-    // --- LÓGICA DE JUEGO ---
     function updateDisplay() {
         if(!currentUserData) return;
         scoreText.textContent = `${currentUserData.score || 0} puntos`;
         levelText.textContent = `Nivel ${currentUserData.level || 1}`;
         starsText.textContent = `⭐ Estrellas: ${currentUserData.stars || 0}`;
         const t = currentUserData.timeWorked || 0;
-        const min = Math.floor(t / 60);
-        const sec = t % 60;
+        const min = Math.floor(t / 60), sec = t % 60;
         timeText.textContent = `⏱ Tiempo: ${min}m ${sec}s`;
         userDisplay.textContent = `👤 Hola, ${currentUserData.username || 'Alumno'}`;
     }
@@ -210,33 +209,59 @@ document.addEventListener("DOMContentLoaded", () => {
         await saveProgress(); 
     });
 
-    // ==========================================
-    // 👨‍🏫 ACCIONES DEL MAESTRO (NUEVO)
-    // ==========================================
-    
-    // Función para cambiar grupo
+    // --- ACCIONES MAESTRO ---
     window.changeGroup = async (uid) => {
-        const newGroup = prompt("Escribe el nuevo grupo (ejemplo: B):");
+        const newGroup = prompt("Escribe el nuevo grupo:");
         if (newGroup) {
             try {
-                const docRef = doc(db, "students", uid);
-                await updateDoc(docRef, { group: newGroup.toUpperCase() });
+                await updateDoc(doc(db, "students", uid), { group: newGroup.toUpperCase() });
                 alert("Grupo actualizado");
-                loadTeacherPanel(); // Recargar tabla
+                loadTeacherPanel();
             } catch (e) { alert("Error al cambiar grupo"); }
         }
     };
 
-    // Función para borrar alumno
     window.deleteStudent = async (uid, name) => {
-        if (confirm(`¿Estás seguro de que quieres eliminar a ${name}? Se perderá todo su progreso.`)) {
+        if (confirm(`¿Eliminar a ${name}? Se perderá todo su progreso.`)) {
             try {
                 await deleteDoc(doc(db, "students", uid));
-                alert("Alumno eliminado de la base de datos");
-                loadTeacherPanel(); // Recargar tabla
+                alert("Alumno eliminado");
+                loadTeacherPanel();
             } catch (e) { alert("Error al eliminar"); }
         }
     };
+
+    // FUNCIÓN PARA REINICIAR PUNTOS DE TODOS
+    resetMonthlyBtn.addEventListener("click", async () => {
+        if (confirm("⚠️ ¿ESTÁS SEGURO? Esto pondrá los puntos, estrellas y nivel de TODOS los alumnos en 0. Esta acción no se puede deshacer.")) {
+            resetMonthlyBtn.disabled = true;
+            resetMonthlyBtn.textContent = "Reiniciando...";
+            
+            try {
+                const querySnapshot = await getDocs(collection(db, "students"));
+                const batch = writeBatch(db); // Usamos un batch para actualizar todos de un golpe
+
+                querySnapshot.forEach((documento) => {
+                    const studentRef = doc(db, "students", documento.id);
+                    batch.update(studentRef, {
+                        score: 0,
+                        stars: 0,
+                        level: 1,
+                        timeWorked: 0
+                    });
+                });
+
+                await batch.commit();
+                alert("✅ ¡Todo el progreso ha sido reiniciado para el nuevo mes!");
+                loadTeacherPanel();
+            } catch (e) {
+                console.error(e);
+                alert("Error al reiniciar los datos.");
+            }
+            resetMonthlyBtn.disabled = false;
+            resetMonthlyBtn.textContent = "🗓️ Reiniciar Mes";
+        }
+    });
 
     async function loadTeacherPanel() {
         studentsTable.innerHTML = "<tr><td colspan='8'>Cargando...</td></tr>";
@@ -244,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let allStudents = [];
         querySnapshot.forEach((doc) => { 
             let data = doc.data();
-            data.uid = doc.id; // Nos aseguramos de tener el ID del documento
+            data.uid = doc.id;
             allStudents.push(data); 
         });
 
@@ -265,25 +290,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const row = document.createElement("tr");
             const t = s.timeWorked || 0;
             const min = Math.floor(t / 60), sec = t % 60;
-            
             row.innerHTML = `
-                <td>${s.username}</td>
-                <td>${s.grade}</td>
-                <td>${s.group}</td>
-                <td>${s.score}</td>
-                <td>${s.level}</td>
-                <td>${s.stars}</td>
-                <td>${min}m ${sec}s</td>
+                <td>${s.username}</td><td>${s.grade}</td><td>${s.group}</td><td>${s.score}</td><td>${s.level}</td><td>${s.stars}</td><td>${min}m ${sec}s</td>
                 <td>
-                    <button onclick="changeGroup('${s.uid}')" style="background:#ffc107; color:black; border:none; padding:3px 7px; cursor:pointer; margin-bottom:2px;">Gr.</button>
+                    <button onclick="changeGroup('${s.uid}')" style="background:#ffc107; border:none; padding:3px 7px; cursor:pointer;">Gr.</button>
                     <button onclick="deleteStudent('${s.uid}', '${s.username}')" style="background:#dc3545; color:white; border:none; padding:3px 7px; cursor:pointer;">X</button>
-                </td>
-            `;
+                </td>`;
             studentsTable.appendChild(row);
         });
     }
 
-    // --- RESTO DE BOTONES UI ---
     refreshTeacherBtn.addEventListener("click", loadTeacherPanel);
     groupSelect.addEventListener("change", loadTeacherPanel);
 
