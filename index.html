@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - MASTER PRO</title>
+    <title>Inglés Para Todos - PLATINUM EDITION</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -34,7 +34,7 @@
         input, select { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
         .btn { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; background: var(--primary); }
         .btn-danger { background: var(--accent); } .btn-secondary { background: #6c757d; }
-        .btn-excel { background: #217346; } .btn-pdf { background: #b30b00; } .btn-chart { background: #6610f2; }
+        .btn-excel { background: #217346; } .btn-pdf { background: #b30b00; } .btn-chart { background: #6610f2; } .btn-download { background: #007bff; }
         
         /* JUEGO */
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
@@ -57,7 +57,7 @@
         td { vertical-align: middle; }
         
         .action-btn { padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; font-size: 14px; }
-        .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-edit { background: #ffc107; color: black; }
+        .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-edit { background: #ffc107; color: black; } .btn-history { background: #795548; }
         
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
         .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
@@ -67,6 +67,10 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; text-align: center; }
         .teacher-controls { display: flex; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 15px; align-items: center; margin-bottom: 15px; }
+
+        /* TABLA HISTORIAL */
+        .history-table { width: 100%; margin-top: 15px; text-align: left; }
+        .history-table th { background: #6c757d; }
     </style>
 </head>
 <body>
@@ -188,8 +192,25 @@
     <div id="modalGraficaGrupal" class="modal-overlay">
         <div class="modal-content" style="max-width: 900px;">
             <h3>📊 Rendimiento del Grupo</h3>
-            <canvas id="groupBigChart"></canvas>
-            <br><button onclick="cerrarModal('modalGraficaGrupal')" class="btn btn-secondary">Cerrar</button>
+            <div style="background: white; padding: 10px;">
+                <canvas id="groupBigChart"></canvas>
+            </div>
+            <br>
+            <button onclick="descargarGraficaGrupal()" class="btn btn-download"><i class="fas fa-download"></i> Descargar Imagen</button>
+            <button onclick="cerrarModal('modalGraficaGrupal')" class="btn btn-secondary">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="modalHistorial" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="historialNombre">Historial de Trabajo 📜</h3>
+            <div style="overflow-y: auto; max-height: 300px;">
+                <table class="history-table">
+                    <thead><tr><th>Fecha</th><th>Tiempo Trabajado</th></tr></thead>
+                    <tbody id="historialCuerpo"></tbody>
+                </table>
+            </div>
+            <br><button onclick="cerrarModal('modalHistorial')" class="btn btn-secondary">Cerrar</button>
         </div>
     </div>
 
@@ -236,6 +257,8 @@
                         if(!datosUsuario.totalCorrect) datosUsuario.totalCorrect = 0;
                         if(!datosUsuario.totalWrong) datosUsuario.totalWrong = 0;
                         if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
+                        // Inicializar Historial Diario si no existe
+                        if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {};
                         mostrarJuego();
                     }
                 });
@@ -245,13 +268,28 @@
             }
         });
 
-        // 5. CRONÓMETRO
+        // 5. CRONÓMETRO CON HISTORIAL DIARIO
         function iniciarCronometro() {
             if(timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
+                // A. Tiempo Total
                 datosUsuario.timeWorked = (datosUsuario.timeWorked || 0) + 1;
+                
+                // B. Historial Diario (Log)
+                const fechaHoy = new Date().toLocaleDateString('es-ES'); // ej: "27/1/2026"
+                if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {};
+                if(!datosUsuario.dailyLogs[fechaHoy]) datosUsuario.dailyLogs[fechaHoy] = 0;
+                datosUsuario.dailyLogs[fechaHoy] = datosUsuario.dailyLogs[fechaHoy] + 1;
+
                 actualizarUI();
-                if(datosUsuario.timeWorked % 10 === 0) db.collection("students").doc(usuarioActual).update({timeWorked: datosUsuario.timeWorked});
+                
+                // Guardar cada 10s
+                if(datosUsuario.timeWorked % 10 === 0) {
+                    db.collection("students").doc(usuarioActual).update({
+                        timeWorked: datosUsuario.timeWorked,
+                        dailyLogs: datosUsuario.dailyLogs
+                    });
+                }
             }, 1000);
         }
         function detenerCronometro() { clearInterval(timerInterval); }
@@ -308,7 +346,8 @@
                     auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
                         db.collection("students").doc(cred.user.uid).set({
                             uid: cred.user.uid, username: nombre, grade: grado, group: grupo, email: email, password: pass,
-                            score: 0, unlockedLevels: [1], totalCorrect: 0, totalWrong: 0, timeWorked: 0, medals: {gold:0, silver:0, bronze:0}
+                            score: 0, unlockedLevels: [1], totalCorrect: 0, totalWrong: 0, timeWorked: 0, 
+                            medals: {gold:0, silver:0, bronze:0}, dailyLogs: {}
                         }).then(() => Swal.fire("Creado", "Bienvenido", "success"));
                     }).catch(e => Swal.fire("Error", e.message, "error"));
                 } else Swal.fire("Error", error.message, "error");
@@ -319,8 +358,10 @@
             if (email) auth.sendPasswordResetEmail(email).then(() => Swal.fire('Enviado', 'Revisa tu correo', 'success'));
         }
         function cerrarSesion() {
-            db.collection("students").doc(usuarioActual).update({timeWorked: datosUsuario.timeWorked})
-            .then(() => auth.signOut().then(() => location.reload()));
+            db.collection("students").doc(usuarioActual).update({
+                timeWorked: datosUsuario.timeWorked,
+                dailyLogs: datosUsuario.dailyLogs || {}
+            }).then(() => auth.signOut().then(() => location.reload()));
         }
 
         // 9. LÓGICA JUEGO
@@ -422,9 +463,8 @@
             const filtro = document.getElementById("groupFilter").value;
             let data = listaAlumnosCache;
             if(filtro !== "todos") data = data.filter(s => s.group === filtro);
-            data.sort((a,b) => (b.score||0) - (a.score||0)); // Ranking
+            data.sort((a,b) => (b.score||0) - (a.score||0));
 
-            // Mini Global Chart
             const ctx = document.getElementById('globalChart').getContext('2d');
             if(chartGlobalInstance) chartGlobalInstance.destroy();
             const gruposLabels = [...new Set(data.map(s => s.group))];
@@ -443,6 +483,7 @@
                     <td>${Math.max(...(alum.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(alum.timeWorked||0)}</td>
                     <td style="color:green">${alum.totalCorrect||0}</td><td style="color:red">${alum.totalWrong||0}</td><td style="color:#d4af37">${m.gold}</td>
                     <td>
+                        <button onclick="verHistorial('${alum.uid}')" class="action-btn btn-history" title="Historial">📜</button>
                         <button onclick="verGraficaInd('${alum.uid}')" class="action-btn btn-info" title="Gráfica">📊</button>
                         <button onclick="cambiarGrupo('${alum.uid}')" class="action-btn btn-edit">📂</button>
                         <button onclick="resetearAlumno('${alum.uid}')" class="action-btn btn-edit">🔄</button>
@@ -454,25 +495,49 @@
             document.getElementById("promedioAciertos").textContent = data.reduce((a,b)=>a+(b.totalCorrect||0),0);
         }
 
-        // ACCIONES
+        // ACCIONES MAESTRO
         async function cambiarGrupo(uid) {
             const { value: ng } = await Swal.fire({ title: 'Nuevo Grupo', input: 'text', showCancelButton: true });
             if (ng) { await db.collection("students").doc(uid).update({group: ng.toUpperCase()}); cargarTablaAlumnos(); }
         }
         function resetearAlumno(uid) {
-            if(confirm("¿Reiniciar alumno?")) db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}}).then(()=>cargarTablaAlumnos());
+            if(confirm("¿Reiniciar alumno?")) db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}}).then(()=>cargarTablaAlumnos());
         }
         function borrarAlumno(uid) {
             if(confirm("¿ELIMINAR ALUMNO?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos());
         }
         function resetearTodo() {
             if(prompt("Escribe BORRAR para reiniciar a TODOS:") === "BORRAR") {
-                listaAlumnosCache.forEach(s => db.collection("students").doc(s.uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}}));
+                listaAlumnosCache.forEach(s => db.collection("students").doc(s.uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}}));
                 alert("Hecho"); setTimeout(cargarTablaAlumnos, 2000);
             }
         }
 
-        // GRAFICAS Y EXPORT
+        // HISTORIAL DIARIO (NUEVO)
+        function verHistorial(uid) {
+            const s = listaAlumnosCache.find(x => x.uid === uid);
+            const logs = s.dailyLogs || {};
+            const tbody = document.getElementById("historialCuerpo");
+            tbody.innerHTML = "";
+            document.getElementById("modalHistorial").style.display = "flex";
+            document.getElementById("historialNombre").textContent = "Historial: " + s.username;
+
+            const fechas = Object.keys(logs).sort().reverse(); // Ordenar reciente a antiguo
+            
+            if(fechas.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='2'>Sin historial reciente</td></tr>";
+                return;
+            }
+
+            fechas.forEach(fecha => {
+                const tr = document.createElement("tr");
+                const tiempoDia = formatearTiempo(logs[fecha]);
+                tr.innerHTML = `<td>${fecha}</td><td style="font-weight:bold; color:blue;">${tiempoDia}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // GRAFICAS
         function verGraficaInd(uid) {
             const s = listaAlumnosCache.find(x => x.uid === uid);
             document.getElementById("modalGrafica").style.display = "flex"; document.getElementById("modalNombre").textContent = s.username;
@@ -480,13 +545,10 @@
             chartStudentInstance = new Chart(document.getElementById('studentChart'), { type: 'doughnut', data: { labels: ['✅', '❌'], datasets: [{ data: [s.totalCorrect, s.totalWrong], backgroundColor: ['#28a745', '#dc3545'] }] } });
         }
         
-        // --- NUEVA FUNCIÓN: GRÁFICA GRUPAL ---
         function verGraficaGrupal() {
             const filtro = document.getElementById("groupFilter").value;
             let data = listaAlumnosCache;
             if(filtro !== "todos") data = data.filter(s => s.group === filtro);
-            
-            // Ordenar por puntaje para que se vea bonito (Top estudiantes primero)
             data.sort((a,b) => b.score - a.score);
 
             document.getElementById("modalGraficaGrupal").style.display = "flex";
@@ -497,30 +559,27 @@
                 type: 'bar',
                 data: {
                     labels: data.map(s => s.username),
-                    datasets: [{
-                        label: 'Puntos Totales (Score)',
-                        data: data.map(s => s.score),
-                        backgroundColor: '#004e92',
-                        borderColor: '#003366',
-                        borderWidth: 1
-                    }]
+                    datasets: [{ label: 'Puntos Totales', data: data.map(s => s.score), backgroundColor: '#004e92', borderColor: '#003366', borderWidth: 1 }]
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: { display: true, text: filtro === 'todos' ? 'Ranking General' : 'Ranking Grupo ' + filtro }
-                    },
-                    scales: { y: { beginAtZero: true } }
-                }
+                options: { responsive: true, plugins: { title: { display: true, text: filtro === 'todos' ? 'Ranking General' : 'Ranking Grupo ' + filtro } }, scales: { y: { beginAtZero: true } } }
             });
         }
         
+        // NUEVA FUNCIÓN DESCARGA IMAGEN
+        function descargarGraficaGrupal() {
+            const canvas = document.getElementById('groupBigChart');
+            const link = document.createElement('a');
+            link.download = 'Grafica_Grupal.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
         function cerrarModal(id) { document.getElementById(id).style.display = "none"; }
 
         function exportarExcel() {
             const filtro = document.getElementById("groupFilter").value;
             let data = listaAlumnosCache; if(filtro!=="todos") data = data.filter(s=>s.group===filtro);
-            const ws = XLSX.utils.json_to_sheet(data.map(s=>({Nombre:s.username, Grupo:s.group, Puntos:s.score, Tiempo:formatearTiempo(s.timeWorked||0), Correctas:s.totalCorrect})));
+            const ws = XLSX.utils.json_to_sheet(data.map(s=>({Nombre:s.username, Grupo:s.group, Puntos:s.score, TiempoTotal:formatearTiempo(s.timeWorked||0), Correctas:s.totalCorrect})));
             const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Reporte"); XLSX.writeFile(wb, "Reporte.xlsx");
         }
         function exportarPDF() {
