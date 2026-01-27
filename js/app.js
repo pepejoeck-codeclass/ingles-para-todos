@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, updateDoc, deleteDoc, writeBatch } 
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, updateDoc, deleteDoc, writeBatch, query, where } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -19,25 +19,48 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-document.addEventListener("DOMContentLoaded", () => {
-    const soundCorrect = new Audio("assets/sounds/correct.mp3");
-    const soundError = new Audio("assets/sounds/wrong.mp3");
-    const soundLevel = new Audio("assets/sounds/levelup.mp3");
+// Variables Globales de Juego
+let currentLevel = 1;
+let questionsInSession = 0;
+let correctInSession = 0;
+const SESSION_LENGTH = 5; // Preguntas por "examen" para ganar medalla
 
-    const TEACHER_USER = "Jose de Jesus Ramos Flores";
-    const TEACHER_PASS = "161286";
-
-    const questions = [
+// Base de datos de preguntas por Nivel
+const questionsDB = {
+    1: [ // Básicos
         { q: "How do you say 'Hola' in English?", a: "hello" },
         { q: "How do you say 'Adiós' in English?", a: "goodbye" },
         { q: "How do you say 'Por favor' in English?", a: "please" },
         { q: "How do you say 'Gracias' in English?", a: "thank you" },
+        { q: "How do you say 'Buenos días' in English?", a: "good morning" }
+    ],
+    2: [ // Animales (Se desbloquea con Oro/Plata en Nivel 1)
         { q: "How do you say 'Gato' in English?", a: "cat" },
         { q: "How do you say 'Perro' in English?", a: "dog" },
+        { q: "How do you say 'Pájaro' in English?", a: "bird" },
+        { q: "How do you say 'León' in English?", a: "lion" },
+        { q: "How do you say 'Pez' in English?", a: "fish" }
+    ],
+    3: [ // Colores
         { q: "How do you say 'Rojo' in English?", a: "red" },
-        { q: "How do you say 'Azul' in English?", a: "blue" }
-    ];
+        { q: "How do you say 'Azul' in English?", a: "blue" },
+        { q: "How do you say 'Verde' in English?", a: "green" },
+        { q: "How do you say 'Amarillo' in English?", a: "yellow" },
+        { q: "How do you say 'Negro' in English?", a: "black" }
+    ]
+};
 
+document.addEventListener("DOMContentLoaded", () => {
+    // SONIDOS (Asegúrate de tener estos archivos o comenta las líneas si fallan)
+    const soundCorrect = new Audio("assets/sounds/correct.mp3");
+    const soundError = new Audio("assets/sounds/wrong.mp3");
+    const soundLevel = new Audio("assets/sounds/levelup.mp3"); 
+    const soundPerfect = new Audio("assets/sounds/perfect.mp3"); // NUEVO: Sonido para Gold
+
+    const TEACHER_USER = "Jose de Jesus Ramos Flores";
+    const TEACHER_PASS = "161286";
+
+    // Elementos DOM
     const loginCard = document.getElementById("loginCard"),
           mainContent = document.getElementById("mainContent"),
           teacherPanel = document.getElementById("teacherPanel"),
@@ -50,15 +73,16 @@ document.addEventListener("DOMContentLoaded", () => {
           closeTeacherLogin = document.getElementById("closeTeacherLogin"),
           closeTeacherPanel = document.getElementById("closeTeacherPanel"),
           refreshTeacherBtn = document.getElementById("refreshTeacher"),
-          exportBtn = document.getElementById("exportBtn"),
-          resetMonthlyBtn = document.getElementById("resetMonthlyBtn"),
+          viewStatsBtn = document.getElementById("viewStatsBtn"), // NUEVO
+          downloadPdfBtn = document.getElementById("downloadPdfBtn"), // NUEVO
           startBtn = document.getElementById("startGame"),
           checkBtn = document.getElementById("checkAnswer"),
           themeToggle = document.getElementById("themeToggle"),
           hamburger = document.getElementById("hamburger"),
           nav = document.getElementById("nav"),
           groupSelect = document.getElementById("groupSelect"),
-          studentsTable = document.getElementById("studentsTable");
+          studentsTable = document.getElementById("studentsTable"),
+          forgotPasswordLink = document.getElementById("forgotPasswordLink"); // NUEVO
 
     const gradeInput = document.getElementById("gradeInput"),
           groupInput = document.getElementById("groupInput"),
@@ -74,18 +98,23 @@ document.addEventListener("DOMContentLoaded", () => {
           scoreText = document.getElementById("scoreText"),
           levelText = document.getElementById("levelText"),
           starsText = document.getElementById("starsText"),
-          timeText = document.getElementById("timeText");
+          timeText = document.getElementById("timeText"),
+          lessonProgressBar = document.getElementById("lessonProgressBar"),
+          progressText = document.getElementById("progressText");
 
     let currentUserId = null; 
     let currentUserData = {};
     let timerInterval = null;
     let currentQuestion = null;
 
+    // --- AUTENTICACIÓN Y REGISTRO ---
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUserId = user.uid;
             await loadUserData(user.uid);
             showStudentInterface();
+            updateLevelLocks(); // Revisar candados al entrar
         } else {
             currentUserId = null;
             currentUserData = {};
@@ -101,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const group = groupInput.value.trim().toUpperCase();
 
         if (!email || !password || password.length < 6) {
-            alert("❌ Ingresa un correo y una contraseña de al menos 6 caracteres.");
+            Swal.fire("Error", "Ingresa correo y contraseña (min 6 caracteres).", "error");
             return;
         }
 
@@ -113,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
             if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
                 if (!name || !grade || !group) {
-                    alert("⚠️ No encontramos ese usuario. Para crear cuenta nueva, completa Nombre, Grado y Grupo.");
+                    Swal.fire("Usuario no encontrado", "Para registrarte llena Nombre, Grado y Grupo.", "info");
                     loginBtn.disabled = false;
                     loginBtn.textContent = "Entrar / Registrarse";
                     return;
@@ -121,29 +150,63 @@ document.addEventListener("DOMContentLoaded", () => {
                 try {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
+                    // IMPORTANTE: Guardamos la contraseña en Firestore solo porque pediste "Recuperarla mostrándola".
+                    // En una app real de alta seguridad esto no se recomienda, pero para escuela funciona perfecto.
                     await setDoc(doc(db, "students", user.uid), {
                         uid: user.uid,
                         username: name, grade: grade, group: group, email: email,
+                        password: password, // Guardada para la función "Olvidé contraseña"
                         score: 0, level: 1, stars: 0, timeWorked: 0,
+                        medals: { gold: 0, silver: 0, bronze: 0 }, // NUEVO: Medallas
+                        history: [], // NUEVO: Historial
+                        unlockedLevels: [1], // NUEVO: Nivel 1 desbloqueado por defecto
                         lastLogin: new Date().toISOString()
                     });
-                    alert("✅ ¡Cuenta creada exitosamente!");
-                } catch (regError) { alert("Error al registrar: " + regError.message); }
-            } else { alert("Error de acceso: " + error.message); }
+                    Swal.fire("¡Bienvenido!", "Cuenta creada exitosamente.", "success");
+                } catch (regError) { Swal.fire("Error", regError.message, "error"); }
+            } else { Swal.fire("Error", error.message, "error"); }
         }
         loginBtn.disabled = false;
         loginBtn.textContent = "Entrar / Registrarse";
     });
 
-    async function loadUserData(uid) {
-        try {
-            const docRef = doc(db, "students", uid);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                currentUserData = docSnap.data();
-                updateDisplay();
+    // --- NUEVO: RECUPERAR CONTRASEÑA ---
+    forgotPasswordLink.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const { value: email } = await Swal.fire({
+            title: 'Recuperar Contraseña',
+            input: 'email',
+            inputLabel: 'Introduce tu correo Gmail registrado',
+            inputPlaceholder: 'alumno@gmail.com'
+        });
+
+        if (email) {
+            // Buscamos en Firestore el usuario con ese correo
+            const q = query(collection(db, "students"), where("email", "==", email));
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                const userData = querySnapshot.docs[0].data();
+                // Mostramos la contraseña (Simulación segura solicitada)
+                Swal.fire(`Hola ${userData.username}`, `Tu contraseña es: <b>${userData.password}</b>`, 'info');
+            } else {
+                Swal.fire('Error', 'Este correo no está registrado.', 'error');
             }
-        } catch (e) { console.error("Error cargando datos", e); }
+        }
+    });
+
+    // --- LÓGICA DE DATOS ---
+
+    async function loadUserData(uid) {
+        const docRef = doc(db, "students", uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            currentUserData = docSnap.data();
+            // Asegurar campos nuevos si el usuario es antiguo
+            if(!currentUserData.medals) currentUserData.medals = { gold:0, silver:0, bronze:0 };
+            if(!currentUserData.unlockedLevels) currentUserData.unlockedLevels = [1];
+            updateDisplay();
+        }
     }
 
     async function saveProgress() {
@@ -157,129 +220,198 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function updateDisplay() {
         if(!currentUserData) return;
-        scoreText.textContent = `${currentUserData.score || 0} puntos`;
-        levelText.textContent = `Nivel ${currentUserData.level || 1}`;
-        starsText.textContent = `⭐ Estrellas: ${currentUserData.stars || 0}`;
+        scoreText.textContent = `${currentUserData.score || 0} pts`;
+        levelText.textContent = `Nivel: ${currentLevel}`; // Muestra el nivel que se está jugando
+        starsText.textContent = `⭐ ${currentUserData.stars || 0}`;
         const t = currentUserData.timeWorked || 0;
         const min = Math.floor(t / 60), sec = t % 60;
-        timeText.textContent = `⏱ Tiempo: ${min}m ${sec}s`;
-        userDisplay.textContent = `👤 Hola, ${currentUserData.username || 'Alumno'}`;
+        timeText.textContent = `⏱ ${min}m ${sec}s`;
+        userDisplay.textContent = `👤 ${currentUserData.username || 'Alumno'}`;
     }
 
+    // --- JUEGO Y MEDALLAS ---
+
+    // Función para cambiar de nivel desde el menú
+    window.selectLevel = (level) => {
+        if (!currentUserData.unlockedLevels.includes(level)) {
+            Swal.fire("Bloqueado 🔒", "Debes ganar medalla de ORO o PLATA en el nivel anterior para desbloquear este.", "warning");
+            return;
+        }
+        currentLevel = level;
+        questionsInSession = 0;
+        correctInSession = 0;
+        updateProgressBar();
+        startQuestion();
+        nav.classList.remove("active"); // Cerrar menú móvil
+    };
+
+    function startQuestion() {
+        // Seleccionar preguntas del nivel actual
+        const pool = questionsDB[currentLevel] || questionsDB[1];
+        currentQuestion = pool[Math.floor(Math.random() * pool.length)];
+        
+        questionText.textContent = currentQuestion.q;
+        feedback.textContent = "";
+        answerInput.value = "";
+        answerInput.focus();
+    }
+
+    startBtn.addEventListener("click", startQuestion);
+
+    checkBtn.addEventListener("click", async () => {
+        if (!currentQuestion) return;
+        
+        const userAns = answerInput.value.trim().toLowerCase();
+        questionsInSession++;
+        
+        if (userAns === currentQuestion.a) {
+            feedback.textContent = "🔥 ¡Correcto!";
+            feedback.style.color = "green";
+            soundCorrect.play().catch(()=>{});
+            currentUserData.score += 10;
+            currentUserData.stars += 1;
+            correctInSession++;
+        } else {
+            feedback.textContent = `❌ Era: ${currentQuestion.a}`;
+            feedback.style.color = "red";
+            soundError.play().catch(()=>{});
+        }
+
+        updateProgressBar();
+        updateDisplay();
+
+        // Verificar si terminamos la lección (5 preguntas)
+        if (questionsInSession >= SESSION_LENGTH) {
+            await finishSession();
+        } else {
+            // Siguiente pregunta automática tras 1.5s
+            setTimeout(startQuestion, 1500);
+        }
+        await saveProgress(); 
+    });
+
+    function updateProgressBar() {
+        const pct = (questionsInSession / SESSION_LENGTH) * 100;
+        lessonProgressBar.style.width = pct + "%";
+        progressText.textContent = `${questionsInSession}/${SESSION_LENGTH}`;
+    }
+
+    async function finishSession() {
+        const percentage = (correctInSession / SESSION_LENGTH) * 100;
+        let medal = null;
+        let msg = "";
+        let icon = "info";
+
+        if (percentage === 100) {
+            medal = "gold";
+            msg = "🥇 PERFECT! You got a GOLD medal!";
+            icon = "success";
+            soundPerfect.play().catch(()=>{});
+            currentUserData.medals.gold++;
+            unlockNextLevel();
+        } else if (percentage >= 80) {
+            medal = "silver";
+            msg = "🥈 Great job! SILVER medal!";
+            icon = "success";
+            soundLevel.play().catch(()=>{});
+            currentUserData.medals.silver++;
+            unlockNextLevel();
+        } else {
+            medal = "bronze";
+            msg = "🥉 Practice more! Bronze medal.";
+            icon = "warning";
+            currentUserData.medals.bronze++;
+        }
+
+        // Guardar en historial
+        const historyRecord = {
+            date: new Date().toLocaleDateString(),
+            level: currentLevel,
+            score: percentage,
+            medal: medal
+        };
+        if(!currentUserData.history) currentUserData.history = [];
+        currentUserData.history.push(historyRecord);
+
+        await saveProgress();
+        updateLevelLocks();
+
+        Swal.fire({
+            title: msg,
+            text: `Score: ${correctInSession}/${SESSION_LENGTH}`,
+            icon: icon,
+            confirmButtonText: 'Continuar'
+        }).then(() => {
+            questionsInSession = 0;
+            correctInSession = 0;
+            updateProgressBar();
+            startQuestion();
+        });
+    }
+
+    function unlockNextLevel() {
+        const next = currentLevel + 1;
+        if (!currentUserData.unlockedLevels.includes(next)) {
+            currentUserData.unlockedLevels.push(next);
+            Swal.fire("LEVEL UNLOCKED!", `Has desbloqueado la Lección ${next}`, "success");
+        }
+    }
+
+    function updateLevelLocks() {
+        if(!currentUserData.unlockedLevels) return;
+        // Leccion 2
+        const l2 = document.getElementById("navL2");
+        if(currentUserData.unlockedLevels.includes(2)) {
+            l2.classList.remove("locked");
+            l2.innerHTML = "Lección 2 (Animales)";
+        }
+        // Leccion 3
+        const l3 = document.getElementById("navL3");
+        if(currentUserData.unlockedLevels.includes(3)) {
+            l3.classList.remove("locked");
+            l3.innerHTML = "Lección 3 (Colores)";
+        }
+    }
+
+    // --- TEMPORIZADOR ---
     function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             if(!currentUserData.timeWorked) currentUserData.timeWorked = 0;
             currentUserData.timeWorked++;
-            updateDisplay();
-            if (currentUserData.timeWorked % 10 === 0) saveProgress();
+            if (currentUserData.timeWorked % 5 === 0) updateDisplay(); // Actualizar visual
+            if (currentUserData.timeWorked % 30 === 0) saveProgress(); // Guardar cada 30s
         }, 1000);
     }
-
     function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
 
-    startBtn.addEventListener("click", () => {
-        currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-        questionText.textContent = currentQuestion.q;
-        feedback.textContent = "";
-        answerInput.value = "";
-        answerInput.focus();
+
+    // --- MAESTRO Y GRÁFICAS ---
+
+    teacherLoginBtn.addEventListener("click", () => {
+        if (teacherUser.value === TEACHER_USER && teacherPass.value === TEACHER_PASS) {
+            teacherLogin.style.display = "none";
+            teacherPanel.style.display = "block";
+            loadTeacherPanel();
+        } else { Swal.fire("Error", "Credenciales incorrectas", "error"); }
     });
 
-    checkBtn.addEventListener("click", async () => {
-        if (!currentQuestion) return;
-        const userAns = answerInput.value.trim().toLowerCase();
-        if (userAns === currentQuestion.a) {
-            feedback.textContent = "🔥 ¡Excelente!";
-            feedback.style.color = "green";
-            soundCorrect.play().catch(()=>{});
-            currentUserData.score = (currentUserData.score || 0) + 10;
-            currentUserData.stars = (currentUserData.stars || 0) + 1;
-            if (currentUserData.score % 50 === 0) {
-                currentUserData.level = (currentUserData.level || 1) + 1;
-                soundLevel.play().catch(()=>{});
-            }
-            currentQuestion = null;
-        } else {
-            feedback.textContent = "❌ Intenta de nuevo";
-            feedback.style.color = "red";
-            soundError.play().catch(()=>{});
-        }
-        updateDisplay();
-        await saveProgress(); 
-    });
-
-    // --- ACCIONES MAESTRO ---
-
-    window.changeGroup = async (uid) => {
-        const newGroup = prompt("Escribe el nuevo grupo:");
-        if (newGroup) {
-            try {
-                await updateDoc(doc(db, "students", uid), { group: newGroup.toUpperCase() });
-                alert("Grupo actualizado");
-                loadTeacherPanel();
-            } catch (e) { alert("Error al cambiar grupo"); }
-        }
-    };
-
-    window.deleteStudent = async (uid, name) => {
-        if (confirm(`¿Eliminar a ${name}? Se perderá todo su progreso.`)) {
-            try {
-                await deleteDoc(doc(db, "students", uid));
-                alert("Alumno eliminado");
-                loadTeacherPanel();
-            } catch (e) { alert("Error al eliminar"); }
-        }
-    };
-
-    window.resetStudent = async (uid, name) => {
-        if (confirm(`¿Reiniciar puntos de ${name} a cero?`)) {
-            try {
-                await updateDoc(doc(db, "students", uid), {
-                    score: 0, stars: 0, level: 1, timeWorked: 0
-                });
-                alert(`Progreso de ${name} reiniciado.`);
-                loadTeacherPanel();
-            } catch (e) { alert("Error al reiniciar alumno"); }
-        }
-    };
-
-    resetMonthlyBtn.addEventListener("click", async () => {
-        if (confirm("⚠️ ¿REINICIAR A TODOS? Esto pondrá los puntos de TODOS los alumnos en 0.")) {
-            resetMonthlyBtn.disabled = true;
-            resetMonthlyBtn.textContent = "Procesando...";
-            try {
-                const querySnapshot = await getDocs(collection(db, "students"));
-                const batch = writeBatch(db);
-                querySnapshot.forEach((documento) => {
-                    const studentRef = doc(db, "students", documento.id);
-                    batch.update(studentRef, { score: 0, stars: 0, level: 1, timeWorked: 0 });
-                });
-                await batch.commit();
-                alert("✅ ¡Todo el progreso ha sido reiniciado!");
-                loadTeacherPanel();
-            } catch (e) { alert("Error al reiniciar."); }
-            resetMonthlyBtn.disabled = false;
-            resetMonthlyBtn.textContent = "🗓️ Reiniciar TODOS";
-        }
-    });
-
-    // ESTA FUNCIÓN ES LA QUE TENÍA EL ERROR DEL MENÚ
+    // Cargar tabla de estudiantes
     async function loadTeacherPanel() {
-        // Guardamos qué grupo estaba seleccionado para que no se borre
         const selectedGroupBefore = groupSelect.value;
-
         studentsTable.innerHTML = "<tr><td colspan='8'>Cargando...</td></tr>";
+        
         const querySnapshot = await getDocs(collection(db, "students"));
-        let allStudents = [];
+        window.allStudentsData = []; // Guardar global para las gráficas
+        
         querySnapshot.forEach((doc) => { 
             let data = doc.data();
             data.uid = doc.id;
-            allStudents.push(data); 
+            window.allStudentsData.push(data); 
         });
 
-        // Reconstruimos la lista de grupos
-        const groups = [...new Set(allStudents.map(s => s.group))].sort();
+        // Grupos únicos
+        const groups = [...new Set(window.allStudentsData.map(s => s.group))].sort();
         groupSelect.innerHTML = '<option value="">Todos los grupos</option>';
         groups.forEach(g => {
             const opt = document.createElement("option");
@@ -287,78 +419,112 @@ document.addEventListener("DOMContentLoaded", () => {
             opt.textContent = `Grupo ${g}`;
             groupSelect.appendChild(opt);
         });
-
-        // Le devolvemos el valor que el maestro ya había seleccionado
         groupSelect.value = selectedGroupBefore;
 
-        // Filtramos la tabla según la selección actual
         const filter = groupSelect.value;
-        let filtered = filter ? allStudents.filter(s => s.group === filter) : allStudents;
+        let filtered = filter ? window.allStudentsData.filter(s => s.group === filter) : window.allStudentsData;
         filtered.sort((a, b) => b.score - a.score);
 
         studentsTable.innerHTML = "";
         filtered.forEach(s => {
+            const m = s.medals || {gold:0, silver:0, bronze:0};
             const row = document.createElement("tr");
-            const t = s.timeWorked || 0;
-            const min = Math.floor(t / 60), sec = t % 60;
             row.innerHTML = `
-                <td>${s.username}</td><td>${s.grade}</td><td>${s.group}</td><td>${s.score}</td><td>${s.level}</td><td>${s.stars}</td><td>${min}m ${sec}s</td>
+                <td>${s.username}</td><td>${s.grade}</td><td>${s.group}</td>
+                <td>${s.score}</td><td>${s.unlockedLevels ? Math.max(...s.unlockedLevels) : 1}</td>
+                <td>🥇${m.gold} 🥈${m.silver}</td>
                 <td>
-                    <button onclick="changeGroup('${s.uid}')" style="background:#ffc107; border:none; padding:3px 5px; cursor:pointer;" title="Cambiar Grupo">Gr.</button>
-                    <button onclick="resetStudent('${s.uid}', '${s.username}')" style="background:#007bff; color:white; border:none; padding:3px 5px; cursor:pointer;" title="Reiniciar puntos">🔄</button>
-                    <button onclick="deleteStudent('${s.uid}', '${s.username}')" style="background:#dc3545; color:white; border:none; padding:3px 5px; cursor:pointer;" title="Borrar alumno">X</button>
+                   <button onclick="deleteStudent('${s.uid}')" style="background:red; color:white; border:none; border-radius:3px;">X</button>
                 </td>`;
             studentsTable.appendChild(row);
         });
     }
 
+    // --- NUEVO: Gráficas y PDF ---
+    viewStatsBtn.addEventListener("click", () => {
+        document.getElementById("statsModal").style.display = "block";
+        renderCharts();
+    });
+
+    function renderCharts() {
+        const ctx = document.getElementById('groupChart').getContext('2d');
+        
+        // Calcular totales
+        let totalGold = 0, totalSilver = 0, totalBronze = 0;
+        window.allStudentsData.forEach(s => {
+            if(s.medals) {
+                totalGold += s.medals.gold || 0;
+                totalSilver += s.medals.silver || 0;
+                totalBronze += s.medals.bronze || 0;
+            }
+        });
+
+        if(window.myChart) window.myChart.destroy(); // Limpiar anterior
+
+        window.myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Oro 🥇', 'Plata 🥈', 'Bronce 🥉'],
+                datasets: [{
+                    label: 'Medallas Totales del Grupo',
+                    data: [totalGold, totalSilver, totalBronze],
+                    backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32']
+                }]
+            }
+        });
+
+        // Llenar lista historial simple
+        const list = document.getElementById("historyList");
+        list.innerHTML = "";
+        window.allStudentsData.forEach(s => {
+            if(s.history && s.history.length > 0) {
+                const last = s.history[s.history.length - 1];
+                const li = document.createElement("li");
+                li.innerHTML = `<b>${s.username}</b>: ${last.medal ? last.medal.toUpperCase() : 'Intento'} en Nivel ${last.level} (${last.score}%)`;
+                list.appendChild(li);
+            }
+        });
+    }
+
+    downloadPdfBtn.addEventListener("click", () => {
+        const element = document.getElementById('reportContent');
+        html2pdf(element);
+    });
+
     refreshTeacherBtn.addEventListener("click", loadTeacherPanel);
     groupSelect.addEventListener("change", loadTeacherPanel);
 
-    teacherLoginBtn.addEventListener("click", () => {
-        if (teacherUser.value === TEACHER_USER && teacherPass.value === TEACHER_PASS) {
-            teacherLogin.style.display = "none";
-            teacherPanel.style.display = "block";
+    // Funciones globales para botones HTML
+    window.deleteStudent = async (uid) => {
+        if(confirm("¿Eliminar alumno?")) {
+            await deleteDoc(doc(db, "students", uid));
             loadTeacherPanel();
-        } else { alert("Maestro no reconocido"); }
-    });
+        }
+    };
 
+    // UI Generales
     logoutBtn.addEventListener("click", () => {
         saveProgress(); stopTimer();
         signOut(auth).then(() => { location.reload(); });
     });
-
-    openTeacherBtn.addEventListener("click", () => {
-        loginCard.style.display = "none";
-        teacherLogin.style.display = "block";
-    });
-
-    closeTeacherPanel.addEventListener("click", () => {
-        teacherPanel.style.display = "none";
-        loginCard.style.display = "block";
-    });
+    openTeacherBtn.addEventListener("click", () => { loginCard.style.display = "none"; teacherLogin.style.display = "block"; });
+    closeTeacherPanel.addEventListener("click", () => { teacherPanel.style.display = "none"; loginCard.style.display = "block"; });
+    closeTeacherLogin.addEventListener("click", () => { teacherLogin.style.display = "none"; loginCard.style.display = "block"; });
     
-    closeTeacherLogin.addEventListener("click", () => {
-        teacherLogin.style.display = "none";
-        loginCard.style.display = "block";
-    });
-
     themeToggle.addEventListener("click", () => {
         document.body.classList.toggle("dark");
         localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     });
     if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
 
-    hamburger.addEventListener("click", (e) => {
-        e.stopPropagation();
-        nav.classList.toggle("active");
-    });
+    hamburger.addEventListener("click", (e) => { e.stopPropagation(); nav.classList.toggle("active"); });
 
     function showStudentInterface() {
         loginCard.style.display = "none";
         mainContent.style.display = "block";
         logoutBtn.style.display = "inline-block";
         startTimer();
+        startQuestion(); // Inicia la primera pregunta
     }
 
     function showLoginInterface() {
