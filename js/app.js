@@ -211,7 +211,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- ACCIONES MAESTRO ---
 
-    // 1. Cambiar Grupo
     window.changeGroup = async (uid) => {
         const newGroup = prompt("Escribe el nuevo grupo:");
         if (newGroup) {
@@ -223,7 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // 2. Borrar Alumno
     window.deleteStudent = async (uid, name) => {
         if (confirm(`¿Eliminar a ${name}? Se perderá todo su progreso.`)) {
             try {
@@ -234,7 +232,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // 3. Reiniciar Alumno Individual (NUEVO)
     window.resetStudent = async (uid, name) => {
         if (confirm(`¿Reiniciar puntos de ${name} a cero?`)) {
             try {
@@ -247,7 +244,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // 4. Reiniciar TODOS
     resetMonthlyBtn.addEventListener("click", async () => {
         if (confirm("⚠️ ¿REINICIAR A TODOS? Esto pondrá los puntos de TODOS los alumnos en 0.")) {
             resetMonthlyBtn.disabled = true;
@@ -268,7 +264,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // ESTA FUNCIÓN ES LA QUE TENÍA EL ERROR DEL MENÚ
     async function loadTeacherPanel() {
+        // Guardamos qué grupo estaba seleccionado para que no se borre
+        const selectedGroupBefore = groupSelect.value;
+
         studentsTable.innerHTML = "<tr><td colspan='8'>Cargando...</td></tr>";
         const querySnapshot = await getDocs(collection(db, "students"));
         let allStudents = [];
@@ -278,14 +278,20 @@ document.addEventListener("DOMContentLoaded", () => {
             allStudents.push(data); 
         });
 
-        const groups = [...new Set(allStudents.map(s => s.group))];
+        // Reconstruimos la lista de grupos
+        const groups = [...new Set(allStudents.map(s => s.group))].sort();
         groupSelect.innerHTML = '<option value="">Todos los grupos</option>';
         groups.forEach(g => {
             const opt = document.createElement("option");
-            opt.value = g; opt.textContent = `Grupo ${g}`;
+            opt.value = g; 
+            opt.textContent = `Grupo ${g}`;
             groupSelect.appendChild(opt);
         });
 
+        // Le devolvemos el valor que el maestro ya había seleccionado
+        groupSelect.value = selectedGroupBefore;
+
+        // Filtramos la tabla según la selección actual
         const filter = groupSelect.value;
         let filtered = filter ? allStudents.filter(s => s.group === filter) : allStudents;
         filtered.sort((a, b) => b.score - a.score);
