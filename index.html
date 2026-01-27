@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - FUNCIONAL</title>
+    <title>Inglés Para Todos - SONIDOS ACTIVOS</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -65,7 +65,6 @@
             </div>
 
             <button onclick="intentarLogin()" class="btn">🚀 ENTRAR / REGISTRAR</button>
-            
             <div style="margin-top: 15px;">
                 <a href="#" onclick="recuperarPassword()" style="font-size: 13px; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a>
             </div>
@@ -133,7 +132,7 @@
     </div>
 
     <script>
-        // 1. CONFIGURACION DE FIREBASE
+        // --- 1. CONFIGURACIÓN FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s",
             authDomain: "ingles-pepejoeck.firebaseapp.com",
@@ -145,12 +144,17 @@
             measurementId: "G-5MEQGW13ZE"
         };
         
-        // Inicializar Firebase (MODO COMPAT)
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // 2. VARIABLES GLOBALES
+        // --- 2. CARGA DE SONIDOS ---
+        // Aquí cargamos tus sonidos para usarlos en el juego
+        const audioCorrecto = new Audio('assets/sounds/correct.mp3');
+        const audioError = new Audio('assets/sounds/wrong.mp3');
+        const audioLevelUp = new Audio('assets/sounds/levelup.mp3');
+
+        // --- 3. VARIABLES Y BASE DE DATOS ---
         let usuarioActual = null;
         let datosUsuario = {};
         let nivelActual = 1;
@@ -164,12 +168,11 @@
             3: [{q:"Lunes",a:"monday"}, {q:"Martes",a:"tuesday"}, {q:"Sol",a:"sun"}, {q:"Luna",a:"moon"}, {q:"Agua",a:"water"}]
         };
 
-        // 3. DETECTOR DE SESION
+        // --- 4. DETECTOR DE SESIÓN ---
         auth.onAuthStateChanged((user) => {
             if (user) {
-                console.log("Usuario detectado:", user.email);
+                console.log("Sesión iniciada:", user.email);
                 usuarioActual = user.uid;
-                // Cargar datos
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
@@ -177,16 +180,15 @@
                     }
                 });
             } else {
-                console.log("Sin sesión");
+                console.log("Sesión cerrada");
                 usuarioActual = null;
-                // Solo mostrar login si no estamos en panel maestro
                 if(document.getElementById("teacherPanel").style.display === "none") {
                     mostrarLogin();
                 }
             }
         });
 
-        // 4. FUNCIONES DE INTERFAZ
+        // --- 5. FUNCIONES DE PANTALLAS ---
         function mostrarLogin() {
             document.getElementById("loginCard").style.display = "block";
             document.getElementById("mainContent").style.display = "none";
@@ -198,8 +200,6 @@
             document.getElementById("loginCard").style.display = "none";
             document.getElementById("teacherLogin").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
-            
-            // Actualizar UI
             document.getElementById("userDisplay").textContent = "Alumno: " + (datosUsuario.username || "Héroe");
             document.getElementById("scoreText").textContent = "Puntos: " + (datosUsuario.score || 0);
             actualizarCandados();
@@ -217,7 +217,7 @@
             document.getElementById("loginCard").style.display = "block";
         }
 
-        // 5. LOGICA ALUMNO (SOLUCIÓN ERROR CREDENTIALS)
+        // --- 6. LOGICA ALUMNO ---
         function intentarLogin() {
             const email = document.getElementById("emailInput").value.trim();
             const pass = document.getElementById("passwordInput").value.trim();
@@ -229,42 +229,23 @@
 
             auth.signInWithEmailAndPassword(email, pass)
                 .catch((error) => {
-                    console.log("Error:", error.code);
-                    // Lista de errores que indican "no se pudo entrar, tal vez quieres registrarte"
-                    const erroresRegistro = [
-                        'auth/user-not-found', 
-                        'auth/wrong-password', 
-                        'auth/invalid-login-credentials', 
-                        'auth/invalid-credential'
-                    ];
-
+                    const erroresRegistro = ['auth/user-not-found', 'auth/wrong-password', 'auth/invalid-login-credentials', 'auth/invalid-credential'];
                     if(erroresRegistro.includes(error.code)) {
-                        // Si falta nombre, es que solo quería login y falló
                         if(!nombre || !grado || !grupo) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Atención',
-                                text: 'Si ya tienes cuenta: Tu contraseña es incorrecta.\n\nSi eres NUEVO: Llena Nombre, Grado y Grupo para registrarte.'
-                            });
+                            Swal.fire({icon: 'warning', title: 'Aviso', text: 'Usuario no encontrado. Si eres nuevo, llena Nombre, Grado y Grupo.'});
                             return;
                         }
-                        
-                        // Si tiene nombre, creamos la cuenta
                         auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
                             db.collection("students").doc(cred.user.uid).set({
                                 uid: cred.user.uid,
                                 username: nombre, grade: grado, group: grupo, email: email, password: pass,
-                                score: 0, unlockedLevels: [1], totalCorrect: 0,
-                                medals: {gold:0, silver:0, bronze:0}
+                                score: 0, unlockedLevels: [1], totalCorrect: 0, medals: {gold:0, silver:0, bronze:0}
                             }).then(() => {
-                                Swal.fire("¡Bienvenido!", "Cuenta creada exitosamente.", "success");
+                                Swal.fire("¡Éxito!", "Cuenta creada", "success");
                             });
                         }).catch(e => {
-                            if(e.code === 'auth/email-already-in-use') {
-                                Swal.fire("Error", "Este correo ya está registrado.", "error");
-                            } else {
-                                Swal.fire("Error Registro", e.message, "error");
-                            }
+                            if(e.code === 'auth/email-already-in-use') Swal.fire("Error", "Correo ya registrado", "error");
+                            else Swal.fire("Error", e.message, "error");
                         });
                     } else {
                         Swal.fire("Error", error.message, "error");
@@ -272,26 +253,15 @@
                 });
         }
 
-        // Recuperar Contraseña
         async function recuperarPassword() {
             const { value: email } = await Swal.fire({
-                title: 'Recuperar Contraseña',
-                input: 'email',
-                inputLabel: 'Escribe tu correo registrado',
-                inputPlaceholder: 'correo@ejemplo.com',
-                showCancelButton: true,
-                confirmButtonText: 'Enviar Link',
-                cancelButtonText: 'Cancelar'
+                title: 'Recuperar', input: 'email', inputLabel: 'Tu correo registrado:',
+                showCancelButton: true, confirmButtonText: 'Enviar'
             });
-
             if (email) {
                 auth.sendPasswordResetEmail(email)
-                    .then(() => {
-                        Swal.fire('¡Enviado!', 'Revisa tu correo (y SPAM) para restablecer la contraseña.', 'success');
-                    })
-                    .catch((error) => {
-                        Swal.fire('Error', 'No se encontró ese correo o hubo un error.', 'error');
-                    });
+                    .then(() => Swal.fire('Enviado', 'Revisa tu correo.', 'success'))
+                    .catch(() => Swal.fire('Error', 'Correo no encontrado.', 'error'));
             }
         }
 
@@ -299,7 +269,7 @@
             auth.signOut().then(() => location.reload());
         }
 
-        // 6. LOGICA DE JUEGO
+        // --- 7. LOGICA DE JUEGO Y SONIDOS ---
         function cargarPregunta() {
             const pool = preguntasDB[nivelActual];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
@@ -317,6 +287,10 @@
             const feed = document.getElementById("feedback");
 
             if(resp === preguntaActual.a) {
+                // REPRODUCIR SONIDO CORRECTO
+                audioCorrecto.currentTime = 0; // Reiniciar sonido
+                audioCorrecto.play().catch(e => console.log("Audio bloqueado por navegador"));
+
                 feed.textContent = "¡Correcto! 🔥"; feed.style.color = "green";
                 datosUsuario.score = (datosUsuario.score || 0) + 10;
                 datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1;
@@ -326,6 +300,10 @@
                     totalCorrect: datosUsuario.totalCorrect
                 });
             } else {
+                // REPRODUCIR SONIDO ERROR
+                audioError.currentTime = 0;
+                audioError.play().catch(e => console.log("Audio bloqueado"));
+
                 feed.textContent = "Incorrecto. Era: " + preguntaActual.a; feed.style.color = "red";
             }
 
@@ -342,6 +320,10 @@
         function finSesion() {
             let msg = "Bien hecho";
             if(aciertosSesion >= 4) {
+                // REPRODUCIR SONIDO LEVEL UP
+                audioLevelUp.currentTime = 0;
+                audioLevelUp.play().catch(e => console.log("Audio bloqueado"));
+
                 msg = "¡Nivel Superado!";
                 const next = nivelActual + 1;
                 if(!datosUsuario.unlockedLevels.includes(next) && next <= 3) {
@@ -385,7 +367,7 @@
             }
         }
 
-        // 7. LOGICA MAESTRO
+        // --- 8. LOGICA MAESTRO ---
         function loginMaestro() {
             const u = document.getElementById("teacherUserImput").value.trim();
             const p = document.getElementById("teacherPassInput").value.trim();
@@ -407,32 +389,20 @@
         function cargarTablaAlumnos() {
             const tbody = document.getElementById("cuerpoTabla");
             tbody.innerHTML = "<tr><td colspan='5'>Cargando datos...</td></tr>";
-            
             let totalAciertos = 0;
-
             db.collection("students").get().then((querySnapshot) => {
                 tbody.innerHTML = "";
                 const alumnos = [];
                 querySnapshot.forEach((doc) => {
-                    let d = doc.data();
-                    d.uid = doc.id;
-                    alumnos.push(d);
+                    let d = doc.data(); d.uid = doc.id; alumnos.push(d);
                     totalAciertos += (d.totalCorrect || 0);
                 });
-                
                 document.getElementById("totalAciertos").textContent = totalAciertos;
                 alumnos.sort((a,b) => (b.score||0) - (a.score||0));
-
                 alumnos.forEach(alum => {
                     const tr = document.createElement("tr");
                     const nivelMax = Math.max(...(alum.unlockedLevels || [1]));
-                    tr.innerHTML = `
-                        <td>${alum.username}</td>
-                        <td>${alum.group}</td>
-                        <td>${nivelMax}</td>
-                        <td style="color:blue; font-weight:bold">${alum.score}</td>
-                        <td><button onclick="borrarAlumno('${alum.uid}')" class="btn-delete action-btn">🗑️</button></td>
-                    `;
+                    tr.innerHTML = `<td>${alum.username}</td><td>${alum.group}</td><td>${nivelMax}</td><td style="color:blue; font-weight:bold">${alum.score}</td><td><button onclick="borrarAlumno('${alum.uid}')" class="btn-delete action-btn">🗑️</button></td>`;
                     tbody.appendChild(tr);
                 });
             });
@@ -448,11 +418,8 @@
             const codigo = prompt("Escribe BORRAR para reiniciar a todos a cero:");
             if(codigo === "BORRAR") {
                 db.collection("students").get().then(snapshot => {
-                    snapshot.forEach(doc => {
-                        doc.ref.update({score:0, unlockedLevels:[1], totalCorrect:0});
-                    });
-                    alert("Escuela Reiniciada");
-                    cargarTablaAlumnos();
+                    snapshot.forEach(doc => { doc.ref.update({score:0, unlockedLevels:[1], totalCorrect:0}); });
+                    alert("Escuela Reiniciada"); cargarTablaAlumnos();
                 });
             }
         }
@@ -460,7 +427,6 @@
         document.getElementById("answerInput").addEventListener("keypress", function(event) {
             if (event.key === "Enter") verificarRespuesta();
         });
-
     </script>
 </body>
 </html>
