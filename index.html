@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - HEROES EDITION</title>
+    <title>Inglés Para Todos - FINAL PRO</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -71,7 +71,7 @@
         .history-table { width: 100%; margin-top: 15px; text-align: left; }
         .history-table th { background: #6c757d; }
 
-        /* --- NUEVOS ESTILOS PARA NOTICIAS Y LEADERBOARD --- */
+        /* COMUNIDAD */
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
@@ -119,20 +119,17 @@
         </div>
 
         <div id="communitySection" class="community-section">
-            
             <div class="news-box">
                 <h3 style="margin-top:0; color:#333;"><i class="fas fa-bullhorn"></i> Noticias / News</h3>
                 <div id="newsContent" style="white-space: pre-wrap; color: #555;">Cargando noticias...</div>
             </div>
-
             <div class="leaderboard-box">
-                <h3 style="margin-top:0; color:#004e92;"><i class="fas fa-trophy"></i> The Best Heroes Practicing</h3>
+                <h3 style="margin-top:0; color:#004e92;"><i class="fas fa-trophy"></i> The Best Heroes</h3>
                 <table class="leader-table">
                     <thead><tr><th>Hero</th><th>Time</th><th>Pts</th><th>Medals</th></tr></thead>
-                    <tbody id="leaderboardBody"><tr><td colspan="4">Cargando héroes...</td></tr></tbody>
+                    <tbody id="leaderboardBody"><tr><td colspan="4">Cargando...</td></tr></tbody>
                 </table>
             </div>
-
         </div>
     </div>
 
@@ -195,10 +192,10 @@
             <hr>
             
             <div style="background: #fff3cd; padding: 10px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ffeeba;">
-                <h4 style="margin: 0 0 5px 0;">📢 Publicar Noticia Nueva</h4>
+                <h4 style="margin: 0 0 5px 0;">📢 Publicar Noticia</h4>
                 <div style="display: flex; gap: 10px;">
-                    <textarea id="teacherNewsInput" rows="1" style="resize: none; height: 40px;" placeholder="Escribe aquí la noticia para tus alumnos..."></textarea>
-                    <button onclick="publicarNoticia()" class="btn" style="margin-top: 8px; width: auto;">Publicar</button>
+                    <textarea id="teacherNewsInput" rows="1" style="resize: none; height: 40px; width: 100%;" placeholder="Escribe aquí..."></textarea>
+                    <button onclick="publicarNoticia()" class="btn" style="margin-top: 0; width: auto;">Publicar</button>
                 </div>
             </div>
 
@@ -367,7 +364,7 @@
             document.getElementById("mainContent").style.display = "none";
             document.getElementById("teacherPanel").style.display = "none";
             document.getElementById("teacherLogin").style.display = "none";
-            cargarLeaderboard(); // Refrescar ranking
+            cargarLeaderboard(); // Refrescar
         }
         function mostrarJuego() {
             document.getElementById("loginContainerWrapper").style.display = "none";
@@ -385,26 +382,29 @@
             document.getElementById("loginContainerWrapper").style.display = "flex";
         }
 
-        // --- NOTICIAS Y LEADERBOARD ---
+        // --- SOLUCIÓN NOTICIAS Y LEADERBOARD ---
+        // Usamos "students" -> "ADMIN_NEWS" para evitar errores de permisos
         function cargarNoticias() {
-            db.collection("global").doc("news").onSnapshot((doc) => {
-                if(doc.exists) {
-                    const text = doc.data().text || "Bienvenido a Inglés Para Todos.";
-                    document.getElementById("newsContent").innerText = text;
-                    document.getElementById("teacherNewsInput").value = text;
-                }
+            db.collection("students").doc("ADMIN_NEWS").onSnapshot((doc) => {
+                const text = (doc.exists && doc.data().text) ? doc.data().text : "Bienvenido a Inglés Para Todos.";
+                document.getElementById("newsContent").innerText = text;
+                document.getElementById("teacherNewsInput").value = text;
             });
         }
         function publicarNoticia() {
             const txt = document.getElementById("teacherNewsInput").value;
-            db.collection("global").doc("news").set({ text: txt }).then(() => Swal.fire("Publicado", "Noticia actualizada", "success"));
+            db.collection("students").doc("ADMIN_NEWS").set({ text: txt }).then(() => Swal.fire("Publicado", "Noticia actualizada", "success"));
         }
         function cargarLeaderboard() {
-            db.collection("students").orderBy("timeWorked", "desc").limit(10).get().then((snap) => {
+            db.collection("students").orderBy("timeWorked", "desc").limit(12).get().then((snap) => {
                 const tbody = document.getElementById("leaderboardBody");
                 tbody.innerHTML = "";
                 let rank = 1;
                 snap.forEach(doc => {
+                    // FILTRAR EL ARCHIVO DE NOTICIAS PARA QUE NO SALGA EN EL TOP
+                    if(doc.id === 'ADMIN_NEWS') return;
+                    if(rank > 10) return;
+
                     const d = doc.data();
                     const tr = document.createElement("tr");
                     if(rank===1) tr.className = "rank-1"; else if(rank===2) tr.className = "rank-2"; else if(rank===3) tr.className = "rank-3";
@@ -536,7 +536,11 @@
             document.getElementById("cuerpoTabla").innerHTML = "<tr><td colspan='10'>Cargando...</td></tr>";
             db.collection("students").get().then((querySnapshot) => {
                 listaAlumnosCache = [];
-                querySnapshot.forEach((doc) => { listaAlumnosCache.push({ ...doc.data(), uid: doc.id }); });
+                querySnapshot.forEach((doc) => { 
+                    if(doc.id !== 'ADMIN_NEWS') { // IGNORAR LA NOTICIA
+                        listaAlumnosCache.push({ ...doc.data(), uid: doc.id }); 
+                    }
+                });
                 const grupos = [...new Set(listaAlumnosCache.map(s => s.group))].sort();
                 const select = document.getElementById("groupFilter");
                 const valorActual = select.value;
