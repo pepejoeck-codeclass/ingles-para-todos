@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - EXPERT AI PRO</title>
+    <title>Inglés Para Todos - PROFESIONAL AI</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -86,7 +86,6 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; text-align: center; }
         
-        /* ESTILOS PARA LA FICHA DE REPORTE QUE SE DESCARGA */
         .report-summary { background: #f8f9fa; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--primary); text-align: left; font-size: 14px; }
         .report-summary strong { color: var(--primary); }
     </style>
@@ -229,12 +228,10 @@
     <div id="modalGrafica" class="modal-overlay">
         <div class="modal-content">
             <h3 id="modalNombre">Individual</h3>
-            
             <div id="printAreaInd" style="background: white; padding: 10px; border-radius: 10px;">
                 <div id="modalStats" class="report-summary"></div>
                 <canvas id="studentChart"></canvas>
             </div>
-            
             <br>
             <button onclick="descargarCaptura('printAreaInd', 'Reporte_Individual.png')" class="btn btn-download"><i class="fas fa-download"></i> Descargar Imagen</button>
             <button onclick="cerrarModal('modalGrafica')" class="btn btn-secondary">Cerrar</button>
@@ -244,12 +241,10 @@
     <div id="modalGraficaGrupal" class="modal-overlay">
         <div class="modal-content" style="max-width: 900px;">
             <h3>📊 Rendimiento del Grupo</h3>
-            
             <div id="printAreaGroup" style="background: white; padding: 10px;">
                 <div id="modalStatsGroup" class="report-summary" style="text-align: center;"></div>
                 <canvas id="groupBigChart"></canvas>
             </div>
-            
             <br>
             <button onclick="descargarCaptura('printAreaGroup', 'Grafica_Grupal.png')" class="btn btn-download"><i class="fas fa-download"></i> Descargar Imagen</button>
             <button onclick="cerrarModal('modalGraficaGrupal')" class="btn btn-secondary">Cerrar</button>
@@ -431,7 +426,7 @@
             const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>(b.score||0)-(a.score||0));
             
             const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy();
-            const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(b.score||0),0)/gs.length;});
+            const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;});
             chartGlobalInstance=new Chart(ctx,{type:'bar',data:{labels:gl,datasets:[{label:'Promedio',data:prom,backgroundColor:'#004e92'}]},options:{maintainAspectRatio:false}});
             
             const tb=document.getElementById("cuerpoTabla"); tb.innerHTML="";
@@ -441,7 +436,7 @@
                 tr.innerHTML=`<td>${s.username}</td><td>${s.group}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td><button onclick="verHistorial('${s.uid}')" class="action-btn btn-history">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info">📊</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete">🗑️</button></td>`;
                 tb.appendChild(tr);
             });
-            document.getElementById("totalAlumnos").textContent=d.length; document.getElementById("promedioAciertos").textContent=d.reduce((a,b)=>a+(b.totalCorrect||0),0);
+            document.getElementById("totalAlumnos").textContent=d.length; document.getElementById("promedioAciertos").textContent=d.reduce((a,b)=>a+(Number(b.totalCorrect)||0),0);
         }
         
         async function resetearAlumno(uid) {
@@ -459,14 +454,14 @@
             Object.keys(l).sort().reverse().forEach(f=>{ tb.innerHTML+=`<tr><td>${f}</td><td style="color:blue;font-weight:bold">${formatearTiempo(l[f])}</td></tr>`; });
         }
 
-        // --- FUNCIONES MEJORADAS CON TEXTO EN IMAGEN ---
+        // --- REPORTES VISUALES MEJORADOS ---
         function verGraficaInd(uid) {
             const s=listaAlumnosCache.find(x=>x.uid===uid); 
             document.getElementById("modalGrafica").style.display="flex"; 
             document.getElementById("modalNombre").textContent=s.username;
-            
-            // LLENAR ESTADISTICAS VISIBLES
             const m = s.medals || {gold:0, silver:0, bronze:0};
+            
+            // DETALLE TEXTUAL PARA LA FOTO
             document.getElementById("modalStats").innerHTML = `
                 <p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p>
                 <p><b>Racha:</b> ${s.currentStreak||1} días 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p>
@@ -481,8 +476,8 @@
             const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>b.score-a.score);
             document.getElementById("modalGraficaGrupal").style.display="flex"; 
             
-            // RESUMEN GRUPAL
-            const totalPuntos = d.reduce((acc, curr) => acc + (curr.score || 0), 0);
+            // DETALLE TEXTUAL PARA LA FOTO
+            const totalPuntos = d.reduce((acc, curr) => acc + Number(curr.score || 0), 0);
             const promedio = d.length > 0 ? (totalPuntos / d.length).toFixed(1) : 0;
             document.getElementById("modalStatsGroup").innerHTML = `<p><b>Total Alumnos:</b> ${d.length} | <b>Promedio Puntos:</b> ${promedio}</p>`;
 
@@ -491,14 +486,11 @@
             chartGroupInstance=new Chart(ctx,{type:'bar',data:{labels:d.map(s=>s.username),datasets:[{label:'Puntos Totales',data:d.map(s=>s.score),backgroundColor:'#004e92'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}});
         }
         
-        // DESCARGA INTELIGENTE (CAPTURA TODO EL DIV)
-        function descargarCaptura(divId, nombreArchivo) {
-            const element = document.getElementById(divId);
-            html2canvas(element).then(canvas => {
-                const link = document.createElement('a');
-                link.download = nombreArchivo;
-                link.href = canvas.toDataURL("image/png");
-                link.click();
+        // CAPTURA INTELIGENTE
+        function descargarCaptura(divId, nombre) {
+            const el = document.getElementById(divId);
+            html2canvas(el).then(canvas => {
+                const link = document.createElement('a'); link.download = nombre; link.href = canvas.toDataURL(); link.click();
             });
         }
 
