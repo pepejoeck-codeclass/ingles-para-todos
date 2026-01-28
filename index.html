@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - AI DICTATION</title>
+    <title>Inglés Para Todos - EXPERT AI PRO</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,18 +25,15 @@
         
         .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; position: relative; }
         
-        /* IMAGENES */
         .logo-img { width: 100%; max-width: 300px; margin-bottom: 10px; }
         .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; margin: 10px auto; display: block; object-fit: cover; }
         .teacher-header-img { width: 100%; max-height: 180px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 10px; }
         
-        /* INPUTS Y BOTONES */
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; font-family: 'Nunito'; }
         .btn { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; background: var(--primary); }
         .btn-danger { background: var(--accent); } .btn-secondary { background: #6c757d; }
         .btn-excel { background: #217346; } .btn-pdf { background: #b30b00; } .btn-chart { background: #6610f2; } .btn-download { background: #007bff; }
         
-        /* AUDIO CONTROLS */
         .audio-controls { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
         .btn-audio { width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer; font-size: 24px; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
         .btn-speak { background: #17a2b8; color: white; }
@@ -45,13 +42,11 @@
         .btn-audio:active { transform: translateY(4px); box-shadow: none; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
 
-        /* ACADEMIC BUTTONS */
         .academic-nav { display: flex; gap: 10px; margin-bottom: 15px; }
         .btn-academic { flex: 1; padding: 10px; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-vocab { background: linear-gradient(45deg, #11998e, #38ef7d); }
         .btn-grammar { background: linear-gradient(45deg, #833ab4, #fd1d1d); }
 
-        /* JUEGO */
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
         .question-box { font-size: 22px; font-weight: bold; color: var(--secondary); margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 5px solid var(--primary); }
@@ -60,11 +55,9 @@
         .nav-item.active { color: var(--primary); font-weight: bold; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
         
-        /* HUD */
         .hud-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 12px; font-weight: bold; background: #f0f2f5; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
         .hud-item { display: flex; flex-direction: column; align-items: center; }
         
-        /* MAESTRO & COMUNIDAD */
         .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
@@ -80,7 +73,6 @@
         .history-table { width: 100%; margin-top: 15px; text-align: left; }
         .history-table th { background: #6c757d; }
         
-        /* COMMUNITY */
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
@@ -91,9 +83,12 @@
         .rank-2 { background-color: #f8f9fa; } .rank-2 td:first-child::before { content: '🥈 '; }
         .rank-3 { background-color: #fff0e6; } .rank-3 td:first-child::before { content: '🥉 '; }
 
-        /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; text-align: center; }
+        
+        /* ESTILOS PARA LA FICHA DE REPORTE QUE SE DESCARGA */
+        .report-summary { background: #f8f9fa; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--primary); text-align: left; font-size: 14px; }
+        .report-summary strong { color: var(--primary); }
     </style>
 </head>
 <body>
@@ -177,19 +172,15 @@
         <div class="card">
             <span id="levelText" style="background:#ffd700; padding:5px 10px; border-radius:10px; font-weight:bold;">Nivel 1</span>
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
-            
             <div id="questionText" class="question-box">...</div>
-            
             <div class="audio-controls">
-                <button onclick="pronunciarPregunta()" class="btn-audio btn-speak" title="Escuchar (Listen)">🔊</button>
-                <button onclick="activarMicrofono()" id="btnMicrofono" class="btn-audio btn-mic" title="Hablar (Speak)">🎤</button>
+                <button onclick="pronunciarPregunta()" class="btn-audio btn-speak" title="Listen">🔊</button>
+                <button onclick="activarMicrofono()" id="btnMicrofono" class="btn-audio btn-mic" title="Speak">🎤</button>
             </div>
-
             <input type="text" id="answerInput" placeholder="Write or Speak..." autocomplete="off">
             <button onclick="verificarRespuesta()" class="btn">CHECK</button>
             <div id="feedback" style="margin-top: 15px; font-weight: bold; height: 20px;"></div>
         </div>
-        
         <div class="bottom-nav">
             <div class="nav-item active" onclick="cambiarNivel(1)">Nivel 1</div>
             <div class="nav-item locked" id="navL2" onclick="cambiarNivel(2)">🔐 Nivel 2</div>
@@ -204,7 +195,6 @@
                 <button onclick="cerrarSesionMaestro()" class="btn-danger" style="width:auto; padding:8px 20px;">Cerrar Sesión</button>
             </div>
             <hr>
-            
             <div style="background: #fff3cd; padding: 10px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ffeeba;">
                 <h4 style="margin: 0 0 5px 0;">📢 Publicar Noticia</h4>
                 <div style="display: flex; gap: 10px;">
@@ -212,13 +202,11 @@
                     <button onclick="publicarNoticia()" class="btn" style="margin-top: 0; width: auto;">Publicar</button>
                 </div>
             </div>
-
             <div class="dashboard-grid">
                 <div class="stat-card"><div class="stat-number" id="totalAlumnos">0</div>Alumnos</div>
                 <div class="stat-card"><div class="stat-number" id="promedioAciertos">0</div>Aciertos</div>
                 <div class="stat-card"><canvas id="globalChart" style="max-height: 100px;"></canvas></div>
             </div>
-
             <div class="teacher-controls">
                 <div style="flex: 1; min-width: 200px;">
                     <label style="font-size: 12px; font-weight: bold;">Filtrar:</label>
@@ -229,7 +217,6 @@
                 <button onclick="exportarExcel()" class="action-btn btn-excel" style="font-size: 16px;"><i class="fas fa-file-excel"></i></button>
                 <button onclick="exportarPDF()" class="action-btn btn-pdf" style="font-size: 16px;"><i class="fas fa-file-pdf"></i></button>
             </div>
-
             <div style="overflow-x: auto;" id="tableContainer">
                 <table id="tablaAlumnos">
                     <thead><tr><th>Nombre</th><th>Gpo</th><th>Nvl</th><th>🕓</th><th>🔥</th><th style="color:#d4af37">🥇</th><th style="color:#C0C0C0">🥈</th><th style="color:#CD7F32">🥉</th><th>Acciones</th></tr></thead>
@@ -239,16 +226,42 @@
         </div>
     </div>
 
-    <div id="modalGrafica" class="modal-overlay"><div class="modal-content"><h3 id="modalNombre">Individual</h3><canvas id="studentChart"></canvas><br><button onclick="cerrarModal('modalGrafica')" class="btn btn-secondary">Cerrar</button></div></div>
-    <div id="modalGraficaGrupal" class="modal-overlay"><div class="modal-content" style="max-width: 900px;"><h3>📊 Rendimiento del Grupo</h3><div style="background: white; padding: 10px;"><canvas id="groupBigChart"></canvas></div><br><button onclick="descargarGraficaGrupal()" class="btn btn-download">Descargar Imagen</button> <button onclick="cerrarModal('modalGraficaGrupal')" class="btn btn-secondary">Cerrar</button></div></div>
+    <div id="modalGrafica" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalNombre">Individual</h3>
+            
+            <div id="printAreaInd" style="background: white; padding: 10px; border-radius: 10px;">
+                <div id="modalStats" class="report-summary"></div>
+                <canvas id="studentChart"></canvas>
+            </div>
+            
+            <br>
+            <button onclick="descargarCaptura('printAreaInd', 'Reporte_Individual.png')" class="btn btn-download"><i class="fas fa-download"></i> Descargar Imagen</button>
+            <button onclick="cerrarModal('modalGrafica')" class="btn btn-secondary">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="modalGraficaGrupal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 900px;">
+            <h3>📊 Rendimiento del Grupo</h3>
+            
+            <div id="printAreaGroup" style="background: white; padding: 10px;">
+                <div id="modalStatsGroup" class="report-summary" style="text-align: center;"></div>
+                <canvas id="groupBigChart"></canvas>
+            </div>
+            
+            <br>
+            <button onclick="descargarCaptura('printAreaGroup', 'Grafica_Grupal.png')" class="btn btn-download"><i class="fas fa-download"></i> Descargar Imagen</button>
+            <button onclick="cerrarModal('modalGraficaGrupal')" class="btn btn-secondary">Cerrar</button>
+        </div>
+    </div>
+
     <div id="modalHistorial" class="modal-overlay"><div class="modal-content"><h3 id="historialNombre">Historial 📜</h3><div style="overflow-y: auto; max-height: 300px;"><table class="history-table"><thead><tr><th>Fecha</th><th>Tiempo</th></tr></thead><tbody id="historialCuerpo"></tbody></table></div><br><button onclick="cerrarModal('modalHistorial')" class="btn btn-secondary">Cerrar</button></div></div>
     
     <div id="modalAcademico" class="modal-overlay">
         <div class="modal-content">
             <h3 id="tituloAcademico">...</h3><hr>
-            <div style="padding: 20px; font-size: 18px; color: #555;">
-                <i class="fas fa-tools"></i><br>Contenido para <b>Nivel <span id="nivelAcademico">1</span></b> próximamente.<br>
-            </div><br><button onclick="cerrarModal('modalAcademico')" class="btn btn-secondary">Cerrar</button>
+            <div style="padding: 20px; font-size: 18px; color: #555;"><i class="fas fa-tools"></i><br>Contenido para <b>Nivel <span id="nivelAcademico">1</span></b> próximamente.</div><br><button onclick="cerrarModal('modalAcademico')" class="btn btn-secondary">Cerrar</button>
         </div>
     </div>
 
@@ -261,16 +274,8 @@
 
         let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null, contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [], chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
         
-        // BASE DE DATOS DE PREGUNTAS (AGREGADO MODE: 'dictation' PARA PROBAR)
-        // type: 'translation' (Default) | type: 'dictation' (Audio only)
         const preguntasDB = {
-            1: [
-                { type: "translation", q: "Hola", a: "hello" },
-                { type: "dictation", q: "Apple", a: "apple" }, // Ejemplo Dictado
-                { type: "translation", q: "Adiós", a: "goodbye" },
-                { type: "dictation", q: "Cat", a: "cat" }, // Ejemplo Dictado
-                { type: "translation", q: "Rojo", a: "red" }
-            ],
+            1: [ { type: "translation", q: "Hola", a: "hello" }, { type: "dictation", q: "Apple", a: "apple" }, { type: "translation", q: "Adiós", a: "goodbye" }, { type: "dictation", q: "Cat", a: "cat" }, { type: "translation", q: "Rojo", a: "red" } ],
             2: [{q:"Gato",a:"cat"},{q:"Perro",a:"dog"},{q:"Azul",a:"blue"},{q:"Uno",a:"one"},{q:"Dos",a:"two"}],
             3: [{q:"Lunes",a:"monday"},{q:"Martes",a:"tuesday"},{q:"Sol",a:"sun"},{q:"Luna",a:"moon"},{q:"Agua",a:"water"}]
         };
@@ -366,89 +371,47 @@
         async function recuperarPassword() { const {value:e}=await Swal.fire({title:'Recuperar',input:'email',showCancelButton:true}); if(e) auth.sendPasswordResetEmail(e).then(()=>Swal.fire('Enviado','','success')); }
         function cerrarSesion() { db.collection("students").doc(usuarioActual).update({timeWorked:datosUsuario.timeWorked, dailyLogs:datosUsuario.dailyLogs||{}}).then(()=>auth.signOut().then(()=>location.reload())); }
 
-        // --- GAME LOGIC (AI UPGRADE) ---
+        // GAME LOGIC
         function cargarPregunta() {
             const pool = preguntasDB[nivelActual] || preguntasDB[1];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
             const qt = document.getElementById("questionText");
-            
-            // DETECTAR TIPO DE PREGUNTA
-            if (preguntaActual.type === 'dictation') {
-                qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen and write...';
-                // Auto-pronunciar
-                setTimeout(() => pronunciarPregunta(), 500); 
-            } else {
-                qt.textContent = "Translate: " + preguntaActual.q;
-            }
-            
-            document.getElementById("feedback").textContent = "";
-            document.getElementById("answerInput").value = "";
-            document.getElementById("answerInput").focus();
+            if (preguntaActual.type === 'dictation') { qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen and write...'; setTimeout(() => pronunciarPregunta(), 500); } 
+            else { qt.textContent = "Translate: " + preguntaActual.q; }
+            document.getElementById("feedback").textContent = ""; document.getElementById("answerInput").value = ""; document.getElementById("answerInput").focus();
         }
-
-        function pronunciarPregunta() {
-            if (!preguntaActual) return;
-            // Si es dictado, dice la pregunta. Si es traducción, dice la respuesta en inglés.
-            const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
-            
-            const utterance = new SpeechSynthesisUtterance(texto);
-            utterance.lang = 'en-US'; 
-            utterance.rate = 0.85; 
-            synth.speak(utterance);
-        }
-
+        function pronunciarPregunta() { if (!preguntaActual) return; const t = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a; const u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; u.rate = 0.85; synth.speak(u); }
         function activarMicrofono() {
             const btn = document.getElementById("btnMicrofono");
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { Swal.fire("Error","Usa Google Chrome para hablar.","error"); return; }
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-US'; recognition.interimResults = false; recognition.maxAlternatives = 1;
-            recognition.start(); btn.classList.add("listening");
-            recognition.onresult = (e) => {
-                const t = e.results[0][0].transcript.toLowerCase().replace('.','');
-                document.getElementById("answerInput").value = t;
-                btn.classList.remove("listening");
-                verificarRespuesta();
-            };
-            recognition.onspeechend = () => { recognition.stop(); btn.classList.remove("listening"); };
+            if (!SpeechRecognition) { Swal.fire("Error","Usa Google Chrome.","error"); return; }
+            const r = new SpeechRecognition(); r.lang = 'en-US'; r.start(); btn.classList.add("listening");
+            r.onresult = (e) => { document.getElementById("answerInput").value = e.results[0][0].transcript.toLowerCase().replace('.',''); btn.classList.remove("listening"); verificarRespuesta(); };
+            r.onspeechend = () => { r.stop(); btn.classList.remove("listening"); };
         }
-
         function abrirModalAcademico(t) { document.getElementById("modalAcademico").style.display="flex"; document.getElementById("tituloAcademico").textContent=t; document.getElementById("nivelAcademico").textContent=nivelActual; }
-
         function verificarRespuesta() {
-            const r = document.getElementById("answerInput").value.trim().toLowerCase();
-            if(!r) return;
-            contadorPreguntas++;
-            const fd = document.getElementById("feedback");
+            const r = document.getElementById("answerInput").value.trim().toLowerCase(); if(!r) return;
+            contadorPreguntas++; const fd = document.getElementById("feedback");
             if(r === preguntaActual.a.toLowerCase()) {
-                audioCorrecto.currentTime=0; audioCorrecto.play().catch(()=>{});
-                fd.textContent = "CORRECT! 🔥"; fd.style.color = "green";
-                datosUsuario.score+=10; datosUsuario.totalCorrect++; aciertosSesion++;
-                // AI Feedback Positive
-                const u = new SpeechSynthesisUtterance("Good!"); u.lang='en-US'; synth.speak(u);
+                audioCorrecto.currentTime=0; audioCorrecto.play().catch(()=>{}); fd.textContent = "CORRECT! 🔥"; fd.style.color = "green";
+                datosUsuario.score+=10; datosUsuario.totalCorrect++; aciertosSesion++; const u = new SpeechSynthesisUtterance("Good!"); u.lang='en-US'; synth.speak(u);
             } else {
-                audioError.currentTime=0; audioError.play().catch(()=>{});
-                fd.textContent = "WRONG. Answer: " + preguntaActual.a; fd.style.color = "red";
-                datosUsuario.totalWrong++;
-                // AI Correction
-                const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); u.lang='en-US'; synth.speak(u);
+                audioError.currentTime=0; audioError.play().catch(()=>{}); fd.textContent = "WRONG. Answer: " + preguntaActual.a; fd.style.color = "red";
+                datosUsuario.totalWrong++; const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); u.lang='en-US'; synth.speak(u);
             }
             db.collection("students").doc(usuarioActual).update({score:datosUsuario.score, totalCorrect:datosUsuario.totalCorrect, totalWrong:datosUsuario.totalWrong});
-            actualizarUI();
-            document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100)+"%";
+            actualizarUI(); document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100)+"%";
             if(contadorPreguntas>=5) setTimeout(finSesion, 1500); else setTimeout(cargarPregunta, 1500);
         }
-
         function finSesion() {
             let msg="", medal="";
             if(aciertosSesion===5) { msg="🏆 PERFECT!"; medal="gold"; datosUsuario.medals.gold++; audioLevelUp.play().catch(()=>{}); const n=nivelActual+1; if(!datosUsuario.unlockedLevels.includes(n)&&n<=3) datosUsuario.unlockedLevels.push(n); }
             else if(aciertosSesion===4) { msg="🥈 Good!"; medal="silver"; datosUsuario.medals.silver++; }
             else { msg="🥉 Try again."; medal="bronze"; datosUsuario.medals.bronze++; }
             db.collection("students").doc(usuarioActual).update({ unlockedLevels:datosUsuario.unlockedLevels, medals:datosUsuario.medals });
-            actualizarCandados();
-            Swal.fire({title:msg, icon:medal==='gold'?'success':'info', confirmButtonText:'OK'}).then(()=>{ contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); });
+            actualizarCandados(); Swal.fire({title:msg, icon:medal==='gold'?'success':'info', confirmButtonText:'OK'}).then(()=>{ contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); });
         }
-
         function actualizarCandados() { for(let i=2;i<=3;i++) { const e=document.getElementById(`navL${i}`); if(datosUsuario.unlockedLevels.includes(i)) {e.classList.remove("locked");e.innerHTML=`Nivel ${i}`;} else {e.classList.add("locked");e.innerHTML=`🔐 Nivel ${i}`;}} }
         function cambiarNivel(n) { if(datosUsuario.unlockedLevels.includes(n)) { nivelActual=n; document.getElementById("levelText").textContent="Nivel "+n; contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active")); event.target.classList.add("active"); } else Swal.fire("LOCKED","Need GOLD in previous level.","error"); }
 
@@ -466,11 +429,11 @@
         }
         function renderizarTabla() {
             const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>(b.score||0)-(a.score||0));
-            // Chart Global
+            
             const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy();
             const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(b.score||0),0)/gs.length;});
             chartGlobalInstance=new Chart(ctx,{type:'bar',data:{labels:gl,datasets:[{label:'Promedio',data:prom,backgroundColor:'#004e92'}]},options:{maintainAspectRatio:false}});
-            // Tabla
+            
             const tb=document.getElementById("cuerpoTabla"); tb.innerHTML="";
             d.forEach(s=>{
                 const m=s.medals||{gold:0,silver:0,bronze:0}, r=s.currentStreak||1, ir=r>1?'🔥':'😔';
@@ -495,20 +458,52 @@
             document.getElementById("modalHistorial").style.display="flex"; document.getElementById("historialNombre").textContent="Historial: "+s.username;
             Object.keys(l).sort().reverse().forEach(f=>{ tb.innerHTML+=`<tr><td>${f}</td><td style="color:blue;font-weight:bold">${formatearTiempo(l[f])}</td></tr>`; });
         }
+
+        // --- FUNCIONES MEJORADAS CON TEXTO EN IMAGEN ---
         function verGraficaInd(uid) {
-            const s=listaAlumnosCache.find(x=>x.uid===uid); document.getElementById("modalGrafica").style.display="flex"; document.getElementById("modalNombre").textContent=s.username;
+            const s=listaAlumnosCache.find(x=>x.uid===uid); 
+            document.getElementById("modalGrafica").style.display="flex"; 
+            document.getElementById("modalNombre").textContent=s.username;
+            
+            // LLENAR ESTADISTICAS VISIBLES
+            const m = s.medals || {gold:0, silver:0, bronze:0};
+            document.getElementById("modalStats").innerHTML = `
+                <p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p>
+                <p><b>Racha:</b> ${s.currentStreak||1} días 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p>
+                <p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p>
+            `;
+
             if(chartStudentInstance) chartStudentInstance.destroy();
-            chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅','❌'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}});
+            chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅ Correctas','❌ Incorrectas'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}});
         }
+        
         function verGraficaGrupal() {
             const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>b.score-a.score);
-            document.getElementById("modalGraficaGrupal").style.display="flex"; const ctx=document.getElementById('groupBigChart').getContext('2d');
+            document.getElementById("modalGraficaGrupal").style.display="flex"; 
+            
+            // RESUMEN GRUPAL
+            const totalPuntos = d.reduce((acc, curr) => acc + (curr.score || 0), 0);
+            const promedio = d.length > 0 ? (totalPuntos / d.length).toFixed(1) : 0;
+            document.getElementById("modalStatsGroup").innerHTML = `<p><b>Total Alumnos:</b> ${d.length} | <b>Promedio Puntos:</b> ${promedio}</p>`;
+
+            const ctx=document.getElementById('groupBigChart').getContext('2d');
             if(chartGroupInstance) chartGroupInstance.destroy();
-            chartGroupInstance=new Chart(ctx,{type:'bar',data:{labels:d.map(s=>s.username),datasets:[{label:'Puntos',data:d.map(s=>s.score),backgroundColor:'#004e92'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}});
+            chartGroupInstance=new Chart(ctx,{type:'bar',data:{labels:d.map(s=>s.username),datasets:[{label:'Puntos Totales',data:d.map(s=>s.score),backgroundColor:'#004e92'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}});
         }
-        function descargarGraficaGrupal() { const l=document.createElement('a'); l.download='Grafica.png'; l.href=document.getElementById('groupBigChart').toDataURL(); l.click(); }
+        
+        // DESCARGA INTELIGENTE (CAPTURA TODO EL DIV)
+        function descargarCaptura(divId, nombreArchivo) {
+            const element = document.getElementById(divId);
+            html2canvas(element).then(canvas => {
+                const link = document.createElement('a');
+                link.download = nombreArchivo;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }
+
         function cerrarModal(id) { document.getElementById(id).style.display="none"; }
-        function exportarExcel() { const ws=XLSX.utils.json_to_sheet(listaAlumnosCache.map(s=>({Nombre:s.username,Grupo:s.group,Puntos:s.score}))); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Reporte"); XLSX.writeFile(wb,"Reporte.xlsx"); }
+        function exportarExcel() { const ws=XLSX.utils.json_to_sheet(listaAlumnosCache.map(s=>({Nombre:s.username,Grupo:s.group,Puntos:s.score,Tiempo:formatearTiempo(s.timeWorked||0)}))); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Reporte"); XLSX.writeFile(wb,"Reporte.xlsx"); }
         function exportarPDF() { html2pdf().from(document.getElementById('teacherPanel')).save(); }
 
         document.getElementById("answerInput").addEventListener("keypress", function(e) { if (e.key === "Enter") verificarRespuesta(); });
