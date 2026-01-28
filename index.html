@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - POLYGLOT PRO</title>
+    <title>Inglés Para Todos - MASTER STABLE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -36,7 +36,7 @@
         .btn-shop { background: #ff9800; background: linear-gradient(45deg, #ff9800, #ff5722); box-shadow: 0 4px 0 #bf360c; }
         .btn-shop:active { transform: translateY(4px); box-shadow: none; }
 
-        /* --- NUEVA BARRA DE HABILIDADES (SKILLS BAR) --- */
+        /* SKILLS BAR */
         .skills-bar { display: flex; justify-content: center; gap: 15px; margin: 20px 0; background: #f0f2f5; padding: 10px; border-radius: 50px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
         .skill-btn { width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 24px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #555; }
         .skill-label { font-size: 9px; margin-top: 2px; font-weight: bold; text-transform: uppercase; }
@@ -44,9 +44,7 @@
         .skill-btn.active-listening { background: #17a2b8; color: white; transform: scale(1.1); box-shadow: 0 0 15px rgba(23, 162, 184, 0.5); }
         .skill-btn.active-speaking { background: #ffc107; color: #333; transform: scale(1.1); box-shadow: 0 0 15px rgba(255, 193, 7, 0.5); }
         .skill-btn.active-writing { background: #28a745; color: white; transform: scale(1.1); box-shadow: 0 0 15px rgba(40, 167, 69, 0.5); }
-        
         .skill-btn:active { transform: scale(0.95); }
-        /* Animación pulso para micrófono activo */
         @keyframes pulseMic { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
         .mic-listening { background: #ff0000 !important; color: white !important; animation: pulseMic 1.5s infinite; }
 
@@ -64,6 +62,7 @@
         .nav-item.active { color: var(--primary); font-weight: bold; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
         
+        /* HUD & AVATAR */
         .hud-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 12px; font-weight: bold; background: #f0f2f5; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
         .hud-item { display: flex; flex-direction: column; align-items: center; }
         .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -96,6 +95,10 @@
         .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
         .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
         .teacher-controls { display: flex; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 15px; align-items: center; margin-bottom: 15px; }
+        
+        .history-table { width: 100%; margin-top: 15px; text-align: left; }
+        .history-table th { background: #6c757d; }
+        
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
@@ -188,21 +191,13 @@
         <div class="card">
             <span id="levelText" style="background:#ffd700; padding:5px 10px; border-radius:10px; font-weight:bold;">Nivel 1</span>
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
-            <div id="questionText" class="question-box">...</div>
+            
+            <div id="questionText" class="question-box">Cargando...</div>
             
             <div class="skills-bar">
-                <button onclick="pronunciarPregunta()" class="skill-btn" id="btnListen" title="Listening">
-                    👂
-                    <span class="skill-label">Listen</span>
-                </button>
-                <button onclick="activarMicrofono()" class="skill-btn" id="btnMicrofono" title="Speaking">
-                    🎤
-                    <span class="skill-label">Speak</span>
-                </button>
-                <button onclick="activarEscritura()" class="skill-btn" id="btnWrite" title="Writing">
-                    ✍️
-                    <span class="skill-label">Write</span>
-                </button>
+                <button onclick="pronunciarPregunta()" class="skill-btn" id="btnListen" title="Listening">👂<span class="skill-label">Listen</span></button>
+                <button onclick="activarMicrofono()" class="skill-btn" id="btnMicrofono" title="Speaking">🎤<span class="skill-label">Speak</span></button>
+                <button onclick="activarEscritura()" class="skill-btn" id="btnWrite" title="Writing">✍️<span class="skill-label">Write</span></button>
             </div>
 
             <input type="text" id="answerInput" placeholder="Write or Speak..." autocomplete="off">
@@ -282,7 +277,7 @@
 
         let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null, contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [], chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
         
-        // --- CATÁLOGO TIENDA ---
+        // --- CATÁLOGO ---
         const shopCatalog = [
             { id: 'av_1', type: 'avatar', name: 'Super Boy', price: 100, icon: '🦸‍♂️' }, { id: 'av_2', type: 'avatar', name: 'Super Girl', price: 100, icon: '🦸‍♀️' },
             { id: 'av_3', type: 'avatar', name: 'Ninja', price: 200, icon: '🥷' }, { id: 'av_4', type: 'avatar', name: 'Robot', price: 300, icon: '🤖' }, { id: 'av_5', type: 'avatar', name: 'Wizard', price: 500, icon: '🧙‍♂️' },
@@ -300,26 +295,24 @@
             3: [{q:"Lunes",a:"monday"},{q:"Martes",a:"tuesday"},{q:"Sol",a:"sun"},{q:"Luna",a:"moon"},{q:"Agua",a:"water"}]
         };
 
-        // --- MANEJO AVANZADO DE VOCES (GOOGLE/APPLE) ---
         let vocesDisponibles = [];
-        function cargarVoces() {
-            vocesDisponibles = synth.getVoices();
-        }
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = cargarVoces;
-        }
+        function cargarVoces() { vocesDisponibles = synth.getVoices(); }
+        if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVoces; }
 
+        // --- AUTH & INIT ---
         auth.onAuthStateChanged((user) => {
             if (user) {
                 usuarioActual = user.uid;
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
+                        // BLINDAJE DE DATOS
                         if(!datosUsuario.timeWorked) datosUsuario.timeWorked = 0;
                         if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
                         if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {};
                         if(!datosUsuario.inventory) datosUsuario.inventory = [];
                         if(!datosUsuario.equipped) datosUsuario.equipped = { avatar: '👤', frame: '', theme: '' };
+                        if(!datosUsuario.unlockedLevels) datosUsuario.unlockedLevels = [1]; // FORCE LEVEL 1
 
                         const hoy = new Date().toLocaleDateString('es-ES');
                         if (!datosUsuario.lastLoginDate) { datosUsuario.lastLoginDate = hoy; datosUsuario.currentStreak = 1; }
@@ -450,96 +443,64 @@
         async function recuperarPassword() { const {value:e}=await Swal.fire({title:'Recuperar',input:'email',showCancelButton:true}); if(e) auth.sendPasswordResetEmail(e).then(()=>Swal.fire('Enviado','','success')); }
         function cerrarSesion() { db.collection("students").doc(usuarioActual).update({timeWorked:datosUsuario.timeWorked, dailyLogs:datosUsuario.dailyLogs||{}}).then(()=>auth.signOut().then(()=>location.reload())); }
 
-        // --- LOGICA DE JUEGO (SKILLS & VOICE OPTIMIZED) ---
+        // --- GAME LOGIC ---
         function cargarPregunta() {
+            if(!nivelActual) nivelActual = 1;
             const pool = preguntasDB[nivelActual] || preguntasDB[1];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
             const qt = document.getElementById("questionText");
-            
-            // Si es dictado, ocultar texto y preparar
             if (preguntaActual.type === 'dictation') { 
                 qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen...'; 
-                // Auto-play solo si el navegador lo permite sin interacción (raro en iOS, común en PC)
                 setTimeout(() => pronunciarPregunta(), 500); 
             } else { 
                 qt.textContent = "Translate: " + preguntaActual.q; 
             }
-            
             document.getElementById("feedback").textContent = ""; 
             document.getElementById("answerInput").value = ""; 
-            // Reset botones activos
             document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active-listening', 'active-speaking', 'active-writing', 'mic-listening'));
         }
 
-        // SELECCIONADOR DE MEJOR VOZ (CRITICO PARA GOOGLE/APPLE)
         function seleccionarMejorVoz(lang = 'en') {
             if (vocesDisponibles.length === 0) cargarVoces();
-            // 1. Buscar voz Premium de Google (Android/Chrome)
             let voz = vocesDisponibles.find(v => v.name.includes('Google US English'));
-            // 2. Buscar voz Premium de Apple (Safari/iOS) - Samantha o Daniel
             if (!voz) voz = vocesDisponibles.find(v => v.name.includes('Samantha'));
             if (!voz) voz = vocesDisponibles.find(v => v.name.includes('Daniel'));
-            // 3. Buscar cualquier voz en inglés nativo
             if (!voz) voz = vocesDisponibles.find(v => v.lang === 'en-US');
-            // 4. Default
             return voz;
         }
 
         function pronunciarPregunta() {
             if (!preguntaActual) return;
             const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
-            
-            // Animación botón
             const btn = document.getElementById('btnListen');
-            btn.classList.add('active-listening');
-            setTimeout(() => btn.classList.remove('active-listening'), 1000);
-
+            btn.classList.add('active-listening'); setTimeout(() => btn.classList.remove('active-listening'), 1000);
             const utterance = new SpeechSynthesisUtterance(texto);
             const vozElegida = seleccionarMejorVoz();
             if (vozElegida) utterance.voice = vozElegida;
-            
-            utterance.lang = 'en-US'; 
-            utterance.rate = 0.9; // Un poco más lento para claridad
-            synth.cancel(); // Detener anterior
-            synth.speak(utterance);
+            utterance.lang = 'en-US'; utterance.rate = 0.9; 
+            synth.cancel(); synth.speak(utterance);
         }
 
         function activarMicrofono() {
             const btn = document.getElementById("btnMicrofono");
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
-            if (!SpeechRecognition) { 
-                Swal.fire("Aviso", "Tu navegador no soporta micrófono. Intenta escribir.", "info"); 
-                activarEscritura();
-                return; 
-            }
-            
+            if (!SpeechRecognition) { Swal.fire("Aviso", "Navegador no compatible. Usa Chrome.", "info"); activarEscritura(); return; }
             const recognition = new SpeechRecognition();
-            recognition.lang = 'en-US'; 
-            recognition.interimResults = false; 
-            recognition.maxAlternatives = 1;
-            
-            recognition.start();
-            btn.classList.add("mic-listening", "active-speaking");
-            
+            recognition.lang = 'en-US'; recognition.interimResults = false; recognition.maxAlternatives = 1;
+            recognition.start(); btn.classList.add("mic-listening", "active-speaking");
             recognition.onresult = (e) => {
                 const t = e.results[0][0].transcript.toLowerCase().replace('.','');
                 document.getElementById("answerInput").value = t;
                 btn.classList.remove("mic-listening", "active-speaking");
                 verificarRespuesta();
             };
-            
             recognition.onspeechend = () => { recognition.stop(); btn.classList.remove("mic-listening", "active-speaking"); };
-            recognition.onerror = () => { 
-                btn.classList.remove("mic-listening", "active-speaking"); 
-                // Fallback silencioso
-            };
+            recognition.onerror = () => { btn.classList.remove("mic-listening", "active-speaking"); };
         }
 
         function activarEscritura() {
             const btn = document.getElementById("btnWrite");
-            btn.classList.add("active-writing");
-            document.getElementById("answerInput").focus();
+            btn.classList.add("active-writing"); document.getElementById("answerInput").focus();
             setTimeout(() => btn.classList.remove("active-writing"), 500);
         }
 
@@ -548,7 +509,6 @@
         function verificarRespuesta() {
             const r = document.getElementById("answerInput").value.trim().toLowerCase(); if(!r) return;
             contadorPreguntas++; const fd = document.getElementById("feedback");
-            
             if(r === preguntaActual.a.toLowerCase()) {
                 audioCorrecto.currentTime=0; audioCorrecto.play().catch(()=>{}); fd.textContent = "CORRECT! 🔥"; fd.style.color = "green";
                 datosUsuario.score+=10; datosUsuario.totalCorrect++; aciertosSesion++; 
@@ -614,10 +574,28 @@
             Object.keys(l).sort().reverse().forEach(f=>{ tb.innerHTML+=`<tr><td>${f}</td><td style="color:blue;font-weight:bold">${formatearTiempo(l[f])}</td></tr>`; });
         }
 
+        // --- REPORTES CON INVENTARIO ---
         function verGraficaInd(uid) {
             const s=listaAlumnosCache.find(x=>x.uid===uid); document.getElementById("modalGrafica").style.display="flex"; document.getElementById("modalNombre").textContent=s.username;
             const m = s.medals || {gold:0, silver:0, bronze:0};
-            document.getElementById("modalStats").innerHTML = `<p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p><p><b>Racha:</b> ${s.currentStreak||1} 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p><p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p>`;
+            
+            // MAPEO DEL INVENTARIO
+            let itemsTexto = "Ninguna compra";
+            if (s.inventory && s.inventory.length > 0) {
+                itemsTexto = s.inventory.map(id => {
+                    const item = shopCatalog.find(i => i.id === id);
+                    return item ? `${item.icon} ${item.name}` : id;
+                }).join(', ');
+            }
+
+            document.getElementById("modalStats").innerHTML = `
+                <p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p>
+                <p><b>Racha:</b> ${s.currentStreak||1} 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p>
+                <p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p>
+                <hr>
+                <p><b>🎒 Inventario / Compras:</b></p>
+                <p style="font-size:12px; color:#555;">${itemsTexto}</p>
+            `;
             if(chartStudentInstance) chartStudentInstance.destroy();
             chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅ Correctas','❌ Incorrectas'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}});
         }
