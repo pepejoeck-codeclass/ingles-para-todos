@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - HEROES SHOP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inglés Para Todos - POLYGLOT PRO</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,31 +18,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* VARIABLES DINÁMICAS PARA TEMAS */
-        :root { 
-            --primary: #004e92; 
-            --secondary: #000428; 
-            --accent: #ff0000; 
-            --bg-color: linear-gradient(135deg, #000428, #004e92);
-            --gold: #ffd700; 
-            --silver: #C0C0C0; 
-            --bronze: #CD7F32; 
-            --white: #ffffff; 
-            --text-color: #333;
-        }
-
-        body { font-family: 'Nunito', sans-serif; background: var(--bg-color); margin: 0; min-height: 100vh; color: var(--text-color); display: flex; flex-direction: column; align-items: center; transition: background 0.5s; }
+        :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
+        body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; }
         .login-width { max-width: 500px; margin: 0 auto; }
         
         .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; position: relative; transition: all 0.3s; }
         
-        /* IMAGENES */
         .logo-img { width: 100%; max-width: 300px; margin-bottom: 10px; }
         .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; margin: 10px auto; display: block; object-fit: cover; }
         .teacher-header-img { width: 100%; max-height: 180px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 10px; }
         
-        /* INPUTS Y BOTONES */
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; font-family: 'Nunito'; }
         .btn { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; background: var(--primary); }
         .btn-danger { background: var(--accent); } .btn-secondary { background: #6c757d; }
@@ -50,14 +36,19 @@
         .btn-shop { background: #ff9800; background: linear-gradient(45deg, #ff9800, #ff5722); box-shadow: 0 4px 0 #bf360c; }
         .btn-shop:active { transform: translateY(4px); box-shadow: none; }
 
-        /* AUDIO CONTROLS */
-        .audio-controls { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
-        .btn-audio { width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer; font-size: 24px; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
-        .btn-speak { background: #17a2b8; color: white; }
-        .btn-mic { background: #ffc107; color: #333; }
-        .btn-mic.listening { background: #ff0000; color: white; animation: pulse 1s infinite; }
-        .btn-audio:active { transform: translateY(4px); box-shadow: none; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
+        /* --- NUEVA BARRA DE HABILIDADES (SKILLS BAR) --- */
+        .skills-bar { display: flex; justify-content: center; gap: 15px; margin: 20px 0; background: #f0f2f5; padding: 10px; border-radius: 50px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .skill-btn { width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 24px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #555; }
+        .skill-label { font-size: 9px; margin-top: 2px; font-weight: bold; text-transform: uppercase; }
+        
+        .skill-btn.active-listening { background: #17a2b8; color: white; transform: scale(1.1); box-shadow: 0 0 15px rgba(23, 162, 184, 0.5); }
+        .skill-btn.active-speaking { background: #ffc107; color: #333; transform: scale(1.1); box-shadow: 0 0 15px rgba(255, 193, 7, 0.5); }
+        .skill-btn.active-writing { background: #28a745; color: white; transform: scale(1.1); box-shadow: 0 0 15px rgba(40, 167, 69, 0.5); }
+        
+        .skill-btn:active { transform: scale(0.95); }
+        /* Animación pulso para micrófono activo */
+        @keyframes pulseMic { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
+        .mic-listening { background: #ff0000 !important; color: white !important; animation: pulseMic 1.5s infinite; }
 
         /* ACADEMIC */
         .academic-nav { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -65,7 +56,6 @@
         .btn-vocab { background: linear-gradient(45deg, #11998e, #38ef7d); }
         .btn-grammar { background: linear-gradient(45deg, #833ab4, #fd1d1d); }
 
-        /* JUEGO */
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
         .question-box { font-size: 22px; font-weight: bold; color: var(--secondary); margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 5px solid var(--primary); }
@@ -74,50 +64,16 @@
         .nav-item.active { color: var(--primary); font-weight: bold; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
         
-        /* HUD & AVATAR */
         .hud-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 12px; font-weight: bold; background: #f0f2f5; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
         .hud-item { display: flex; flex-direction: column; align-items: center; }
         .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .avatar-display { font-size: 24px; width: 40px; height: 40px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
         
-        /* ESTILOS DE MARCOS (FRAMES) */
+        /* FRAMES & TIENDA */
         .frame-gold { border: 3px solid gold; box-shadow: 0 0 10px gold; }
         .frame-fire { border: 3px solid orangered; box-shadow: 0 0 10px red; }
         .frame-neon { border: 3px solid cyan; box-shadow: 0 0 10px cyan; }
         .frame-matrix { border: 3px solid lime; box-shadow: 0 0 10px lime; background: #000; color: lime; }
-
-        /* MAESTRO */
-        .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
-        th { background: var(--primary); color: white; }
-        .action-btn { padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; font-size: 14px; }
-        .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-edit { background: #ffc107; color: black; } .btn-history { background: #795548; }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
-        .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
-        .teacher-controls { display: flex; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 15px; align-items: center; margin-bottom: 15px; }
-        .history-table { width: 100%; margin-top: 15px; text-align: left; }
-        .history-table th { background: #6c757d; }
-        
-        /* COMMUNITY */
-        .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-        .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
-        .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
-        .leader-table { width: 100%; font-size: 14px; border-collapse: collapse; }
-        .leader-table th { background: #f1f1f1; color: #333; padding: 8px; }
-        .leader-table td { padding: 8px; border-bottom: 1px solid #eee; }
-        .rank-1 { background-color: #fff9db; font-weight: bold; } .rank-1 td:first-child::before { content: '🥇 '; }
-        .rank-2 { background-color: #f8f9fa; } .rank-2 td:first-child::before { content: '🥈 '; }
-        .rank-3 { background-color: #fff0e6; } .rank-3 td:first-child::before { content: '🥉 '; }
-
-        /* MODALS */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; text-align: center; }
-        .report-summary { background: #f8f9fa; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--primary); text-align: left; font-size: 14px; }
-        .report-summary strong { color: var(--primary); }
-
-        /* --- ESTILOS DE LA TIENDA --- */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
         .shop-item { border: 1px solid #ddd; border-radius: 10px; padding: 10px; cursor: pointer; transition: 0.2s; position: relative; }
         .shop-item:hover { transform: scale(1.05); border-color: var(--primary); }
@@ -128,6 +84,31 @@
         .shop-tabs { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
         .shop-tab { padding: 5px 15px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; background: #f1f1f1; }
         .shop-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* MAESTRO & COMUNIDAD */
+        .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
+        th { background: var(--primary); color: white; }
+        .action-btn { padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; font-size: 14px; }
+        .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-edit { background: #ffc107; color: black; } .btn-history { background: #795548; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
+        .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
+        .teacher-controls { display: flex; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 15px; align-items: center; margin-bottom: 15px; }
+        .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
+        .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
+        .leader-table { width: 100%; font-size: 14px; border-collapse: collapse; }
+        .leader-table th { background: #f1f1f1; color: #333; padding: 8px; }
+        .leader-table td { padding: 8px; border-bottom: 1px solid #eee; }
+        .rank-1 { background-color: #fff9db; font-weight: bold; } .rank-1 td:first-child::before { content: '🥇 '; }
+        .rank-2 { background-color: #f8f9fa; } .rank-2 td:first-child::before { content: '🥈 '; }
+        .rank-3 { background-color: #fff0e6; } .rank-3 td:first-child::before { content: '🥉 '; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; text-align: center; }
+        .report-summary { background: #f8f9fa; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--primary); text-align: left; font-size: 14px; }
+        .report-summary strong { color: var(--primary); }
     </style>
 </head>
 <body>
@@ -208,10 +189,22 @@
             <span id="levelText" style="background:#ffd700; padding:5px 10px; border-radius:10px; font-weight:bold;">Nivel 1</span>
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
             <div id="questionText" class="question-box">...</div>
-            <div class="audio-controls">
-                <button onclick="pronunciarPregunta()" class="btn-audio btn-speak" title="Listen">🔊</button>
-                <button onclick="activarMicrofono()" id="btnMicrofono" class="btn-audio btn-mic" title="Speak">🎤</button>
+            
+            <div class="skills-bar">
+                <button onclick="pronunciarPregunta()" class="skill-btn" id="btnListen" title="Listening">
+                    👂
+                    <span class="skill-label">Listen</span>
+                </button>
+                <button onclick="activarMicrofono()" class="skill-btn" id="btnMicrofono" title="Speaking">
+                    🎤
+                    <span class="skill-label">Speak</span>
+                </button>
+                <button onclick="activarEscritura()" class="skill-btn" id="btnWrite" title="Writing">
+                    ✍️
+                    <span class="skill-label">Write</span>
+                </button>
             </div>
+
             <input type="text" id="answerInput" placeholder="Write or Speak..." autocomplete="off">
             <button onclick="verificarRespuesta()" class="btn">CHECK</button>
             <div id="feedback" style="margin-top: 15px; font-weight: bold; height: 20px;"></div>
@@ -270,16 +263,12 @@
         <div class="modal-content">
             <h3>🛒 Tienda de Héroes</h3>
             <div style="margin-bottom: 10px;">Tus Puntos: <b id="shopPoints" style="color:green">0</b></div>
-            
             <div class="shop-tabs">
                 <div class="shop-tab active" onclick="filtrarTienda('avatar')">Avatares</div>
                 <div class="shop-tab" onclick="filtrarTienda('frame')">Marcos</div>
                 <div class="shop-tab" onclick="filtrarTienda('theme')">Temas</div>
             </div>
-
-            <div id="shopGrid" class="shop-grid">
-                </div>
-            
+            <div id="shopGrid" class="shop-grid"></div>
             <br><button onclick="cerrarModal('modalTienda')" class="btn btn-secondary">Cerrar</button>
         </div>
     </div>
@@ -293,29 +282,32 @@
 
         let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null, contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [], chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
         
-        // --- CATÁLOGO DE LA TIENDA ---
+        // --- CATÁLOGO TIENDA ---
         const shopCatalog = [
-            { id: 'av_1', type: 'avatar', name: 'Super Boy', price: 100, icon: '🦸‍♂️' },
-            { id: 'av_2', type: 'avatar', name: 'Super Girl', price: 100, icon: '🦸‍♀️' },
-            { id: 'av_3', type: 'avatar', name: 'Ninja', price: 200, icon: '🥷' },
-            { id: 'av_4', type: 'avatar', name: 'Robot', price: 300, icon: '🤖' },
-            { id: 'av_5', type: 'avatar', name: 'Wizard', price: 500, icon: '🧙‍♂️' },
-            
-            { id: 'fr_1', type: 'frame', name: 'Gold', price: 150, class: 'frame-gold' },
-            { id: 'fr_2', type: 'frame', name: 'Fire', price: 300, class: 'frame-fire' },
-            { id: 'fr_3', type: 'frame', name: 'Neon', price: 400, class: 'frame-neon' },
-            { id: 'fr_4', type: 'frame', name: 'Matrix', price: 600, class: 'frame-matrix' },
-
+            { id: 'av_1', type: 'avatar', name: 'Super Boy', price: 100, icon: '🦸‍♂️' }, { id: 'av_2', type: 'avatar', name: 'Super Girl', price: 100, icon: '🦸‍♀️' },
+            { id: 'av_3', type: 'avatar', name: 'Ninja', price: 200, icon: '🥷' }, { id: 'av_4', type: 'avatar', name: 'Robot', price: 300, icon: '🤖' }, { id: 'av_5', type: 'avatar', name: 'Wizard', price: 500, icon: '🧙‍♂️' },
+            { id: 'fr_1', type: 'frame', name: 'Gold', price: 150, class: 'frame-gold' }, { id: 'fr_2', type: 'frame', name: 'Fire', price: 300, class: 'frame-fire' },
+            { id: 'fr_3', type: 'frame', name: 'Neon', price: 400, class: 'frame-neon' }, { id: 'fr_4', type: 'frame', name: 'Matrix', price: 600, class: 'frame-matrix' },
             { id: 'th_1', type: 'theme', name: 'Dark Mode', price: 200, colors: {bg:'linear-gradient(135deg, #000000, #434343)', card:'#222', text:'#fff'} },
             { id: 'th_2', type: 'theme', name: 'Forest', price: 200, colors: {bg:'linear-gradient(135deg, #134e5e, #71b280)', card:'#fff', text:'#333'} },
             { id: 'th_3', type: 'theme', name: 'Candy', price: 200, colors: {bg:'linear-gradient(135deg, #ff9a9e, #fecfef)', card:'#fff', text:'#333'} }
         ];
 
+        // --- PREGUNTAS ---
         const preguntasDB = {
             1: [ { type: "translation", q: "Hola", a: "hello" }, { type: "dictation", q: "Apple", a: "apple" }, { type: "translation", q: "Adiós", a: "goodbye" }, { type: "dictation", q: "Cat", a: "cat" }, { type: "translation", q: "Rojo", a: "red" } ],
             2: [{q:"Gato",a:"cat"},{q:"Perro",a:"dog"},{q:"Azul",a:"blue"},{q:"Uno",a:"one"},{q:"Dos",a:"two"}],
             3: [{q:"Lunes",a:"monday"},{q:"Martes",a:"tuesday"},{q:"Sol",a:"sun"},{q:"Luna",a:"moon"},{q:"Agua",a:"water"}]
         };
+
+        // --- MANEJO AVANZADO DE VOCES (GOOGLE/APPLE) ---
+        let vocesDisponibles = [];
+        function cargarVoces() {
+            vocesDisponibles = synth.getVoices();
+        }
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = cargarVoces;
+        }
 
         auth.onAuthStateChanged((user) => {
             if (user) {
@@ -323,12 +315,9 @@
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
-                        // Inicializadores seguros
                         if(!datosUsuario.timeWorked) datosUsuario.timeWorked = 0;
                         if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
                         if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {};
-                        
-                        // Inicializadores Tienda
                         if(!datosUsuario.inventory) datosUsuario.inventory = [];
                         if(!datosUsuario.equipped) datosUsuario.equipped = { avatar: '👤', frame: '', theme: '' };
 
@@ -347,110 +336,53 @@
             } else { usuarioActual = null; detenerCronometro(); if(document.getElementById("teacherPanel").style.display === "none") mostrarLogin(); }
         });
 
-        document.addEventListener("DOMContentLoaded", () => { cargarNoticias(); cargarLeaderboard(); });
+        document.addEventListener("DOMContentLoaded", () => { cargarNoticias(); cargarLeaderboard(); cargarVoces(); });
 
-        // --- TIENDA LOGIC ---
-        function abrirTienda() {
-            document.getElementById("modalTienda").style.display = "flex";
-            document.getElementById("shopPoints").textContent = datosUsuario.score || 0;
-            filtrarTienda('avatar'); // Default tab
-        }
-
+        // --- TIENDA ---
+        function abrirTienda() { document.getElementById("modalTienda").style.display="flex"; document.getElementById("shopPoints").textContent = datosUsuario.score || 0; filtrarTienda('avatar'); }
         function filtrarTienda(tipo) {
             document.querySelectorAll(".shop-tab").forEach(t => t.classList.remove("active"));
             document.querySelector(`.shop-tab[onclick="filtrarTienda('${tipo}')"]`).classList.add("active");
-            
-            const grid = document.getElementById("shopGrid");
-            grid.innerHTML = "";
-            
-            const items = shopCatalog.filter(i => i.type === tipo);
-            
-            items.forEach(item => {
+            const grid = document.getElementById("shopGrid"); grid.innerHTML = "";
+            shopCatalog.filter(i => i.type === tipo).forEach(item => {
                 const owned = (datosUsuario.inventory || []).includes(item.id);
                 let equipped = false;
                 if(tipo === 'avatar' && datosUsuario.equipped.avatar === item.icon) equipped = true;
                 if(tipo === 'frame' && datosUsuario.equipped.frame === item.class) equipped = true;
                 if(tipo === 'theme' && JSON.stringify(datosUsuario.equipped.theme) === JSON.stringify(item.colors)) equipped = true;
-
-                const div = document.createElement("div");
-                div.className = "shop-item";
-                div.innerHTML = `
-                    <div class="shop-icon">${item.icon || (tipo==='frame'?'🖼️':'🎨')}</div>
-                    <div>${item.name}</div>
-                    ${equipped ? '<div class="shop-equipped">✅</div>' : ''}
-                    <div class="${owned ? 'shop-owned' : 'shop-price'}">
-                        ${owned ? (equipped ? 'En uso' : 'Adquirido') : '💰 ' + item.price}
-                    </div>
-                `;
-                
-                div.onclick = () => {
-                    if (equipped) return; // Ya lo trae
-                    if (owned) equiparItem(item); // Si lo tiene, equipar
-                    else comprarItem(item); // Si no, comprar
-                };
+                const div = document.createElement("div"); div.className = "shop-item";
+                div.innerHTML = `<div class="shop-icon">${item.icon || (tipo==='frame'?'🖼️':'🎨')}</div><div>${item.name}</div>${equipped ? '<div class="shop-equipped">✅</div>' : ''}<div class="${owned ? 'shop-owned' : 'shop-price'}">${owned ? (equipped ? 'En uso' : 'Adquirido') : '💰 ' + item.price}</div>`;
+                div.onclick = () => { if(equipped) return; if(owned) equiparItem(item); else comprarItem(item); };
                 grid.appendChild(div);
             });
         }
-
         function comprarItem(item) {
             if (datosUsuario.score >= item.price) {
-                Swal.fire({
-                    title: `¿Comprar ${item.name}?`,
-                    text: `Cuesta ${item.price} puntos.`,
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, comprar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        datosUsuario.score -= item.price;
-                        datosUsuario.inventory.push(item.id);
-                        db.collection("students").doc(usuarioActual).update({
-                            score: datosUsuario.score,
-                            inventory: datosUsuario.inventory
-                        });
-                        document.getElementById("shopPoints").textContent = datosUsuario.score;
-                        filtrarTienda(item.type);
-                        Swal.fire("¡Comprado!", "Ahora puedes equiparlo.", "success");
-                        actualizarUI(); // Refrescar puntos en HUD
+                Swal.fire({title: `¿Comprar ${item.name}?`, text: `Cuesta ${item.price} puntos.`, showCancelButton: true, confirmButtonText: 'Sí'}).then((res) => {
+                    if (res.isConfirmed) {
+                        datosUsuario.score -= item.price; datosUsuario.inventory.push(item.id);
+                        db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, inventory: datosUsuario.inventory });
+                        document.getElementById("shopPoints").textContent = datosUsuario.score; filtrarTienda(item.type); Swal.fire("¡Comprado!", "", "success"); actualizarUI();
                     }
                 });
-            } else {
-                Swal.fire("Saldo Insuficiente", "Necesitas más puntos. ¡Sigue practicando!", "error");
-            }
+            } else Swal.fire("Saldo Insuficiente", "", "error");
         }
-
         function equiparItem(item) {
             if(item.type === 'avatar') datosUsuario.equipped.avatar = item.icon;
             if(item.type === 'frame') datosUsuario.equipped.frame = item.class;
             if(item.type === 'theme') datosUsuario.equipped.theme = item.colors;
-
             db.collection("students").doc(usuarioActual).update({ equipped: datosUsuario.equipped });
-            aplicarCosmeticos();
-            filtrarTienda(item.type);
+            aplicarCosmeticos(); filtrarTienda(item.type);
         }
-
         function aplicarCosmeticos() {
-            // Avatar
             document.getElementById("myAvatar").textContent = datosUsuario.equipped.avatar || '👤';
-            
-            // Frame (Marco)
             document.getElementById("myAvatar").className = "avatar-display " + (datosUsuario.equipped.frame || "");
-            
-            // Theme
             const t = datosUsuario.equipped.theme;
-            if(t) {
-                document.body.style.background = t.bg;
-                document.querySelectorAll(".card").forEach(c => {
-                    c.style.background = t.card;
-                    c.style.color = t.text;
-                });
-            } else {
-                // Reset default
-                document.body.style.background = "linear-gradient(135deg, #000428, #004e92)";
-                document.querySelectorAll(".card").forEach(c => { c.style.background = "#ffffff"; c.style.color = "#333"; });
-            }
+            if(t) { document.body.style.background = t.bg; document.querySelectorAll(".card").forEach(c => { c.style.background = t.card; c.style.color = t.text; }); }
+            else { document.body.style.background = "linear-gradient(135deg, #000428, #004e92)"; document.querySelectorAll(".card").forEach(c => { c.style.background = "#ffffff"; c.style.color = "#333"; }); }
         }
 
-        // --- SISTEMA ORIGINAL ---
+        // --- SISTEMA CORE ---
         function iniciarCronometro() {
             if(timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -518,33 +450,113 @@
         async function recuperarPassword() { const {value:e}=await Swal.fire({title:'Recuperar',input:'email',showCancelButton:true}); if(e) auth.sendPasswordResetEmail(e).then(()=>Swal.fire('Enviado','','success')); }
         function cerrarSesion() { db.collection("students").doc(usuarioActual).update({timeWorked:datosUsuario.timeWorked, dailyLogs:datosUsuario.dailyLogs||{}}).then(()=>auth.signOut().then(()=>location.reload())); }
 
+        // --- LOGICA DE JUEGO (SKILLS & VOICE OPTIMIZED) ---
         function cargarPregunta() {
             const pool = preguntasDB[nivelActual] || preguntasDB[1];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
             const qt = document.getElementById("questionText");
-            if (preguntaActual.type === 'dictation') { qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen and write...'; setTimeout(() => pronunciarPregunta(), 500); } 
-            else { qt.textContent = "Translate: " + preguntaActual.q; }
-            document.getElementById("feedback").textContent = ""; document.getElementById("answerInput").value = ""; document.getElementById("answerInput").focus();
+            
+            // Si es dictado, ocultar texto y preparar
+            if (preguntaActual.type === 'dictation') { 
+                qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen...'; 
+                // Auto-play solo si el navegador lo permite sin interacción (raro en iOS, común en PC)
+                setTimeout(() => pronunciarPregunta(), 500); 
+            } else { 
+                qt.textContent = "Translate: " + preguntaActual.q; 
+            }
+            
+            document.getElementById("feedback").textContent = ""; 
+            document.getElementById("answerInput").value = ""; 
+            // Reset botones activos
+            document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active-listening', 'active-speaking', 'active-writing', 'mic-listening'));
         }
-        function pronunciarPregunta() { if (!preguntaActual) return; const t = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a; const u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; u.rate = 0.85; synth.speak(u); }
+
+        // SELECCIONADOR DE MEJOR VOZ (CRITICO PARA GOOGLE/APPLE)
+        function seleccionarMejorVoz(lang = 'en') {
+            if (vocesDisponibles.length === 0) cargarVoces();
+            // 1. Buscar voz Premium de Google (Android/Chrome)
+            let voz = vocesDisponibles.find(v => v.name.includes('Google US English'));
+            // 2. Buscar voz Premium de Apple (Safari/iOS) - Samantha o Daniel
+            if (!voz) voz = vocesDisponibles.find(v => v.name.includes('Samantha'));
+            if (!voz) voz = vocesDisponibles.find(v => v.name.includes('Daniel'));
+            // 3. Buscar cualquier voz en inglés nativo
+            if (!voz) voz = vocesDisponibles.find(v => v.lang === 'en-US');
+            // 4. Default
+            return voz;
+        }
+
+        function pronunciarPregunta() {
+            if (!preguntaActual) return;
+            const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
+            
+            // Animación botón
+            const btn = document.getElementById('btnListen');
+            btn.classList.add('active-listening');
+            setTimeout(() => btn.classList.remove('active-listening'), 1000);
+
+            const utterance = new SpeechSynthesisUtterance(texto);
+            const vozElegida = seleccionarMejorVoz();
+            if (vozElegida) utterance.voice = vozElegida;
+            
+            utterance.lang = 'en-US'; 
+            utterance.rate = 0.9; // Un poco más lento para claridad
+            synth.cancel(); // Detener anterior
+            synth.speak(utterance);
+        }
+
         function activarMicrofono() {
             const btn = document.getElementById("btnMicrofono");
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { Swal.fire("Error","Usa Google Chrome.","error"); return; }
-            const r = new SpeechRecognition(); r.lang = 'en-US'; r.start(); btn.classList.add("listening");
-            r.onresult = (e) => { document.getElementById("answerInput").value = e.results[0][0].transcript.toLowerCase().replace('.',''); btn.classList.remove("listening"); verificarRespuesta(); };
-            r.onspeechend = () => { r.stop(); btn.classList.remove("listening"); };
+            
+            if (!SpeechRecognition) { 
+                Swal.fire("Aviso", "Tu navegador no soporta micrófono. Intenta escribir.", "info"); 
+                activarEscritura();
+                return; 
+            }
+            
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US'; 
+            recognition.interimResults = false; 
+            recognition.maxAlternatives = 1;
+            
+            recognition.start();
+            btn.classList.add("mic-listening", "active-speaking");
+            
+            recognition.onresult = (e) => {
+                const t = e.results[0][0].transcript.toLowerCase().replace('.','');
+                document.getElementById("answerInput").value = t;
+                btn.classList.remove("mic-listening", "active-speaking");
+                verificarRespuesta();
+            };
+            
+            recognition.onspeechend = () => { recognition.stop(); btn.classList.remove("mic-listening", "active-speaking"); };
+            recognition.onerror = () => { 
+                btn.classList.remove("mic-listening", "active-speaking"); 
+                // Fallback silencioso
+            };
         }
+
+        function activarEscritura() {
+            const btn = document.getElementById("btnWrite");
+            btn.classList.add("active-writing");
+            document.getElementById("answerInput").focus();
+            setTimeout(() => btn.classList.remove("active-writing"), 500);
+        }
+
         function abrirModalAcademico(t) { document.getElementById("modalAcademico").style.display="flex"; document.getElementById("tituloAcademico").textContent=t; document.getElementById("nivelAcademico").textContent=nivelActual; }
+        
         function verificarRespuesta() {
             const r = document.getElementById("answerInput").value.trim().toLowerCase(); if(!r) return;
             contadorPreguntas++; const fd = document.getElementById("feedback");
+            
             if(r === preguntaActual.a.toLowerCase()) {
                 audioCorrecto.currentTime=0; audioCorrecto.play().catch(()=>{}); fd.textContent = "CORRECT! 🔥"; fd.style.color = "green";
-                datosUsuario.score+=10; datosUsuario.totalCorrect++; aciertosSesion++; const u = new SpeechSynthesisUtterance("Good!"); u.lang='en-US'; synth.speak(u);
+                datosUsuario.score+=10; datosUsuario.totalCorrect++; aciertosSesion++; 
+                const u = new SpeechSynthesisUtterance("Good!"); u.lang='en-US'; synth.speak(u);
             } else {
                 audioError.currentTime=0; audioError.play().catch(()=>{}); fd.textContent = "WRONG. Answer: " + preguntaActual.a; fd.style.color = "red";
-                datosUsuario.totalWrong++; const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); u.lang='en-US'; synth.speak(u);
+                datosUsuario.totalWrong++; 
+                const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); u.lang='en-US'; synth.speak(u);
             }
             db.collection("students").doc(usuarioActual).update({score:datosUsuario.score, totalCorrect:datosUsuario.totalCorrect, totalWrong:datosUsuario.totalWrong});
             actualizarUI(); document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100)+"%";
@@ -574,11 +586,9 @@
         }
         function renderizarTabla() {
             const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>(b.score||0)-(a.score||0));
-            
             const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy();
             const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;});
             chartGlobalInstance=new Chart(ctx,{type:'bar',data:{labels:gl,datasets:[{label:'Promedio',data:prom,backgroundColor:'#004e92'}]},options:{maintainAspectRatio:false}});
-            
             const tb=document.getElementById("cuerpoTabla"); tb.innerHTML="";
             d.forEach(s=>{
                 const m=s.medals||{gold:0,silver:0,bronze:0}, r=s.currentStreak||1, ir=r>1?'🔥':'😔';
