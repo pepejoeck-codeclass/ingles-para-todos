@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER PRO V6</title>
+    <title>Inglés Para Todos - PRO PAYMENTS V7</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -105,7 +105,7 @@
         
         .mini-avatar { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 2px solid transparent; font-size: 18px; background: #eee; }
 
-        /* COMUNIDAD / NOTICIAS (ESTRUCTURA RESTAURADA) */
+        /* COMUNIDAD / NOTICIAS RESTAURADAS */
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
@@ -280,7 +280,7 @@
                 <p style="font-size:12px; color:#777;">Debes completar el nivel 5 veces para avanzar.</p>
                 <hr style="width:100%">
                 <button onclick="opcionIngresarCodigo()" class="btn btn-code">🔐 Tengo Código Secreto</button>
-                <button onclick="opcionPagarNivel()" class="btn btn-pay">💸 Pagar para Avanzar ($)</button>
+                <button onclick="opcionPagarNivel()" class="btn btn-pay">💸 Pagar $25 MXN (Saltar)</button>
             </div>
         </div>
     </div>
@@ -379,6 +379,7 @@
                         if(!datosUsuario.equipped) datosUsuario.equipped = { avatar: '👤', frame: '', theme: '' };
                         if(!datosUsuario.unlockedLevels) datosUsuario.unlockedLevels = [1];
                         if(!datosUsuario.levelRepetitions) datosUsuario.levelRepetitions = {};
+                        if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; // NUEVO: Historial de pagos
 
                         const hoy = new Date().toLocaleDateString('es-ES');
                         if (!datosUsuario.lastLoginDate) { datosUsuario.lastLoginDate = hoy; datosUsuario.currentStreak = 1; }
@@ -571,9 +572,41 @@
             });
         }
 
+        // --- SISTEMA DE PAGO REAL (LINK MERCADO PAGO) ---
         function opcionPagarNivel() {
-            Swal.fire({ title: 'Pagar para saltar', text: "El costo es de $20 MXN para saltar el requisito de repetición.", icon: 'question', showCancelButton: true, confirmButtonText: 'Pagar $20', cancelButtonText: 'Cancelar' }).then((result) => {
-                if (result.isConfirmed) { Swal.fire("¡Pago Exitoso!", "Has saltado el nivel.", "success"); desbloquearSiguienteNivel(); }
+            // 1. Abrir link de pago real
+            window.open('https://mpago.li/2aeNocU', '_blank');
+
+            // 2. Pedir confirmación al usuario (Ya que no tenemos backend para webhook)
+            Swal.fire({
+                title: 'Verificando Pago...',
+                text: 'Por favor completa el pago en la ventana que se abrió. Una vez hecho, confirma aquí.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: '¡Listo, ya pagué!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    registrarPagoReal();
+                }
+            });
+        }
+
+        function registrarPagoReal() {
+            // Registrar auditoría en la base de datos
+            const pagoInfo = {
+                fecha: new Date().toLocaleString(),
+                monto: 25,
+                concepto: `Salto Nivel ${nivelActual}`,
+                estado: "Reclamado por Alumno"
+            };
+            
+            if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = [];
+            datosUsuario.paymentHistory.push(pagoInfo);
+
+            db.collection("students").doc(usuarioActual).update({ paymentHistory: datosUsuario.paymentHistory }).then(() => {
+                Swal.fire("¡Pago Registrado!", "Nivel desbloqueado. El maestro verificará tu pago.", "success");
+                desbloquearSiguienteNivel();
             });
         }
 
@@ -648,14 +681,13 @@
         function loginMaestro() { if(document.getElementById("teacherUserInput").value==="Jose de Jesus Ramos Flores" && document.getElementById("teacherPassInput").value==="161286") { document.getElementById("teacherLogin").style.display="none"; document.getElementById("teacherPanel").style.display="block"; cargarTablaAlumnos(); } else Swal.fire("Error","Datos mal","error"); }
         function cerrarSesionMaestro() { document.getElementById("teacherPanel").style.display="none"; document.getElementById("loginContainerWrapper").style.display="flex"; }
         
-        // --- FUNCIÓN DE CARGA DE ALUMNOS BLINDADA (EVITA UNDEFINED) ---
+        // --- FUNCIÓN BLINDADA PARA CARGAR ALUMNOS (ARREGLO DEL UNDEFINED) ---
         function cargarTablaAlumnos() {
             document.getElementById("cuerpoTabla").innerHTML="<tr><td colspan='10'>Cargando...</td></tr>";
             db.collection("students").get().then((snap) => {
                 listaAlumnosCache=[]; 
                 snap.forEach(d=>{ 
                     if(d.id!=='ADMIN_NEWS') {
-                        // Aseguramos que data existe
                         const data = d.data() || {};
                         listaAlumnosCache.push({...data, uid:d.id}); 
                     }
@@ -671,23 +703,17 @@
             const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; 
             if(f!=="todos") d=d.filter(s=>s.group===f); 
             d.sort((a,b)=>(b.score||0)-(a.score||0));
-            
-            // Gráfica
-            const ctx=document.getElementById('globalChart').getContext('2d'); 
-            if(chartGlobalInstance) chartGlobalInstance.destroy(); 
+            const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy(); 
             const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;}); 
             chartGlobalInstance=new Chart(ctx,{type:'bar',data:{labels:gl,datasets:[{label:'Promedio',data:prom,backgroundColor:'#004e92'}]},options:{maintainAspectRatio:false}});
-            
-            // Tabla
             const tb=document.getElementById("cuerpoTabla"); tb.innerHTML=""; 
             d.forEach(s=>{ 
                 const m=s.medals||{gold:0,silver:0,bronze:0}, r=s.currentStreak||1, ir=r>1?'🔥':'😔'; 
                 const tr=document.createElement("tr"); 
                 const av = s.equipped?.avatar || '👤'; 
                 const fr = s.equipped?.frame || ''; 
-                // BLINDAJE DE NOMBRE: Si username es undefined, usa nombre, o "Sin Nombre"
-                const nombreMostrar = s.username || s.nombre || "Alumno Sin Nombre";
-                
+                // ARREGLO DE NOMBRE (Busca username, nombre o nombre completo)
+                const nombreMostrar = s.username || s.nombre || s.name || "Alumno";
                 tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td><button onclick="verHistorial('${s.uid}')" class="action-btn btn-history">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info">📊</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete">🗑️</button></td>`; 
                 tb.appendChild(tr); 
             }); 
@@ -695,10 +721,43 @@
             document.getElementById("promedioAciertos").textContent=d.reduce((a,b)=>a+(Number(b.totalCorrect)||0),0);
         }
 
-        async function resetearAlumno(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), nm=Math.max(...(s.unlockedLevels||[1])); const {value:o}=await Swal.fire({title:s.username, input:'select', inputOptions:{'puntos':'📉 Reset Puntos','nivel':'🔙 Regresar Nivel','total':'⚠️ Reset Total'}, showCancelButton:true}); if(o==='puntos') await db.collection("students").doc(uid).update({score:0}); else if(o==='nivel') { if(nm<=1) return; await db.collection("students").doc(uid).update({unlockedLevels:s.unlockedLevels.filter(n=>n!==nm)}); } else if(o==='total') await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}}); cargarTablaAlumnos(); }
+        async function resetearAlumno(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), nm=Math.max(...(s.unlockedLevels||[1])); const {value:o}=await Swal.fire({title:s.username, input:'select', inputOptions:{'puntos':'📉 Reset Puntos','nivel':'🔙 Regresar Nivel','total':'⚠️ Reset Total'}, showCancelButton:true}); if(o==='puntos') await db.collection("students").doc(uid).update({score:0}); else if(o==='nivel') { if(nm<=1) return; await db.collection("students").doc(uid).update({unlockedLevels:s.unlockedLevels.filter(n=>n!==nm)}); } else if(o==='total') await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[]}); cargarTablaAlumnos(); }
         function borrarAlumno(uid) { if(confirm("¿Eliminar?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos()); }
         function verHistorial(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), l=s.dailyLogs||{}, tb=document.getElementById("historialCuerpo"); tb.innerHTML=""; document.getElementById("modalHistorial").style.display="flex"; document.getElementById("historialNombre").textContent="Historial: "+(s.username||"Alumno"); Object.keys(l).sort().reverse().forEach(f=>{ tb.innerHTML+=`<tr><td>${f}</td><td style="color:blue;font-weight:bold">${formatearTiempo(l[f])}</td></tr>`; }); }
-        function verGraficaInd(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid); document.getElementById("modalGrafica").style.display="flex"; document.getElementById("modalNombre").textContent=s.username||"Alumno"; const m = s.medals || {gold:0, silver:0, bronze:0}; let itemsTexto = "Ninguna compra"; if (s.inventory && s.inventory.length > 0) { itemsTexto = s.inventory.map(id => { const item = shopCatalog.find(i => i.id === id); return item ? `${item.icon} ${item.name}` : id; }).join(', '); } document.getElementById("modalStats").innerHTML = `<p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p><p><b>Racha:</b> ${s.currentStreak||1} 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p><p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p><hr><p><b>🎒 Inventario / Compras:</b></p><p style="font-size:12px; color:#555;">${itemsTexto}</p>`; if(chartStudentInstance) chartStudentInstance.destroy(); chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅ Correctas','❌ Incorrectas'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}}); }
+        
+        // --- INFORME INDIVIDUAL CON HISTORIAL DE PAGOS ---
+        function verGraficaInd(uid) { 
+            const s=listaAlumnosCache.find(x=>x.uid===uid); 
+            document.getElementById("modalGrafica").style.display="flex"; 
+            document.getElementById("modalNombre").textContent=s.username||"Alumno"; 
+            const m = s.medals || {gold:0, silver:0, bronze:0}; 
+            let itemsTexto = "Ninguna compra"; 
+            if (s.inventory && s.inventory.length > 0) { itemsTexto = s.inventory.map(id => { const item = shopCatalog.find(i => i.id === id); return item ? `${item.icon} ${item.name}` : id; }).join(', '); } 
+            
+            // GENERAR LISTA DE PAGOS
+            let pagosHTML = "<p>No hay pagos registrados.</p>";
+            if (s.paymentHistory && s.paymentHistory.length > 0) {
+                pagosHTML = `<ul style="text-align:left; font-size:12px; list-style:none; padding:0;">`;
+                s.paymentHistory.forEach(p => {
+                    pagosHTML += `<li style="margin-bottom:5px; border-bottom:1px solid #eee; padding-bottom:3px;">📅 ${p.fecha} - <b>$${p.monto}</b> (${p.concepto})</li>`;
+                });
+                pagosHTML += `</ul>`;
+            }
+
+            document.getElementById("modalStats").innerHTML = `
+                <p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p>
+                <p><b>Racha:</b> ${s.currentStreak||1} 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p>
+                <p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p>
+                <hr>
+                <p><b>🎒 Inventario:</b></p><p style="font-size:12px; color:#555;">${itemsTexto}</p>
+                <hr>
+                <p style="color:green;"><b>💰 Historial de Pagos Reales:</b></p>
+                ${pagosHTML}
+            `; 
+            if(chartStudentInstance) chartStudentInstance.destroy(); 
+            chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅ Correctas','❌ Incorrectas'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}}); 
+        }
+
         function verGraficaGrupal() { const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>b.score-a.score); document.getElementById("modalGraficaGrupal").style.display="flex"; const totalPuntos = d.reduce((acc, curr) => acc + Number(curr.score || 0), 0); const promedio = d.length > 0 ? (totalPuntos / d.length).toFixed(1) : 0; document.getElementById("modalStatsGroup").innerHTML = `<p><b>Total Alumnos:</b> ${d.length} | <b>Promedio Puntos:</b> ${promedio}</p>`; const ctx=document.getElementById('groupBigChart').getContext('2d'); if(chartGroupInstance) chartGroupInstance.destroy(); chartGroupInstance=new Chart(ctx,{type:'bar',data:{labels:d.map(s=>s.username),datasets:[{label:'Puntos Totales',data:d.map(s=>s.score),backgroundColor:'#004e92'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}}); }
         function descargarCaptura(divId, nombre) { const el = document.getElementById(divId); html2canvas(el).then(c => { const l = document.createElement('a'); l.download = nombre; l.href = c.toDataURL(); l.click(); }); }
         function cerrarModal(id) { document.getElementById(id).style.display="none"; }
