@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - PRO PAYMENTS V7</title>
+    <title>Inglés Para Todos - SECURE PAYMENTS V8</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -51,7 +51,7 @@
         @keyframes pulseMic { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
         .mic-listening { background: #ff0000 !important; color: white !important; animation: pulseMic 1.5s infinite; }
 
-        /* --- BOTONES ACADÉMICOS (RESTAURADOS) --- */
+        /* --- BOTONES ACADÉMICOS --- */
         .academic-nav { display: flex; gap: 10px; margin-bottom: 20px; }
         .btn-academic { flex: 1; padding: 12px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
         .btn-academic:active { transform: translateY(2px); }
@@ -92,20 +92,23 @@
         .shop-tab { padding: 5px 15px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; background: #f1f1f1; }
         .shop-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* --- ESTILOS DE MAESTRO Y COMUNIDAD (REPARADOS) --- */
+        /* --- ESTILOS DE MAESTRO Y COMUNIDAD --- */
         .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
         th { background: var(--primary); color: white; }
         .action-btn { padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; font-size: 14px; }
         .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-edit { background: #ffc107; color: black; } .btn-history { background: #795548; }
+        .btn-approve { background: #28a745; animation: pulseBtn 1s infinite; font-weight: bold; }
+        @keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); } }
+
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
         .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
         .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
         
         .mini-avatar { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 2px solid transparent; font-size: 18px; background: #eee; }
 
-        /* COMUNIDAD / NOTICIAS RESTAURADAS */
+        /* COMUNIDAD / NOTICIAS */
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
@@ -379,7 +382,8 @@
                         if(!datosUsuario.equipped) datosUsuario.equipped = { avatar: '👤', frame: '', theme: '' };
                         if(!datosUsuario.unlockedLevels) datosUsuario.unlockedLevels = [1];
                         if(!datosUsuario.levelRepetitions) datosUsuario.levelRepetitions = {};
-                        if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; // NUEVO: Historial de pagos
+                        if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = [];
+                        if(!datosUsuario.pendingPayment) datosUsuario.pendingPayment = null; // Nuevo: Flag de pago
 
                         const hoy = new Date().toLocaleDateString('es-ES');
                         if (!datosUsuario.lastLoginDate) { datosUsuario.lastLoginDate = hoy; datosUsuario.currentStreak = 1; }
@@ -572,41 +576,42 @@
             });
         }
 
-        // --- SISTEMA DE PAGO REAL (LINK MERCADO PAGO) ---
+        // --- SISTEMA DE PAGO SEGURO (SOLICITUD) ---
         function opcionPagarNivel() {
-            // 1. Abrir link de pago real
             window.open('https://mpago.li/2aeNocU', '_blank');
-
-            // 2. Pedir confirmación al usuario (Ya que no tenemos backend para webhook)
             Swal.fire({
-                title: 'Verificando Pago...',
-                text: 'Por favor completa el pago en la ventana que se abrió. Una vez hecho, confirma aquí.',
-                icon: 'info',
+                title: 'Confirmar Pago',
+                text: '¿Ya realizaste el pago en la ventana que se abrió?',
+                icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: '¡Listo, ya pagué!',
+                confirmButtonText: 'Sí, ya pagué',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    registrarPagoReal();
+                    registrarSolicitudPago();
                 }
             });
         }
 
-        function registrarPagoReal() {
-            // Registrar auditoría en la base de datos
-            const pagoInfo = {
+        function registrarSolicitudPago() {
+            // AQUÍ ESTÁ EL TRUCO: No desbloquea, solo avisa
+            const solicitud = {
                 fecha: new Date().toLocaleString(),
                 monto: 25,
                 concepto: `Salto Nivel ${nivelActual}`,
-                estado: "Reclamado por Alumno"
+                estado: "Pendiente"
             };
             
+            // Actualizamos historial y activamos la "bandera" pendiente
             if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = [];
-            datosUsuario.paymentHistory.push(pagoInfo);
-
-            db.collection("students").doc(usuarioActual).update({ paymentHistory: datosUsuario.paymentHistory }).then(() => {
-                Swal.fire("¡Pago Registrado!", "Nivel desbloqueado. El maestro verificará tu pago.", "success");
-                desbloquearSiguienteNivel();
+            datosUsuario.paymentHistory.push(solicitud);
+            
+            db.collection("students").doc(usuarioActual).update({ 
+                paymentHistory: datosUsuario.paymentHistory,
+                pendingPayment: { nivel: nivelActual, fecha: new Date().toLocaleString() } 
+            }).then(() => {
+                cerrarModal('modalNivelCompleto');
+                Swal.fire("⏳ Verificando...", "Tu pago ha sido enviado al maestro para aprobación. El nivel se desbloqueará cuando el maestro confirme.", "info");
             });
         }
 
@@ -615,8 +620,19 @@
         }
 
         function procesarPagoPuntos(dinero, puntos) {
-            Swal.fire({ title: 'Procesando...', text: `Pagando $${dinero} MXN...`, timer: 1500, didOpen: () => { Swal.showLoading() } }).then(() => {
-                datosUsuario.score += puntos; db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score }); actualizarUI(); Swal.fire("¡Compra Exitosa!", `Has recibido ${puntos} puntos.`, "success");
+            // Mismo sistema: Solicitud
+             Swal.fire({
+                title: 'Ir a Pagar',
+                text: `Se abrirá Mercado Pago para pagar $${dinero}. Avísale a tu maestro.`,
+                confirmButtonText: 'Pagar',
+                showCancelButton: true
+            }).then((r) => {
+                if(r.isConfirmed) {
+                    window.open('https://mpago.li/2aeNocU', '_blank');
+                    // Simulación para puntos (aquí sí dejamos confianza del cliente para puntos pequeños, o puedes aplicar la misma lógica)
+                    // Para no complicar, los puntos los dejamos "confianza", los niveles "estrictos".
+                    datosUsuario.score += puntos; db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score }); actualizarUI(); 
+                }
             });
         }
 
@@ -681,7 +697,6 @@
         function loginMaestro() { if(document.getElementById("teacherUserInput").value==="Jose de Jesus Ramos Flores" && document.getElementById("teacherPassInput").value==="161286") { document.getElementById("teacherLogin").style.display="none"; document.getElementById("teacherPanel").style.display="block"; cargarTablaAlumnos(); } else Swal.fire("Error","Datos mal","error"); }
         function cerrarSesionMaestro() { document.getElementById("teacherPanel").style.display="none"; document.getElementById("loginContainerWrapper").style.display="flex"; }
         
-        // --- FUNCIÓN BLINDADA PARA CARGAR ALUMNOS (ARREGLO DEL UNDEFINED) ---
         function cargarTablaAlumnos() {
             document.getElementById("cuerpoTabla").innerHTML="<tr><td colspan='10'>Cargando...</td></tr>";
             db.collection("students").get().then((snap) => {
@@ -712,20 +727,49 @@
                 const tr=document.createElement("tr"); 
                 const av = s.equipped?.avatar || '👤'; 
                 const fr = s.equipped?.frame || ''; 
-                // ARREGLO DE NOMBRE (Busca username, nombre o nombre completo)
                 const nombreMostrar = s.username || s.nombre || s.name || "Alumno";
-                tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td><button onclick="verHistorial('${s.uid}')" class="action-btn btn-history">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info">📊</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete">🗑️</button></td>`; 
+                
+                // BOTÓN DE APROBACIÓN DE PAGO
+                let btnPago = "";
+                if(s.pendingPayment) {
+                    btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago $25">💸 APROBAR</button>`;
+                }
+
+                tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info">📊</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete">🗑️</button></td>`; 
                 tb.appendChild(tr); 
             }); 
             document.getElementById("totalAlumnos").textContent=d.length; 
             document.getElementById("promedioAciertos").textContent=d.reduce((a,b)=>a+(Number(b.totalCorrect)||0),0);
         }
 
-        async function resetearAlumno(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), nm=Math.max(...(s.unlockedLevels||[1])); const {value:o}=await Swal.fire({title:s.username, input:'select', inputOptions:{'puntos':'📉 Reset Puntos','nivel':'🔙 Regresar Nivel','total':'⚠️ Reset Total'}, showCancelButton:true}); if(o==='puntos') await db.collection("students").doc(uid).update({score:0}); else if(o==='nivel') { if(nm<=1) return; await db.collection("students").doc(uid).update({unlockedLevels:s.unlockedLevels.filter(n=>n!==nm)}); } else if(o==='total') await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[]}); cargarTablaAlumnos(); }
+        async function aprobarPagoReal(uid) {
+            const s = listaAlumnosCache.find(x => x.uid === uid);
+            if(!s.pendingPayment) return;
+            const nivelADesbloquear = s.pendingPayment.nivel + 1; // El siguiente
+            
+            let nuevosNiveles = s.unlockedLevels || [1];
+            if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear);
+
+            // Actualizar estado del pago en historial
+            let historial = s.paymentHistory || [];
+            if(historial.length > 0) {
+                historial[historial.length - 1].estado = "Aprobado ✅";
+            }
+
+            await db.collection("students").doc(uid).update({
+                unlockedLevels: nuevosNiveles,
+                pendingPayment: null, // Quitar pendiente
+                paymentHistory: historial
+            });
+
+            Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success");
+            cargarTablaAlumnos();
+        }
+
+        async function resetearAlumno(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), nm=Math.max(...(s.unlockedLevels||[1])); const {value:o}=await Swal.fire({title:s.username, input:'select', inputOptions:{'puntos':'📉 Reset Puntos','nivel':'🔙 Regresar Nivel','total':'⚠️ Reset Total'}, showCancelButton:true}); if(o==='puntos') await db.collection("students").doc(uid).update({score:0}); else if(o==='nivel') { if(nm<=1) return; await db.collection("students").doc(uid).update({unlockedLevels:s.unlockedLevels.filter(n=>n!==nm)}); } else if(o==='total') await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); cargarTablaAlumnos(); }
         function borrarAlumno(uid) { if(confirm("¿Eliminar?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos()); }
         function verHistorial(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), l=s.dailyLogs||{}, tb=document.getElementById("historialCuerpo"); tb.innerHTML=""; document.getElementById("modalHistorial").style.display="flex"; document.getElementById("historialNombre").textContent="Historial: "+(s.username||"Alumno"); Object.keys(l).sort().reverse().forEach(f=>{ tb.innerHTML+=`<tr><td>${f}</td><td style="color:blue;font-weight:bold">${formatearTiempo(l[f])}</td></tr>`; }); }
         
-        // --- INFORME INDIVIDUAL CON HISTORIAL DE PAGOS ---
         function verGraficaInd(uid) { 
             const s=listaAlumnosCache.find(x=>x.uid===uid); 
             document.getElementById("modalGrafica").style.display="flex"; 
@@ -734,12 +778,12 @@
             let itemsTexto = "Ninguna compra"; 
             if (s.inventory && s.inventory.length > 0) { itemsTexto = s.inventory.map(id => { const item = shopCatalog.find(i => i.id === id); return item ? `${item.icon} ${item.name}` : id; }).join(', '); } 
             
-            // GENERAR LISTA DE PAGOS
             let pagosHTML = "<p>No hay pagos registrados.</p>";
             if (s.paymentHistory && s.paymentHistory.length > 0) {
                 pagosHTML = `<ul style="text-align:left; font-size:12px; list-style:none; padding:0;">`;
                 s.paymentHistory.forEach(p => {
-                    pagosHTML += `<li style="margin-bottom:5px; border-bottom:1px solid #eee; padding-bottom:3px;">📅 ${p.fecha} - <b>$${p.monto}</b> (${p.concepto})</li>`;
+                    const color = p.estado.includes("Aprobado") ? "green" : "orange";
+                    pagosHTML += `<li style="margin-bottom:5px; border-bottom:1px solid #eee; padding-bottom:3px;">📅 ${p.fecha} - <b>$${p.monto}</b> - <span style="color:${color}">${p.estado}</span></li>`;
                 });
                 pagosHTML += `</ul>`;
             }
@@ -751,7 +795,7 @@
                 <hr>
                 <p><b>🎒 Inventario:</b></p><p style="font-size:12px; color:#555;">${itemsTexto}</p>
                 <hr>
-                <p style="color:green;"><b>💰 Historial de Pagos Reales:</b></p>
+                <p style="color:green;"><b>💰 Historial de Pagos:</b></p>
                 ${pagosHTML}
             `; 
             if(chartStudentInstance) chartStudentInstance.destroy(); 
