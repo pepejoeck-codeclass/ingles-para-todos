@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inglés Para Todos - STREAKS EDITION</title>
+    <title>Inglés Para Todos - AI EXPERT</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -30,12 +30,28 @@
         .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; margin: 10px auto; display: block; object-fit: cover; }
         .teacher-header-img { width: 100%; max-height: 180px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 10px; }
         
-        /* INPUTS */
+        /* INPUTS Y BOTONES */
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; font-family: 'Nunito'; }
         .btn { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; background: var(--primary); }
         .btn-danger { background: var(--accent); } .btn-secondary { background: #6c757d; }
         .btn-excel { background: #217346; } .btn-pdf { background: #b30b00; } .btn-chart { background: #6610f2; } .btn-download { background: #007bff; }
         
+        /* BOTONES DE AUDIO Y MICROFONO */
+        .audio-controls { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
+        .btn-audio { width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer; font-size: 24px; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+        .btn-speak { background: #17a2b8; color: white; }
+        .btn-mic { background: #ffc107; color: #333; }
+        .btn-mic.listening { background: #ff0000; color: white; animation: pulse 1s infinite; }
+        .btn-audio:active { transform: translateY(4px); box-shadow: none; }
+        
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
+
+        /* BOTONES ACADEMICOS (VOCAB & GRAMMAR) */
+        .academic-nav { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn-academic { flex: 1; padding: 10px; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-vocab { background: linear-gradient(45deg, #11998e, #38ef7d); }
+        .btn-grammar { background: linear-gradient(45deg, #833ab4, #fd1d1d); }
+
         /* JUEGO */
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
@@ -55,10 +71,8 @@
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
         th { background: var(--primary); color: white; }
         td { vertical-align: middle; }
-        
         .action-btn { padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; font-size: 14px; }
         .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-edit { background: #ffc107; color: black; } .btn-history { background: #795548; }
-        
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
         .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
         .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
@@ -67,7 +81,6 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; text-align: center; }
         .teacher-controls { display: flex; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 15px; align-items: center; margin-bottom: 15px; }
-
         .history-table { width: 100%; margin-top: 15px; text-align: left; }
         .history-table th { background: #6c757d; }
 
@@ -75,7 +88,6 @@
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
-        
         .leader-table { width: 100%; font-size: 14px; border-collapse: collapse; }
         .leader-table th { background: #f1f1f1; color: #333; padding: 8px; }
         .leader-table td { padding: 8px; border-bottom: 1px solid #eee; }
@@ -167,18 +179,30 @@
                     <span style="color:#CD7F32">🥉 <span id="bronzeDisplay">0</span></span>
                 </div>
             </div>
-
             <div style="font-size: 12px; color: #666; margin-top:5px;">Puntos Totales: <span id="scoreText">0</span></div>
+        </div>
+
+        <div class="academic-nav">
+            <button onclick="abrirModalAcademico('Vocabulary 📚')" class="btn-academic btn-vocab"><i class="fas fa-book"></i> Vocabulary</button>
+            <button onclick="abrirModalAcademico('Grammar 📖')" class="btn-academic btn-grammar"><i class="fas fa-pen-fancy"></i> Grammar</button>
         </div>
 
         <div class="card">
             <span id="levelText" style="background:#ffd700; padding:5px 10px; border-radius:10px; font-weight:bold;">Nivel 1</span>
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
+            
             <div id="questionText" class="question-box">...</div>
-            <input type="text" id="answerInput" placeholder="Respuesta..." autocomplete="off">
+            
+            <div class="audio-controls">
+                <button onclick="pronunciarPregunta()" class="btn-audio btn-speak" title="Escuchar (Listen)">🔊</button>
+                <button onclick="activarMicrofono()" id="btnMicrofono" class="btn-audio btn-mic" title="Hablar (Speak)">🎤</button>
+            </div>
+
+            <input type="text" id="answerInput" placeholder="Escribe o pronuncia tu respuesta..." autocomplete="off">
             <button onclick="verificarRespuesta()" class="btn">CHECK</button>
             <div id="feedback" style="margin-top: 15px; font-weight: bold; height: 20px;"></div>
         </div>
+        
         <div class="bottom-nav">
             <div class="nav-item active" onclick="cambiarNivel(1)">Nivel 1</div>
             <div class="nav-item locked" id="navL2" onclick="cambiarNivel(2)">🔐 Nivel 2</div>
@@ -265,6 +289,19 @@
         </div>
     </div>
 
+    <div id="modalAcademico" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="tituloAcademico">...</h3>
+            <hr>
+            <div style="padding: 20px; font-size: 18px; color: #555;">
+                <i class="fas fa-tools"></i><br>
+                Contenido para el <b>Nivel <span id="nivelAcademico">1</span></b> próximamente.<br>
+                <small>Aquí podrás agregar listas de palabras o reglas gramaticales específicas.</small>
+            </div>
+            <br><button onclick="cerrarModal('modalAcademico')" class="btn btn-secondary">Cerrar</button>
+        </div>
+    </div>
+
     <script>
         // 1. CONFIGURACIÓN
         const firebaseConfig = {
@@ -281,63 +318,48 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // 2. SONIDOS
+        // 2. SONIDOS Y SÍNTESIS DE VOZ (TTS)
         const audioCorrecto = new Audio('./assets/sounds/correct.mp3');
         const audioError = new Audio('./assets/sounds/wrong.mp3');
         const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
+        const synth = window.speechSynthesis; // Voz del navegador
 
         // 3. VARIABLES
         let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null;
         let listaAlumnosCache = [], chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
         
+        // BASE DE DATOS DE PREGUNTAS (Aquí agregas el contenido que leerá la PC)
         const preguntasDB = {
             1: [{q:"Hola",a:"hello"}, {q:"Adiós",a:"goodbye"}, {q:"Gracias",a:"thank you"}, {q:"Por favor",a:"please"}, {q:"Rojo",a:"red"}],
             2: [{q:"Gato",a:"cat"}, {q:"Perro",a:"dog"}, {q:"Azul",a:"blue"}, {q:"Uno",a:"one"}, {q:"Dos",a:"two"}],
             3: [{q:"Lunes",a:"monday"}, {q:"Martes",a:"tuesday"}, {q:"Sol",a:"sun"}, {q:"Luna",a:"moon"}, {q:"Agua",a:"water"}]
         };
 
-        // 4. DETECTOR + CALCULO RACHA
+        // 4. DETECTOR + RACHA
         auth.onAuthStateChanged((user) => {
             if (user) {
                 usuarioActual = user.uid;
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
-                        // Inicializaciones
                         if(!datosUsuario.timeWorked) datosUsuario.timeWorked = 0;
                         if(!datosUsuario.totalCorrect) datosUsuario.totalCorrect = 0;
                         if(!datosUsuario.totalWrong) datosUsuario.totalWrong = 0;
                         if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
                         if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {};
                         
-                        // === LÓGICA DE RACHA ===
                         const hoy = new Date().toLocaleDateString('es-ES');
                         if (!datosUsuario.lastLoginDate) {
-                            // Primer login
-                            datosUsuario.lastLoginDate = hoy;
-                            datosUsuario.currentStreak = 1;
+                            datosUsuario.lastLoginDate = hoy; datosUsuario.currentStreak = 1;
                         } else if (datosUsuario.lastLoginDate !== hoy) {
-                            // Revisar si fue ayer
-                            const fechaAyer = new Date(); 
-                            fechaAyer.setDate(fechaAyer.getDate() - 1);
+                            const fechaAyer = new Date(); fechaAyer.setDate(fechaAyer.getDate() - 1);
                             const ayerStr = fechaAyer.toLocaleDateString('es-ES');
-
-                            if (datosUsuario.lastLoginDate === ayerStr) {
-                                // Jugó ayer, sube racha
-                                datosUsuario.currentStreak = (datosUsuario.currentStreak || 0) + 1;
-                            } else {
-                                // Se rompió la racha (no jugó ayer)
-                                datosUsuario.currentStreak = 1;
-                            }
+                            if (datosUsuario.lastLoginDate === ayerStr) datosUsuario.currentStreak = (datosUsuario.currentStreak || 0) + 1;
+                            else datosUsuario.currentStreak = 1;
                             datosUsuario.lastLoginDate = hoy;
                         }
-                        // Guardar racha actualizada
-                        db.collection("students").doc(usuarioActual).update({
-                            lastLoginDate: datosUsuario.lastLoginDate,
-                            currentStreak: datosUsuario.currentStreak
-                        });
-
+                        db.collection("students").doc(usuarioActual).update({ lastLoginDate: datosUsuario.lastLoginDate, currentStreak: datosUsuario.currentStreak });
                         mostrarJuego();
                     }
                 });
@@ -347,11 +369,7 @@
             }
         });
 
-        // INICIALIZACIÓN LANDING
-        document.addEventListener("DOMContentLoaded", () => {
-            cargarNoticias();
-            cargarLeaderboard();
-        });
+        document.addEventListener("DOMContentLoaded", () => { cargarNoticias(); cargarLeaderboard(); });
 
         // 5. CRONÓMETRO
         function iniciarCronometro() {
@@ -364,9 +382,7 @@
                 datosUsuario.dailyLogs[fechaHoy] = datosUsuario.dailyLogs[fechaHoy] + 1;
                 actualizarUI();
                 if(datosUsuario.timeWorked % 10 === 0) {
-                    db.collection("students").doc(usuarioActual).update({
-                        timeWorked: datosUsuario.timeWorked, dailyLogs: datosUsuario.dailyLogs
-                    });
+                    db.collection("students").doc(usuarioActual).update({ timeWorked: datosUsuario.timeWorked, dailyLogs: datosUsuario.dailyLogs });
                 }
             }, 1000);
         }
@@ -386,8 +402,6 @@
             document.getElementById("silverDisplay").textContent = m.silver;
             document.getElementById("bronzeDisplay").textContent = m.bronze;
             document.getElementById("scoreText").textContent = datosUsuario.score || 0;
-            
-            // MOSTRAR RACHA
             const racha = datosUsuario.currentStreak || 1;
             const iconoRacha = racha > 1 ? "🔥" : "😔";
             document.getElementById("streakDisplay").textContent = `${iconoRacha} ${racha} días seguidos`;
@@ -442,7 +456,6 @@
                     const d = doc.data();
                     const tr = document.createElement("tr");
                     if(rank===1) tr.className = "rank-1"; else if(rank===2) tr.className = "rank-2"; else if(rank===3) tr.className = "rank-3";
-                    
                     const medallas = (d.medals?.gold||0) + (d.medals?.silver||0) + (d.medals?.bronze||0);
                     tr.innerHTML = `<td>${d.username}</td><td>${formatearTiempo(d.timeWorked||0)}</td><td>${d.score}</td><td>${medallas} 🏅</td>`;
                     tbody.appendChild(tr);
@@ -486,15 +499,75 @@
             .then(() => auth.signOut().then(() => location.reload()));
         }
 
-        // 9. LÓGICA JUEGO
+        // ==========================================
+        // 9. LÓGICA JUEGO + INTELLIGENCIA ARTIFICIAL (TTS & STT)
+        // ==========================================
+        
         function cargarPregunta() {
             const pool = preguntasDB[nivelActual];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
             document.getElementById("questionText").textContent = "Traduce: " + preguntaActual.q;
             document.getElementById("feedback").textContent = "";
             document.getElementById("answerInput").value = "";
-            document.getElementById("answerInput").focus();
+            // Pronunciar automáticamente la pregunta en español (opcional) o esperar al botón
         }
+
+        // --- TTS: Texto a Voz (La computadora habla) ---
+        function pronunciarPregunta() {
+            if (!preguntaActual) return;
+            // Pronunciar la RESPUESTA correcta en inglés para que el alumno escuche
+            const utterance = new SpeechSynthesisUtterance(preguntaActual.a);
+            utterance.lang = 'en-US'; // Inglés Americano
+            utterance.rate = 0.9; // Velocidad normal
+            synth.speak(utterance);
+        }
+
+        // --- STT: Reconocimiento de Voz (El alumno habla) ---
+        function activarMicrofono() {
+            const btn = document.getElementById("btnMicrofono");
+            
+            // Verificar soporte del navegador
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                Swal.fire("Error", "Tu navegador no soporta reconocimiento de voz. Usa Google Chrome.", "error");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US'; // Escuchar en Inglés
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.start();
+            btn.classList.add("listening"); // Activar animación
+
+            recognition.onresult = (event) => {
+                const speechResult = event.results[0][0].transcript.toLowerCase().replace('.', ''); // Limpiar texto
+                document.getElementById("answerInput").value = speechResult;
+                btn.classList.remove("listening");
+                verificarRespuesta(); // Verificar automáticamente
+            };
+
+            recognition.onspeechend = () => {
+                recognition.stop();
+                btn.classList.remove("listening");
+            };
+
+            recognition.onerror = (event) => {
+                btn.classList.remove("listening");
+                console.log("Error mic: " + event.error);
+                // No mostrar alerta intrusiva, solo en consola
+            };
+        }
+
+        // --- VOCABULARY & GRAMMAR ---
+        function abrirModalAcademico(titulo) {
+            document.getElementById("modalAcademico").style.display = "flex";
+            document.getElementById("tituloAcademico").textContent = titulo;
+            document.getElementById("nivelAcademico").textContent = nivelActual;
+            // Aquí en el futuro cargaremos contenido dinámico según el nivel
+        }
+
         function verificarRespuesta() {
             const resp = document.getElementById("answerInput").value.trim().toLowerCase();
             if(!resp) return;
@@ -505,10 +578,21 @@
                 audioCorrecto.currentTime = 0; audioCorrecto.play().catch(()=>{});
                 feed.textContent = "CORRECT! 🔥"; feed.style.color = "green";
                 datosUsuario.score += 10; datosUsuario.totalCorrect++; aciertosSesion++;
+                
+                // Pronunciar confirmación
+                const nice = new SpeechSynthesisUtterance("Good job!");
+                nice.lang = 'en-US';
+                synth.speak(nice);
+
             } else {
                 audioError.currentTime = 0; audioError.play().catch(()=>{});
                 feed.textContent = "WRONG. Answer: " + preguntaActual.a; feed.style.color = "red";
                 datosUsuario.totalWrong++;
+                
+                // Pronunciar corrección
+                const correction = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a);
+                correction.lang = 'en-US';
+                synth.speak(correction);
             }
             db.collection("students").doc(usuarioActual).update({
                 score: datosUsuario.score, totalCorrect: datosUsuario.totalCorrect, totalWrong: datosUsuario.totalWrong
@@ -517,6 +601,7 @@
             document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100) + "%";
             if(contadorPreguntas >= 5) setTimeout(finSesion, 1500); else setTimeout(cargarPregunta, 1500);
         }
+
         function finSesion() {
             let msg = "", medal = "";
             if(aciertosSesion === 5) {
@@ -574,9 +659,7 @@
             db.collection("students").get().then((querySnapshot) => {
                 listaAlumnosCache = [];
                 querySnapshot.forEach((doc) => { 
-                    if(doc.id !== 'ADMIN_NEWS') { // IGNORAR LA NOTICIA
-                        listaAlumnosCache.push({ ...doc.data(), uid: doc.id }); 
-                    }
+                    if(doc.id !== 'ADMIN_NEWS') { listaAlumnosCache.push({ ...doc.data(), uid: doc.id }); }
                 });
                 const grupos = [...new Set(listaAlumnosCache.map(s => s.group))].sort();
                 const select = document.getElementById("groupFilter");
