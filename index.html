@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - AI EXPERT INTERFACE FIX</title>
+    <title>Inglés Para Todos - MASTER PRO V6</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -39,7 +39,7 @@
         .btn-pay { background: linear-gradient(45deg, #11998e, #38ef7d); box-shadow: 0 4px 0 #0b6623; }
         .btn-code { background: linear-gradient(45deg, #8e44ad, #c0392b); box-shadow: 0 4px 0 #5b2c6f; }
 
-        /* --- BARRA DE HABILIDADES (CIRCULOS) --- */
+        /* SKILLS BAR */
         .skills-bar { display: flex; justify-content: center; gap: 15px; margin: 20px 0; background: #f0f2f5; padding: 10px; border-radius: 50px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
         .skill-btn { width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 24px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #555; }
         .skill-label { font-size: 9px; margin-top: 2px; font-weight: bold; text-transform: uppercase; }
@@ -51,19 +51,16 @@
         @keyframes pulseMic { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
         .mic-listening { background: #ff0000 !important; color: white !important; animation: pulseMic 1.5s infinite; }
 
-        /* --- BOTONES ACADÉMICOS (VOCAB/GRAMMAR) - ARREGLADOS --- */
-        .academic-nav { display: flex; gap: 10px; margin-bottom: 20px; /* Aumenté margen inferior */ }
-        .btn-academic { flex: 1; padding: 12px; /* Un poco más grandes */ border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        /* --- BOTONES ACADÉMICOS (RESTAURADOS) --- */
+        .academic-nav { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-academic { flex: 1; padding: 12px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
         .btn-academic:active { transform: translateY(2px); }
-        /* Estos son los colores que se perdieron, aquí están de vuelta */
         .btn-vocab { background: linear-gradient(45deg, #11998e, #38ef7d); }
         .btn-grammar { background: linear-gradient(45deg, #833ab4, #fd1d1d); }
 
         /* --- OTROS ESTILOS --- */
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
-        /* Eliminé la clase .question-box antigua que causaba el borde feo */
-        
         .bottom-nav { display: flex; justify-content: space-around; background: white; padding: 10px; border-radius: 15px; margin-top: 10px; }
         .nav-item { cursor: pointer; color: #aaa; font-size: 12px; text-align: center; }
         .nav-item.active { color: var(--primary); font-weight: bold; }
@@ -95,7 +92,7 @@
         .shop-tab { padding: 5px 15px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; background: #f1f1f1; }
         .shop-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* MAESTRO */
+        /* --- ESTILOS DE MAESTRO Y COMUNIDAD (REPARADOS) --- */
         .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
@@ -106,15 +103,27 @@
         .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
         .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
         
-        /* MINI AVATAR */
         .mini-avatar { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 2px solid transparent; font-size: 18px; background: #eee; }
+
+        /* COMUNIDAD / NOTICIAS (ESTRUCTURA RESTAURADA) */
+        .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
+        .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
+        .leader-table { width: 100%; font-size: 14px; border-collapse: collapse; }
+        .leader-table th { background: #f1f1f1; color: #333; padding: 8px; }
+        .leader-table td { padding: 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .rank-1 { background-color: #fff9db; font-weight: bold; } .rank-1 td:first-child::before { content: '🥇 '; }
+        .rank-2 { background-color: #f8f9fa; } .rank-2 td:first-child::before { content: '🥈 '; }
+        .rank-3 { background-color: #fff0e6; } .rank-3 td:first-child::before { content: '🥉 '; }
 
         /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; text-align: center; }
         .level-complete-options { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        
         .add-points-btn { background: #27ae60; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-weight: bold; margin-left: 5px; display: inline-flex; align-items: center; justify-content: center; }
+        .report-summary { background: #f8f9fa; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--primary); text-align: left; font-size: 14px; }
+        .history-table { width: 100%; margin-top: 15px; text-align: left; }
+        .history-table th { background: #6c757d; }
     </style>
 </head>
 <body>
@@ -143,7 +152,11 @@
         </div>
 
         <div id="communitySection" class="community-section">
-            <div style="background: white; padding: 15px; border-radius: 15px; width: 100%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <div class="news-box">
+                <h3 style="margin-top:0; color:#333;"><i class="fas fa-bullhorn"></i> Noticias / News</h3>
+                <div id="newsContent" style="white-space: pre-wrap; color: #555;">Cargando...</div>
+            </div>
+            <div class="leaderboard-box">
                 <h3 style="margin-top:0; color:#004e92;"><i class="fas fa-trophy"></i> The Best Heroes</h3>
                 <div style="overflow-x: auto;">
                     <table class="leader-table"><thead><tr><th>Hero</th><th>Time</th><th>Pts</th><th>Medals</th></tr></thead><tbody id="leaderboardBody"><tr><td colspan="4">Cargando...</td></tr></tbody></table>
@@ -634,22 +647,58 @@
         function volverInicio() { document.getElementById("teacherLogin").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("loginContainerWrapper").style.display="flex"; }
         function loginMaestro() { if(document.getElementById("teacherUserInput").value==="Jose de Jesus Ramos Flores" && document.getElementById("teacherPassInput").value==="161286") { document.getElementById("teacherLogin").style.display="none"; document.getElementById("teacherPanel").style.display="block"; cargarTablaAlumnos(); } else Swal.fire("Error","Datos mal","error"); }
         function cerrarSesionMaestro() { document.getElementById("teacherPanel").style.display="none"; document.getElementById("loginContainerWrapper").style.display="flex"; }
+        
+        // --- FUNCIÓN DE CARGA DE ALUMNOS BLINDADA (EVITA UNDEFINED) ---
         function cargarTablaAlumnos() {
             document.getElementById("cuerpoTabla").innerHTML="<tr><td colspan='10'>Cargando...</td></tr>";
             db.collection("students").get().then((snap) => {
-                listaAlumnosCache=[]; snap.forEach(d=>{ if(d.id!=='ADMIN_NEWS') listaAlumnosCache.push({...d.data(), uid:d.id}); });
-                const gs=[...new Set(listaAlumnosCache.map(s=>s.group))].sort(), sel=document.getElementById("groupFilter"), v=sel.value; sel.innerHTML='<option value="todos">Todos</option>'; gs.forEach(g=>{if(g)sel.innerHTML+=`<option value="${g}">Gpo ${g}</option>`}); sel.value=v; renderizarTabla();
+                listaAlumnosCache=[]; 
+                snap.forEach(d=>{ 
+                    if(d.id!=='ADMIN_NEWS') {
+                        // Aseguramos que data existe
+                        const data = d.data() || {};
+                        listaAlumnosCache.push({...data, uid:d.id}); 
+                    }
+                });
+                const gs=[...new Set(listaAlumnosCache.map(s=>s.group))].sort(), sel=document.getElementById("groupFilter"), v=sel.value; 
+                sel.innerHTML='<option value="todos">Todos</option>'; 
+                gs.forEach(g=>{if(g)sel.innerHTML+=`<option value="${g}">Gpo ${g}</option>`}); 
+                sel.value=v; 
+                renderizarTabla();
             });
         }
         function renderizarTabla() {
-            const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>(b.score||0)-(a.score||0));
-            const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy(); const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;}); chartGlobalInstance=new Chart(ctx,{type:'bar',data:{labels:gl,datasets:[{label:'Promedio',data:prom,backgroundColor:'#004e92'}]},options:{maintainAspectRatio:false}});
-            const tb=document.getElementById("cuerpoTabla"); tb.innerHTML=""; d.forEach(s=>{ const m=s.medals||{gold:0,silver:0,bronze:0}, r=s.currentStreak||1, ir=r>1?'🔥':'😔'; const tr=document.createElement("tr"); const av = d.equipped?.avatar || '👤'; const fr = d.equipped?.frame || ''; tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${d.username}</td><td>${s.group}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td><button onclick="verHistorial('${s.uid}')" class="action-btn btn-history">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info">📊</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete">🗑️</button></td>`; tb.appendChild(tr); }); document.getElementById("totalAlumnos").textContent=d.length; document.getElementById("promedioAciertos").textContent=d.reduce((a,b)=>a+(Number(b.totalCorrect)||0),0);
+            const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; 
+            if(f!=="todos") d=d.filter(s=>s.group===f); 
+            d.sort((a,b)=>(b.score||0)-(a.score||0));
+            
+            // Gráfica
+            const ctx=document.getElementById('globalChart').getContext('2d'); 
+            if(chartGlobalInstance) chartGlobalInstance.destroy(); 
+            const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;}); 
+            chartGlobalInstance=new Chart(ctx,{type:'bar',data:{labels:gl,datasets:[{label:'Promedio',data:prom,backgroundColor:'#004e92'}]},options:{maintainAspectRatio:false}});
+            
+            // Tabla
+            const tb=document.getElementById("cuerpoTabla"); tb.innerHTML=""; 
+            d.forEach(s=>{ 
+                const m=s.medals||{gold:0,silver:0,bronze:0}, r=s.currentStreak||1, ir=r>1?'🔥':'😔'; 
+                const tr=document.createElement("tr"); 
+                const av = s.equipped?.avatar || '👤'; 
+                const fr = s.equipped?.frame || ''; 
+                // BLINDAJE DE NOMBRE: Si username es undefined, usa nombre, o "Sin Nombre"
+                const nombreMostrar = s.username || s.nombre || "Alumno Sin Nombre";
+                
+                tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td><button onclick="verHistorial('${s.uid}')" class="action-btn btn-history">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info">📊</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete">🗑️</button></td>`; 
+                tb.appendChild(tr); 
+            }); 
+            document.getElementById("totalAlumnos").textContent=d.length; 
+            document.getElementById("promedioAciertos").textContent=d.reduce((a,b)=>a+(Number(b.totalCorrect)||0),0);
         }
+
         async function resetearAlumno(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), nm=Math.max(...(s.unlockedLevels||[1])); const {value:o}=await Swal.fire({title:s.username, input:'select', inputOptions:{'puntos':'📉 Reset Puntos','nivel':'🔙 Regresar Nivel','total':'⚠️ Reset Total'}, showCancelButton:true}); if(o==='puntos') await db.collection("students").doc(uid).update({score:0}); else if(o==='nivel') { if(nm<=1) return; await db.collection("students").doc(uid).update({unlockedLevels:s.unlockedLevels.filter(n=>n!==nm)}); } else if(o==='total') await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}}); cargarTablaAlumnos(); }
         function borrarAlumno(uid) { if(confirm("¿Eliminar?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos()); }
-        function verHistorial(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), l=s.dailyLogs||{}, tb=document.getElementById("historialCuerpo"); tb.innerHTML=""; document.getElementById("modalHistorial").style.display="flex"; document.getElementById("historialNombre").textContent="Historial: "+s.username; Object.keys(l).sort().reverse().forEach(f=>{ tb.innerHTML+=`<tr><td>${f}</td><td style="color:blue;font-weight:bold">${formatearTiempo(l[f])}</td></tr>`; }); }
-        function verGraficaInd(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid); document.getElementById("modalGrafica").style.display="flex"; document.getElementById("modalNombre").textContent=s.username; const m = s.medals || {gold:0, silver:0, bronze:0}; let itemsTexto = "Ninguna compra"; if (s.inventory && s.inventory.length > 0) { itemsTexto = s.inventory.map(id => { const item = shopCatalog.find(i => i.id === id); return item ? `${item.icon} ${item.name}` : id; }).join(', '); } document.getElementById("modalStats").innerHTML = `<p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p><p><b>Racha:</b> ${s.currentStreak||1} 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p><p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p><hr><p><b>🎒 Inventario / Compras:</b></p><p style="font-size:12px; color:#555;">${itemsTexto}</p>`; if(chartStudentInstance) chartStudentInstance.destroy(); chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅ Correctas','❌ Incorrectas'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}}); }
+        function verHistorial(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), l=s.dailyLogs||{}, tb=document.getElementById("historialCuerpo"); tb.innerHTML=""; document.getElementById("modalHistorial").style.display="flex"; document.getElementById("historialNombre").textContent="Historial: "+(s.username||"Alumno"); Object.keys(l).sort().reverse().forEach(f=>{ tb.innerHTML+=`<tr><td>${f}</td><td style="color:blue;font-weight:bold">${formatearTiempo(l[f])}</td></tr>`; }); }
+        function verGraficaInd(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid); document.getElementById("modalGrafica").style.display="flex"; document.getElementById("modalNombre").textContent=s.username||"Alumno"; const m = s.medals || {gold:0, silver:0, bronze:0}; let itemsTexto = "Ninguna compra"; if (s.inventory && s.inventory.length > 0) { itemsTexto = s.inventory.map(id => { const item = shopCatalog.find(i => i.id === id); return item ? `${item.icon} ${item.name}` : id; }).join(', '); } document.getElementById("modalStats").innerHTML = `<p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p><p><b>Racha:</b> ${s.currentStreak||1} 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p><p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p><hr><p><b>🎒 Inventario / Compras:</b></p><p style="font-size:12px; color:#555;">${itemsTexto}</p>`; if(chartStudentInstance) chartStudentInstance.destroy(); chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅ Correctas','❌ Incorrectas'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}}); }
         function verGraficaGrupal() { const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>b.score-a.score); document.getElementById("modalGraficaGrupal").style.display="flex"; const totalPuntos = d.reduce((acc, curr) => acc + Number(curr.score || 0), 0); const promedio = d.length > 0 ? (totalPuntos / d.length).toFixed(1) : 0; document.getElementById("modalStatsGroup").innerHTML = `<p><b>Total Alumnos:</b> ${d.length} | <b>Promedio Puntos:</b> ${promedio}</p>`; const ctx=document.getElementById('groupBigChart').getContext('2d'); if(chartGroupInstance) chartGroupInstance.destroy(); chartGroupInstance=new Chart(ctx,{type:'bar',data:{labels:d.map(s=>s.username),datasets:[{label:'Puntos Totales',data:d.map(s=>s.score),backgroundColor:'#004e92'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}}); }
         function descargarCaptura(divId, nombre) { const el = document.getElementById(divId); html2canvas(el).then(c => { const l = document.createElement('a'); l.download = nombre; l.href = c.toDataURL(); l.click(); }); }
         function cerrarModal(id) { document.getElementById(id).style.display="none"; }
@@ -680,7 +729,7 @@
                     if(doc.id==='ADMIN_NEWS') return; if(r>10) return; const d=doc.data(); const tr=document.createElement("tr");
                     if(r===1) tr.className="rank-1"; else if(r===2) tr.className="rank-2"; else if(r===3) tr.className="rank-3";
                     const m=(d.medals?.gold||0)+(d.medals?.silver||0)+(d.medals?.bronze||0); const av = d.equipped?.avatar || '👤'; const fr = d.equipped?.frame || '';
-                    tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${d.username}</td><td>${formatearTiempo(d.timeWorked||0)}</td><td>${d.score}</td><td>${m} 🏅</td>`; b.appendChild(tr); r++;
+                    tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${d.username||"Héroe"}</td><td>${formatearTiempo(d.timeWorked||0)}</td><td>${d.score}</td><td>${m} 🏅</td>`; b.appendChild(tr); r++;
                 });
             });
         }
