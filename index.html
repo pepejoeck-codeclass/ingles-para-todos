@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - DC LEGENDS EDITION</title>
+    <title>Inglés Para Todos - AI EXPERT EDITION</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -35,6 +35,8 @@
         .btn-excel { background: #217346; } .btn-pdf { background: #b30b00; } .btn-chart { background: #6610f2; } .btn-download { background: #007bff; }
         .btn-shop { background: #ff9800; background: linear-gradient(45deg, #ff9800, #ff5722); box-shadow: 0 4px 0 #bf360c; }
         .btn-shop:active { transform: translateY(4px); box-shadow: none; }
+        .btn-pay { background: linear-gradient(45deg, #11998e, #38ef7d); box-shadow: 0 4px 0 #0b6623; }
+        .btn-code { background: linear-gradient(45deg, #8e44ad, #c0392b); box-shadow: 0 4px 0 #5b2c6f; }
 
         /* SKILLS BAR */
         .skills-bar { display: flex; justify-content: center; gap: 15px; margin: 20px 0; background: #f0f2f5; padding: 10px; border-radius: 50px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
@@ -48,27 +50,13 @@
         @keyframes pulseMic { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
         .mic-listening { background: #ff0000 !important; color: white !important; animation: pulseMic 1.5s infinite; }
 
-        /* ACADEMIC */
-        .academic-nav { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn-academic { flex: 1; padding: 10px; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-vocab { background: linear-gradient(45deg, #11998e, #38ef7d); }
-        .btn-grammar { background: linear-gradient(45deg, #833ab4, #fd1d1d); }
-
-        .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
-        .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
-        .question-box { font-size: 22px; font-weight: bold; color: var(--secondary); margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 5px solid var(--primary); }
-        .bottom-nav { display: flex; justify-content: space-around; background: white; padding: 10px; border-radius: 15px; margin-top: 10px; }
-        .nav-item { cursor: pointer; color: #aaa; font-size: 12px; text-align: center; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
-        .nav-item.locked { opacity: 0.5; pointer-events: none; }
-        
-        /* HUD & AVATAR */
-        .hud-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 12px; font-weight: bold; background: #f0f2f5; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
-        .hud-item { display: flex; flex-direction: column; align-items: center; }
+        /* HUD MEJORADO */
+        .hud-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 11px; font-weight: bold; background: #f0f2f5; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
+        .hud-item { display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 5px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .avatar-display { font-size: 24px; width: 40px; height: 40px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
+        .avatar-display { font-size: 24px; width: 50px; height: 50px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
         
-        /* FRAMES & TIENDA */
+        /* FRAMES */
         .frame-gold { border: 3px solid gold !important; box-shadow: 0 0 10px gold; }
         .frame-fire { border: 3px solid orangered !important; box-shadow: 0 0 10px red; }
         .frame-neon { border: 3px solid cyan !important; box-shadow: 0 0 10px cyan; }
@@ -77,18 +65,18 @@
         .frame-rainbow { border: 3px solid transparent !important; background: linear-gradient(#fff, #fff) padding-box, linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) border-box !important; border-radius: 50%; }
         .frame-royal { border: 3px solid #8e44ad !important; box-shadow: 0 0 0 2px #f1c40f inset; }
 
+        /* TIENDA */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
         .shop-item { border: 1px solid #ddd; border-radius: 10px; padding: 10px; cursor: pointer; transition: 0.2s; position: relative; }
         .shop-item:hover { transform: scale(1.05); border-color: var(--primary); }
         .shop-icon { font-size: 30px; display: block; margin-bottom: 5px; }
         .shop-price { font-size: 12px; font-weight: bold; color: green; }
-        .shop-owned { color: #888; font-size: 11px; font-weight: bold; }
         .shop-equipped { position: absolute; top: 5px; right: 5px; color: gold; font-size: 14px; }
         .shop-tabs { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
         .shop-tab { padding: 5px 15px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; background: #f1f1f1; }
         .shop-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* MAESTRO & COMUNIDAD */
+        /* MAESTRO */
         .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
@@ -98,27 +86,16 @@
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
         .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
         .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
-        .teacher-controls { display: flex; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 15px; align-items: center; margin-bottom: 15px; }
         
-        .history-table { width: 100%; margin-top: 15px; text-align: left; }
-        .history-table th { background: #6c757d; }
-        
-        /* LEADERBOARD VIVO */
-        .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-        .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
-        .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
-        .leader-table { width: 100%; font-size: 14px; border-collapse: collapse; }
-        .leader-table th { background: #f1f1f1; color: #333; padding: 8px; }
-        .leader-table td { padding: 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
-        .rank-1 { background-color: #fff9db; font-weight: bold; } .rank-1 td:first-child::before { content: '🥇 '; }
-        .rank-2 { background-color: #f8f9fa; } .rank-2 td:first-child::before { content: '🥈 '; }
-        .rank-3 { background-color: #fff0e6; } .rank-3 td:first-child::before { content: '🥉 '; }
+        /* MINI AVATAR */
         .mini-avatar { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 2px solid transparent; font-size: 18px; background: #eee; }
 
+        /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; text-align: center; }
-        .report-summary { background: #f8f9fa; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--primary); text-align: left; font-size: 14px; }
-        .report-summary strong { color: var(--primary); }
+        .level-complete-options { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        
+        .add-points-btn { background: #27ae60; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-weight: bold; margin-left: 5px; display: inline-flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -147,13 +124,11 @@
         </div>
 
         <div id="communitySection" class="community-section">
-            <div class="news-box">
-                <h3 style="margin-top:0; color:#333;"><i class="fas fa-bullhorn"></i> Noticias / News</h3>
-                <div id="newsContent" style="white-space: pre-wrap; color: #555;">Cargando...</div>
-            </div>
-            <div class="leaderboard-box">
+            <div style="background: white; padding: 15px; border-radius: 15px; width: 100%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
                 <h3 style="margin-top:0; color:#004e92;"><i class="fas fa-trophy"></i> The Best Heroes</h3>
-                <table class="leader-table"><thead><tr><th>Hero</th><th>Time</th><th>Pts</th><th>Medals</th></tr></thead><tbody id="leaderboardBody"><tr><td colspan="4">Cargando...</td></tr></tbody></table>
+                <div style="overflow-x: auto;">
+                    <table class="leader-table"><thead><tr><th>Hero</th><th>Time</th><th>Pts</th><th>Medals</th></tr></thead><tbody id="leaderboardBody"><tr><td colspan="4">Cargando...</td></tr></tbody></table>
+                </div>
             </div>
         </div>
     </div>
@@ -182,12 +157,18 @@
             </div>
             
             <div class="hud-grid">
+                <div class="hud-item"><span style="color:#d4af37; font-size:18px;">🥇</span><span id="goldDisplay">0</span></div>
+                <div class="hud-item"><span style="color:#C0C0C0; font-size:18px;">🥈</span><span id="silverDisplay">0</span></div>
+                <div class="hud-item"><span style="color:#CD7F32; font-size:18px;">🥉</span><span id="bronzeDisplay">0</span></div>
                 <div class="hud-item"><span style="color:blue">🕓</span><span id="timerDisplay">0m</span></div>
                 <div class="hud-item"><span style="color:green">✅</span><span id="correctDisplay">0</span></div>
                 <div class="hud-item"><span style="color:red">❌</span><span id="wrongDisplay">0</span></div>
-                <div class="hud-item"><span style="color:gold">🥇</span><span id="medalDisplay">0</span></div>
             </div>
-            <div style="font-size: 12px; color: #666; margin-top:5px;">💰 Puntos Disponibles: <b id="scoreText" style="color:green; font-size:14px;">0</b></div>
+            
+            <div style="font-size: 14px; margin-top:5px; display: flex; justify-content: center; align-items: center; gap: 5px;">
+                💰 Puntos: <b id="scoreText" style="color:green; font-size:16px;">0</b>
+                <button onclick="pagarPuntos()" class="add-points-btn" title="Comprar Puntos">+</button>
+            </div>
         </div>
 
         <div class="academic-nav">
@@ -196,7 +177,11 @@
         </div>
 
         <div class="card">
-            <span id="levelText" style="background:#ffd700; padding:5px 10px; border-radius:10px; font-weight:bold;">Nivel 1</span>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span id="levelText" style="background:#ffd700; padding:5px 10px; border-radius:10px; font-weight:bold;">Nivel 1</span>
+                <span id="repsText" style="font-size: 10px; color: #666;">Repeticiones: 0/5</span>
+            </div>
+            
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
             
             <div id="questionText" class="question-box">Cargando...</div>
@@ -211,6 +196,7 @@
             <button onclick="verificarRespuesta()" class="btn">CHECK</button>
             <div id="feedback" style="margin-top: 15px; font-weight: bold; height: 20px;"></div>
         </div>
+
         <div class="bottom-nav">
             <div class="nav-item active" onclick="cambiarNivel(1)">Nivel 1</div>
             <div class="nav-item locked" id="navL2" onclick="cambiarNivel(2)">🔐 Nivel 2</div>
@@ -221,7 +207,7 @@
     <div id="teacherPanel" class="teacher-panel-container">
         <div class="card" style="text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2><i class="fas fa-chalkboard-teacher"></i> Panel de Control</h2>
+                <h2>Panel de Control</h2>
                 <button onclick="cerrarSesionMaestro()" class="btn-danger" style="width:auto; padding:8px 20px;">Cerrar Sesión</button>
             </div>
             <hr>
@@ -238,20 +224,32 @@
                 <div class="stat-card"><canvas id="globalChart" style="max-height: 100px;"></canvas></div>
             </div>
             <div class="teacher-controls">
-                <div style="flex: 1; min-width: 200px;">
-                    <label style="font-size: 12px; font-weight: bold;">Filtrar:</label>
-                    <select id="groupFilter" onchange="renderizarTabla()"><option value="todos">Todos los Grupos</option></select>
-                </div>
-                <button onclick="verGraficaGrupal()" class="action-btn btn-chart" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Gráfica Grupal</button>
-                <button onclick="cargarTablaAlumnos()" class="action-btn btn-info" style="font-size: 16px;"><i class="fas fa-sync"></i></button>
-                <button onclick="exportarExcel()" class="action-btn btn-excel" style="font-size: 16px;"><i class="fas fa-file-excel"></i></button>
-                <button onclick="exportarPDF()" class="action-btn btn-pdf" style="font-size: 16px;"><i class="fas fa-file-pdf"></i></button>
+                <select id="groupFilter" onchange="renderizarTabla()"><option value="todos">Todos los Grupos</option></select>
+                <button onclick="verGraficaGrupal()" class="action-btn btn-chart">📊 Gráfica Grupal</button>
+                <button onclick="cargarTablaAlumnos()" class="action-btn btn-info">🔄</button>
+                <button onclick="exportarExcel()" class="action-btn btn-excel">📗 Excel</button>
+                <button onclick="exportarPDF()" class="action-btn btn-pdf">📕 PDF</button>
             </div>
             <div style="overflow-x: auto;" id="tableContainer">
                 <table id="tablaAlumnos">
                     <thead><tr><th>Nombre</th><th>Gpo</th><th>Nvl</th><th>🕓</th><th>🔥</th><th style="color:#d4af37">🥇</th><th style="color:#C0C0C0">🥈</th><th style="color:#CD7F32">🥉</th><th>Acciones</th></tr></thead>
                     <tbody id="cuerpoTabla"></tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalNivelCompleto" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="modalLevelTitle">¡Nivel Completado! 🎉</h2>
+            <div id="modalLevelMessage" style="font-size: 14px; margin-bottom: 20px;"></div>
+            
+            <div class="level-complete-options">
+                <button onclick="opcionRepetirNivel()" class="btn btn-secondary">🔄 Repetir Nivel (Gratis)</button>
+                <p style="font-size:12px; color:#777;">Debes completar el nivel 5 veces para avanzar.</p>
+                <hr style="width:100%">
+                <button onclick="opcionIngresarCodigo()" class="btn btn-code">🔐 Tengo Código Secreto</button>
+                <button onclick="opcionPagarNivel()" class="btn btn-pay">💸 Pagar para Avanzar ($)</button>
             </div>
         </div>
     </div>
@@ -290,27 +288,27 @@
 
         function cargarVoces() {
             vocesDisponibles = synth.getVoices();
-            if (vocesDisponibles.length === 0) {
-                setTimeout(cargarVoces, 100);
-            }
+            if (vocesDisponibles.length === 0) { setTimeout(cargarVoces, 100); }
         }
         cargarVoces();
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = cargarVoces;
-        }
+        if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVoces; }
 
         // --- VARIABLES GLOBALES ---
         let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
         let chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
         
-        // --- CATÁLOGO DC LEGENDS EDITION ---
+        // CÓDIGOS DE NIVEL
+        const LEVEL_CODES = {
+            1: "angysanti1",
+            2: "angysanti2",
+            3: "angysanti3"
+        };
+
+        // --- CATÁLOGO DE TIENDA ---
         const shopCatalog = [
-            // META SUPREMA (25,000 PUNTOS)
             { id: 'av_1', type: 'avatar', name: 'Super Boy Prime', price: 25000, icon: '🦸‍♂️' }, 
             { id: 'av_2', type: 'avatar', name: 'Super Girl Prime', price: 25000, icon: '🦸‍♀️' },
-            
-            // DC COMICS HEROES (4,000 - 8,000 PUNTOS)
             { id: 'av_dc_1', type: 'avatar', name: 'Dark Knight', price: 8000, icon: '🦇' },
             { id: 'av_dc_2', type: 'avatar', name: 'Amazon', price: 7000, icon: '⚔️' },
             { id: 'av_dc_3', type: 'avatar', name: 'Clown Prince', price: 6500, icon: '🤡' },
@@ -318,8 +316,6 @@
             { id: 'av_dc_5', type: 'avatar', name: 'Sea King', price: 5000, icon: '🔱' },
             { id: 'av_dc_6', type: 'avatar', name: 'Cyborg', price: 4000, icon: '🦾' },
             { id: 'av_dc_7', type: 'avatar', name: 'Emerald Ring', price: 4500, icon: '🟢' },
-
-            // OTROS AVATARES DIVERTIDOS
             { id: 'av_3', type: 'avatar', name: 'Ninja', price: 200, icon: '🥷' }, 
             { id: 'av_4', type: 'avatar', name: 'Robot', price: 300, icon: '🤖' }, 
             { id: 'av_5', type: 'avatar', name: 'Wizard', price: 500, icon: '🧙‍♂️' },
@@ -327,8 +323,6 @@
             { id: 'av_8', type: 'avatar', name: 'King', price: 1000, icon: '🤴' },
             { id: 'av_9', type: 'avatar', name: 'Queen', price: 1000, icon: '👸' },
             { id: 'av_10', type: 'avatar', name: 'Dragon', price: 1500, icon: '🐲' },
-
-            // MARCOS
             { id: 'fr_1', type: 'frame', name: 'Gold', price: 150, class: 'frame-gold' }, 
             { id: 'fr_2', type: 'frame', name: 'Fire', price: 300, class: 'frame-fire' },
             { id: 'fr_3', type: 'frame', name: 'Neon', price: 400, class: 'frame-neon' }, 
@@ -336,8 +330,6 @@
             { id: 'fr_5', type: 'frame', name: 'Ice', price: 700, class: 'frame-ice' },
             { id: 'fr_6', type: 'frame', name: 'Rainbow', price: 1000, class: 'frame-rainbow' },
             { id: 'fr_7', type: 'frame', name: 'Royal', price: 1500, class: 'frame-royal' },
-
-            // TEMAS
             { id: 'th_1', type: 'theme', name: 'Dark Mode', price: 200, colors: {bg:'linear-gradient(135deg, #000000, #434343)', card:'#222', text:'#fff'} },
             { id: 'th_2', type: 'theme', name: 'Forest', price: 200, colors: {bg:'linear-gradient(135deg, #134e5e, #71b280)', card:'#fff', text:'#333'} },
             { id: 'th_3', type: 'theme', name: 'Candy', price: 200, colors: {bg:'linear-gradient(135deg, #ff9a9e, #fecfef)', card:'#fff', text:'#333'} },
@@ -367,6 +359,8 @@
                         if(!datosUsuario.inventory) datosUsuario.inventory = [];
                         if(!datosUsuario.equipped) datosUsuario.equipped = { avatar: '👤', frame: '', theme: '' };
                         if(!datosUsuario.unlockedLevels) datosUsuario.unlockedLevels = [1];
+                        // NUEVO: Contador de Repeticiones por Nivel
+                        if(!datosUsuario.levelRepetitions) datosUsuario.levelRepetitions = {};
 
                         const hoy = new Date().toLocaleDateString('es-ES');
                         if (!datosUsuario.lastLoginDate) { datosUsuario.lastLoginDate = hoy; datosUsuario.currentStreak = 1; }
@@ -419,11 +413,20 @@
             document.getElementById("timerDisplay").textContent = formatearTiempo(datosUsuario.timeWorked||0);
             document.getElementById("correctDisplay").textContent = datosUsuario.totalCorrect||0;
             document.getElementById("wrongDisplay").textContent = datosUsuario.totalWrong||0;
+            
+            // MEDALLAS DETALLADAS
             const m = datosUsuario.medals||{gold:0, silver:0, bronze:0};
-            document.getElementById("medalDisplay").textContent = m.gold;
+            document.getElementById("goldDisplay").textContent = m.gold;
+            document.getElementById("silverDisplay").textContent = m.silver;
+            document.getElementById("bronzeDisplay").textContent = m.bronze;
+            
             document.getElementById("scoreText").textContent = datosUsuario.score||0;
             const r = datosUsuario.currentStreak||1;
             document.getElementById("streakDisplay").textContent = `${r>1?'🔥':'😔'} ${r} días seguidos`;
+            
+            // ACTUALIZAR CONTADOR DE REPETICIONES
+            const reps = (datosUsuario.levelRepetitions && datosUsuario.levelRepetitions[nivelActual]) ? datosUsuario.levelRepetitions[nivelActual] : 0;
+            document.getElementById("repsText").textContent = `Intentos Completados: ${reps}/5`;
         }
 
         // --- LÓGICA DEL JUEGO (CORE) ---
@@ -451,6 +454,7 @@
             
             document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active-listening', 'active-speaking', 'active-writing', 'mic-listening'));
             inp.focus();
+            actualizarUI();
         }
 
         function pronunciarPregunta() {
@@ -507,6 +511,132 @@
             if(contadorPreguntas >= 5) setTimeout(finSesion, 2000); else setTimeout(cargarPregunta, 2000);
         }
 
+        // --- FIN DE SESIÓN: LÓGICA EXPERTA (REPETICIÓN / PAGO / CÓDIGO) ---
+        function finSesion() {
+            let msg="", medal="";
+            // Dar medalla según desempeño
+            if(aciertosSesion===5) { msg="🏆 PERFECT!"; medal="gold"; datosUsuario.medals.gold++; try{audioLevelUp.play();}catch(e){} }
+            else if(aciertosSesion===4) { msg="🥈 Good!"; medal="silver"; datosUsuario.medals.silver++; }
+            else { msg="🥉 Try again."; medal="bronze"; datosUsuario.medals.bronze++; }
+
+            // Guardar medallas
+            db.collection("students").doc(usuarioActual).update({ medals:datosUsuario.medals });
+
+            // Si es un intento válido (al menos 3 aciertos), cuenta como repetición
+            if(aciertosSesion >= 3) {
+                if(!datosUsuario.levelRepetitions) datosUsuario.levelRepetitions = {};
+                if(!datosUsuario.levelRepetitions[nivelActual]) datosUsuario.levelRepetitions[nivelActual] = 0;
+                datosUsuario.levelRepetitions[nivelActual]++;
+                db.collection("students").doc(usuarioActual).update({ levelRepetitions: datosUsuario.levelRepetitions });
+            }
+
+            // Verificar si ya cumplió las 5 veces
+            const reps = datosUsuario.levelRepetitions[nivelActual] || 0;
+            
+            if (reps >= 5) {
+                // Pasa automáticamente
+                Swal.fire({title: msg, text: "¡Has dominado este nivel! (5/5 completado)", icon: 'success'}).then(() => {
+                    desbloquearSiguienteNivel();
+                });
+            } else {
+                // Mostrar Modal de Opciones
+                document.getElementById("modalLevelTitle").textContent = msg;
+                document.getElementById("modalLevelMessage").innerHTML = `Has completado el nivel.<br>Repeticiones: <b>${reps}/5</b><br>Tienes 3 opciones:`;
+                document.getElementById("modalNivelCompleto").style.display = "flex";
+            }
+        }
+
+        function desbloquearSiguienteNivel() {
+            const n = nivelActual + 1;
+            if(!datosUsuario.unlockedLevels.includes(n) && n <= 3) {
+                datosUsuario.unlockedLevels.push(n);
+                db.collection("students").doc(usuarioActual).update({ unlockedLevels: datosUsuario.unlockedLevels });
+            }
+            // Resetear para siguiente ronda o nivel
+            cerrarModal('modalNivelCompleto');
+            actualizarCandados();
+            contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%";
+            // Si desbloqueó nivel nuevo, preguntar si quiere ir
+            if(datosUsuario.unlockedLevels.includes(nivelActual+1)) {
+                 Swal.fire({title: 'Level Up!', text: '¿Ir al siguiente nivel?', showCancelButton: true, confirmButtonText: 'Sí, vamos!'}).then((res)=>{
+                     if(res.isConfirmed) cambiarNivel(nivelActual+1);
+                     else cargarPregunta();
+                 });
+            } else {
+                cargarPregunta();
+            }
+        }
+
+        // --- OPCIONES DEL MODAL ---
+        function opcionRepetirNivel() {
+            // Solo resetea y vuelve a cargar
+            cerrarModal('modalNivelCompleto');
+            contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%";
+            cargarPregunta();
+        }
+
+        function opcionIngresarCodigo() {
+            Swal.fire({
+                title: 'Código Secreto',
+                input: 'text',
+                inputPlaceholder: 'Ingresa el código...',
+                showCancelButton: true
+            }).then((result) => {
+                if (result.value === LEVEL_CODES[nivelActual]) {
+                    Swal.fire("¡Código Correcto!", "Nivel desbloqueado.", "success");
+                    desbloquearSiguienteNivel();
+                } else if(result.value) {
+                    Swal.fire("Error", "Código incorrecto.", "error");
+                }
+            });
+        }
+
+        function opcionPagarNivel() {
+            // Simulacion de pago
+            Swal.fire({
+                title: 'Pagar para saltar',
+                text: "El costo es de $20 MXN para saltar el requisito de repetición.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Pagar $20',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire("¡Pago Exitoso!", "Has saltado el nivel.", "success");
+                    desbloquearSiguienteNivel();
+                }
+            });
+        }
+
+        // --- SISTEMA DE PAGO DE PUNTOS ---
+        function pagarPuntos() {
+            Swal.fire({
+                title: 'Comprar Puntos 💰',
+                html: `
+                    <button onclick="procesarPagoPuntos(10, 50)" class="btn" style="margin:5px">$10 MXN = 50 Pts</button>
+                    <button onclick="procesarPagoPuntos(20, 100)" class="btn" style="margin:5px">$20 MXN = 100 Pts</button>
+                    <button onclick="procesarPagoPuntos(50, 300)" class="btn" style="margin:5px; background:gold; color:black;">$50 MXN = 300 Pts</button>
+                `,
+                showConfirmButton: false,
+                showCancelButton: true,
+                cancelButtonText: 'Cerrar'
+            });
+        }
+
+        function procesarPagoPuntos(dinero, puntos) {
+            Swal.fire({
+                title: 'Procesando...',
+                text: `Pagando $${dinero} MXN...`,
+                timer: 1500,
+                didOpen: () => { Swal.showLoading() }
+            }).then(() => {
+                datosUsuario.score += puntos;
+                db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score });
+                actualizarUI();
+                Swal.fire("¡Compra Exitosa!", `Has recibido ${puntos} puntos.`, "success");
+            });
+        }
+
         function activarEscritura() {
             const btn = document.getElementById("btnWrite");
             btn.classList.add("active-writing"); 
@@ -552,7 +682,7 @@
             if (e.key === "Enter") verificarRespuesta(); 
         });
 
-        // --- TIENDA Y COSMÉTICOS MEJORADOS ---
+        // --- TIENDA Y COSMÉTICOS ---
         function abrirTienda() { document.getElementById("modalTienda").style.display="flex"; document.getElementById("shopPoints").textContent = datosUsuario.score || 0; filtrarTienda('avatar'); }
         function filtrarTienda(tipo) {
             document.querySelectorAll(".shop-tab").forEach(t => t.classList.remove("active"));
@@ -597,16 +727,17 @@
         }
 
         // --- SISTEMAS DE NIVEL ---
-        function finSesion() {
-            let msg="", medal="";
-            if(aciertosSesion===5) { msg="🏆 PERFECT!"; medal="gold"; datosUsuario.medals.gold++; try{audioLevelUp.play();}catch(e){} const n=nivelActual+1; if(!datosUsuario.unlockedLevels.includes(n)&&n<=3) datosUsuario.unlockedLevels.push(n); }
-            else if(aciertosSesion===4) { msg="🥈 Good!"; medal="silver"; datosUsuario.medals.silver++; }
-            else { msg="🥉 Try again."; medal="bronze"; datosUsuario.medals.bronze++; }
-            db.collection("students").doc(usuarioActual).update({ unlockedLevels:datosUsuario.unlockedLevels, medals:datosUsuario.medals });
-            actualizarCandados(); Swal.fire({title:msg, icon:medal==='gold'?'success':'info', confirmButtonText:'OK'}).then(()=>{ contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); });
-        }
         function actualizarCandados() { for(let i=2;i<=3;i++) { const e=document.getElementById(`navL${i}`); if(datosUsuario.unlockedLevels.includes(i)) {e.classList.remove("locked");e.innerHTML=`Nivel ${i}`;} else {e.classList.add("locked");e.innerHTML=`🔐 Nivel ${i}`;}} }
-        function cambiarNivel(n) { if(datosUsuario.unlockedLevels.includes(n)) { nivelActual=n; document.getElementById("levelText").textContent="Nivel "+n; contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active")); event.target.classList.add("active"); } else Swal.fire("LOCKED","Need GOLD in previous level.","error"); }
+        function cambiarNivel(n) { 
+            if(datosUsuario.unlockedLevels.includes(n)) { 
+                nivelActual=n; 
+                document.getElementById("levelText").textContent="Nivel "+n; 
+                contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; 
+                cargarPregunta(); 
+                document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active")); 
+                event.target.classList.add("active"); 
+            } else Swal.fire("BLOQUEADO","Necesitas completar el nivel anterior 5 veces o usar un código.","error"); 
+        }
 
         // --- MAESTRO FUNCTIONS ---
         function mostrarLoginMaestro() { document.getElementById("loginContainerWrapper").style.display="none"; document.getElementById("teacherLogin").style.display="block"; }
