@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - SECURE PAYMENTS V8</title>
+    <title>Inglés Para Todos - MASTER PAYMENTS V9</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -99,7 +99,7 @@
         th { background: var(--primary); color: white; }
         .action-btn { padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 2px; font-size: 14px; }
         .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-edit { background: #ffc107; color: black; } .btn-history { background: #795548; }
-        .btn-approve { background: #28a745; animation: pulseBtn 1s infinite; font-weight: bold; }
+        .btn-approve { background: #28a745; animation: pulseBtn 1s infinite; font-weight: bold; padding: 6px 12px; }
         @keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); } }
 
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
@@ -383,7 +383,7 @@
                         if(!datosUsuario.unlockedLevels) datosUsuario.unlockedLevels = [1];
                         if(!datosUsuario.levelRepetitions) datosUsuario.levelRepetitions = {};
                         if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = [];
-                        if(!datosUsuario.pendingPayment) datosUsuario.pendingPayment = null; // Nuevo: Flag de pago
+                        if(!datosUsuario.pendingPayment) datosUsuario.pendingPayment = null; 
 
                         const hoy = new Date().toLocaleDateString('es-ES');
                         if (!datosUsuario.lastLoginDate) { datosUsuario.lastLoginDate = hoy; datosUsuario.currentStreak = 1; }
@@ -576,42 +576,47 @@
             });
         }
 
-        // --- SISTEMA DE PAGO SEGURO (SOLICITUD) ---
+        // --- SISTEMA DE PAGO SEGURO POR FOLIO (V9.0) ---
         function opcionPagarNivel() {
+            // 1. Abrir link de pago
             window.open('https://mpago.li/2aeNocU', '_blank');
+
+            // 2. Pedir Folio de Transacción
             Swal.fire({
-                title: 'Confirmar Pago',
-                text: '¿Ya realizaste el pago en la ventana que se abrió?',
-                icon: 'question',
+                title: 'Verificar Pago 🔍',
+                html: '<p style="font-size:14px">Ingresa el <b>Número de Operación o Folio</b> de tu comprobante de pago.</p>',
+                input: 'text',
+                inputPlaceholder: 'Ej: 1234567890',
                 showCancelButton: true,
-                confirmButtonText: 'Sí, ya pagué',
+                confirmButtonText: 'Enviar para Revisión',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    registrarSolicitudPago();
+                if (result.isConfirmed && result.value) {
+                    registrarSolicitudPago(result.value); // Enviamos el folio
+                } else if (result.isConfirmed) {
+                    Swal.fire("Error", "Debes escribir el folio para verificar.", "warning");
                 }
             });
         }
 
-        function registrarSolicitudPago() {
-            // AQUÍ ESTÁ EL TRUCO: No desbloquea, solo avisa
+        function registrarSolicitudPago(folio) {
             const solicitud = {
                 fecha: new Date().toLocaleString(),
                 monto: 25,
                 concepto: `Salto Nivel ${nivelActual}`,
-                estado: "Pendiente"
+                estado: `Pendiente (Folio: ${folio})`, // Guardamos el folio aquí
+                folio: folio
             };
             
-            // Actualizamos historial y activamos la "bandera" pendiente
             if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = [];
             datosUsuario.paymentHistory.push(solicitud);
             
             db.collection("students").doc(usuarioActual).update({ 
                 paymentHistory: datosUsuario.paymentHistory,
-                pendingPayment: { nivel: nivelActual, fecha: new Date().toLocaleString() } 
+                pendingPayment: { nivel: nivelActual, fecha: new Date().toLocaleString(), folio: folio } 
             }).then(() => {
                 cerrarModal('modalNivelCompleto');
-                Swal.fire("⏳ Verificando...", "Tu pago ha sido enviado al maestro para aprobación. El nivel se desbloqueará cuando el maestro confirme.", "info");
+                Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado al maestro. Cuando él confirme que el dinero llegó, se desbloqueará el nivel.`, "info");
             });
         }
 
@@ -620,8 +625,7 @@
         }
 
         function procesarPagoPuntos(dinero, puntos) {
-            // Mismo sistema: Solicitud
-             Swal.fire({
+            Swal.fire({
                 title: 'Ir a Pagar',
                 text: `Se abrirá Mercado Pago para pagar $${dinero}. Avísale a tu maestro.`,
                 confirmButtonText: 'Pagar',
@@ -629,8 +633,6 @@
             }).then((r) => {
                 if(r.isConfirmed) {
                     window.open('https://mpago.li/2aeNocU', '_blank');
-                    // Simulación para puntos (aquí sí dejamos confianza del cliente para puntos pequeños, o puedes aplicar la misma lógica)
-                    // Para no complicar, los puntos los dejamos "confianza", los niveles "estrictos".
                     datosUsuario.score += puntos; db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score }); actualizarUI(); 
                 }
             });
@@ -729,10 +731,11 @@
                 const fr = s.equipped?.frame || ''; 
                 const nombreMostrar = s.username || s.nombre || s.name || "Alumno";
                 
-                // BOTÓN DE APROBACIÓN DE PAGO
+                // BOTÓN DE APROBACIÓN DE PAGO CON FOLIO
                 let btnPago = "";
                 if(s.pendingPayment) {
-                    btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago $25">💸 APROBAR</button>`;
+                    const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio";
+                    btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">💸 ${folioInfo}</button>`;
                 }
 
                 tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info">📊</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete">🗑️</button></td>`; 
@@ -745,12 +748,11 @@
         async function aprobarPagoReal(uid) {
             const s = listaAlumnosCache.find(x => x.uid === uid);
             if(!s.pendingPayment) return;
-            const nivelADesbloquear = s.pendingPayment.nivel + 1; // El siguiente
+            const nivelADesbloquear = s.pendingPayment.nivel + 1; 
             
             let nuevosNiveles = s.unlockedLevels || [1];
             if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear);
 
-            // Actualizar estado del pago en historial
             let historial = s.paymentHistory || [];
             if(historial.length > 0) {
                 historial[historial.length - 1].estado = "Aprobado ✅";
@@ -758,7 +760,7 @@
 
             await db.collection("students").doc(uid).update({
                 unlockedLevels: nuevosNiveles,
-                pendingPayment: null, // Quitar pendiente
+                pendingPayment: null, 
                 paymentHistory: historial
             });
 
@@ -783,6 +785,7 @@
                 pagosHTML = `<ul style="text-align:left; font-size:12px; list-style:none; padding:0;">`;
                 s.paymentHistory.forEach(p => {
                     const color = p.estado.includes("Aprobado") ? "green" : "orange";
+                    // MOSTRAR EL FOLIO EN EL HISTORIAL
                     pagosHTML += `<li style="margin-bottom:5px; border-bottom:1px solid #eee; padding-bottom:3px;">📅 ${p.fecha} - <b>$${p.monto}</b> - <span style="color:${color}">${p.estado}</span></li>`;
                 });
                 pagosHTML += `</ul>`;
