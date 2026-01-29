@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V18 GUARDIAN</title>
+    <title>Inglés Para Todos - MASTER V19 ULTRA STABLE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTILOS GENERALES (INTACTOS) --- */
+        /* --- ESTILOS V19 (ESTABILIZADOS) --- */
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; }
@@ -26,6 +26,7 @@
         
         .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; position: relative; transition: all 0.3s; }
         
+        /* FIX IMAGENES */
         .logo-img { width: 100%; max-width: 300px; margin-bottom: 10px; }
         .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; margin: 10px auto; display: block; object-fit: cover; }
         .teacher-header-img { width: 100%; max-height: 180px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 10px; }
@@ -247,7 +248,7 @@
             
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
             
-            <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px;">...</h3>
+            <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px; min-height: 40px;">...</h3>
             
             <div class="skills-bar">
                 <button onclick="pronunciarPregunta()" class="skill-btn" id="btnListen" title="Listening">👂<span class="skill-label">Listen</span></button>
@@ -383,7 +384,7 @@
         let vocesDisponibles = [];
         let audioUnlocked = false;
 
-        /* --- MOTOR DE AUDIO HIGH-END PROTEGIDO (NO TOCAR) --- */
+        // V17: CARGA DE VOCES SEGURA (BACKGROUND)
         function cargarVocesMejoradas() {
             const rawVoices = synth.getVoices();
             if (rawVoices.length === 0) { setTimeout(cargarVocesMejoradas, 100); return; }
@@ -400,7 +401,6 @@
             synth.speak(buffer);
             audioUnlocked = true;
         }
-        /* ----------------------------------------------------- */
 
         let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
@@ -475,13 +475,13 @@
             });
         }
 
-        // --- V17: SISTEMA DE IDENTIFICACIÓN DE DONADORES (CASCADA) ---
+        // --- V17 FIX CRÍTICO: MANEJO DE PROMESAS CASCADA PARA DONACIONES ---
         function verDonacionesGlobales() {
             document.getElementById("modalInformeDonaciones").style.display = "flex";
             const tbody = document.getElementById("cuerpoDonaciones");
             tbody.innerHTML = "<tr><td colspan='5'>Cargando base de datos...</td></tr>";
             
-            // 1. OBLIGATORIO: Cargar alumnos primero
+            // 1. FORZAMOS DESCARGA DE ALUMNOS (Promesa Principal)
             db.collection("students").get().then((snapEstudiantes) => {
                 listaAlumnosCache = []; 
                 snapEstudiantes.forEach(d => { 
@@ -491,7 +491,7 @@
                     }
                 });
 
-                // 2. LUEGO: Cargar donaciones
+                // 2. UNA VEZ COMPLETADO 1, DESCARGAMOS DONACIONES
                 db.collection("donations").orderBy("fecha", "desc").get().then((snapDonaciones) => {
                     tbody.innerHTML = "";
                     if(snapDonaciones.empty) {
@@ -501,21 +501,19 @@
                     snapDonaciones.forEach(doc => {
                         const d = doc.data();
                         
-                        // 3. COMPARACIÓN
-                        // POR DEFECTO: 🌍 Donador Externo (SI NO ENCUENTRA COINCIDENCIA)
-                        let categoria = "<span style='color:grey; font-weight:bold;'>🌍 Donador Externo</span>"; 
+                        // 3. ALGORITMO DE COMPARACIÓN V17 (Ultra Seguro)
+                        let categoria = "<span style='color:grey;'>🌍 Donador Externo</span>"; // DEFAULT
                         
-                        // Normalizar nombres
+                        // Normalizamos cadenas para evitar errores de mayúsculas/espacios
                         const donanteNombreClean = (d.nombre || "").toLowerCase().trim();
                         
-                        // Buscar en lista de alumnos
+                        // Búsqueda inteligente en array
                         let match = listaAlumnosCache.find(u => {
                             const alumnoNombre = (u.username || u.nombre || "").toLowerCase().trim();
                             // Coincidencia exacta o parcial
                             return alumnoNombre === donanteNombreClean || (donanteNombreClean.length > 3 && alumnoNombre.includes(donanteNombreClean));
                         });
                         
-                        // Si encuentra, sobreescribe la categoría
                         if(match) {
                             if(match.userType === 'adult') categoria = "<span style='color:purple; font-weight:bold;'>💼 Adulto</span>";
                             else categoria = `<span style='color:blue; font-weight:bold;'>🎓 Alumno (Gpo ${match.group || '?'})</span>`;
@@ -649,7 +647,7 @@
             // PINTAR TEXTO YA
             if (preguntaActual.type === 'dictation') { 
                 qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
-                // Audio después, sin bloquear
+                // Audio en segundo plano
                 setTimeout(() => pronunciarPregunta(), 150); 
             } else { 
                 qt.textContent = "Translate: " + preguntaActual.q; 
