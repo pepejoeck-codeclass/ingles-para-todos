@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V10 DUAL</title>
+    <title>Inglés Para Todos - MASTER V10 STABLE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -89,7 +89,7 @@
         .shop-tab { padding: 5px 15px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; background: #f1f1f1; }
         .shop-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* --- MAESTRO Y COMUNIDAD --- */
+        /* --- ESTILOS DE MAESTRO Y COMUNIDAD --- */
         .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
@@ -102,6 +102,15 @@
         .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
         .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
         .mini-avatar { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 2px solid transparent; font-size: 18px; background: #eee; }
+        
+        /* TABS (LOGIN Y MAESTRO) */
+        .tabs-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; background: #f0f2f5; color: #666; transition: all 0.3s; text-transform: uppercase; font-size: 14px; }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,78,146,0.3); }
+        .tab-btn-teacher { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; background: white; font-weight: bold; }
+        .tab-btn-teacher.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* COMUNIDAD / NOTICIAS */
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
@@ -111,13 +120,6 @@
         .rank-1 { background-color: #fff9db; font-weight: bold; } .rank-1 td:first-child::before { content: '🥇 '; }
         .rank-2 { background-color: #f8f9fa; } .rank-2 td:first-child::before { content: '🥈 '; }
         .rank-3 { background-color: #fff0e6; } .rank-3 td:first-child::before { content: '🥉 '; }
-
-        /* ESTILOS DE TABS (LOGIN Y MAESTRO) */
-        .tabs-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; background: #f0f2f5; color: #666; transition: all 0.3s; text-transform: uppercase; font-size: 14px; }
-        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,78,146,0.3); }
-        .tab-btn-teacher { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; background: white; font-weight: bold; }
-        .tab-btn-teacher.active { background: var(--primary); color: white; border-color: var(--primary); }
 
         /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -226,7 +228,8 @@
             </div>
             
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
-            <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px;">Cargando...</h3>
+            
+            <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px; min-height: 40px;">Cargando...</h3>
             
             <div class="skills-bar">
                 <button onclick="pronunciarPregunta()" class="skill-btn" id="btnListen" title="Listening">👂<span class="skill-label">Listen</span></button>
@@ -273,7 +276,6 @@
             </div>
             <div class="teacher-controls">
                 <select id="groupFilter" onchange="renderizarTabla()"><option value="todos">Todos los Grupos</option></select>
-                
                 <button onclick="verGraficaGrupal()" class="action-btn btn-chart">📊 Gráfica Grupal</button>
                 <button onclick="cargarTablaAlumnos()" class="action-btn btn-info">🔄</button>
                 <button onclick="exportarExcel()" class="action-btn btn-excel">📗 Excel</button>
@@ -332,6 +334,7 @@
         const synth = window.speechSynthesis;
         let vocesDisponibles = [];
 
+        // REPARACION DE AUDIO: Carga forzada
         function cargarVoces() {
             vocesDisponibles = synth.getVoices();
             if (vocesDisponibles.length === 0) { setTimeout(cargarVoces, 100); }
@@ -343,9 +346,8 @@
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
         let chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
         
-        // --- NUEVAS VARIABLES GLOBALES V10 ---
-        let loginMode = 'student'; // 'student' or 'adult'
-        let teacherViewMode = 'student'; // 'student' or 'adult'
+        let loginMode = 'student'; 
+        let teacherViewMode = 'student';
 
         const LEVEL_CODES = { 1: "angysanti1", 2: "angysanti2", 3: "angysanti3" };
 
@@ -361,24 +363,13 @@
             { id: 'av_dc_7', type: 'avatar', name: 'Emerald Ring', price: 4500, icon: '🟢' },
             { id: 'av_3', type: 'avatar', name: 'Ninja', price: 200, icon: '🥷' }, 
             { id: 'av_4', type: 'avatar', name: 'Robot', price: 300, icon: '🤖' }, 
-            { id: 'av_5', type: 'avatar', name: 'Wizard', price: 500, icon: '🧙‍♂️' },
-            { id: 'av_6', type: 'avatar', name: 'Alien', price: 600, icon: '👽' },
-            { id: 'av_8', type: 'avatar', name: 'King', price: 1000, icon: '🤴' },
-            { id: 'av_9', type: 'avatar', name: 'Queen', price: 1000, icon: '👸' },
-            { id: 'av_10', type: 'avatar', name: 'Dragon', price: 1500, icon: '🐲' },
             { id: 'fr_1', type: 'frame', name: 'Gold', price: 150, class: 'frame-gold' }, 
             { id: 'fr_2', type: 'frame', name: 'Fire', price: 300, class: 'frame-fire' },
             { id: 'fr_3', type: 'frame', name: 'Neon', price: 400, class: 'frame-neon' }, 
             { id: 'fr_4', type: 'frame', name: 'Matrix', price: 600, class: 'frame-matrix' },
-            { id: 'fr_5', type: 'frame', name: 'Ice', price: 700, class: 'frame-ice' },
-            { id: 'fr_6', type: 'frame', name: 'Rainbow', price: 1000, class: 'frame-rainbow' },
-            { id: 'fr_7', type: 'frame', name: 'Royal', price: 1500, class: 'frame-royal' },
             { id: 'th_1', type: 'theme', name: 'Dark Mode', price: 200, colors: {bg:'linear-gradient(135deg, #000000, #434343)', card:'#222', text:'#fff'} },
             { id: 'th_2', type: 'theme', name: 'Forest', price: 200, colors: {bg:'linear-gradient(135deg, #134e5e, #71b280)', card:'#fff', text:'#333'} },
-            { id: 'th_3', type: 'theme', name: 'Candy', price: 200, colors: {bg:'linear-gradient(135deg, #ff9a9e, #fecfef)', card:'#fff', text:'#333'} },
-            { id: 'th_4', type: 'theme', name: 'Ocean', price: 500, colors: {bg:'linear-gradient(135deg, #2193b0, #6dd5ed)', card:'#fff', text:'#333'} },
-            { id: 'th_5', type: 'theme', name: 'Space', price: 800, colors: {bg:'radial-gradient(circle, #0f2027, #203a43, #2c5364)', card:'#2c3e50', text:'#ecf0f1'} },
-            { id: 'th_6', type: 'theme', name: 'Cyberpunk', price: 1000, colors: {bg:'linear-gradient(135deg, #fce38a, #f38181)', card:'#222', text:'#00ffea'} }
+            { id: 'th_3', type: 'theme', name: 'Candy', price: 200, colors: {bg:'linear-gradient(135deg, #ff9a9e, #fecfef)', card:'#fff', text:'#333'} }
         ];
 
         const preguntasDB = {
@@ -387,38 +378,21 @@
             3: [{q:"Lunes",a:"monday"},{q:"Martes",a:"tuesday"},{q:"Sol",a:"sun"},{q:"Luna",a:"moon"},{q:"Agua",a:"water"}]
         };
 
-        // --- MANEJO DE TABS DE LOGIN ---
         function setLoginMode(mode) {
             loginMode = mode;
             const tabS = document.getElementById('tabStudent');
             const tabA = document.getElementById('tabAdult');
             const fields = document.getElementById('studentFields');
-            
-            if(mode === 'student') {
-                tabS.classList.add('active');
-                tabA.classList.remove('active');
-                fields.style.display = 'flex';
-            } else {
-                tabA.classList.add('active');
-                tabS.classList.remove('active');
-                fields.style.display = 'none';
-            }
+            if(mode === 'student') { tabS.classList.add('active'); tabA.classList.remove('active'); fields.style.display = 'flex'; } 
+            else { tabA.classList.add('active'); tabS.classList.remove('active'); fields.style.display = 'none'; }
         }
 
-        // --- MANEJO DE TABS DE MAESTRO ---
         function setTeacherTab(mode) {
             teacherViewMode = mode;
             document.getElementById('btnTabStudents').classList.toggle('active', mode === 'student');
             document.getElementById('btnTabAdults').classList.toggle('active', mode === 'adult');
-            
-            // Ocultar/Mostrar filtro de grupo (los adultos no tienen grupo)
             const groupFilter = document.getElementById('groupFilter');
-            if(mode === 'adult') {
-                groupFilter.value = 'todos';
-                groupFilter.style.display = 'none';
-            } else {
-                groupFilter.style.display = 'block';
-            }
+            if(mode === 'adult') { groupFilter.value = 'todos'; groupFilter.style.display = 'none'; } else { groupFilter.style.display = 'block'; }
             renderizarTabla();
         }
 
@@ -434,10 +408,7 @@
                         if(!datosUsuario.inventory) datosUsuario.inventory = [];
                         if(!datosUsuario.equipped) datosUsuario.equipped = { avatar: '👤', frame: '', theme: '' };
                         if(!datosUsuario.unlockedLevels) datosUsuario.unlockedLevels = [1];
-                        if(!datosUsuario.levelRepetitions) datosUsuario.levelRepetitions = {};
-                        if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = [];
-                        if(!datosUsuario.pendingPayment) datosUsuario.pendingPayment = null; 
-                        if(!datosUsuario.userType) datosUsuario.userType = 'student'; // Compatibilidad antigua
+                        if(!datosUsuario.userType) datosUsuario.userType = 'student'; 
 
                         const hoy = new Date().toLocaleDateString('es-ES');
                         if (!datosUsuario.lastLoginDate) { datosUsuario.lastLoginDate = hoy; datosUsuario.currentStreak = 1; }
@@ -464,15 +435,7 @@
             cargarVoces();
         });
 
-        function mostrarLogin() { 
-            document.getElementById("loginContainerWrapper").style.display="flex"; 
-            document.getElementById("loginCard").style.display="block"; 
-            document.getElementById("communitySection").style.display="flex"; 
-            document.getElementById("mainContent").style.display="none"; 
-            document.getElementById("teacherPanel").style.display="none"; 
-            document.getElementById("teacherLogin").style.display="none"; 
-            cargarLeaderboard(); 
-        }
+        function mostrarLogin() { document.getElementById("loginContainerWrapper").style.display="flex"; document.getElementById("loginCard").style.display="block"; document.getElementById("communitySection").style.display="flex"; document.getElementById("mainContent").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("teacherLogin").style.display="none"; cargarLeaderboard(); }
 
         function mostrarJuego() { 
             document.getElementById("loginContainerWrapper").style.display="none"; 
@@ -480,7 +443,15 @@
             document.getElementById("userDisplay").textContent = (datosUsuario.userType === 'adult' ? "Adulto: " : "Alumno: ") + (datosUsuario.username||"Héroe"); 
             actualizarUI(); 
             actualizarCandados(); 
-            setTimeout(cargarPregunta, 500); 
+            
+            // --- FIX CRÍTICO DEL "CARGANDO..." ---
+            // Forzamos la carga de la pregunta inmediatamente, sin esperar al audio
+            cargarPregunta(); 
+            // Y por si acaso, un respaldo:
+            setTimeout(() => {
+                if(document.getElementById("questionText").textContent === "Cargando...") cargarPregunta();
+            }, 1000);
+
             iniciarCronometro(); 
             aplicarCosmeticos();
         }
@@ -504,30 +475,52 @@
             if(!nivelActual) nivelActual = 1;
             const pool = preguntasDB[nivelActual] || preguntasDB[1];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
-            if (!preguntaActual) return;
+            
+            if (!preguntaActual) return; // DB vacía
+
             const qt = document.getElementById("questionText");
             const inp = document.getElementById("answerInput");
+            
             inp.value = "";
             document.getElementById("feedback").textContent = "";
             inp.style.borderColor = "#ddd";
             inp.style.backgroundColor = "white";
-            if (preguntaActual.type === 'dictation') { qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; setTimeout(() => pronunciarPregunta(), 500); } else { qt.textContent = "Translate: " + preguntaActual.q; }
+
+            // MOSTRAR TEXTO INMEDIATAMENTE (Elimina el "Cargando...")
+            if (preguntaActual.type === 'dictation') { 
+                qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
+                // Intentar hablar, pero no bloquear si falla
+                setTimeout(() => pronunciarPregunta(), 500); 
+            } else { 
+                qt.textContent = "Translate: " + preguntaActual.q; 
+            }
+            
             document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active-listening', 'active-speaking', 'active-writing', 'mic-listening'));
-            inp.focus(); actualizarUI();
+            inp.focus();
         }
 
         function pronunciarPregunta() {
             if (!preguntaActual) return;
+            // Asegurar que las voces estén cargadas, si no, reintentar UNA vez
+            if (vocesDisponibles.length === 0) {
+                vocesDisponibles = synth.getVoices();
+                if (vocesDisponibles.length === 0) return; // Si no hay voces, no hacer nada (evita error)
+            }
+
             const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
             synth.cancel();
             const utterance = new SpeechSynthesisUtterance(texto);
+            
             let vozElegida = vocesDisponibles.find(v => v.lang.includes('en-US') || v.lang.includes('en-GB'));
             if (!vozElegida) vozElegida = vocesDisponibles.find(v => v.lang.includes('en'));
             if (vozElegida) utterance.voice = vozElegida;
-            utterance.rate = 0.85; utterance.pitch = 1;
+            
+            utterance.rate = 0.9; // Velocidad ajustada
+            utterance.pitch = 1;
+            
             const btn = document.getElementById('btnListen');
-            btn.classList.add('active-listening'); 
-            utterance.onend = () => { btn.classList.remove('active-listening'); };
+            if(btn) btn.classList.add('active-listening'); 
+            utterance.onend = () => { if(btn) btn.classList.remove('active-listening'); };
             synth.speak(utterance);
         }
 
@@ -590,18 +583,8 @@
 
         function opcionRepetirNivel() { cerrarModal('modalNivelCompleto'); contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); }
         function opcionIngresarCodigo() { Swal.fire({ title: 'Código Secreto', input: 'text', inputPlaceholder: 'Ingresa el código...', showCancelButton: true }).then((result) => { if (result.value === LEVEL_CODES[nivelActual]) { Swal.fire("¡Código Correcto!", "Nivel desbloqueado.", "success"); desbloquearSiguienteNivel(); } else if(result.value) { Swal.fire("Error", "Código incorrecto.", "error"); } }); }
-        
-        function opcionPagarNivel() {
-            window.open('https://mpago.li/2aeNocU', '_blank');
-            Swal.fire({ title: 'Verificar Pago 🔍', html: '<p style="font-size:14px">Ingresa el <b>Número de Operación o Folio</b> de tu comprobante de pago.</p>', input: 'text', inputPlaceholder: 'Ej: 1234567890', showCancelButton: true, confirmButtonText: 'Enviar para Revisión', cancelButtonText: 'Cancelar' }).then((result) => { if (result.isConfirmed && result.value) { registrarSolicitudPago(result.value); } else if (result.isConfirmed) { Swal.fire("Error", "Debes escribir el folio para verificar.", "warning"); } });
-        }
-
-        function registrarSolicitudPago(folio) {
-            const solicitud = { fecha: new Date().toLocaleString(), monto: 25, concepto: `Salto Nivel ${nivelActual}`, estado: `Pendiente (Folio: ${folio})`, folio: folio };
-            if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; datosUsuario.paymentHistory.push(solicitud);
-            db.collection("students").doc(usuarioActual).update({ paymentHistory: datosUsuario.paymentHistory, pendingPayment: { nivel: nivelActual, fecha: new Date().toLocaleString(), folio: folio } }).then(() => { cerrarModal('modalNivelCompleto'); Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado al maestro. Cuando él confirme que el dinero llegó, se desbloqueará el nivel.`, "info"); });
-        }
-
+        function opcionPagarNivel() { window.open('https://mpago.li/2aeNocU', '_blank'); Swal.fire({ title: 'Verificar Pago 🔍', html: '<p style="font-size:14px">Ingresa el <b>Número de Operación o Folio</b> de tu comprobante de pago.</p>', input: 'text', inputPlaceholder: 'Ej: 1234567890', showCancelButton: true, confirmButtonText: 'Enviar para Revisión', cancelButtonText: 'Cancelar' }).then((result) => { if (result.isConfirmed && result.value) { registrarSolicitudPago(result.value); } else if (result.isConfirmed) { Swal.fire("Error", "Debes escribir el folio para verificar.", "warning"); } }); }
+        function registrarSolicitudPago(folio) { const solicitud = { fecha: new Date().toLocaleString(), monto: 25, concepto: `Salto Nivel ${nivelActual}`, estado: `Pendiente (Folio: ${folio})`, folio: folio }; if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; datosUsuario.paymentHistory.push(solicitud); db.collection("students").doc(usuarioActual).update({ paymentHistory: datosUsuario.paymentHistory, pendingPayment: { nivel: nivelActual, fecha: new Date().toLocaleString(), folio: folio } }).then(() => { cerrarModal('modalNivelCompleto'); Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado al maestro.`, "info"); }); }
         function pagarPuntos() { Swal.fire({ title: 'Comprar Puntos 💰', html: `<button onclick="procesarPagoPuntos(10, 50)" class="btn" style="margin:5px">$10 MXN = 50 Pts</button><button onclick="procesarPagoPuntos(20, 100)" class="btn" style="margin:5px">$20 MXN = 100 Pts</button><button onclick="procesarPagoPuntos(50, 300)" class="btn" style="margin:5px; background:gold; color:black;">$50 MXN = 300 Pts</button>`, showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Cerrar' }); }
         function procesarPagoPuntos(dinero, puntos) { Swal.fire({ title: 'Ir a Pagar', text: `Se abrirá Mercado Pago para pagar $${dinero}. Avísale a tu maestro.`, confirmButtonText: 'Pagar', showCancelButton: true }).then((r) => { if(r.isConfirmed) { window.open('https://mpago.li/2aeNocU', '_blank'); datosUsuario.score += puntos; db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score }); actualizarUI(); } }); }
 
@@ -618,6 +601,9 @@
         function comprarItem(item) { if (datosUsuario.score >= item.price) { Swal.fire({title: `¿Comprar ${item.name}?`, text: `Cuesta ${item.price} puntos.`, showCancelButton: true, confirmButtonText: 'Sí'}).then((res) => { if (res.isConfirmed) { datosUsuario.score -= item.price; datosUsuario.inventory.push(item.id); db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, inventory: datosUsuario.inventory }); document.getElementById("shopPoints").textContent = datosUsuario.score; filtrarTienda(item.type); Swal.fire("¡Comprado!", "", "success"); actualizarUI(); } }); } else Swal.fire("Saldo Insuficiente", "", "error"); }
         function equiparItem(item) { if(item.type === 'avatar') datosUsuario.equipped.avatar = item.icon; if(item.type === 'frame') datosUsuario.equipped.frame = item.class; if(item.type === 'theme') datosUsuario.equipped.theme = item.colors; db.collection("students").doc(usuarioActual).update({ equipped: datosUsuario.equipped }); aplicarCosmeticos(); filtrarTienda(item.type); }
         function aplicarCosmeticos() { document.getElementById("myAvatar").textContent = datosUsuario.equipped.avatar || '👤'; document.getElementById("myAvatar").className = "avatar-display " + (datosUsuario.equipped.frame || ""); const t = datosUsuario.equipped.theme; if(t) { document.body.style.background = t.bg; document.querySelectorAll(".card").forEach(c => { c.style.background = t.card; c.style.color = t.text; }); } else { document.body.style.background = "linear-gradient(135deg, #000428, #004e92)"; document.querySelectorAll(".card").forEach(c => { c.style.background = "#ffffff"; c.style.color = "#333"; }); } }
+
+        function actualizarCandados() { for(let i=2;i<=3;i++) { const e=document.getElementById(`navL${i}`); if(datosUsuario.unlockedLevels.includes(i)) {e.classList.remove("locked");e.innerHTML=`Nivel ${i}`;} else {e.classList.add("locked");e.innerHTML=`🔐 Nivel ${i}`;}} }
+        function cambiarNivel(n) { if(datosUsuario.unlockedLevels.includes(n)) { nivelActual=n; document.getElementById("levelText").textContent="Nivel "+n; contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active")); event.target.classList.add("active"); } else Swal.fire("BLOQUEADO","Necesitas completar el nivel anterior 5 veces o usar un código.","error"); }
 
         function mostrarLoginMaestro() { document.getElementById("loginContainerWrapper").style.display="none"; document.getElementById("teacherLogin").style.display="block"; }
         function volverInicio() { document.getElementById("teacherLogin").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("loginContainerWrapper").style.display="flex"; }
@@ -642,17 +628,9 @@
             });
         }
         function renderizarTabla() {
-            // FILTRADO POR PESTAÑA (STUDENT VS ADULT)
-            let d = listaAlumnosCache.filter(u => {
-                // Compatibilidad: Si no tiene userType, asumimos que es student
-                const tipo = u.userType || 'student';
-                return tipo === teacherViewMode;
-            });
-
-            // FILTRADO POR GRUPO (SOLO SI ESTÁ VISIBLE)
+            let d = listaAlumnosCache.filter(u => { const tipo = u.userType || 'student'; return tipo === teacherViewMode; });
             const f=document.getElementById("groupFilter").value; 
             if(f!=="todos" && teacherViewMode === 'student') d=d.filter(s=>s.group===f); 
-            
             d.sort((a,b)=>(b.score||0)-(a.score||0));
             const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy(); 
             const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;}); 
@@ -685,40 +663,35 @@
         function exportarPDF() { html2pdf().from(document.getElementById('teacherPanel')).save(); }
         function abrirModalAcademico(t) { document.getElementById("modalAcademico").style.display="flex"; document.getElementById("tituloAcademico").textContent=t; document.getElementById("nivelAcademico").textContent=nivelActual; }
         
+        // --- FUNCIÓN DE LOGIN CORREGIDA (ARREGLO DEL ERROR DE FIREBASE) ---
         function intentarLogin() {
             const e=document.getElementById("emailInput").value.trim(), p=document.getElementById("passwordInput").value.trim(), n=document.getElementById("usernameInput").value.trim();
-            
-            // VALIDACIÓN CONDICIONAL (SI ES ALUMNO O ADULTO)
             let g = "", gr = "";
-            if(loginMode === 'student') {
-                g = document.getElementById("gradeInput").value.trim();
-                gr = document.getElementById("groupInput").value.trim().toUpperCase();
-            } else {
-                g = "N/A"; // No aplica
-                gr = "Adults"; // Grupo interno
-            }
+            if(loginMode === 'student') { g = document.getElementById("gradeInput").value.trim(); gr = document.getElementById("groupInput").value.trim().toUpperCase(); } 
+            else { g = "N/A"; gr = "Adults"; }
 
             if(!e||!p) { Swal.fire("Error","Faltan datos","error"); return; }
             
             auth.signInWithEmailAndPassword(e,p).catch((err) => {
-                if(['auth/user-not-found','auth/wrong-password','auth/invalid-credential'].includes(err.code)) {
-                    // SI ES NUEVO REGISTRO
-                    if(loginMode === 'student' && (!n||!g||!gr)) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo alumno, llena todos los datos.'}); return; }
-                    if(loginMode === 'adult' && !n) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo, pon tu nombre.'}); return; }
+                // AQUI ESTA LA CORRECCION CLAVE PARA EL ERROR auth/invalid-login-credentials
+                if(['auth/user-not-found','auth/wrong-password','auth/invalid-credential','auth/invalid-login-credentials'].includes(err.code)) {
+                    if(loginMode === 'student' && (!n||!g||!gr)) { Swal.fire({icon:'warning',title:'Error de Acceso',text:'Correo o contraseña incorrectos. Si eres nuevo, por favor llena todos los datos para registrarte.'}); return; }
+                    if(loginMode === 'adult' && !n) { Swal.fire({icon:'warning',title:'Error de Acceso',text:'Correo o contraseña incorrectos. Si eres nuevo, ingresa tu nombre para registrarte.'}); return; }
 
                     auth.createUserWithEmailAndPassword(e,p).then((c) => {
                         db.collection("students").doc(c.user.uid).set({ 
                             uid:c.user.uid, username:n, grade:g, group:gr, email:e, password:p, 
-                            userType: loginMode, // GUARDAMOS SI ES STUDENT O ADULT
+                            userType: loginMode, 
                             score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, 
                             medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, 
                             lastLoginDate:new Date().toLocaleDateString('es-ES'), currentStreak:1, 
                             inventory:[], equipped:{avatar:'👤',frame:'',theme:''}, levelRepetitions:{}, paymentHistory:[], pendingPayment:null
-                        }).then(()=>Swal.fire("Creado","Bienvenido","success"));
-                    }).catch(e=>Swal.fire("Error",e.message,"error"));
+                        }).then(()=>Swal.fire("¡Cuenta Creada!","Bienvenido","success"));
+                    }).catch(e=>Swal.fire("Error al Registrar",e.message,"error"));
                 } else Swal.fire("Error",err.message,"error");
             });
         }
+        
         async function recuperarPassword() { const {value:e}=await Swal.fire({title:'Recuperar',input:'email',showCancelButton:true}); if(e) auth.sendPasswordResetEmail(e).then(()=>Swal.fire('Enviado','','success')); }
         function cerrarSesion() { db.collection("students").doc(usuarioActual).update({timeWorked:datosUsuario.timeWorked, dailyLogs:datosUsuario.dailyLogs||{}}).then(()=>auth.signOut().then(()=>location.reload())); }
         function cargarNoticias() { db.collection("students").doc("ADMIN_NEWS").onSnapshot((doc) => { const t = (doc.exists&&doc.data().text)?doc.data().text:"Bienvenido."; document.getElementById("newsContent").innerText=t; document.getElementById("teacherNewsInput").value=t; }); }
