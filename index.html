@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V10 STABLE</title>
+    <title>Inglés Para Todos - MASTER V11 AUDIO REVOLUTION</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTILOS GENERALES --- */
+        /* --- ESTILOS GENERALES (INTACTOS V10) --- */
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; }
@@ -50,14 +50,14 @@
         @keyframes pulseMic { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
         .mic-listening { background: #ff0000 !important; color: white !important; animation: pulseMic 1.5s infinite; }
 
-        /* --- BOTONES ACADÉMICOS --- */
+        /* BOTONES ACADÉMICOS */
         .academic-nav { display: flex; gap: 10px; margin-bottom: 20px; }
         .btn-academic { flex: 1; padding: 12px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
         .btn-academic:active { transform: translateY(2px); }
         .btn-vocab { background: linear-gradient(45deg, #11998e, #38ef7d); }
         .btn-grammar { background: linear-gradient(45deg, #833ab4, #fd1d1d); }
 
-        /* --- OTROS ESTILOS --- */
+        /* OTROS ESTILOS */
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
         .bottom-nav { display: flex; justify-content: space-around; background: white; padding: 10px; border-radius: 15px; margin-top: 10px; }
@@ -65,13 +65,13 @@
         .nav-item.active { color: var(--primary); font-weight: bold; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
         
-        /* HUD MEJORADO */
+        /* HUD */
         .hud-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 11px; font-weight: bold; background: #f0f2f5; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
         .hud-item { display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 5px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .avatar-display { font-size: 24px; width: 50px; height: 50px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
         
-        /* FRAMES Y TIENDA */
+        /* FRAMES & TIENDA */
         .frame-gold { border: 3px solid gold !important; box-shadow: 0 0 10px gold; }
         .frame-fire { border: 3px solid orangered !important; box-shadow: 0 0 10px red; }
         .frame-neon { border: 3px solid cyan !important; box-shadow: 0 0 10px cyan; }
@@ -89,7 +89,7 @@
         .shop-tab { padding: 5px 15px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; background: #f1f1f1; }
         .shop-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* --- ESTILOS DE MAESTRO Y COMUNIDAD --- */
+        /* MAESTRO Y COMUNIDAD */
         .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
@@ -103,14 +103,14 @@
         .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
         .mini-avatar { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 2px solid transparent; font-size: 18px; background: #eee; }
         
-        /* TABS (LOGIN Y MAESTRO) */
+        /* TABS */
         .tabs-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
         .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; background: #f0f2f5; color: #666; transition: all 0.3s; text-transform: uppercase; font-size: 14px; }
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,78,146,0.3); }
         .tab-btn-teacher { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; background: white; font-weight: bold; }
         .tab-btn-teacher.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* COMUNIDAD / NOTICIAS */
+        /* COMUNIDAD */
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
@@ -155,7 +155,7 @@
                     <input type="text" id="groupInput" placeholder="Grupo" style="width:50%">
                 </div>
 
-                <button onclick="intentarLogin()" class="btn">🚀 ENTRAR / REGISTRAR</button>
+                <button onclick="intentarLogin(); unlockAudio();" class="btn">🚀 ENTRAR / REGISTRAR</button>
                 <div style="margin-top: 15px;"><a href="#" onclick="recuperarPassword()" style="font-size: 13px; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a></div>
             </div>
             <div style="text-align: center;">
@@ -229,7 +229,7 @@
             
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
             
-            <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px; min-height: 40px;">Cargando...</h3>
+            <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px;">Cargando...</h3>
             
             <div class="skills-bar">
                 <button onclick="pronunciarPregunta()" class="skill-btn" id="btnListen" title="Listening">👂<span class="skill-label">Listen</span></button>
@@ -328,19 +328,46 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
         
+        // --- V11 AUDIO ENGINE REVOLUTION ---
         const audioCorrecto = new Audio('./assets/sounds/correct.mp3'); 
         const audioError = new Audio('./assets/sounds/wrong.mp3'); 
         const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
         const synth = window.speechSynthesis;
         let vocesDisponibles = [];
+        let audioUnlocked = false;
 
-        // REPARACION DE AUDIO: Carga forzada
-        function cargarVoces() {
-            vocesDisponibles = synth.getVoices();
-            if (vocesDisponibles.length === 0) { setTimeout(cargarVoces, 100); }
+        // 1. CARGA DE VOCES MEJORADA (HEURÍSTICA PRO)
+        function cargarVocesMejoradas() {
+            const rawVoices = synth.getVoices();
+            if (rawVoices.length === 0) { setTimeout(cargarVocesMejoradas, 100); return; }
+            
+            // Filtro para buscar voces PREMIUM (Google, Samantha, Enhanced)
+            // Prioridad: Inglés Google > Inglés Apple > Inglés General
+            let bestVoices = rawVoices.filter(v => 
+                (v.lang.includes('en-US') || v.lang.includes('en-GB')) && 
+                (v.name.includes('Google') || v.name.includes('Premium') || v.name.includes('Samantha') || v.name.includes('Enhanced'))
+            );
+
+            if (bestVoices.length === 0) {
+                // Fallback: Cualquier voz en inglés
+                bestVoices = rawVoices.filter(v => v.lang.includes('en'));
+            }
+            
+            vocesDisponibles = bestVoices.length > 0 ? bestVoices : rawVoices;
+            console.log("Audio Engine V11 Ready: ", vocesDisponibles.length + " voices loaded.");
         }
-        cargarVoces();
-        if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVoces; }
+        
+        cargarVocesMejoradas();
+        if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVocesMejoradas; }
+
+        // 2. PARCHE DE COMPATIBILIDAD IOS/ANDROID (UNLOCK)
+        function unlockAudio() {
+            if(audioUnlocked) return;
+            // Reproducir silencio de 0.1s para desbloquear el motor
+            const buffer = new SpeechSynthesisUtterance("");
+            synth.speak(buffer);
+            audioUnlocked = true;
+        }
 
         let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
@@ -402,6 +429,7 @@
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
+                        // Inicialización de datos
                         if(!datosUsuario.timeWorked) datosUsuario.timeWorked = 0;
                         if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
                         if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {};
@@ -432,7 +460,7 @@
         document.addEventListener("DOMContentLoaded", () => { 
             cargarNoticias(); 
             cargarLeaderboard(); 
-            cargarVoces();
+            cargarVocesMejoradas(); // Usar la versión mejorada
         });
 
         function mostrarLogin() { document.getElementById("loginContainerWrapper").style.display="flex"; document.getElementById("loginCard").style.display="block"; document.getElementById("communitySection").style.display="flex"; document.getElementById("mainContent").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("teacherLogin").style.display="none"; cargarLeaderboard(); }
@@ -444,13 +472,9 @@
             actualizarUI(); 
             actualizarCandados(); 
             
-            // --- FIX CRÍTICO DEL "CARGANDO..." ---
-            // Forzamos la carga de la pregunta inmediatamente, sin esperar al audio
+            // FIX: Carga inmediata
             cargarPregunta(); 
-            // Y por si acaso, un respaldo:
-            setTimeout(() => {
-                if(document.getElementById("questionText").textContent === "Cargando...") cargarPregunta();
-            }, 1000);
+            setTimeout(() => { if(document.getElementById("questionText").textContent === "Cargando...") cargarPregunta(); }, 1000);
 
             iniciarCronometro(); 
             aplicarCosmeticos();
@@ -476,7 +500,7 @@
             const pool = preguntasDB[nivelActual] || preguntasDB[1];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
             
-            if (!preguntaActual) return; // DB vacía
+            if (!preguntaActual) return;
 
             const qt = document.getElementById("questionText");
             const inp = document.getElementById("answerInput");
@@ -486,11 +510,10 @@
             inp.style.borderColor = "#ddd";
             inp.style.backgroundColor = "white";
 
-            // MOSTRAR TEXTO INMEDIATAMENTE (Elimina el "Cargando...")
+            // CARGA VISUAL INMEDIATA
             if (preguntaActual.type === 'dictation') { 
                 qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
-                // Intentar hablar, pero no bloquear si falla
-                setTimeout(() => pronunciarPregunta(), 500); 
+                setTimeout(() => pronunciarPregunta(), 300); 
             } else { 
                 qt.textContent = "Translate: " + preguntaActual.q; 
             }
@@ -499,29 +522,33 @@
             inp.focus();
         }
 
+        // 3. AUDIO ENGINE V11 (SIN CORTES)
         function pronunciarPregunta() {
             if (!preguntaActual) return;
-            // Asegurar que las voces estén cargadas, si no, reintentar UNA vez
-            if (vocesDisponibles.length === 0) {
-                vocesDisponibles = synth.getVoices();
-                if (vocesDisponibles.length === 0) return; // Si no hay voces, no hacer nada (evita error)
-            }
+            
+            // Limpieza proactiva del buffer de audio
+            if(synth.speaking) { synth.cancel(); }
 
             const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
-            synth.cancel();
-            const utterance = new SpeechSynthesisUtterance(texto);
             
-            let vozElegida = vocesDisponibles.find(v => v.lang.includes('en-US') || v.lang.includes('en-GB'));
-            if (!vozElegida) vozElegida = vocesDisponibles.find(v => v.lang.includes('en'));
-            if (vozElegida) utterance.voice = vozElegida;
-            
-            utterance.rate = 0.9; // Velocidad ajustada
-            utterance.pitch = 1;
-            
-            const btn = document.getElementById('btnListen');
-            if(btn) btn.classList.add('active-listening'); 
-            utterance.onend = () => { if(btn) btn.classList.remove('active-listening'); };
-            synth.speak(utterance);
+            // Retraso técnico de 50ms para evitar colisiones en Safari
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(texto);
+                
+                // Selección inteligente V11
+                if(vocesDisponibles.length > 0) {
+                    utterance.voice = vocesDisponibles[0]; // La mejor voz ya está ordenada al principio
+                }
+                
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                
+                const btn = document.getElementById('btnListen');
+                if(btn) btn.classList.add('active-listening'); 
+                utterance.onend = () => { if(btn) btn.classList.remove('active-listening'); };
+                
+                synth.speak(utterance);
+            }, 50);
         }
 
         function verificarRespuesta() {
@@ -541,7 +568,11 @@
                 fd.textContent = "WRONG. Answer: " + preguntaActual.a; fd.style.color = "red";
                 inputEl.style.borderColor = "#e74c3c"; inputEl.style.backgroundColor = "#fdedec";
                 datosUsuario.totalWrong = (datosUsuario.totalWrong || 0) + 1; 
-                const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); u.lang='en-US'; synth.speak(u);
+                // Feedback audio
+                const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); 
+                u.lang='en-US'; 
+                if(vocesDisponibles.length > 0) u.voice = vocesDisponibles[0];
+                synth.speak(u);
             }
             db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, totalCorrect: datosUsuario.totalCorrect, totalWrong: datosUsuario.totalWrong });
             actualizarUI(); 
@@ -673,10 +704,10 @@
             if(!e||!p) { Swal.fire("Error","Faltan datos","error"); return; }
             
             auth.signInWithEmailAndPassword(e,p).catch((err) => {
-                // AQUI ESTA LA CORRECCION CLAVE PARA EL ERROR auth/invalid-login-credentials
+                // FIX: AÑADIDO auth/invalid-login-credentials PARA DETECTAR ADULTOS NUEVOS
                 if(['auth/user-not-found','auth/wrong-password','auth/invalid-credential','auth/invalid-login-credentials'].includes(err.code)) {
-                    if(loginMode === 'student' && (!n||!g||!gr)) { Swal.fire({icon:'warning',title:'Error de Acceso',text:'Correo o contraseña incorrectos. Si eres nuevo, por favor llena todos los datos para registrarte.'}); return; }
-                    if(loginMode === 'adult' && !n) { Swal.fire({icon:'warning',title:'Error de Acceso',text:'Correo o contraseña incorrectos. Si eres nuevo, ingresa tu nombre para registrarte.'}); return; }
+                    if(loginMode === 'student' && (!n||!g||!gr)) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo alumno, llena todos los datos para registrarte.'}); return; }
+                    if(loginMode === 'adult' && !n) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo, pon tu nombre para registrarte.'}); return; }
 
                     auth.createUserWithEmailAndPassword(e,p).then((c) => {
                         db.collection("students").doc(c.user.uid).set({ 
@@ -686,7 +717,7 @@
                             medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, 
                             lastLoginDate:new Date().toLocaleDateString('es-ES'), currentStreak:1, 
                             inventory:[], equipped:{avatar:'👤',frame:'',theme:''}, levelRepetitions:{}, paymentHistory:[], pendingPayment:null
-                        }).then(()=>Swal.fire("¡Cuenta Creada!","Bienvenido","success"));
+                        }).then(()=>Swal.fire("¡Bienvenido!","Tu cuenta ha sido creada.","success"));
                     }).catch(e=>Swal.fire("Error al Registrar",e.message,"error"));
                 } else Swal.fire("Error",err.message,"error");
             });
