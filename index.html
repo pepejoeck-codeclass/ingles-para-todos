@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V15 PRO</title>
+    <title>Inglés Para Todos - MASTER V17 ULTRA STABLE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTILOS GENERALES --- */
+        /* --- ESTILOS GENERALES (INTACTOS) --- */
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; }
@@ -164,7 +164,7 @@
                     <input type="text" id="groupInput" placeholder="Grupo" style="width:50%">
                 </div>
 
-                <button onclick="intentarLogin();" class="btn">🚀 ENTRAR / REGISTRAR</button>
+                <button onclick="intentarLogin(); unlockAudio();" class="btn">🚀 ENTRAR / REGISTRAR</button>
                 <div style="margin-top: 15px;"><a href="#" onclick="recuperarPassword()" style="font-size: 13px; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a></div>
 
                 <div class="donation-section">
@@ -247,7 +247,7 @@
             
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
             
-            <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px; min-height: 40px;">...</h3>
+            <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px;">...</h3>
             
             <div class="skills-bar">
                 <button onclick="pronunciarPregunta()" class="skill-btn" id="btnListen" title="Listening">👂<span class="skill-label">Listen</span></button>
@@ -383,6 +383,7 @@
         let vocesDisponibles = [];
         let audioUnlocked = false;
 
+        // V17: CARGA DE VOCES SEGURA (BACKGROUND)
         function cargarVocesMejoradas() {
             const rawVoices = synth.getVoices();
             if (rawVoices.length === 0) { setTimeout(cargarVocesMejoradas, 100); return; }
@@ -436,7 +437,6 @@
             3: [{q:"Lunes",a:"monday"},{q:"Martes",a:"tuesday"},{q:"Sol",a:"sun"},{q:"Luna",a:"moon"},{q:"Agua",a:"water"}]
         };
 
-        // --- DONACIONES V15 ---
         function abrirDonacion() {
             document.getElementById("modalDonarSeleccion").style.display = "flex";
         }
@@ -474,23 +474,23 @@
             });
         }
 
-        // --- V15 FIX: LÓGICA DE RECONOCIMIENTO ROBUSTA ---
+        // --- V17 FIX CRÍTICO: MANEJO DE PROMESAS CASCADA PARA DONACIONES ---
         function verDonacionesGlobales() {
             document.getElementById("modalInformeDonaciones").style.display = "flex";
             const tbody = document.getElementById("cuerpoDonaciones");
-            tbody.innerHTML = "<tr><td colspan='5'>Cargando...</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='5'>Cargando base de datos...</td></tr>";
             
-            // PRIMERO: Asegurar carga de alumnos
+            // 1. FORZAMOS DESCARGA DE ALUMNOS (Promesa Principal)
             db.collection("students").get().then((snapEstudiantes) => {
-                listaAlumnosCache=[]; 
-                snapEstudiantes.forEach(d=>{ 
-                    if(d.id!=='ADMIN_NEWS') {
+                listaAlumnosCache = []; 
+                snapEstudiantes.forEach(d => { 
+                    if(d.id !== 'ADMIN_NEWS') {
                         const data = d.data() || {};
                         listaAlumnosCache.push({...data, uid:d.id}); 
                     }
                 });
 
-                // SEGUNDO: Cargar donaciones y cruzar datos
+                // 2. UNA VEZ COMPLETADO 1, DESCARGAMOS DONACIONES
                 db.collection("donations").orderBy("fecha", "desc").get().then((snapDonaciones) => {
                     tbody.innerHTML = "";
                     if(snapDonaciones.empty) {
@@ -500,14 +500,17 @@
                     snapDonaciones.forEach(doc => {
                         const d = doc.data();
                         
-                        // ALGORITMO MATCHING V15 (Case Insensitive)
-                        // POR DEFECTO: DONADOR EXTERNO (CORRECCIÓN SOLICITADA)
-                        let categoria = "<span style='color:grey;'>🌍 Donador Externo</span>";
+                        // 3. ALGORITMO DE COMPARACIÓN V17 (Ultra Seguro)
+                        let categoria = "<span style='color:grey;'>🌍 Donador Externo</span>"; // DEFAULT
                         
+                        // Normalizamos cadenas para evitar errores de mayúsculas/espacios
+                        const donanteNombreClean = (d.nombre || "").toLowerCase().trim();
+                        
+                        // Búsqueda inteligente en array
                         let match = listaAlumnosCache.find(u => {
-                            const uName = (u.username || u.nombre || "").toLowerCase().trim();
-                            const dName = (d.nombre || "").toLowerCase().trim();
-                            return uName === dName || uName.includes(dName) || dName.includes(uName);
+                            const alumnoNombre = (u.username || u.nombre || "").toLowerCase().trim();
+                            // Coincidencia exacta o parcial
+                            return alumnoNombre === donanteNombreClean || (donanteNombreClean.length > 3 && alumnoNombre.includes(donanteNombreClean));
                         });
                         
                         if(match) {
@@ -526,9 +529,12 @@
                         `;
                     });
                 }).catch(error => {
-                    console.warn("Error/Colección no existe:", error);
-                    tbody.innerHTML = "<tr><td colspan='5'>No hay donaciones registradas.</td></tr>";
+                    console.warn("Error leyendo donaciones:", error);
+                    tbody.innerHTML = "<tr><td colspan='5'>Error al cargar donaciones. (Colección vacía)</td></tr>";
                 });
+            }).catch(error => {
+                console.error("Error leyendo alumnos:", error);
+                tbody.innerHTML = "<tr><td colspan='5'>Error de conexión con Alumnos.</td></tr>";
             });
         }
 
@@ -598,7 +604,7 @@
             actualizarUI(); 
             actualizarCandados(); 
             
-            // V15 FIX: CARGA INMEDIATA ASINCRONA
+            // V17 FIX: INYECCIÓN VISUAL INMEDIATA
             cargarPregunta(); 
             
             iniciarCronometro(); 
@@ -620,6 +626,7 @@
             document.getElementById("repsText").textContent = `Intentos: ${reps}/5`;
         }
 
+        // V17 FIX: CARGA VISUAL SIN ESPERAR AUDIO
         function cargarPregunta() {
             if(!nivelActual) nivelActual = 1;
             const pool = preguntasDB[nivelActual] || preguntasDB[1];
@@ -630,16 +637,17 @@
             const qt = document.getElementById("questionText");
             const inp = document.getElementById("answerInput");
             
+            // RESET VISUAL INMEDIATO
             inp.value = "";
             document.getElementById("feedback").textContent = "";
             inp.style.borderColor = "#ddd";
             inp.style.backgroundColor = "white";
 
-            // V15: Mostrar texto INMEDIATAMENTE
+            // PINTAR TEXTO AHORA (SIN ESPERAR NADA)
             if (preguntaActual.type === 'dictation') { 
                 qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
-                // Intentar audio asíncronamente sin bloquear la vista
-                setTimeout(() => pronunciarPregunta(), 200); 
+                // Audio en segundo plano
+                setTimeout(() => pronunciarPregunta(), 100); 
             } else { 
                 qt.textContent = "Translate: " + preguntaActual.q; 
             }
@@ -650,17 +658,16 @@
 
         function pronunciarPregunta() {
             if (!preguntaActual) return;
-            // Intento silencioso de cargar voces si falló al inicio
+            // Reintento silencioso de carga de voces
             if (vocesDisponibles.length === 0) vocesDisponibles = synth.getVoices();
 
             const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
+            
+            // Limpieza de buffer
             if(synth.speaking) synth.cancel();
             
             const utterance = new SpeechSynthesisUtterance(texto);
-            
-            // Usar mejor voz si existe, si no, usar default
             if(vocesDisponibles.length > 0) utterance.voice = vocesDisponibles[0];
-            
             utterance.rate = 0.9;
             utterance.pitch = 1.0;
             
