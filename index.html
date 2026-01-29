@@ -26,6 +26,7 @@
         
         .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; position: relative; transition: all 0.3s; }
         
+        /* LOGO & IMÁGENES */
         .logo-img { width: 140px; height: 140px; object-fit: cover; border-radius: 50%; margin: 0 auto 15px auto; display: block; border: 4px solid var(--primary); }
         .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; margin: 10px auto; display: block; object-fit: cover; }
         
@@ -86,6 +87,11 @@
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
         .shop-item { border: 1px solid #ddd; border-radius: 10px; padding: 10px; cursor: pointer; transition: 0.2s; position: relative; }
         .shop-item:hover { transform: scale(1.05); border-color: var(--primary); }
+
+        /* COMUNIDAD */
+        .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
+        .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
 
         /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -347,14 +353,12 @@
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
-                        // Inicializar campos si faltan
-                        if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
-                        if(!datosUsuario.inventory) datosUsuario.inventory = [];
-                        if(!datosUsuario.equipped) datosUsuario.equipped = { avatar: '👤' };
+                        if(!datosUsuario.timeWorked) datosUsuario.timeWorked = 0; if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0}; if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {}; if(!datosUsuario.inventory) datosUsuario.inventory = []; if(!datosUsuario.equipped) datosUsuario.equipped = { avatar: '👤', frame: '', theme: '' }; if(!datosUsuario.unlockedLevels) datosUsuario.unlockedLevels = [1]; if(!datosUsuario.userType) datosUsuario.userType = 'student'; 
+                        const hoy = new Date().toLocaleDateString('es-ES'); if (!datosUsuario.lastLoginDate) { datosUsuario.lastLoginDate = hoy; datosUsuario.currentStreak = 1; } else if (datosUsuario.lastLoginDate !== hoy) { const ayer = new Date(); ayer.setDate(ayer.getDate()-1); if (datosUsuario.lastLoginDate === ayer.toLocaleDateString('es-ES')) datosUsuario.currentStreak = (datosUsuario.currentStreak||0)+1; else datosUsuario.currentStreak = 1; datosUsuario.lastLoginDate = hoy; } db.collection("students").doc(usuarioActual).update({ lastLoginDate: datosUsuario.lastLoginDate, currentStreak: datosUsuario.currentStreak });
                         mostrarJuego();
                     }
                 });
-            } else { usuarioActual = null; if(document.getElementById("teacherPanel").style.display === "none") mostrarLogin(); }
+            } else { usuarioActual = null; detenerCronometro(); if(document.getElementById("teacherPanel").style.display === "none") mostrarLogin(); }
         });
 
         document.addEventListener("DOMContentLoaded", () => { cargarNoticias(); cargarLeaderboard(); cargarVocesMejoradas(); });
@@ -364,8 +368,8 @@
         function mostrarJuego() { 
             document.getElementById("loginContainerWrapper").style.display="none"; document.getElementById("mainContent").style.display="block"; 
             document.getElementById("userDisplay").textContent = (datosUsuario.userType === 'adult' ? "Adulto: " : "Alumno: ") + (datosUsuario.username||"Héroe"); 
-            actualizarUI(); 
-            // CARGA INMEDIATA
+            actualizarUI(); actualizarCandados(); 
+            // V50 FIX: Cargar primera pregunta de inmediato
             cargarPregunta(); 
             iniciarCronometro(); aplicarCosmeticos();
         }
@@ -389,19 +393,27 @@
             const qt = document.getElementById("questionText"); const inp = document.getElementById("answerInput");
             inp.value = ""; document.getElementById("feedback").textContent = ""; inp.style.borderColor = "#ddd"; inp.style.backgroundColor = "white";
             
-            // RENDER INMEDIATO (SIN CARGANDO)
-            if (preguntaActual.type === 'dictation') { qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; setTimeout(() => pronunciarPregunta(), 150); } else { qt.textContent = "Translate: " + preguntaActual.q; }
+            // RENDER INMEDIATO (SIN ESPERAR AUDIO)
+            if (preguntaActual.type === 'dictation') { 
+                qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
+                // Intentar hablar después, sin bloquear
+                setTimeout(() => pronunciarPregunta(), 200); 
+            } else { 
+                qt.textContent = "Translate: " + preguntaActual.q; 
+            }
             document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active-listening', 'active-speaking', 'active-writing', 'mic-listening')); inp.focus();
         }
 
         function pronunciarPregunta() {
             if (!preguntaActual) return;
+            // SI NO HAY VOCES, USAR DEFAULT (NO BLOQUEAR)
             if (vocesDisponibles.length === 0) vocesDisponibles = synth.getVoices();
+            
             const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
             if(synth.speaking) synth.cancel();
             const utterance = new SpeechSynthesisUtterance(texto);
             if(vocesDisponibles.length > 0) utterance.voice = vocesDisponibles[0];
-            utterance.rate = 0.9;
+            utterance.rate = 0.9; utterance.pitch = 1.0;
             const btn = document.getElementById('btnListen'); if(btn) btn.classList.add('active-listening'); 
             utterance.onend = () => { if(btn) btn.classList.remove('active-listening'); };
             synth.speak(utterance);
@@ -412,10 +424,10 @@
             const correct = preguntaActual.a.toLowerCase();
             const fd = document.getElementById("feedback");
             if(input === correct) { 
-                fd.textContent = "CORRECT! 🎉"; fd.style.color = "green"; datosUsuario.score = (datosUsuario.score || 0) + 10; datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1; 
+                fd.textContent = "CORRECT! 🎉"; fd.style.color = "green"; inputEl.style.borderColor = "#2ecc71"; inputEl.style.backgroundColor = "#eafaf1"; datosUsuario.score = (datosUsuario.score || 0) + 10; datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1; aciertosSesion++; 
                 try { audioCorrecto.currentTime=0; audioCorrecto.play(); } catch(e){}
             } else { 
-                fd.textContent = "WRONG: " + correct; fd.style.color = "red"; datosUsuario.totalWrong = (datosUsuario.totalWrong || 0) + 1; 
+                fd.textContent = "WRONG: " + correct; fd.style.color = "red"; inputEl.style.borderColor = "#e74c3c"; inputEl.style.backgroundColor = "#fdedec"; datosUsuario.totalWrong = (datosUsuario.totalWrong || 0) + 1; 
                 try { audioError.currentTime=0; audioError.play(); } catch(e){}
                 const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); u.lang='en-US'; synth.speak(u); 
             }
