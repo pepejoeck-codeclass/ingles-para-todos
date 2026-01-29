@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V13 DONATION INTELLIGENCE</title>
+    <title>Inglés Para Todos - MASTER V14 STABLE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -295,7 +295,9 @@
             <div class="teacher-controls">
                 <select id="groupFilter" onchange="renderizarTabla()"><option value="todos">Todos los Grupos</option></select>
                 <button onclick="verGraficaGrupal()" class="action-btn btn-chart">📊 Gráfica Grupal</button>
+                
                 <button onclick="verDonacionesGlobales()" class="action-btn" style="background:#e91e63; color:white; font-weight:bold;">💖 Ver Donaciones</button>
+                
                 <button onclick="cargarTablaAlumnos()" class="action-btn btn-info">🔄</button>
                 <button onclick="exportarExcel()" class="action-btn btn-excel">📗 Excel</button>
                 <button onclick="exportarPDF()" class="action-btn btn-pdf">📕 PDF</button>
@@ -381,13 +383,25 @@
         const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
         const synth = window.speechSynthesis;
         let vocesDisponibles = [];
+        let audioUnlocked = false;
 
-        function cargarVoces() {
-            vocesDisponibles = synth.getVoices();
-            if (vocesDisponibles.length === 0) { setTimeout(cargarVoces, 100); }
+        // V14: CARGA DE VOCES SEGURA (NO BLOQUEANTE)
+        function cargarVocesMejoradas() {
+            const rawVoices = synth.getVoices();
+            if (rawVoices.length === 0) { setTimeout(cargarVocesMejoradas, 100); return; }
+            let bestVoices = rawVoices.filter(v => (v.lang.includes('en-US') || v.lang.includes('en-GB')) && (v.name.includes('Google') || v.name.includes('Premium') || v.name.includes('Samantha') || v.name.includes('Enhanced')));
+            if (bestVoices.length === 0) bestVoices = rawVoices.filter(v => v.lang.includes('en'));
+            vocesDisponibles = bestVoices.length > 0 ? bestVoices : rawVoices;
         }
-        cargarVoces();
-        if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVoces; }
+        cargarVocesMejoradas();
+        if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVocesMejoradas; }
+
+        function unlockAudio() {
+            if(audioUnlocked) return;
+            const buffer = new SpeechSynthesisUtterance("");
+            synth.speak(buffer);
+            audioUnlocked = true;
+        }
 
         let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
@@ -425,7 +439,7 @@
             3: [{q:"Lunes",a:"monday"},{q:"Martes",a:"tuesday"},{q:"Sol",a:"sun"},{q:"Luna",a:"moon"},{q:"Agua",a:"water"}]
         };
 
-        // --- FUNCIONES DONACIONES (V13 INTELLIGENCE FIX) ---
+        // --- FUNCIONES DONACIONES (V14 MATCHING INTELIGENTE) ---
         function abrirDonacion() {
             document.getElementById("modalDonarSeleccion").style.display = "flex";
         }
@@ -463,61 +477,60 @@
             });
         }
 
-        // --- FIX INTELIGENTE: CRUCE DE DATOS DONADOR VS ALUMNOS ---
+        // --- V14: LÓGICA DE RECONOCIMIENTO ROBUSTA ---
         function verDonacionesGlobales() {
             document.getElementById("modalInformeDonaciones").style.display = "flex";
             const tbody = document.getElementById("cuerpoDonaciones");
             tbody.innerHTML = "<tr><td colspan='5'>Cargando...</td></tr>";
             
-            // Aseguramos que tenemos la lista de alumnos cargada para comparar
-            if(listaAlumnosCache.length === 0) {
-                db.collection("students").get().then((snap) => {
-                    listaAlumnosCache=[]; 
-                    snap.forEach(d=>{ 
-                        if(d.id!=='ADMIN_NEWS') {
-                            const data = d.data() || {};
-                            listaAlumnosCache.push({...data, uid:d.id}); 
-                        }
-                    });
-                    renderizarDonaciones(tbody);
-                });
-            } else {
-                renderizarDonaciones(tbody);
-            }
-        }
-
-        function renderizarDonaciones(tbody) {
-            db.collection("donations").orderBy("fecha", "desc").get().then((snap) => {
-                tbody.innerHTML = "";
-                if(snap.empty) {
-                    tbody.innerHTML = "<tr><td colspan='5'>No hay donaciones registradas aún.</td></tr>";
-                    return;
-                }
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    
-                    // ALGORITMO DE IDENTIFICACIÓN
-                    let categoria = "<span style='color:grey;'>🌍 Donador Externo</span>";
-                    let match = listaAlumnosCache.find(u => (u.username && u.username.toLowerCase() === d.nombre.toLowerCase()) || (u.nombre && u.nombre.toLowerCase() === d.nombre.toLowerCase()));
-                    
-                    if(match) {
-                        if(match.userType === 'adult') categoria = "<span style='color:purple; font-weight:bold;'>💼 Adulto</span>";
-                        else categoria = `<span style='color:blue; font-weight:bold;'>🎓 Alumno (Gpo ${match.group})</span>`;
+            // PRIMERO: Asegurar carga de alumnos
+            db.collection("students").get().then((snapEstudiantes) => {
+                listaAlumnosCache=[]; 
+                snapEstudiantes.forEach(d=>{ 
+                    if(d.id!=='ADMIN_NEWS') {
+                        const data = d.data() || {};
+                        listaAlumnosCache.push({...data, uid:d.id}); 
                     }
-
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${d.nombre}</td>
-                            <td>${categoria}</td>
-                            <td style="color:green; font-weight:bold;">$${d.monto}</td>
-                            <td>${d.folio}</td>
-                            <td style="font-size:12px;">${d.fecha}</td>
-                        </tr>
-                    `;
                 });
-            }).catch(error => {
-                tbody.innerHTML = "<tr><td colspan='5'>Error al cargar datos.</td></tr>";
-                console.error(error);
+
+                // SEGUNDO: Cargar donaciones y cruzar datos
+                db.collection("donations").orderBy("fecha", "desc").get().then((snapDonaciones) => {
+                    tbody.innerHTML = "";
+                    if(snapDonaciones.empty) {
+                        tbody.innerHTML = "<tr><td colspan='5'>No hay donaciones registradas aún.</td></tr>";
+                        return;
+                    }
+                    snapDonaciones.forEach(doc => {
+                        const d = doc.data();
+                        
+                        // ALGORITMO MATCHING V14 (Case Insensitive)
+                        let categoria = "<span style='color:grey;'>🌍 Donador Externo</span>";
+                        let match = listaAlumnosCache.find(u => {
+                            const uName = (u.username || u.nombre || "").toLowerCase();
+                            const dName = (d.nombre || "").toLowerCase();
+                            return uName === dName || uName.includes(dName) || dName.includes(uName);
+                        });
+                        
+                        if(match) {
+                            if(match.userType === 'adult') categoria = "<span style='color:purple; font-weight:bold;'>💼 Adulto</span>";
+                            else categoria = `<span style='color:blue; font-weight:bold;'>🎓 Alumno (Gpo ${match.group || '?'})</span>`;
+                        }
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${d.nombre}</td>
+                                <td>${categoria}</td>
+                                <td style="color:green; font-weight:bold;">$${d.monto}</td>
+                                <td>${d.folio}</td>
+                                <td style="font-size:12px;">${d.fecha}</td>
+                            </tr>
+                        `;
+                    });
+                }).catch(error => {
+                    // Si falla (ej: colección no existe), mostrar vacío seguro
+                    console.warn("Donations collection might not exist yet:", error);
+                    tbody.innerHTML = "<tr><td colspan='5'>No hay donaciones registradas.</td></tr>";
+                });
             });
         }
 
@@ -575,7 +588,7 @@
         document.addEventListener("DOMContentLoaded", () => { 
             cargarNoticias(); 
             cargarLeaderboard(); 
-            cargarVoces();
+            cargarVocesMejoradas();
         });
 
         function mostrarLogin() { document.getElementById("loginContainerWrapper").style.display="flex"; document.getElementById("loginCard").style.display="block"; document.getElementById("communitySection").style.display="flex"; document.getElementById("mainContent").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("teacherLogin").style.display="none"; cargarLeaderboard(); }
@@ -586,8 +599,17 @@
             document.getElementById("userDisplay").textContent = (datosUsuario.userType === 'adult' ? "Adulto: " : "Alumno: ") + (datosUsuario.username||"Héroe"); 
             actualizarUI(); 
             actualizarCandados(); 
+            
+            // V14 FIX: CARGA INMEDIATA SIN ESPERAR AUDIO
             cargarPregunta(); 
-            setTimeout(() => { if(document.getElementById("questionText").textContent === "Cargando...") cargarPregunta(); }, 1000);
+            // Fallback por si acaso
+            setTimeout(() => { 
+                if(document.getElementById("questionText").textContent === "Cargando...") {
+                    console.log("Forzando carga de pregunta...");
+                    cargarPregunta(); 
+                }
+            }, 500);
+
             iniciarCronometro(); 
             aplicarCosmeticos();
         }
@@ -622,9 +644,11 @@
             inp.style.borderColor = "#ddd";
             inp.style.backgroundColor = "white";
 
+            // V14: Mostrar texto INMEDIATAMENTE
             if (preguntaActual.type === 'dictation') { 
                 qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
-                setTimeout(() => pronunciarPregunta(), 300); 
+                // Intentar audio asíncronamente sin bloquear
+                setTimeout(() => pronunciarPregunta(), 200); 
             } else { 
                 qt.textContent = "Translate: " + preguntaActual.q; 
             }
@@ -635,17 +659,24 @@
 
         function pronunciarPregunta() {
             if (!preguntaActual) return;
-            if (vocesDisponibles.length === 0) { vocesDisponibles = synth.getVoices(); if (vocesDisponibles.length === 0) return; }
+            // Intento silencioso de cargar voces si falló al inicio
+            if (vocesDisponibles.length === 0) vocesDisponibles = synth.getVoices();
+
             const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
-            synth.cancel();
+            if(synth.speaking) synth.cancel();
+            
             const utterance = new SpeechSynthesisUtterance(texto);
-            let vozElegida = vocesDisponibles.find(v => v.lang.includes('en-US') || v.lang.includes('en-GB'));
-            if (!vozElegida) vozElegida = vocesDisponibles.find(v => v.lang.includes('en'));
-            if (vozElegida) utterance.voice = vozElegida;
-            utterance.rate = 0.9; utterance.pitch = 1;
+            
+            // Usar mejor voz si existe, si no, usar default
+            if(vocesDisponibles.length > 0) utterance.voice = vocesDisponibles[0];
+            
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            
             const btn = document.getElementById('btnListen');
             if(btn) btn.classList.add('active-listening'); 
             utterance.onend = () => { if(btn) btn.classList.remove('active-listening'); };
+            
             synth.speak(utterance);
         }
 
