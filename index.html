@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V11 AUDIO REVOLUTION</title>
+    <title>Inglés Para Todos - MASTER V12 DONATIONS</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTILOS GENERALES (INTACTOS V10) --- */
+        /* --- ESTILOS GENERALES --- */
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; }
@@ -38,6 +38,15 @@
         .btn-shop:active { transform: translateY(4px); box-shadow: none; }
         .btn-pay { background: linear-gradient(45deg, #11998e, #38ef7d); box-shadow: 0 4px 0 #0b6623; }
         .btn-code { background: linear-gradient(45deg, #8e44ad, #c0392b); box-shadow: 0 4px 0 #5b2c6f; }
+        .btn-donate { background: linear-gradient(45deg, #e91e63, #ff6090); box-shadow: 0 4px 0 #ad1457; color: white; margin-top: 5px; }
+
+        /* ESTILOS DONACIÓN */
+        .donation-section { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ddd; }
+        .donation-heart { color: #e91e63; animation: heartbeat 1.5s infinite; font-size: 24px; vertical-align: middle; margin-right: 5px; }
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .donate-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+        .btn-amount { padding: 10px; border-radius: 10px; border: 2px solid #e91e63; background: white; color: #e91e63; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-amount:hover { background: #e91e63; color: white; }
 
         /* SKILLS BAR */
         .skills-bar { display: flex; justify-content: center; gap: 15px; margin: 20px 0; background: #f0f2f5; padding: 10px; border-radius: 50px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
@@ -71,7 +80,7 @@
         .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .avatar-display { font-size: 24px; width: 50px; height: 50px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
         
-        /* FRAMES & TIENDA */
+        /* FRAMES Y TIENDA */
         .frame-gold { border: 3px solid gold !important; box-shadow: 0 0 10px gold; }
         .frame-fire { border: 3px solid orangered !important; box-shadow: 0 0 10px red; }
         .frame-neon { border: 3px solid cyan !important; box-shadow: 0 0 10px cyan; }
@@ -157,6 +166,15 @@
 
                 <button onclick="intentarLogin(); unlockAudio();" class="btn">🚀 ENTRAR / REGISTRAR</button>
                 <div style="margin-top: 15px;"><a href="#" onclick="recuperarPassword()" style="font-size: 13px; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a></div>
+
+                <div class="donation-section">
+                    <div style="font-size: 14px; font-weight: bold; color: #333;">
+                        <i class="fas fa-heart donation-heart"></i>
+                        Do you want to donate? / ¿Quieres donar?
+                    </div>
+                    <p style="font-size: 11px; color: #666; margin: 5px 0;">Para mantener la app activa. “Thank you”</p>
+                    <button onclick="abrirDonacion()" class="btn btn-donate">💖 DONAR AHORA</button>
+                </div>
             </div>
             <div style="text-align: center;">
                 <p style="color: white;">¿Maestro?</p>
@@ -277,6 +295,9 @@
             <div class="teacher-controls">
                 <select id="groupFilter" onchange="renderizarTabla()"><option value="todos">Todos los Grupos</option></select>
                 <button onclick="verGraficaGrupal()" class="action-btn btn-chart">📊 Gráfica Grupal</button>
+                
+                <button onclick="verDonacionesGlobales()" class="action-btn" style="background:#e91e63; color:white; font-weight:bold;">💖 Ver Donaciones</button>
+                
                 <button onclick="cargarTablaAlumnos()" class="action-btn btn-info">🔄</button>
                 <button onclick="exportarExcel()" class="action-btn btn-excel">📗 Excel</button>
                 <button onclick="exportarPDF()" class="action-btn btn-pdf">📕 PDF</button>
@@ -287,6 +308,35 @@
                     <tbody id="cuerpoTabla"></tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <div id="modalDonarSeleccion" class="modal-overlay">
+        <div class="modal-content">
+            <h3>💖 Elige tu Donación</h3>
+            <p>Apoya el proyecto / Support the project</p>
+            <div class="donate-grid">
+                <button class="btn-amount" onclick="procesarDonacion(40, 'https://mpago.li/1HvLXiy')">$40.00 MXN</button>
+                <button class="btn-amount" onclick="procesarDonacion(70, 'https://mpago.li/1r3jbNf')">$70.00 MXN</button>
+                <button class="btn-amount" onclick="procesarDonacion(100, 'https://mpago.li/1irBKzH')">$100.00 MXN</button>
+                <button class="btn-amount" onclick="procesarDonacion(200, 'https://mpago.li/1Exy4z9')">$200.00 MXN</button>
+            </div>
+            <br>
+            <button onclick="cerrarModal('modalDonarSeleccion')" class="btn btn-secondary">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="modalInformeDonaciones" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color:#e91e63">💖 Historial de Donaciones</h3>
+            <div style="overflow-y: auto; max-height: 300px;">
+                <table class="history-table">
+                    <thead><tr><th>Nombre</th><th>Monto</th><th>Folio</th><th>Fecha</th></tr></thead>
+                    <tbody id="cuerpoDonaciones"></tbody>
+                </table>
+            </div>
+            <br>
+            <button onclick="cerrarModal('modalInformeDonaciones')" class="btn btn-secondary">Cerrar</button>
         </div>
     </div>
 
@@ -328,46 +378,18 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
         
-        // --- V11 AUDIO ENGINE REVOLUTION ---
         const audioCorrecto = new Audio('./assets/sounds/correct.mp3'); 
         const audioError = new Audio('./assets/sounds/wrong.mp3'); 
         const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
         const synth = window.speechSynthesis;
         let vocesDisponibles = [];
-        let audioUnlocked = false;
 
-        // 1. CARGA DE VOCES MEJORADA (HEURÍSTICA PRO)
-        function cargarVocesMejoradas() {
-            const rawVoices = synth.getVoices();
-            if (rawVoices.length === 0) { setTimeout(cargarVocesMejoradas, 100); return; }
-            
-            // Filtro para buscar voces PREMIUM (Google, Samantha, Enhanced)
-            // Prioridad: Inglés Google > Inglés Apple > Inglés General
-            let bestVoices = rawVoices.filter(v => 
-                (v.lang.includes('en-US') || v.lang.includes('en-GB')) && 
-                (v.name.includes('Google') || v.name.includes('Premium') || v.name.includes('Samantha') || v.name.includes('Enhanced'))
-            );
-
-            if (bestVoices.length === 0) {
-                // Fallback: Cualquier voz en inglés
-                bestVoices = rawVoices.filter(v => v.lang.includes('en'));
-            }
-            
-            vocesDisponibles = bestVoices.length > 0 ? bestVoices : rawVoices;
-            console.log("Audio Engine V11 Ready: ", vocesDisponibles.length + " voices loaded.");
+        function cargarVoces() {
+            vocesDisponibles = synth.getVoices();
+            if (vocesDisponibles.length === 0) { setTimeout(cargarVoces, 100); }
         }
-        
-        cargarVocesMejoradas();
-        if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVocesMejoradas; }
-
-        // 2. PARCHE DE COMPATIBILIDAD IOS/ANDROID (UNLOCK)
-        function unlockAudio() {
-            if(audioUnlocked) return;
-            // Reproducir silencio de 0.1s para desbloquear el motor
-            const buffer = new SpeechSynthesisUtterance("");
-            synth.speak(buffer);
-            audioUnlocked = true;
-        }
+        cargarVoces();
+        if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVoces; }
 
         let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
@@ -405,6 +427,72 @@
             3: [{q:"Lunes",a:"monday"},{q:"Martes",a:"tuesday"},{q:"Sol",a:"sun"},{q:"Luna",a:"moon"},{q:"Agua",a:"water"}]
         };
 
+        // --- FUNCIONES NUEVAS DONACIONES (V12) ---
+        function abrirDonacion() {
+            document.getElementById("modalDonarSeleccion").style.display = "flex";
+        }
+
+        function procesarDonacion(monto, link) {
+            window.open(link, '_blank');
+            cerrarModal("modalDonarSeleccion");
+            
+            Swal.fire({
+                title: 'Confirma tu Donación',
+                html: `<p>Ingresa tu <b>Nombre</b> (y Grupo si eres alumno) y el <b>Folio</b> de pago.</p>`,
+                html: `
+                    <input id="donanteNombre" class="swal2-input" placeholder="Nombre completo">
+                    <input id="donanteFolio" class="swal2-input" placeholder="Folio de operación">
+                `,
+                confirmButtonText: 'Registrar Donación',
+                showCancelButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const nombre = document.getElementById('donanteNombre').value;
+                    const folio = document.getElementById('donanteFolio').value;
+                    
+                    if(nombre && folio) {
+                        // Guardar en colección de donaciones
+                        db.collection("donations").add({
+                            nombre: nombre,
+                            folio: folio,
+                            monto: monto,
+                            fecha: new Date().toLocaleString(),
+                            tipo: "Externa/General"
+                        }).then(() => {
+                            Swal.fire("Thank you very much for your donation!", "Tu apoyo nos ayuda a seguir.", "success");
+                        });
+                    } else {
+                        Swal.fire("Error", "Faltan datos para registrar tu donación.", "error");
+                    }
+                }
+            });
+        }
+
+        function verDonacionesGlobales() {
+            document.getElementById("modalInformeDonaciones").style.display = "flex";
+            const tbody = document.getElementById("cuerpoDonaciones");
+            tbody.innerHTML = "<tr><td colspan='4'>Cargando...</td></tr>";
+            
+            db.collection("donations").orderBy("fecha", "desc").get().then((snap) => {
+                tbody.innerHTML = "";
+                if(snap.empty) {
+                    tbody.innerHTML = "<tr><td colspan='4'>No hay donaciones registradas.</td></tr>";
+                    return;
+                }
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${d.nombre}</td>
+                            <td style="color:green; font-weight:bold;">$${d.monto}</td>
+                            <td>${d.folio}</td>
+                            <td style="font-size:12px;">${d.fecha}</td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
         function setLoginMode(mode) {
             loginMode = mode;
             const tabS = document.getElementById('tabStudent');
@@ -429,7 +517,6 @@
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
-                        // Inicialización de datos
                         if(!datosUsuario.timeWorked) datosUsuario.timeWorked = 0;
                         if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
                         if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {};
@@ -460,7 +547,7 @@
         document.addEventListener("DOMContentLoaded", () => { 
             cargarNoticias(); 
             cargarLeaderboard(); 
-            cargarVocesMejoradas(); // Usar la versión mejorada
+            cargarVoces();
         });
 
         function mostrarLogin() { document.getElementById("loginContainerWrapper").style.display="flex"; document.getElementById("loginCard").style.display="block"; document.getElementById("communitySection").style.display="flex"; document.getElementById("mainContent").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("teacherLogin").style.display="none"; cargarLeaderboard(); }
@@ -471,11 +558,8 @@
             document.getElementById("userDisplay").textContent = (datosUsuario.userType === 'adult' ? "Adulto: " : "Alumno: ") + (datosUsuario.username||"Héroe"); 
             actualizarUI(); 
             actualizarCandados(); 
-            
-            // FIX: Carga inmediata
             cargarPregunta(); 
             setTimeout(() => { if(document.getElementById("questionText").textContent === "Cargando...") cargarPregunta(); }, 1000);
-
             iniciarCronometro(); 
             aplicarCosmeticos();
         }
@@ -510,7 +594,6 @@
             inp.style.borderColor = "#ddd";
             inp.style.backgroundColor = "white";
 
-            // CARGA VISUAL INMEDIATA
             if (preguntaActual.type === 'dictation') { 
                 qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
                 setTimeout(() => pronunciarPregunta(), 300); 
@@ -522,33 +605,20 @@
             inp.focus();
         }
 
-        // 3. AUDIO ENGINE V11 (SIN CORTES)
         function pronunciarPregunta() {
             if (!preguntaActual) return;
-            
-            // Limpieza proactiva del buffer de audio
-            if(synth.speaking) { synth.cancel(); }
-
+            if (vocesDisponibles.length === 0) { vocesDisponibles = synth.getVoices(); if (vocesDisponibles.length === 0) return; }
             const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
-            
-            // Retraso técnico de 50ms para evitar colisiones en Safari
-            setTimeout(() => {
-                const utterance = new SpeechSynthesisUtterance(texto);
-                
-                // Selección inteligente V11
-                if(vocesDisponibles.length > 0) {
-                    utterance.voice = vocesDisponibles[0]; // La mejor voz ya está ordenada al principio
-                }
-                
-                utterance.rate = 0.9;
-                utterance.pitch = 1.0;
-                
-                const btn = document.getElementById('btnListen');
-                if(btn) btn.classList.add('active-listening'); 
-                utterance.onend = () => { if(btn) btn.classList.remove('active-listening'); };
-                
-                synth.speak(utterance);
-            }, 50);
+            synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(texto);
+            let vozElegida = vocesDisponibles.find(v => v.lang.includes('en-US') || v.lang.includes('en-GB'));
+            if (!vozElegida) vozElegida = vocesDisponibles.find(v => v.lang.includes('en'));
+            if (vozElegida) utterance.voice = vozElegida;
+            utterance.rate = 0.9; utterance.pitch = 1;
+            const btn = document.getElementById('btnListen');
+            if(btn) btn.classList.add('active-listening'); 
+            utterance.onend = () => { if(btn) btn.classList.remove('active-listening'); };
+            synth.speak(utterance);
         }
 
         function verificarRespuesta() {
@@ -568,11 +638,7 @@
                 fd.textContent = "WRONG. Answer: " + preguntaActual.a; fd.style.color = "red";
                 inputEl.style.borderColor = "#e74c3c"; inputEl.style.backgroundColor = "#fdedec";
                 datosUsuario.totalWrong = (datosUsuario.totalWrong || 0) + 1; 
-                // Feedback audio
-                const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); 
-                u.lang='en-US'; 
-                if(vocesDisponibles.length > 0) u.voice = vocesDisponibles[0];
-                synth.speak(u);
+                const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); u.lang='en-US'; synth.speak(u);
             }
             db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, totalCorrect: datosUsuario.totalCorrect, totalWrong: datosUsuario.totalWrong });
             actualizarUI(); 
@@ -632,9 +698,6 @@
         function comprarItem(item) { if (datosUsuario.score >= item.price) { Swal.fire({title: `¿Comprar ${item.name}?`, text: `Cuesta ${item.price} puntos.`, showCancelButton: true, confirmButtonText: 'Sí'}).then((res) => { if (res.isConfirmed) { datosUsuario.score -= item.price; datosUsuario.inventory.push(item.id); db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, inventory: datosUsuario.inventory }); document.getElementById("shopPoints").textContent = datosUsuario.score; filtrarTienda(item.type); Swal.fire("¡Comprado!", "", "success"); actualizarUI(); } }); } else Swal.fire("Saldo Insuficiente", "", "error"); }
         function equiparItem(item) { if(item.type === 'avatar') datosUsuario.equipped.avatar = item.icon; if(item.type === 'frame') datosUsuario.equipped.frame = item.class; if(item.type === 'theme') datosUsuario.equipped.theme = item.colors; db.collection("students").doc(usuarioActual).update({ equipped: datosUsuario.equipped }); aplicarCosmeticos(); filtrarTienda(item.type); }
         function aplicarCosmeticos() { document.getElementById("myAvatar").textContent = datosUsuario.equipped.avatar || '👤'; document.getElementById("myAvatar").className = "avatar-display " + (datosUsuario.equipped.frame || ""); const t = datosUsuario.equipped.theme; if(t) { document.body.style.background = t.bg; document.querySelectorAll(".card").forEach(c => { c.style.background = t.card; c.style.color = t.text; }); } else { document.body.style.background = "linear-gradient(135deg, #000428, #004e92)"; document.querySelectorAll(".card").forEach(c => { c.style.background = "#ffffff"; c.style.color = "#333"; }); } }
-
-        function actualizarCandados() { for(let i=2;i<=3;i++) { const e=document.getElementById(`navL${i}`); if(datosUsuario.unlockedLevels.includes(i)) {e.classList.remove("locked");e.innerHTML=`Nivel ${i}`;} else {e.classList.add("locked");e.innerHTML=`🔐 Nivel ${i}`;}} }
-        function cambiarNivel(n) { if(datosUsuario.unlockedLevels.includes(n)) { nivelActual=n; document.getElementById("levelText").textContent="Nivel "+n; contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active")); event.target.classList.add("active"); } else Swal.fire("BLOQUEADO","Necesitas completar el nivel anterior 5 veces o usar un código.","error"); }
 
         function mostrarLoginMaestro() { document.getElementById("loginContainerWrapper").style.display="none"; document.getElementById("teacherLogin").style.display="block"; }
         function volverInicio() { document.getElementById("teacherLogin").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("loginContainerWrapper").style.display="flex"; }
@@ -704,7 +767,6 @@
             if(!e||!p) { Swal.fire("Error","Faltan datos","error"); return; }
             
             auth.signInWithEmailAndPassword(e,p).catch((err) => {
-                // FIX: AÑADIDO auth/invalid-login-credentials PARA DETECTAR ADULTOS NUEVOS
                 if(['auth/user-not-found','auth/wrong-password','auth/invalid-credential','auth/invalid-login-credentials'].includes(err.code)) {
                     if(loginMode === 'student' && (!n||!g||!gr)) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo alumno, llena todos los datos para registrarte.'}); return; }
                     if(loginMode === 'adult' && !n) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo, pon tu nombre para registrarte.'}); return; }
