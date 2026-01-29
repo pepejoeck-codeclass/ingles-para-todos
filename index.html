@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER PAYMENTS V9</title>
+    <title>Inglés Para Todos - MASTER V10 DUAL</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -43,7 +43,6 @@
         .skills-bar { display: flex; justify-content: center; gap: 15px; margin: 20px 0; background: #f0f2f5; padding: 10px; border-radius: 50px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
         .skill-btn { width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 24px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #555; }
         .skill-label { font-size: 9px; margin-top: 2px; font-weight: bold; text-transform: uppercase; }
-        
         .skill-btn.active-listening { background: #17a2b8; color: white; transform: scale(1.1); box-shadow: 0 0 15px rgba(23, 162, 184, 0.5); }
         .skill-btn.active-speaking { background: #ffc107; color: #333; transform: scale(1.1); box-shadow: 0 0 15px rgba(255, 193, 7, 0.5); }
         .skill-btn.active-writing { background: #28a745; color: white; transform: scale(1.1); box-shadow: 0 0 15px rgba(40, 167, 69, 0.5); }
@@ -72,7 +71,7 @@
         .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .avatar-display { font-size: 24px; width: 50px; height: 50px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
         
-        /* FRAMES */
+        /* FRAMES Y TIENDA */
         .frame-gold { border: 3px solid gold !important; box-shadow: 0 0 10px gold; }
         .frame-fire { border: 3px solid orangered !important; box-shadow: 0 0 10px red; }
         .frame-neon { border: 3px solid cyan !important; box-shadow: 0 0 10px cyan; }
@@ -80,8 +79,6 @@
         .frame-ice { border: 3px solid #a8edea !important; box-shadow: 0 0 15px #a8edea; background: #e0f7fa; }
         .frame-rainbow { border: 3px solid transparent !important; background: linear-gradient(#fff, #fff) padding-box, linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) border-box !important; border-radius: 50%; }
         .frame-royal { border: 3px solid #8e44ad !important; box-shadow: 0 0 0 2px #f1c40f inset; }
-
-        /* TIENDA */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
         .shop-item { border: 1px solid #ddd; border-radius: 10px; padding: 10px; cursor: pointer; transition: 0.2s; position: relative; }
         .shop-item:hover { transform: scale(1.05); border-color: var(--primary); }
@@ -92,7 +89,7 @@
         .shop-tab { padding: 5px 15px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; background: #f1f1f1; }
         .shop-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* --- ESTILOS DE MAESTRO Y COMUNIDAD --- */
+        /* --- MAESTRO Y COMUNIDAD --- */
         .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
@@ -101,14 +98,10 @@
         .btn-info { background: #17a2b8; } .btn-delete { background: #dc3545; } .btn-edit { background: #ffc107; color: black; } .btn-history { background: #795548; }
         .btn-approve { background: #28a745; animation: pulseBtn 1s infinite; font-weight: bold; padding: 6px 12px; }
         @keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); } }
-
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
         .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
         .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
-        
         .mini-avatar { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 2px solid transparent; font-size: 18px; background: #eee; }
-
-        /* COMUNIDAD / NOTICIAS */
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
@@ -118,6 +111,13 @@
         .rank-1 { background-color: #fff9db; font-weight: bold; } .rank-1 td:first-child::before { content: '🥇 '; }
         .rank-2 { background-color: #f8f9fa; } .rank-2 td:first-child::before { content: '🥈 '; }
         .rank-3 { background-color: #fff0e6; } .rank-3 td:first-child::before { content: '🥉 '; }
+
+        /* ESTILOS DE TABS (LOGIN Y MAESTRO) */
+        .tabs-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; background: #f0f2f5; color: #666; transition: all 0.3s; text-transform: uppercase; font-size: 14px; }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,78,146,0.3); }
+        .tab-btn-teacher { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; background: white; font-weight: bold; }
+        .tab-btn-teacher.active { background: var(--primary); color: white; border-color: var(--primary); }
 
         /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -136,15 +136,23 @@
             <div class="card">
                 <img src="assets/images/logo_main.png.jpg" alt="Logo" class="logo-img">
                 <h2>Inglés Para Todos</h2>
+                
+                <div class="tabs-container">
+                    <button class="tab-btn active" id="tabStudent" onclick="setLoginMode('student')">🎓 Soy Alumno</button>
+                    <button class="tab-btn" id="tabAdult" onclick="setLoginMode('adult')">💼 Soy Adulto</button>
+                </div>
+
                 <input type="email" id="emailInput" placeholder="Correo Electrónico">
                 <input type="password" id="passwordInput" placeholder="Contraseña">
                 <hr>
                 <p style="font-size: 12px;">* ¿Nuevo? Llena esto:</p>
                 <input type="text" id="usernameInput" placeholder="Nombre Completo">
-                <div style="display: flex; gap: 10px;">
+                
+                <div id="studentFields" style="display: flex; gap: 10px;">
                     <input type="number" id="gradeInput" placeholder="Grado" style="width:50%">
                     <input type="text" id="groupInput" placeholder="Grupo" style="width:50%">
                 </div>
+
                 <button onclick="intentarLogin()" class="btn">🚀 ENTRAR / REGISTRAR</button>
                 <div style="margin-top: 15px;"><a href="#" onclick="recuperarPassword()" style="font-size: 13px; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a></div>
             </div>
@@ -218,7 +226,6 @@
             </div>
             
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
-            
             <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px;">Cargando...</h3>
             
             <div class="skills-bar">
@@ -246,6 +253,12 @@
                 <button onclick="cerrarSesionMaestro()" class="btn-danger" style="width:auto; padding:8px 20px;">Cerrar Sesión</button>
             </div>
             <hr>
+            
+            <div class="tabs-container" style="justify-content: flex-start;">
+                <button class="tab-btn-teacher active" id="btnTabStudents" onclick="setTeacherTab('student')">👨‍🎓 Students</button>
+                <button class="tab-btn-teacher" id="btnTabAdults" onclick="setTeacherTab('adult')">🤵 Adults</button>
+            </div>
+
             <div style="background: #fff3cd; padding: 10px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ffeeba;">
                 <h4 style="margin: 0 0 5px 0;">📢 Publicar Noticia</h4>
                 <div style="display: flex; gap: 10px;">
@@ -254,12 +267,13 @@
                 </div>
             </div>
             <div class="dashboard-grid">
-                <div class="stat-card"><div class="stat-number" id="totalAlumnos">0</div>Alumnos</div>
+                <div class="stat-card"><div class="stat-number" id="totalAlumnos">0</div>Total</div>
                 <div class="stat-card"><div class="stat-number" id="promedioAciertos">0</div>Aciertos</div>
                 <div class="stat-card"><canvas id="globalChart" style="max-height: 100px;"></canvas></div>
             </div>
             <div class="teacher-controls">
                 <select id="groupFilter" onchange="renderizarTabla()"><option value="todos">Todos los Grupos</option></select>
+                
                 <button onclick="verGraficaGrupal()" class="action-btn btn-chart">📊 Gráfica Grupal</button>
                 <button onclick="cargarTablaAlumnos()" class="action-btn btn-info">🔄</button>
                 <button onclick="exportarExcel()" class="action-btn btn-excel">📗 Excel</button>
@@ -329,6 +343,10 @@
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
         let chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
         
+        // --- NUEVAS VARIABLES GLOBALES V10 ---
+        let loginMode = 'student'; // 'student' or 'adult'
+        let teacherViewMode = 'student'; // 'student' or 'adult'
+
         const LEVEL_CODES = { 1: "angysanti1", 2: "angysanti2", 3: "angysanti3" };
 
         const shopCatalog = [
@@ -369,6 +387,41 @@
             3: [{q:"Lunes",a:"monday"},{q:"Martes",a:"tuesday"},{q:"Sol",a:"sun"},{q:"Luna",a:"moon"},{q:"Agua",a:"water"}]
         };
 
+        // --- MANEJO DE TABS DE LOGIN ---
+        function setLoginMode(mode) {
+            loginMode = mode;
+            const tabS = document.getElementById('tabStudent');
+            const tabA = document.getElementById('tabAdult');
+            const fields = document.getElementById('studentFields');
+            
+            if(mode === 'student') {
+                tabS.classList.add('active');
+                tabA.classList.remove('active');
+                fields.style.display = 'flex';
+            } else {
+                tabA.classList.add('active');
+                tabS.classList.remove('active');
+                fields.style.display = 'none';
+            }
+        }
+
+        // --- MANEJO DE TABS DE MAESTRO ---
+        function setTeacherTab(mode) {
+            teacherViewMode = mode;
+            document.getElementById('btnTabStudents').classList.toggle('active', mode === 'student');
+            document.getElementById('btnTabAdults').classList.toggle('active', mode === 'adult');
+            
+            // Ocultar/Mostrar filtro de grupo (los adultos no tienen grupo)
+            const groupFilter = document.getElementById('groupFilter');
+            if(mode === 'adult') {
+                groupFilter.value = 'todos';
+                groupFilter.style.display = 'none';
+            } else {
+                groupFilter.style.display = 'block';
+            }
+            renderizarTabla();
+        }
+
         auth.onAuthStateChanged((user) => {
             if (user) {
                 usuarioActual = user.uid;
@@ -384,6 +437,7 @@
                         if(!datosUsuario.levelRepetitions) datosUsuario.levelRepetitions = {};
                         if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = [];
                         if(!datosUsuario.pendingPayment) datosUsuario.pendingPayment = null; 
+                        if(!datosUsuario.userType) datosUsuario.userType = 'student'; // Compatibilidad antigua
 
                         const hoy = new Date().toLocaleDateString('es-ES');
                         if (!datosUsuario.lastLoginDate) { datosUsuario.lastLoginDate = hoy; datosUsuario.currentStreak = 1; }
@@ -423,7 +477,7 @@
         function mostrarJuego() { 
             document.getElementById("loginContainerWrapper").style.display="none"; 
             document.getElementById("mainContent").style.display="block"; 
-            document.getElementById("userDisplay").textContent="Alumno: "+(datosUsuario.username||"Héroe"); 
+            document.getElementById("userDisplay").textContent = (datosUsuario.userType === 'adult' ? "Adulto: " : "Alumno: ") + (datosUsuario.username||"Héroe"); 
             actualizarUI(); 
             actualizarCandados(); 
             setTimeout(cargarPregunta, 500); 
@@ -450,27 +504,16 @@
             if(!nivelActual) nivelActual = 1;
             const pool = preguntasDB[nivelActual] || preguntasDB[1];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
-            
             if (!preguntaActual) return;
-
             const qt = document.getElementById("questionText");
             const inp = document.getElementById("answerInput");
-            
             inp.value = "";
             document.getElementById("feedback").textContent = "";
             inp.style.borderColor = "#ddd";
             inp.style.backgroundColor = "white";
-
-            if (preguntaActual.type === 'dictation') { 
-                qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
-                setTimeout(() => pronunciarPregunta(), 500); 
-            } else { 
-                qt.textContent = "Translate: " + preguntaActual.q; 
-            }
-            
+            if (preguntaActual.type === 'dictation') { qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; setTimeout(() => pronunciarPregunta(), 500); } else { qt.textContent = "Translate: " + preguntaActual.q; }
             document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active-listening', 'active-speaking', 'active-writing', 'mic-listening'));
-            inp.focus();
-            actualizarUI();
+            inp.focus(); actualizarUI();
         }
 
         function pronunciarPregunta() {
@@ -481,8 +524,7 @@
             let vozElegida = vocesDisponibles.find(v => v.lang.includes('en-US') || v.lang.includes('en-GB'));
             if (!vozElegida) vozElegida = vocesDisponibles.find(v => v.lang.includes('en'));
             if (vozElegida) utterance.voice = vozElegida;
-            utterance.rate = 0.85; 
-            utterance.pitch = 1;
+            utterance.rate = 0.85; utterance.pitch = 1;
             const btn = document.getElementById('btnListen');
             btn.classList.add('active-listening'); 
             utterance.onend = () => { btn.classList.remove('active-listening'); };
@@ -494,34 +536,21 @@
             const inputEl = document.getElementById("answerInput");
             const r = inputEl.value.trim().toLowerCase(); 
             if(!r) return; 
-
             contadorPreguntas++; 
             const fd = document.getElementById("feedback");
-            
             if(r === preguntaActual.a.toLowerCase()) {
                 try { audioCorrecto.currentTime=0; audioCorrecto.play(); } catch(e){}
-                fd.textContent = "CORRECT! 🔥"; 
-                fd.style.color = "green";
-                inputEl.style.borderColor = "#2ecc71";
-                inputEl.style.backgroundColor = "#eafaf1";
-                datosUsuario.score = (datosUsuario.score || 0) + 10; 
-                datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1; 
-                aciertosSesion++; 
+                fd.textContent = "CORRECT! 🔥"; fd.style.color = "green";
+                inputEl.style.borderColor = "#2ecc71"; inputEl.style.backgroundColor = "#eafaf1";
+                datosUsuario.score = (datosUsuario.score || 0) + 10; datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1; aciertosSesion++; 
             } else {
                 try { audioError.currentTime=0; audioError.play(); } catch(e){}
-                fd.textContent = "WRONG. Answer: " + preguntaActual.a; 
-                fd.style.color = "red";
-                inputEl.style.borderColor = "#e74c3c";
-                inputEl.style.backgroundColor = "#fdedec";
+                fd.textContent = "WRONG. Answer: " + preguntaActual.a; fd.style.color = "red";
+                inputEl.style.borderColor = "#e74c3c"; inputEl.style.backgroundColor = "#fdedec";
                 datosUsuario.totalWrong = (datosUsuario.totalWrong || 0) + 1; 
                 const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); u.lang='en-US'; synth.speak(u);
             }
-            
-            db.collection("students").doc(usuarioActual).update({
-                score: datosUsuario.score, 
-                totalCorrect: datosUsuario.totalCorrect, 
-                totalWrong: datosUsuario.totalWrong
-            });
+            db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, totalCorrect: datosUsuario.totalCorrect, totalWrong: datosUsuario.totalWrong });
             actualizarUI(); 
             document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100)+"%";
             if(contadorPreguntas >= 5) setTimeout(finSesion, 2000); else setTimeout(cargarPregunta, 2000);
@@ -555,144 +584,40 @@
                 datosUsuario.unlockedLevels.push(n);
                 db.collection("students").doc(usuarioActual).update({ unlockedLevels: datosUsuario.unlockedLevels });
             }
-            cerrarModal('modalNivelCompleto');
-            actualizarCandados();
-            contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%";
-            if(datosUsuario.unlockedLevels.includes(nivelActual+1)) {
-                 Swal.fire({title: 'Level Up!', text: '¿Ir al siguiente nivel?', showCancelButton: true, confirmButtonText: 'Sí, vamos!'}).then((res)=>{
-                     if(res.isConfirmed) cambiarNivel(nivelActual+1);
-                     else cargarPregunta();
-                 });
-            } else { cargarPregunta(); }
+            cerrarModal('modalNivelCompleto'); actualizarCandados(); contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%";
+            if(datosUsuario.unlockedLevels.includes(nivelActual+1)) { Swal.fire({title: 'Level Up!', text: '¿Ir al siguiente nivel?', showCancelButton: true, confirmButtonText: 'Sí, vamos!'}).then((res)=>{ if(res.isConfirmed) cambiarNivel(nivelActual+1); else cargarPregunta(); }); } else { cargarPregunta(); }
         }
 
-        function opcionRepetirNivel() {
-            cerrarModal('modalNivelCompleto'); contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta();
-        }
-
-        function opcionIngresarCodigo() {
-            Swal.fire({ title: 'Código Secreto', input: 'text', inputPlaceholder: 'Ingresa el código...', showCancelButton: true }).then((result) => {
-                if (result.value === LEVEL_CODES[nivelActual]) { Swal.fire("¡Código Correcto!", "Nivel desbloqueado.", "success"); desbloquearSiguienteNivel(); } else if(result.value) { Swal.fire("Error", "Código incorrecto.", "error"); }
-            });
-        }
-
-        // --- SISTEMA DE PAGO SEGURO POR FOLIO (V9.0) ---
+        function opcionRepetirNivel() { cerrarModal('modalNivelCompleto'); contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); }
+        function opcionIngresarCodigo() { Swal.fire({ title: 'Código Secreto', input: 'text', inputPlaceholder: 'Ingresa el código...', showCancelButton: true }).then((result) => { if (result.value === LEVEL_CODES[nivelActual]) { Swal.fire("¡Código Correcto!", "Nivel desbloqueado.", "success"); desbloquearSiguienteNivel(); } else if(result.value) { Swal.fire("Error", "Código incorrecto.", "error"); } }); }
+        
         function opcionPagarNivel() {
-            // 1. Abrir link de pago
             window.open('https://mpago.li/2aeNocU', '_blank');
-
-            // 2. Pedir Folio de Transacción
-            Swal.fire({
-                title: 'Verificar Pago 🔍',
-                html: '<p style="font-size:14px">Ingresa el <b>Número de Operación o Folio</b> de tu comprobante de pago.</p>',
-                input: 'text',
-                inputPlaceholder: 'Ej: 1234567890',
-                showCancelButton: true,
-                confirmButtonText: 'Enviar para Revisión',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed && result.value) {
-                    registrarSolicitudPago(result.value); // Enviamos el folio
-                } else if (result.isConfirmed) {
-                    Swal.fire("Error", "Debes escribir el folio para verificar.", "warning");
-                }
-            });
+            Swal.fire({ title: 'Verificar Pago 🔍', html: '<p style="font-size:14px">Ingresa el <b>Número de Operación o Folio</b> de tu comprobante de pago.</p>', input: 'text', inputPlaceholder: 'Ej: 1234567890', showCancelButton: true, confirmButtonText: 'Enviar para Revisión', cancelButtonText: 'Cancelar' }).then((result) => { if (result.isConfirmed && result.value) { registrarSolicitudPago(result.value); } else if (result.isConfirmed) { Swal.fire("Error", "Debes escribir el folio para verificar.", "warning"); } });
         }
 
         function registrarSolicitudPago(folio) {
-            const solicitud = {
-                fecha: new Date().toLocaleString(),
-                monto: 25,
-                concepto: `Salto Nivel ${nivelActual}`,
-                estado: `Pendiente (Folio: ${folio})`, // Guardamos el folio aquí
-                folio: folio
-            };
-            
-            if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = [];
-            datosUsuario.paymentHistory.push(solicitud);
-            
-            db.collection("students").doc(usuarioActual).update({ 
-                paymentHistory: datosUsuario.paymentHistory,
-                pendingPayment: { nivel: nivelActual, fecha: new Date().toLocaleString(), folio: folio } 
-            }).then(() => {
-                cerrarModal('modalNivelCompleto');
-                Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado al maestro. Cuando él confirme que el dinero llegó, se desbloqueará el nivel.`, "info");
-            });
+            const solicitud = { fecha: new Date().toLocaleString(), monto: 25, concepto: `Salto Nivel ${nivelActual}`, estado: `Pendiente (Folio: ${folio})`, folio: folio };
+            if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; datosUsuario.paymentHistory.push(solicitud);
+            db.collection("students").doc(usuarioActual).update({ paymentHistory: datosUsuario.paymentHistory, pendingPayment: { nivel: nivelActual, fecha: new Date().toLocaleString(), folio: folio } }).then(() => { cerrarModal('modalNivelCompleto'); Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado al maestro. Cuando él confirme que el dinero llegó, se desbloqueará el nivel.`, "info"); });
         }
 
-        function pagarPuntos() {
-            Swal.fire({ title: 'Comprar Puntos 💰', html: `<button onclick="procesarPagoPuntos(10, 50)" class="btn" style="margin:5px">$10 MXN = 50 Pts</button><button onclick="procesarPagoPuntos(20, 100)" class="btn" style="margin:5px">$20 MXN = 100 Pts</button><button onclick="procesarPagoPuntos(50, 300)" class="btn" style="margin:5px; background:gold; color:black;">$50 MXN = 300 Pts</button>`, showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Cerrar' });
-        }
+        function pagarPuntos() { Swal.fire({ title: 'Comprar Puntos 💰', html: `<button onclick="procesarPagoPuntos(10, 50)" class="btn" style="margin:5px">$10 MXN = 50 Pts</button><button onclick="procesarPagoPuntos(20, 100)" class="btn" style="margin:5px">$20 MXN = 100 Pts</button><button onclick="procesarPagoPuntos(50, 300)" class="btn" style="margin:5px; background:gold; color:black;">$50 MXN = 300 Pts</button>`, showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Cerrar' }); }
+        function procesarPagoPuntos(dinero, puntos) { Swal.fire({ title: 'Ir a Pagar', text: `Se abrirá Mercado Pago para pagar $${dinero}. Avísale a tu maestro.`, confirmButtonText: 'Pagar', showCancelButton: true }).then((r) => { if(r.isConfirmed) { window.open('https://mpago.li/2aeNocU', '_blank'); datosUsuario.score += puntos; db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score }); actualizarUI(); } }); }
 
-        function procesarPagoPuntos(dinero, puntos) {
-            Swal.fire({
-                title: 'Ir a Pagar',
-                text: `Se abrirá Mercado Pago para pagar $${dinero}. Avísale a tu maestro.`,
-                confirmButtonText: 'Pagar',
-                showCancelButton: true
-            }).then((r) => {
-                if(r.isConfirmed) {
-                    window.open('https://mpago.li/2aeNocU', '_blank');
-                    datosUsuario.score += puntos; db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score }); actualizarUI(); 
-                }
-            });
-        }
+        function activarEscritura() { const btn = document.getElementById("btnWrite"); btn.classList.add("active-writing"); document.getElementById("answerInput").focus(); setTimeout(() => btn.classList.remove("active-writing"), 500); }
+        function activarMicrofono() { const btn = document.getElementById("btnMicrofono"); const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) { Swal.fire("Aviso", "Navegador no compatible. Usa Chrome.", "info"); activarEscritura(); return; } const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.interimResults = false; recognition.maxAlternatives = 1; recognition.start(); btn.classList.add("mic-listening", "active-speaking"); recognition.onresult = (e) => { const t = e.results[0][0].transcript.toLowerCase().replace('.',''); document.getElementById("answerInput").value = t; btn.classList.remove("mic-listening", "active-speaking"); verificarRespuesta(); }; recognition.onerror = () => { btn.classList.remove("mic-listening", "active-speaking"); }; }
 
-        function activarEscritura() {
-            const btn = document.getElementById("btnWrite"); btn.classList.add("active-writing"); document.getElementById("answerInput").focus(); setTimeout(() => btn.classList.remove("active-writing"), 500);
-        }
-        
-        function activarMicrofono() {
-            const btn = document.getElementById("btnMicrofono"); const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { Swal.fire("Aviso", "Navegador no compatible. Usa Chrome.", "info"); activarEscritura(); return; }
-            const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.interimResults = false; recognition.maxAlternatives = 1;
-            recognition.start(); btn.classList.add("mic-listening", "active-speaking");
-            recognition.onresult = (e) => { const t = e.results[0][0].transcript.toLowerCase().replace('.',''); document.getElementById("answerInput").value = t; btn.classList.remove("mic-listening", "active-speaking"); verificarRespuesta(); };
-            recognition.onerror = () => { btn.classList.remove("mic-listening", "active-speaking"); };
-        }
-
-        function iniciarCronometro() {
-            if(timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                datosUsuario.timeWorked = (datosUsuario.timeWorked||0)+1; actualizarUI();
-                if(datosUsuario.timeWorked % 15 === 0) { 
-                    const hoy = new Date().toLocaleDateString('es-ES'); if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {}; if(!datosUsuario.dailyLogs[hoy]) datosUsuario.dailyLogs[hoy] = 0; datosUsuario.dailyLogs[hoy]++;
-                    db.collection("students").doc(usuarioActual).update({ timeWorked: datosUsuario.timeWorked, dailyLogs: datosUsuario.dailyLogs });
-                }
-            }, 1000);
-        }
+        function iniciarCronometro() { if(timerInterval) clearInterval(timerInterval); timerInterval = setInterval(() => { datosUsuario.timeWorked = (datosUsuario.timeWorked||0)+1; actualizarUI(); if(datosUsuario.timeWorked % 15 === 0) { const hoy = new Date().toLocaleDateString('es-ES'); if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {}; if(!datosUsuario.dailyLogs[hoy]) datosUsuario.dailyLogs[hoy] = 0; datosUsuario.dailyLogs[hoy]++; db.collection("students").doc(usuarioActual).update({ timeWorked: datosUsuario.timeWorked, dailyLogs: datosUsuario.dailyLogs }); } }, 1000); }
         function detenerCronometro() { clearInterval(timerInterval); }
         function formatearTiempo(s) { const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60; return h>0 ? `${h}h ${m}m ${sec}s` : `${m}m ${sec}s`; }
-        
         document.getElementById("answerInput").addEventListener("keypress", function(e) { if (e.key === "Enter") verificarRespuesta(); });
 
         function abrirTienda() { document.getElementById("modalTienda").style.display="flex"; document.getElementById("shopPoints").textContent = datosUsuario.score || 0; filtrarTienda('avatar'); }
-        function filtrarTienda(tipo) {
-            document.querySelectorAll(".shop-tab").forEach(t => t.classList.remove("active")); document.querySelector(`.shop-tab[onclick="filtrarTienda('${tipo}')"]`).classList.add("active");
-            const grid = document.getElementById("shopGrid"); grid.innerHTML = "";
-            shopCatalog.filter(i => i.type === tipo).forEach(item => {
-                const owned = (datosUsuario.inventory || []).includes(item.id); let equipped = false;
-                if(tipo === 'avatar' && datosUsuario.equipped.avatar === item.icon) equipped = true; if(tipo === 'frame' && datosUsuario.equipped.frame === item.class) equipped = true; if(tipo === 'theme' && JSON.stringify(datosUsuario.equipped.theme) === JSON.stringify(item.colors)) equipped = true;
-                const div = document.createElement("div"); div.className = "shop-item";
-                div.innerHTML = `<div class="shop-icon">${item.icon || (tipo==='frame'?'🖼️':'🎨')}</div><div>${item.name}</div>${equipped ? '<div class="shop-equipped">✅</div>' : ''}<div class="${owned ? 'shop-owned' : 'shop-price'}">${owned ? (equipped ? 'En uso' : 'Adquirido') : '💰 ' + item.price}</div>`;
-                div.onclick = () => { if(equipped) return; if(owned) equiparItem(item); else comprarItem(item); };
-                grid.appendChild(div);
-            });
-        }
-        function comprarItem(item) {
-            if (datosUsuario.score >= item.price) { Swal.fire({title: `¿Comprar ${item.name}?`, text: `Cuesta ${item.price} puntos.`, showCancelButton: true, confirmButtonText: 'Sí'}).then((res) => { if (res.isConfirmed) { datosUsuario.score -= item.price; datosUsuario.inventory.push(item.id); db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, inventory: datosUsuario.inventory }); document.getElementById("shopPoints").textContent = datosUsuario.score; filtrarTienda(item.type); Swal.fire("¡Comprado!", "", "success"); actualizarUI(); } }); } else Swal.fire("Saldo Insuficiente", "", "error");
-        }
-        function equiparItem(item) {
-            if(item.type === 'avatar') datosUsuario.equipped.avatar = item.icon; if(item.type === 'frame') datosUsuario.equipped.frame = item.class; if(item.type === 'theme') datosUsuario.equipped.theme = item.colors;
-            db.collection("students").doc(usuarioActual).update({ equipped: datosUsuario.equipped }); aplicarCosmeticos(); filtrarTienda(item.type);
-        }
-        function aplicarCosmeticos() {
-            document.getElementById("myAvatar").textContent = datosUsuario.equipped.avatar || '👤'; document.getElementById("myAvatar").className = "avatar-display " + (datosUsuario.equipped.frame || "");
-            const t = datosUsuario.equipped.theme; if(t) { document.body.style.background = t.bg; document.querySelectorAll(".card").forEach(c => { c.style.background = t.card; c.style.color = t.text; }); } else { document.body.style.background = "linear-gradient(135deg, #000428, #004e92)"; document.querySelectorAll(".card").forEach(c => { c.style.background = "#ffffff"; c.style.color = "#333"; }); }
-        }
-
-        function actualizarCandados() { for(let i=2;i<=3;i++) { const e=document.getElementById(`navL${i}`); if(datosUsuario.unlockedLevels.includes(i)) {e.classList.remove("locked");e.innerHTML=`Nivel ${i}`;} else {e.classList.add("locked");e.innerHTML=`🔐 Nivel ${i}`;}} }
-        function cambiarNivel(n) { if(datosUsuario.unlockedLevels.includes(n)) { nivelActual=n; document.getElementById("levelText").textContent="Nivel "+n; contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active")); event.target.classList.add("active"); } else Swal.fire("BLOQUEADO","Necesitas completar el nivel anterior 5 veces o usar un código.","error"); }
+        function filtrarTienda(tipo) { document.querySelectorAll(".shop-tab").forEach(t => t.classList.remove("active")); document.querySelector(`.shop-tab[onclick="filtrarTienda('${tipo}')"]`).classList.add("active"); const grid = document.getElementById("shopGrid"); grid.innerHTML = ""; shopCatalog.filter(i => i.type === tipo).forEach(item => { const owned = (datosUsuario.inventory || []).includes(item.id); let equipped = false; if(tipo === 'avatar' && datosUsuario.equipped.avatar === item.icon) equipped = true; if(tipo === 'frame' && datosUsuario.equipped.frame === item.class) equipped = true; if(tipo === 'theme' && JSON.stringify(datosUsuario.equipped.theme) === JSON.stringify(item.colors)) equipped = true; const div = document.createElement("div"); div.className = "shop-item"; div.innerHTML = `<div class="shop-icon">${item.icon || (tipo==='frame'?'🖼️':'🎨')}</div><div>${item.name}</div>${equipped ? '<div class="shop-equipped">✅</div>' : ''}<div class="${owned ? 'shop-owned' : 'shop-price'}">${owned ? (equipped ? 'En uso' : 'Adquirido') : '💰 ' + item.price}</div>`; div.onclick = () => { if(equipped) return; if(owned) equiparItem(item); else comprarItem(item); }; grid.appendChild(div); }); }
+        function comprarItem(item) { if (datosUsuario.score >= item.price) { Swal.fire({title: `¿Comprar ${item.name}?`, text: `Cuesta ${item.price} puntos.`, showCancelButton: true, confirmButtonText: 'Sí'}).then((res) => { if (res.isConfirmed) { datosUsuario.score -= item.price; datosUsuario.inventory.push(item.id); db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, inventory: datosUsuario.inventory }); document.getElementById("shopPoints").textContent = datosUsuario.score; filtrarTienda(item.type); Swal.fire("¡Comprado!", "", "success"); actualizarUI(); } }); } else Swal.fire("Saldo Insuficiente", "", "error"); }
+        function equiparItem(item) { if(item.type === 'avatar') datosUsuario.equipped.avatar = item.icon; if(item.type === 'frame') datosUsuario.equipped.frame = item.class; if(item.type === 'theme') datosUsuario.equipped.theme = item.colors; db.collection("students").doc(usuarioActual).update({ equipped: datosUsuario.equipped }); aplicarCosmeticos(); filtrarTienda(item.type); }
+        function aplicarCosmeticos() { document.getElementById("myAvatar").textContent = datosUsuario.equipped.avatar || '👤'; document.getElementById("myAvatar").className = "avatar-display " + (datosUsuario.equipped.frame || ""); const t = datosUsuario.equipped.theme; if(t) { document.body.style.background = t.bg; document.querySelectorAll(".card").forEach(c => { c.style.background = t.card; c.style.color = t.text; }); } else { document.body.style.background = "linear-gradient(135deg, #000428, #004e92)"; document.querySelectorAll(".card").forEach(c => { c.style.background = "#ffffff"; c.style.color = "#333"; }); } }
 
         function mostrarLoginMaestro() { document.getElementById("loginContainerWrapper").style.display="none"; document.getElementById("teacherLogin").style.display="block"; }
         function volverInicio() { document.getElementById("teacherLogin").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("loginContainerWrapper").style.display="flex"; }
@@ -717,8 +642,17 @@
             });
         }
         function renderizarTabla() {
-            const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; 
-            if(f!=="todos") d=d.filter(s=>s.group===f); 
+            // FILTRADO POR PESTAÑA (STUDENT VS ADULT)
+            let d = listaAlumnosCache.filter(u => {
+                // Compatibilidad: Si no tiene userType, asumimos que es student
+                const tipo = u.userType || 'student';
+                return tipo === teacherViewMode;
+            });
+
+            // FILTRADO POR GRUPO (SOLO SI ESTÁ VISIBLE)
+            const f=document.getElementById("groupFilter").value; 
+            if(f!=="todos" && teacherViewMode === 'student') d=d.filter(s=>s.group===f); 
+            
             d.sort((a,b)=>(b.score||0)-(a.score||0));
             const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy(); 
             const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;}); 
@@ -730,14 +664,8 @@
                 const av = s.equipped?.avatar || '👤'; 
                 const fr = s.equipped?.frame || ''; 
                 const nombreMostrar = s.username || s.nombre || s.name || "Alumno";
-                
-                // BOTÓN DE APROBACIÓN DE PAGO CON FOLIO
                 let btnPago = "";
-                if(s.pendingPayment) {
-                    const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio";
-                    btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">💸 ${folioInfo}</button>`;
-                }
-
+                if(s.pendingPayment) { const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio"; btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">💸 ${folioInfo}</button>`; }
                 tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info">📊</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete">🗑️</button></td>`; 
                 tb.appendChild(tr); 
             }); 
@@ -745,66 +673,11 @@
             document.getElementById("promedioAciertos").textContent=d.reduce((a,b)=>a+(Number(b.totalCorrect)||0),0);
         }
 
-        async function aprobarPagoReal(uid) {
-            const s = listaAlumnosCache.find(x => x.uid === uid);
-            if(!s.pendingPayment) return;
-            const nivelADesbloquear = s.pendingPayment.nivel + 1; 
-            
-            let nuevosNiveles = s.unlockedLevels || [1];
-            if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear);
-
-            let historial = s.paymentHistory || [];
-            if(historial.length > 0) {
-                historial[historial.length - 1].estado = "Aprobado ✅";
-            }
-
-            await db.collection("students").doc(uid).update({
-                unlockedLevels: nuevosNiveles,
-                pendingPayment: null, 
-                paymentHistory: historial
-            });
-
-            Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success");
-            cargarTablaAlumnos();
-        }
-
+        async function aprobarPagoReal(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); if(!s.pendingPayment) return; const nivelADesbloquear = s.pendingPayment.nivel + 1; let nuevosNiveles = s.unlockedLevels || [1]; if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); let historial = s.paymentHistory || []; if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; } await db.collection("students").doc(uid).update({ unlockedLevels: nuevosNiveles, pendingPayment: null, paymentHistory: historial }); Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success"); cargarTablaAlumnos(); }
         async function resetearAlumno(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), nm=Math.max(...(s.unlockedLevels||[1])); const {value:o}=await Swal.fire({title:s.username, input:'select', inputOptions:{'puntos':'📉 Reset Puntos','nivel':'🔙 Regresar Nivel','total':'⚠️ Reset Total'}, showCancelButton:true}); if(o==='puntos') await db.collection("students").doc(uid).update({score:0}); else if(o==='nivel') { if(nm<=1) return; await db.collection("students").doc(uid).update({unlockedLevels:s.unlockedLevels.filter(n=>n!==nm)}); } else if(o==='total') await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); cargarTablaAlumnos(); }
         function borrarAlumno(uid) { if(confirm("¿Eliminar?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos()); }
         function verHistorial(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), l=s.dailyLogs||{}, tb=document.getElementById("historialCuerpo"); tb.innerHTML=""; document.getElementById("modalHistorial").style.display="flex"; document.getElementById("historialNombre").textContent="Historial: "+(s.username||"Alumno"); Object.keys(l).sort().reverse().forEach(f=>{ tb.innerHTML+=`<tr><td>${f}</td><td style="color:blue;font-weight:bold">${formatearTiempo(l[f])}</td></tr>`; }); }
-        
-        function verGraficaInd(uid) { 
-            const s=listaAlumnosCache.find(x=>x.uid===uid); 
-            document.getElementById("modalGrafica").style.display="flex"; 
-            document.getElementById("modalNombre").textContent=s.username||"Alumno"; 
-            const m = s.medals || {gold:0, silver:0, bronze:0}; 
-            let itemsTexto = "Ninguna compra"; 
-            if (s.inventory && s.inventory.length > 0) { itemsTexto = s.inventory.map(id => { const item = shopCatalog.find(i => i.id === id); return item ? `${item.icon} ${item.name}` : id; }).join(', '); } 
-            
-            let pagosHTML = "<p>No hay pagos registrados.</p>";
-            if (s.paymentHistory && s.paymentHistory.length > 0) {
-                pagosHTML = `<ul style="text-align:left; font-size:12px; list-style:none; padding:0;">`;
-                s.paymentHistory.forEach(p => {
-                    const color = p.estado.includes("Aprobado") ? "green" : "orange";
-                    // MOSTRAR EL FOLIO EN EL HISTORIAL
-                    pagosHTML += `<li style="margin-bottom:5px; border-bottom:1px solid #eee; padding-bottom:3px;">📅 ${p.fecha} - <b>$${p.monto}</b> - <span style="color:${color}">${p.estado}</span></li>`;
-                });
-                pagosHTML += `</ul>`;
-            }
-
-            document.getElementById("modalStats").innerHTML = `
-                <p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p>
-                <p><b>Racha:</b> ${s.currentStreak||1} 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p>
-                <p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p>
-                <hr>
-                <p><b>🎒 Inventario:</b></p><p style="font-size:12px; color:#555;">${itemsTexto}</p>
-                <hr>
-                <p style="color:green;"><b>💰 Historial de Pagos:</b></p>
-                ${pagosHTML}
-            `; 
-            if(chartStudentInstance) chartStudentInstance.destroy(); 
-            chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅ Correctas','❌ Incorrectas'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}}); 
-        }
-
+        function verGraficaInd(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid); document.getElementById("modalGrafica").style.display="flex"; document.getElementById("modalNombre").textContent=s.username||"Alumno"; const m = s.medals || {gold:0, silver:0, bronze:0}; let itemsTexto = "Ninguna compra"; if (s.inventory && s.inventory.length > 0) { itemsTexto = s.inventory.map(id => { const item = shopCatalog.find(i => i.id === id); return item ? `${item.icon} ${item.name}` : id; }).join(', '); } let pagosHTML = "<p>No hay pagos registrados.</p>"; if (s.paymentHistory && s.paymentHistory.length > 0) { pagosHTML = `<ul style="text-align:left; font-size:12px; list-style:none; padding:0;">`; s.paymentHistory.forEach(p => { const color = p.estado.includes("Aprobado") ? "green" : "orange"; pagosHTML += `<li style="margin-bottom:5px; border-bottom:1px solid #eee; padding-bottom:3px;">📅 ${p.fecha} - <b>$${p.monto}</b> - <span style="color:${color}">${p.estado}</span></li>`; }); pagosHTML += `</ul>`; } document.getElementById("modalStats").innerHTML = `<p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p><p><b>Racha:</b> ${s.currentStreak||1} 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p><p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p><hr><p><b>🎒 Inventario:</b></p><p style="font-size:12px; color:#555;">${itemsTexto}</p><hr><p style="color:green;"><b>💰 Historial de Pagos:</b></p>${pagosHTML}`; if(chartStudentInstance) chartStudentInstance.destroy(); chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅ Correctas','❌ Incorrectas'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}}); }
         function verGraficaGrupal() { const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>b.score-a.score); document.getElementById("modalGraficaGrupal").style.display="flex"; const totalPuntos = d.reduce((acc, curr) => acc + Number(curr.score || 0), 0); const promedio = d.length > 0 ? (totalPuntos / d.length).toFixed(1) : 0; document.getElementById("modalStatsGroup").innerHTML = `<p><b>Total Alumnos:</b> ${d.length} | <b>Promedio Puntos:</b> ${promedio}</p>`; const ctx=document.getElementById('groupBigChart').getContext('2d'); if(chartGroupInstance) chartGroupInstance.destroy(); chartGroupInstance=new Chart(ctx,{type:'bar',data:{labels:d.map(s=>s.username),datasets:[{label:'Puntos Totales',data:d.map(s=>s.score),backgroundColor:'#004e92'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}}); }
         function descargarCaptura(divId, nombre) { const el = document.getElementById(divId); html2canvas(el).then(c => { const l = document.createElement('a'); l.download = nombre; l.href = c.toDataURL(); l.click(); }); }
         function cerrarModal(id) { document.getElementById(id).style.display="none"; }
@@ -813,13 +686,35 @@
         function abrirModalAcademico(t) { document.getElementById("modalAcademico").style.display="flex"; document.getElementById("tituloAcademico").textContent=t; document.getElementById("nivelAcademico").textContent=nivelActual; }
         
         function intentarLogin() {
-            const e=document.getElementById("emailInput").value.trim(), p=document.getElementById("passwordInput").value.trim(), n=document.getElementById("usernameInput").value.trim(), g=document.getElementById("gradeInput").value.trim(), gr=document.getElementById("groupInput").value.trim().toUpperCase();
+            const e=document.getElementById("emailInput").value.trim(), p=document.getElementById("passwordInput").value.trim(), n=document.getElementById("usernameInput").value.trim();
+            
+            // VALIDACIÓN CONDICIONAL (SI ES ALUMNO O ADULTO)
+            let g = "", gr = "";
+            if(loginMode === 'student') {
+                g = document.getElementById("gradeInput").value.trim();
+                gr = document.getElementById("groupInput").value.trim().toUpperCase();
+            } else {
+                g = "N/A"; // No aplica
+                gr = "Adults"; // Grupo interno
+            }
+
             if(!e||!p) { Swal.fire("Error","Faltan datos","error"); return; }
+            
             auth.signInWithEmailAndPassword(e,p).catch((err) => {
                 if(['auth/user-not-found','auth/wrong-password','auth/invalid-credential'].includes(err.code)) {
-                    if(!n||!g||!gr) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo, llena todos los datos.'}); return; }
+                    // SI ES NUEVO REGISTRO
+                    if(loginMode === 'student' && (!n||!g||!gr)) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo alumno, llena todos los datos.'}); return; }
+                    if(loginMode === 'adult' && !n) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo, pon tu nombre.'}); return; }
+
                     auth.createUserWithEmailAndPassword(e,p).then((c) => {
-                        db.collection("students").doc(c.user.uid).set({ uid:c.user.uid, username:n, grade:g, group:gr, email:e, password:p, score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, lastLoginDate:new Date().toLocaleDateString('es-ES'), currentStreak:1, inventory:[], equipped:{avatar:'👤',frame:'',theme:''}, levelRepetitions:{} }).then(()=>Swal.fire("Creado","","success"));
+                        db.collection("students").doc(c.user.uid).set({ 
+                            uid:c.user.uid, username:n, grade:g, group:gr, email:e, password:p, 
+                            userType: loginMode, // GUARDAMOS SI ES STUDENT O ADULT
+                            score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, 
+                            medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, 
+                            lastLoginDate:new Date().toLocaleDateString('es-ES'), currentStreak:1, 
+                            inventory:[], equipped:{avatar:'👤',frame:'',theme:''}, levelRepetitions:{}, paymentHistory:[], pendingPayment:null
+                        }).then(()=>Swal.fire("Creado","Bienvenido","success"));
                     }).catch(e=>Swal.fire("Error",e.message,"error"));
                 } else Swal.fire("Error",err.message,"error");
             });
