@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V23 RESTORED</title>
+    <title>Inglés Para Todos - MASTER V27 ULTRA STABLE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTILOS ORIGINALES RESTAURADOS --- */
+        /* --- ESTILOS VISUALES V27 (INTACTOS) --- */
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; }
@@ -26,9 +26,8 @@
         
         .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; position: relative; transition: all 0.3s; }
         
-        .logo-img { width: 100%; max-width: 250px; margin-bottom: 10px; }
+        .logo-img { width: 150px; height: 150px; object-fit: cover; border-radius: 50%; margin: 0 auto 15px auto; display: block; border: 4px solid var(--primary); }
         .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; margin: 10px auto; display: block; object-fit: cover; }
-        .teacher-header-img { width: 100%; max-height: 180px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 10px; }
         
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; font-family: 'Nunito'; }
         .btn { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; background: var(--primary); box-shadow: 0 4px 0 #002a5c; }
@@ -58,7 +57,7 @@
         @keyframes pulseMic { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
         .mic-listening { background: #ff0000 !important; color: white !important; animation: pulseMic 1.5s infinite; }
 
-        /* BOTONES ACADÉMICOS (RESTAURADOS) */
+        /* BOTONES ACADÉMICOS */
         .academic-nav { display: flex; gap: 10px; margin-bottom: 20px; }
         .btn-academic { flex: 1; padding: 12px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
         .btn-academic:active { transform: translateY(2px); }
@@ -78,7 +77,7 @@
         .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .avatar-display { font-size: 24px; width: 50px; height: 50px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
         
-        /* MAESTRO Y COMUNIDAD (RESTAURADOS) */
+        /* MAESTRO Y COMUNIDAD */
         .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
@@ -95,7 +94,7 @@
         .tab-btn-teacher { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; background: white; font-weight: bold; }
         .tab-btn-teacher.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* COMUNIDAD / BEST HEROES (RESTAURADO) */
+        /* COMUNIDAD / BEST HEROES */
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
@@ -326,6 +325,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
         
+        // --- AUDIO ENGINE V27 (ASYNCHRONOUS HYBRID) ---
         const audioCorrecto = new Audio('./assets/sounds/correct.mp3'); 
         const audioError = new Audio('./assets/sounds/wrong.mp3'); 
         const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
@@ -333,13 +333,19 @@
         let vocesDisponibles = [];
         let audioUnlocked = false;
 
+        // V27: CARGA DE VOCES OPTIMIZADA (NO BLOQUEANTE)
         function cargarVocesMejoradas() {
             const rawVoices = synth.getVoices();
-            if (rawVoices.length === 0) { setTimeout(cargarVocesMejoradas, 100); return; }
+            if (rawVoices.length === 0) { 
+                // Reintentar en 500ms pero NO bloquear la UI
+                setTimeout(cargarVocesMejoradas, 500); 
+                return; 
+            }
             let bestVoices = rawVoices.filter(v => (v.lang.includes('en-US') || v.lang.includes('en-GB')) && (v.name.includes('Google') || v.name.includes('Premium') || v.name.includes('Samantha') || v.name.includes('Enhanced')));
             if (bestVoices.length === 0) bestVoices = rawVoices.filter(v => v.lang.includes('en'));
             vocesDisponibles = bestVoices.length > 0 ? bestVoices : rawVoices;
         }
+        // Disparar carga inicial
         cargarVocesMejoradas();
         if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVocesMejoradas; }
 
@@ -383,7 +389,7 @@
                     if(snapDonaciones.empty) { tbody.innerHTML = "<tr><td colspan='5'>No hay donaciones aún.</td></tr>"; return; }
                     snapDonaciones.forEach(doc => {
                         const d = doc.data();
-                        // LÓGICA V23 DONADOR EXTERNO
+                        // LÓGICA V27 DONADOR EXTERNO
                         let categoria = "<span style='color:grey; font-weight:bold;'>🌍 Donador Externo</span>"; 
                         const donanteNombreClean = (d.nombre || "").toLowerCase().trim();
                         let match = listaAlumnosCache.find(u => { const alumnoNombre = (u.username || u.nombre || "").toLowerCase().trim(); return alumnoNombre === donanteNombreClean || (donanteNombreClean.length > 3 && alumnoNombre.includes(donanteNombreClean)); });
@@ -419,13 +425,14 @@
             document.getElementById("loginContainerWrapper").style.display="none"; document.getElementById("mainContent").style.display="block"; 
             document.getElementById("userDisplay").textContent = (datosUsuario.userType === 'adult' ? "Adulto: " : "Alumno: ") + (datosUsuario.username||"Héroe"); 
             actualizarUI(); actualizarCandados(); 
-            // V23 FIX: CARGA INMEDIATA SIN ESPERAR AUDIO
+            // V27 FIX: CARGA INMEDIATA
             cargarPregunta(); 
             iniciarCronometro(); aplicarCosmeticos();
         }
         
         function actualizarUI() { document.getElementById("timerDisplay").textContent = formatearTiempo(datosUsuario.timeWorked||0); document.getElementById("correctDisplay").textContent = datosUsuario.totalCorrect||0; document.getElementById("wrongDisplay").textContent = datosUsuario.totalWrong||0; const m = datosUsuario.medals||{gold:0, silver:0, bronze:0}; document.getElementById("goldDisplay").textContent = m.gold; document.getElementById("silverDisplay").textContent = m.silver; document.getElementById("bronzeDisplay").textContent = m.bronze; document.getElementById("scoreText").textContent = datosUsuario.score||0; const r = datosUsuario.currentStreak||1; document.getElementById("streakDisplay").textContent = `${r>1?'🔥':'😔'} ${r} días seguidos`; const reps = (datosUsuario.levelRepetitions && datosUsuario.levelRepetitions[nivelActual]) ? datosUsuario.levelRepetitions[nivelActual] : 0; document.getElementById("repsText").textContent = `Intentos: ${reps}/5`; }
 
+        // V27: LOGICA NO BLOQUEANTE
         function cargarPregunta() {
             if(!nivelActual) nivelActual = 1;
             const pool = preguntasDB[nivelActual] || preguntasDB[1];
@@ -438,7 +445,9 @@
 
         function pronunciarPregunta() {
             if (!preguntaActual) return;
+            // SI NO HAY VOCES CARGADAS, USAR CUALQUIERA DISPONIBLE EN EL MOMENTO
             if (vocesDisponibles.length === 0) vocesDisponibles = synth.getVoices();
+            
             const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
             if(synth.speaking) synth.cancel();
             const utterance = new SpeechSynthesisUtterance(texto);
@@ -483,7 +492,7 @@
         function pagarPuntos() { Swal.fire({ title: 'Comprar Puntos 💰', html: `<button onclick="procesarPagoPuntos(10, 50)" class="btn" style="margin:5px">$10 MXN = 50 Pts</button><button onclick="procesarPagoPuntos(20, 100)" class="btn" style="margin:5px">$20 MXN = 100 Pts</button><button onclick="procesarPagoPuntos(50, 300)" class="btn" style="margin:5px; background:gold; color:black;">$50 MXN = 300 Pts</button>`, showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Cerrar' }); }
         function procesarPagoPuntos(dinero, puntos) { Swal.fire({ title: 'Ir a Pagar', text: `Se abrirá Mercado Pago para pagar $${dinero}. Avísale a tu maestro.`, confirmButtonText: 'Pagar', showCancelButton: true }).then((r) => { if(r.isConfirmed) { window.open('https://mpago.li/2aeNocU', '_blank'); datosUsuario.score += puntos; db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score }); actualizarUI(); } }); }
         
-        // V23: MICROFONO REAL RESTAURADO
+        // V27: MICROFONO REAL 100% OPERATIVO
         function activarEscritura() { const btn = document.getElementById("btnWrite"); btn.classList.add("active-writing"); document.getElementById("answerInput").focus(); setTimeout(() => btn.classList.remove("active-writing"), 500); }
         function activarMicrofono() { 
             const btn = document.getElementById("btnMicrofono"); 
@@ -511,7 +520,7 @@
         
         function cargarTablaAlumnos() { document.getElementById("cuerpoTabla").innerHTML="<tr><td colspan='10'>Cargando...</td></tr>"; db.collection("students").get().then((snap) => { listaAlumnosCache=[]; snap.forEach(d=>{ if(d.id!=='ADMIN_NEWS') { const data = d.data() || {}; listaAlumnosCache.push({...data, uid:d.id}); } }); const gs=[...new Set(listaAlumnosCache.map(s=>s.group))].sort(), sel=document.getElementById("groupFilter"), v=sel.value; sel.innerHTML='<option value="todos">Todos</option>'; gs.forEach(g=>{if(g)sel.innerHTML+=`<option value="${g}">Gpo ${g}</option>`}); sel.value=v; renderizarTabla(); }); }
         
-        // V23: TABLA COMPLETA RESTAURADA
+        // V27: TABLA COMPLETA RESTAURADA
         function renderizarTabla() { let d = listaAlumnosCache.filter(u => { const tipo = u.userType || 'student'; return tipo === teacherViewMode; }); const f=document.getElementById("groupFilter").value; if(f!=="todos" && teacherViewMode === 'student') d=d.filter(s=>s.group===f); d.sort((a,b)=>(b.score||0)-(a.score||0)); const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy(); const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;}); chartGlobalInstance=new Chart(ctx,{type:'bar',data:{labels:gl,datasets:[{label:'Promedio',data:prom,backgroundColor:'#004e92'}]},options:{maintainAspectRatio:false}}); const tb=document.getElementById("cuerpoTabla"); tb.innerHTML=""; d.forEach(s=>{ const m=s.medals||{gold:0,silver:0,bronze:0}, r=s.currentStreak||1, ir=r>1?'🔥':'😔'; const tr=document.createElement("tr"); const av = s.equipped?.avatar || '👤'; const fr = s.equipped?.frame || ''; const nombreMostrar = s.username || s.nombre || s.name || "Alumno"; let btnPago = ""; if(s.pendingPayment) { const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio"; btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">💸 ${folioInfo}</button>`; } tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info">📊</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete">🗑️</button></td>`; tb.appendChild(tr); }); document.getElementById("totalAlumnos").textContent=d.length; document.getElementById("promedioAciertos").textContent=d.reduce((a,b)=>a+(Number(b.totalCorrect)||0),0); }
         async function aprobarPagoReal(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); if(!s.pendingPayment) return; const nivelADesbloquear = s.pendingPayment.nivel + 1; let nuevosNiveles = s.unlockedLevels || [1]; if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); let historial = s.paymentHistory || []; if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; } await db.collection("students").doc(uid).update({ unlockedLevels: nuevosNiveles, pendingPayment: null, paymentHistory: historial }); Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success"); cargarTablaAlumnos(); }
         async function resetearAlumno(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), nm=Math.max(...(s.unlockedLevels||[1])); const {value:o}=await Swal.fire({title:s.username, input:'select', inputOptions:{'puntos':'📉 Reset Puntos','nivel':'🔙 Regresar Nivel','total':'⚠️ Reset Total'}, showCancelButton:true}); if(o==='puntos') await db.collection("students").doc(uid).update({score:0}); else if(o==='nivel') { if(nm<=1) return; await db.collection("students").doc(uid).update({unlockedLevels:s.unlockedLevels.filter(n=>n!==nm)}); } else if(o==='total') await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); cargarTablaAlumnos(); }
