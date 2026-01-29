@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V12 DONATIONS</title>
+    <title>Inglés Para Todos - MASTER V13 DONATION INTELLIGENCE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -295,9 +295,7 @@
             <div class="teacher-controls">
                 <select id="groupFilter" onchange="renderizarTabla()"><option value="todos">Todos los Grupos</option></select>
                 <button onclick="verGraficaGrupal()" class="action-btn btn-chart">📊 Gráfica Grupal</button>
-                
                 <button onclick="verDonacionesGlobales()" class="action-btn" style="background:#e91e63; color:white; font-weight:bold;">💖 Ver Donaciones</button>
-                
                 <button onclick="cargarTablaAlumnos()" class="action-btn btn-info">🔄</button>
                 <button onclick="exportarExcel()" class="action-btn btn-excel">📗 Excel</button>
                 <button onclick="exportarPDF()" class="action-btn btn-pdf">📕 PDF</button>
@@ -331,7 +329,7 @@
             <h3 style="color:#e91e63">💖 Historial de Donaciones</h3>
             <div style="overflow-y: auto; max-height: 300px;">
                 <table class="history-table">
-                    <thead><tr><th>Nombre</th><th>Monto</th><th>Folio</th><th>Fecha</th></tr></thead>
+                    <thead><tr><th>Nombre</th><th>Categoría</th><th>Monto</th><th>Folio</th><th>Fecha</th></tr></thead>
                     <tbody id="cuerpoDonaciones"></tbody>
                 </table>
             </div>
@@ -427,7 +425,7 @@
             3: [{q:"Lunes",a:"monday"},{q:"Martes",a:"tuesday"},{q:"Sol",a:"sun"},{q:"Luna",a:"moon"},{q:"Agua",a:"water"}]
         };
 
-        // --- FUNCIONES NUEVAS DONACIONES (V12) ---
+        // --- FUNCIONES DONACIONES (V13 INTELLIGENCE FIX) ---
         function abrirDonacion() {
             document.getElementById("modalDonarSeleccion").style.display = "flex";
         }
@@ -438,11 +436,9 @@
             
             Swal.fire({
                 title: 'Confirma tu Donación',
-                html: `<p>Ingresa tu <b>Nombre</b> (y Grupo si eres alumno) y el <b>Folio</b> de pago.</p>`,
-                html: `
-                    <input id="donanteNombre" class="swal2-input" placeholder="Nombre completo">
-                    <input id="donanteFolio" class="swal2-input" placeholder="Folio de operación">
-                `,
+                html: `<p>Ingresa tu <b>Nombre</b> (y Grupo si eres alumno) y el <b>Folio</b> de pago.</p>
+                       <input id="donanteNombre" class="swal2-input" placeholder="Nombre completo">
+                       <input id="donanteFolio" class="swal2-input" placeholder="Folio de operación">`,
                 confirmButtonText: 'Registrar Donación',
                 showCancelButton: true
             }).then((result) => {
@@ -451,7 +447,6 @@
                     const folio = document.getElementById('donanteFolio').value;
                     
                     if(nombre && folio) {
-                        // Guardar en colección de donaciones
                         db.collection("donations").add({
                             nombre: nombre,
                             folio: folio,
@@ -468,28 +463,61 @@
             });
         }
 
+        // --- FIX INTELIGENTE: CRUCE DE DATOS DONADOR VS ALUMNOS ---
         function verDonacionesGlobales() {
             document.getElementById("modalInformeDonaciones").style.display = "flex";
             const tbody = document.getElementById("cuerpoDonaciones");
-            tbody.innerHTML = "<tr><td colspan='4'>Cargando...</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='5'>Cargando...</td></tr>";
             
+            // Aseguramos que tenemos la lista de alumnos cargada para comparar
+            if(listaAlumnosCache.length === 0) {
+                db.collection("students").get().then((snap) => {
+                    listaAlumnosCache=[]; 
+                    snap.forEach(d=>{ 
+                        if(d.id!=='ADMIN_NEWS') {
+                            const data = d.data() || {};
+                            listaAlumnosCache.push({...data, uid:d.id}); 
+                        }
+                    });
+                    renderizarDonaciones(tbody);
+                });
+            } else {
+                renderizarDonaciones(tbody);
+            }
+        }
+
+        function renderizarDonaciones(tbody) {
             db.collection("donations").orderBy("fecha", "desc").get().then((snap) => {
                 tbody.innerHTML = "";
                 if(snap.empty) {
-                    tbody.innerHTML = "<tr><td colspan='4'>No hay donaciones registradas.</td></tr>";
+                    tbody.innerHTML = "<tr><td colspan='5'>No hay donaciones registradas aún.</td></tr>";
                     return;
                 }
                 snap.forEach(doc => {
                     const d = doc.data();
+                    
+                    // ALGORITMO DE IDENTIFICACIÓN
+                    let categoria = "<span style='color:grey;'>🌍 Donador Externo</span>";
+                    let match = listaAlumnosCache.find(u => (u.username && u.username.toLowerCase() === d.nombre.toLowerCase()) || (u.nombre && u.nombre.toLowerCase() === d.nombre.toLowerCase()));
+                    
+                    if(match) {
+                        if(match.userType === 'adult') categoria = "<span style='color:purple; font-weight:bold;'>💼 Adulto</span>";
+                        else categoria = `<span style='color:blue; font-weight:bold;'>🎓 Alumno (Gpo ${match.group})</span>`;
+                    }
+
                     tbody.innerHTML += `
                         <tr>
                             <td>${d.nombre}</td>
+                            <td>${categoria}</td>
                             <td style="color:green; font-weight:bold;">$${d.monto}</td>
                             <td>${d.folio}</td>
                             <td style="font-size:12px;">${d.fecha}</td>
                         </tr>
                     `;
                 });
+            }).catch(error => {
+                tbody.innerHTML = "<tr><td colspan='5'>Error al cargar datos.</td></tr>";
+                console.error(error);
             });
         }
 
@@ -757,7 +785,6 @@
         function exportarPDF() { html2pdf().from(document.getElementById('teacherPanel')).save(); }
         function abrirModalAcademico(t) { document.getElementById("modalAcademico").style.display="flex"; document.getElementById("tituloAcademico").textContent=t; document.getElementById("nivelAcademico").textContent=nivelActual; }
         
-        // --- FUNCIÓN DE LOGIN CORREGIDA (ARREGLO DEL ERROR DE FIREBASE) ---
         function intentarLogin() {
             const e=document.getElementById("emailInput").value.trim(), p=document.getElementById("passwordInput").value.trim(), n=document.getElementById("usernameInput").value.trim();
             let g = "", gr = "";
