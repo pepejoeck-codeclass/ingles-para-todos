@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V14 STABLE</title>
+    <title>Inglés Para Todos - MASTER V15 PRO</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -164,7 +164,7 @@
                     <input type="text" id="groupInput" placeholder="Grupo" style="width:50%">
                 </div>
 
-                <button onclick="intentarLogin(); unlockAudio();" class="btn">🚀 ENTRAR / REGISTRAR</button>
+                <button onclick="intentarLogin();" class="btn">🚀 ENTRAR / REGISTRAR</button>
                 <div style="margin-top: 15px;"><a href="#" onclick="recuperarPassword()" style="font-size: 13px; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a></div>
 
                 <div class="donation-section">
@@ -247,7 +247,7 @@
             
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
             
-            <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px;">Cargando...</h3>
+            <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px; min-height: 40px;">...</h3>
             
             <div class="skills-bar">
                 <button onclick="pronunciarPregunta()" class="skill-btn" id="btnListen" title="Listening">👂<span class="skill-label">Listen</span></button>
@@ -295,9 +295,7 @@
             <div class="teacher-controls">
                 <select id="groupFilter" onchange="renderizarTabla()"><option value="todos">Todos los Grupos</option></select>
                 <button onclick="verGraficaGrupal()" class="action-btn btn-chart">📊 Gráfica Grupal</button>
-                
                 <button onclick="verDonacionesGlobales()" class="action-btn" style="background:#e91e63; color:white; font-weight:bold;">💖 Ver Donaciones</button>
-                
                 <button onclick="cargarTablaAlumnos()" class="action-btn btn-info">🔄</button>
                 <button onclick="exportarExcel()" class="action-btn btn-excel">📗 Excel</button>
                 <button onclick="exportarPDF()" class="action-btn btn-pdf">📕 PDF</button>
@@ -385,7 +383,6 @@
         let vocesDisponibles = [];
         let audioUnlocked = false;
 
-        // V14: CARGA DE VOCES SEGURA (NO BLOQUEANTE)
         function cargarVocesMejoradas() {
             const rawVoices = synth.getVoices();
             if (rawVoices.length === 0) { setTimeout(cargarVocesMejoradas, 100); return; }
@@ -439,7 +436,7 @@
             3: [{q:"Lunes",a:"monday"},{q:"Martes",a:"tuesday"},{q:"Sol",a:"sun"},{q:"Luna",a:"moon"},{q:"Agua",a:"water"}]
         };
 
-        // --- FUNCIONES DONACIONES (V14 MATCHING INTELIGENTE) ---
+        // --- DONACIONES V15 ---
         function abrirDonacion() {
             document.getElementById("modalDonarSeleccion").style.display = "flex";
         }
@@ -477,7 +474,7 @@
             });
         }
 
-        // --- V14: LÓGICA DE RECONOCIMIENTO ROBUSTA ---
+        // --- V15 FIX: LÓGICA DE RECONOCIMIENTO ROBUSTA ---
         function verDonacionesGlobales() {
             document.getElementById("modalInformeDonaciones").style.display = "flex";
             const tbody = document.getElementById("cuerpoDonaciones");
@@ -503,11 +500,13 @@
                     snapDonaciones.forEach(doc => {
                         const d = doc.data();
                         
-                        // ALGORITMO MATCHING V14 (Case Insensitive)
+                        // ALGORITMO MATCHING V15 (Case Insensitive)
+                        // POR DEFECTO: DONADOR EXTERNO (CORRECCIÓN SOLICITADA)
                         let categoria = "<span style='color:grey;'>🌍 Donador Externo</span>";
+                        
                         let match = listaAlumnosCache.find(u => {
-                            const uName = (u.username || u.nombre || "").toLowerCase();
-                            const dName = (d.nombre || "").toLowerCase();
+                            const uName = (u.username || u.nombre || "").toLowerCase().trim();
+                            const dName = (d.nombre || "").toLowerCase().trim();
                             return uName === dName || uName.includes(dName) || dName.includes(uName);
                         });
                         
@@ -527,8 +526,7 @@
                         `;
                     });
                 }).catch(error => {
-                    // Si falla (ej: colección no existe), mostrar vacío seguro
-                    console.warn("Donations collection might not exist yet:", error);
+                    console.warn("Error/Colección no existe:", error);
                     tbody.innerHTML = "<tr><td colspan='5'>No hay donaciones registradas.</td></tr>";
                 });
             });
@@ -600,16 +598,9 @@
             actualizarUI(); 
             actualizarCandados(); 
             
-            // V14 FIX: CARGA INMEDIATA SIN ESPERAR AUDIO
+            // V15 FIX: CARGA INMEDIATA ASINCRONA
             cargarPregunta(); 
-            // Fallback por si acaso
-            setTimeout(() => { 
-                if(document.getElementById("questionText").textContent === "Cargando...") {
-                    console.log("Forzando carga de pregunta...");
-                    cargarPregunta(); 
-                }
-            }, 500);
-
+            
             iniciarCronometro(); 
             aplicarCosmeticos();
         }
@@ -644,10 +635,10 @@
             inp.style.borderColor = "#ddd";
             inp.style.backgroundColor = "white";
 
-            // V14: Mostrar texto INMEDIATAMENTE
+            // V15: Mostrar texto INMEDIATAMENTE
             if (preguntaActual.type === 'dictation') { 
                 qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
-                // Intentar audio asíncronamente sin bloquear
+                // Intentar audio asíncronamente sin bloquear la vista
                 setTimeout(() => pronunciarPregunta(), 200); 
             } else { 
                 qt.textContent = "Translate: " + preguntaActual.q; 
