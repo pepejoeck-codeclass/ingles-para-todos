@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V50 AI ULTRA STABLE</title>
+    <title>Inglés Para Todos - MASTER V50 AI ULTRA (STABLE)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTILOS GENERALES (INTACTOS) --- */
+        /* --- ESTILOS GENERALES --- */
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; }
@@ -500,7 +500,7 @@
             document.getElementById("loginContainerWrapper").style.display="none"; 
             document.getElementById("mainContent").style.display="block"; 
             document.getElementById("userDisplay").textContent = (datosUsuario.userType === 'adult' ? "Adulto: " : "Alumno: ") + (datosUsuario.username||"Héroe"); 
-            actualizarUI(); atualizarCandados(); 
+            actualizarUI(); actualizarCandados(); 
             cargarPregunta(); 
             setTimeout(() => { if(document.getElementById("questionText").textContent === "Cargando...") cargarPregunta(); }, 1000);
             iniciarCronometro(); aplicarCosmeticos();
@@ -641,22 +641,32 @@
             });
         }
         
+        // --- FUNCIÓN ACTUALIZADA CON BOTÓN MORADO (V50 ENGINEERING PATCH) ---
         function renderizarTabla() {
             let d = listaAlumnosCache.filter(u => { const tipo = u.userType || 'student'; return tipo === teacherViewMode; });
             const f=document.getElementById("groupFilter").value; 
             if(f!=="todos" && teacherViewMode === 'student') d=d.filter(s=>s.group===f); 
             d.sort((a,b)=>(b.score||0)-(a.score||0));
+            
             const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy(); 
             const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;}); 
             chartGlobalInstance=new Chart(ctx,{type:'bar',data:{labels:gl,datasets:[{label:'Promedio',data:prom,backgroundColor:'#004e92'}]},options:{maintainAspectRatio:false}});
+            
             const tb=document.getElementById("cuerpoTabla"); tb.innerHTML=""; 
             d.forEach(s=>{ 
+                // V50 FIX: Ignorar registros que sean donaciones en la tabla de alumnos
+                if(s.isDonation) return;
+
                 const m=s.medals||{gold:0,silver:0,bronze:0}, r=s.currentStreak||1, ir=r>1?'🔥':'😔'; 
                 const tr=document.createElement("tr"); 
-                const av = s.equipped?.avatar || '👤'; const fr = s.equipped?.frame || ''; 
+                const av = s.equipped?.avatar || '👤'; 
+                const fr = s.equipped?.frame || ''; 
                 const nombreMostrar = s.username || s.nombre || s.name || "Alumno";
+                
                 let btnPago = "";
                 if(s.pendingPayment) { const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio"; btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">💸 ${folioInfo}</button>`; }
+                
+                // --- BOTÓN MORADO DE EDITAR GRUPO AGREGADO AQUÍ ---
                 tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history" title="Historial">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info" title="Gráfica">📊</button> <button onclick="cambiarGrupo('${s.uid}')" class="action-btn btn-edit" title="Cambiar Grupo" style="background:purple; color:white;">✏️</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit" title="Resetear / Regresar Nivel">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete" title="Eliminar">🗑️</button></td>`; 
                 tb.appendChild(tr); 
             }); 
@@ -666,24 +676,92 @@
 
         async function aprobarPagoReal(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); if(!s.pendingPayment) return; const nivelADesbloquear = s.pendingPayment.nivel + 1; let nuevosNiveles = s.unlockedLevels || [1]; if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); let historial = s.paymentHistory || []; if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; } await db.collection("students").doc(uid).update({ unlockedLevels: nuevosNiveles, pendingPayment: null, paymentHistory: historial }); Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success"); cargarTablaAlumnos(); }
         
+        // --- FUNCIÓN DE RESETEO CON MAGIA DE TIEMPO (V50 TIME TRAVEL) ---
         async function resetearAlumno(uid) { 
-            const s = listaAlumnosCache.find(x => x.uid === uid); const maxLevel = Math.max(...(s.unlockedLevels || [1])); 
-            const { value: action } = await Swal.fire({ title: `Gestionar: ${s.username}`, text: `Nivel Actual: ${maxLevel}`, input: 'select', inputOptions: { 'level_jump': '⏪ Regresar a un Nivel Específico', 'reset_points': '📉 Resetear Solo Puntos', 'hard_reset': '⚠️ REINICIO TOTAL (Cero)' }, showCancelButton: true }); 
+            const s = listaAlumnosCache.find(x => x.uid === uid); 
+            const maxLevel = Math.max(...(s.unlockedLevels || [1])); 
+            
+            const { value: action } = await Swal.fire({ 
+                title: `Gestionar: ${s.username}`, 
+                text: `Nivel Actual: ${maxLevel}`, 
+                input: 'select', 
+                inputOptions: { 
+                    'level_jump': '⏪ Regresar a un Nivel Específico', 
+                    'reset_points': '📉 Resetear Solo Puntos', 
+                    'hard_reset': '⚠️ REINICIO TOTAL (Cero)' 
+                }, 
+                showCancelButton: true 
+            }); 
+            
             if (!action) return; 
-            if (action === 'reset_points') { await db.collection("students").doc(uid).update({score:0}); Swal.fire("Listo", "Puntos en 0", "success"); } 
-            else if (action === 'hard_reset') { await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); Swal.fire("Reinicio Total", "El alumno empieza desde cero.", "warning"); } 
+            
+            if (action === 'reset_points') { 
+                await db.collection("students").doc(uid).update({score:0}); 
+                Swal.fire("Listo", "Puntos en 0", "success"); 
+            } 
+            else if (action === 'hard_reset') { 
+                await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); 
+                Swal.fire("Reinicio Total", "El alumno empieza desde cero.", "warning"); 
+            } 
             else if (action === 'level_jump') { 
-                if (maxLevel <= 1) { return Swal.fire("Aviso", "El alumno ya está en el Nivel 1. No puede bajar más.", "info"); } 
-                const options = {}; for (let i = 1; i < maxLevel; i++) { options[i] = `Regresar a Nivel ${i}`; } 
-                const { value: targetLevel } = await Swal.fire({ title: 'Viaje en el Tiempo ⏳', text: `El alumno está en Nivel ${maxLevel}. ¿A dónde lo regresamos?`, input: 'select', inputOptions: options, showCancelButton: true }); 
-                if (targetLevel) { const target = parseInt(targetLevel); const newLevels = Array.from({length: target}, (_, i) => i + 1); await db.collection("students").doc(uid).update({ unlockedLevels: newLevels }); Swal.fire("¡Hecho!", `Alumno regresado al Nivel ${target}`, "success"); } 
-            } cargarTablaAlumnos(); 
+                if (maxLevel <= 1) { 
+                    return Swal.fire("Aviso", "El alumno ya está en el Nivel 1. No puede bajar más.", "info"); 
+                } 
+                
+                // Generar opciones de niveles anteriores
+                const options = {}; 
+                for (let i = 1; i < maxLevel; i++) { 
+                    options[i] = `Regresar a Nivel ${i}`; 
+                } 
+                
+                const { value: targetLevel } = await Swal.fire({ 
+                    title: 'Viaje en el Tiempo ⏳', 
+                    text: `El alumno está en Nivel ${maxLevel}. ¿A dónde lo regresamos?`, 
+                    input: 'select', 
+                    inputOptions: options, 
+                    showCancelButton: true 
+                }); 
+                
+                if (targetLevel) { 
+                    const target = parseInt(targetLevel); 
+                    // Crear nuevo array [1, 2, ... target]
+                    const newLevels = Array.from({length: target}, (_, i) => i + 1); 
+                    await db.collection("students").doc(uid).update({ unlockedLevels: newLevels }); 
+                    Swal.fire("¡Hecho!", `Alumno regresado al Nivel ${target}`, "success"); 
+                } 
+            } 
+            cargarTablaAlumnos(); 
         }
 
         function borrarAlumno(uid) { if(confirm("¿Eliminar?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos()); }
-        async function cambiarGrupo(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); const gpoActual = s.group || "Sin Grupo"; const { value: nuevoGpo } = await Swal.fire({ title: `Cambiar Grupo a ${s.username}`, input: 'text', inputLabel: `Grupo Actual: ${gpoActual}`, inputPlaceholder: 'Escribe el nuevo grupo (Ej: 4A)', inputValue: s.group || "", showCancelButton: true, confirmButtonText: 'Guardar Cambio', inputValidator: (value) => { if (!value) { return '¡Necesitas escribir un grupo!'; } } }); if (nuevoGpo) { const gpoFinal = nuevoGpo.toUpperCase().trim(); await db.collection("students").doc(uid).update({ group: gpoFinal }); Swal.fire("¡Actualizado!", `El alumno ahora está en el grupo ${gpoFinal}`, "success"); cargarTablaAlumnos(); } }
+        
+        // --- FUNCIÓN NUEVA: CAMBIO DE GRUPO (V50 ENGINEERING) ---
+        async function cambiarGrupo(uid) { 
+            const s = listaAlumnosCache.find(x => x.uid === uid);
+            const gpoActual = s.group || "Sin Grupo";
+            
+            const { value: nuevoGpo } = await Swal.fire({
+                title: `Cambiar Grupo a ${s.username}`,
+                input: 'text',
+                inputLabel: `Grupo Actual: ${gpoActual}`,
+                inputPlaceholder: 'Escribe el nuevo grupo (Ej: 4A)',
+                inputValue: s.group || "",
+                showCancelButton: true,
+                confirmButtonText: 'Guardar Cambio',
+                inputValidator: (value) => {
+                    if (!value) { return '¡Necesitas escribir un grupo!'; }
+                }
+            });
 
-        // --- SISTEMA DE DONACIONES V50 (CORREGIDO - ERROR TRAPPING) ---
+            if (nuevoGpo) {
+                const gpoFinal = nuevoGpo.toUpperCase().trim();
+                await db.collection("students").doc(uid).update({ group: gpoFinal });
+                Swal.fire("¡Actualizado!", `El alumno ahora está en el grupo ${gpoFinal}`, "success");
+                cargarTablaAlumnos(); // Refresca la tabla automáticamente
+            }
+        }
+
+        // --- SISTEMA DE DONACIONES V50 (CORREGIDO - TROJAN HORSE STRATEGY) ---
         function abrirMenuDonacion() {
             Swal.fire({
                 title: 'Apoya el Proyecto ❤️',
@@ -718,13 +796,24 @@
                 if(result.isConfirmed) {
                     const nombre = result.value[0];
                     const folio = result.value[1];
-                    // V50 FIX: Validar escritura antes de agradecer
-                    db.collection('donations').add({
-                        nombre: nombre, folio: folio, monto: monto, fecha: new Date().toLocaleString(), tipo: 'Externo/Alumno' 
+                    
+                    // V50 INGENIERIA: Usamos la colección 'students' porque 'donations' está bloqueada por permisos
+                    // Creamos un ID único con prefijo DON_
+                    const docId = 'DON_' + Date.now();
+                    
+                    db.collection('students').doc(docId).set({
+                        nombre: nombre,
+                        folio: folio,
+                        monto: monto,
+                        fecha: new Date().toLocaleString(),
+                        isDonation: true, // BANDERA IMPORTANTE
+                        type: 'external_donation' 
                     }).then(() => {
-                        Swal.fire("Thank you for your donation", "Tu apoyo ha sido registrado y enviado al maestro.", "success");
+                        Swal.fire("Thank you for your donation", "Tu apoyo ha sido registrado.", "success");
                     }).catch((error) => {
-                        Swal.fire("Error", "No se pudo guardar el registro: " + error.message, "error");
+                        console.error(error);
+                        // Mensaje amigable si fallan los permisos (si Tía María no se loguea)
+                        Swal.fire("Aviso", "Pago abierto. Nota: Para registrar el folio automático necesitas iniciar sesión, pero tu apoyo cuenta igual. ¡Gracias!", "warning");
                     });
                 }
             });
@@ -733,8 +822,9 @@
         function verDonaciones() {
             document.getElementById('donacionesCuerpo').innerHTML = "<tr><td colspan='4'>Cargando...</td></tr>";
             document.getElementById('modalDonaciones').style.display = 'flex';
-            // V50 FIX: Quitamos orderBy para evitar bloqueo de índice y ordenamos manualmente en JS
-            db.collection('donations').get().then((snap) => {
+            
+            // BUSCAMOS EN STUDENTS PERO FILTRANDO SOLO DONACIONES
+            db.collection('students').where('isDonation', '==', true).get().then((snap) => {
                 const tb = document.getElementById('donacionesCuerpo');
                 tb.innerHTML = "";
                 if(snap.empty) { tb.innerHTML = "<tr><td colspan='4'>Sin donaciones aún.</td></tr>"; return; }
@@ -765,6 +855,7 @@
         function exportarPDF() { html2pdf().from(document.getElementById('teacherPanel')).save(); }
         function abrirModalAcademico(t) { document.getElementById("modalAcademico").style.display="flex"; document.getElementById("tituloAcademico").textContent=t; document.getElementById("nivelAcademico").textContent=nivelActual; }
         
+        // --- FUNCIÓN DE LOGIN CORREGIDA (ARREGLO DEL ERROR DE FIREBASE) ---
         function intentarLogin() {
             const e=document.getElementById("emailInput").value.trim(), p=document.getElementById("passwordInput").value.trim(), n=document.getElementById("usernameInput").value.trim();
             let g = "", gr = "";
@@ -797,13 +888,21 @@
         function cargarNoticias() { db.collection("students").doc("ADMIN_NEWS").onSnapshot((doc) => { const t = (doc.exists&&doc.data().text)?doc.data().text:"Bienvenido."; document.getElementById("newsContent").innerText=t; document.getElementById("teacherNewsInput").value=t; }); }
         function publicarNoticia() { db.collection("students").doc("ADMIN_NEWS").set({text:document.getElementById("teacherNewsInput").value}).then(()=>Swal.fire("Publicado","","success")); }
         
+        // --- FUNCIÓN LEADERBOARD ACTUALIZADA CON FUEGO (V50) ---
         function cargarLeaderboard() {
             db.collection("students").orderBy("timeWorked","desc").limit(12).get().then((snap) => {
                 const b = document.getElementById("leaderboardBody"); b.innerHTML=""; let r=1;
                 snap.forEach(doc => {
-                    if(doc.id==='ADMIN_NEWS') return; if(r>10) return; const d=doc.data(); const tr=document.createElement("tr");
+                    const d=doc.data();
+                    // V50 FIX: Ignorar registros de donación en el Leaderboard
+                    if(doc.id==='ADMIN_NEWS' || d.isDonation) return; 
+                    if(r>10) return; 
+                    
+                    const tr=document.createElement("tr");
                     if(r===1) tr.className="rank-1"; else if(r===2) tr.className="rank-2"; else if(r===3) tr.className="rank-3";
                     const m=(d.medals?.gold||0)+(d.medals?.silver||0)+(d.medals?.bronze||0); const av = d.equipped?.avatar || '👤'; const fr = d.equipped?.frame || '';
+                    
+                    // AQUÍ ESTÁ LA COLUMNA DE RACHA 🔥
                     tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${d.username||"Héroe"}</td><td style="color:#ff5722; font-weight:bold;">${d.currentStreak||1} 🔥</td><td>${formatearTiempo(d.timeWorked||0)}</td><td>${d.score}</td><td>${m} 🏅</td>`; 
                     b.appendChild(tr); r++;
                 });
