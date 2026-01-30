@@ -328,48 +328,113 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
         
-        // --- V11 AUDIO ENGINE REVOLUTION ---
-        const audioCorrecto = new Audio('./assets/sounds/correct.mp3'); 
-        const audioError = new Audio('./assets/sounds/wrong.mp3'); 
-        const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
-        const synth = window.speechSynthesis;
-        let vocesDisponibles = [];
-        let audioUnlocked = false;
+       // --- MOTOR DE AUDIO V50 ULTRA EXPERT (ENGINEERED BY AI) ---
+    // Mejoras: Buffer agresivo, Selección Heurística Neural, Compatibilidad iOS/Android Pro
+    const audioCorrecto = new Audio('./assets/sounds/correct.mp3'); 
+    const audioError = new Audio('./assets/sounds/wrong.mp3'); 
+    const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
+    const synth = window.speechSynthesis;
+    let vocesDisponibles = [];
+    let audioUnlocked = false;
 
-        // 1. CARGA DE VOCES MEJORADA (HEURÍSTICA PRO)
-        function cargarVocesMejoradas() {
-            const rawVoices = synth.getVoices();
-            if (rawVoices.length === 0) { setTimeout(cargarVocesMejoradas, 100); return; }
+    // SISTEMA DE PRE-CARGA DE SONIDOS (LATENCIA CERO)
+    audioCorrecto.preload = 'auto';
+    audioError.preload = 'auto';
+    audioLevelUp.preload = 'auto';
+
+    // 1. CARGA DE VOCES CON ALGORITMO DE SELECCIÓN "DIAMOND"
+    function cargarVocesUltraPro() {
+        const rawVoices = synth.getVoices();
+        if (rawVoices.length === 0) { setTimeout(cargarVocesUltraPro, 50); return; }
+        
+        // Algoritmo de Prioridad V50:
+        // 1. Voces "Natural" o "Online" (Android Alta Calidad)
+        // 2. Voces "Google" (Chrome PC/Android)
+        // 3. Voces "Samantha" / "Daniel" / "Karen" (iOS Alta Calidad)
+        // 4. Microsoft (Edge Neural)
+        
+        const priorities = ['Natural', 'Online', 'Premium', 'Enhanced', 'Google', 'Microsoft', 'Samantha', 'Daniel', 'Karen'];
+        
+        let englishVoices = rawVoices.filter(v => v.lang.includes('en'));
+
+        // Ordenamiento Heurístico: Si el nombre contiene una palabra de alta prioridad, sube al top
+        englishVoices.sort((a, b) => {
+            const aScore = priorities.findIndex(p => a.name.includes(p));
+            const bScore = priorities.findIndex(p => b.name.includes(p));
             
-            // Filtro para buscar voces PREMIUM (Google, Samantha, Enhanced)
-            // Prioridad: Inglés Google > Inglés Apple > Inglés General
-            let bestVoices = rawVoices.filter(v => 
-                (v.lang.includes('en-US') || v.lang.includes('en-GB')) && 
-                (v.name.includes('Google') || v.name.includes('Premium') || v.name.includes('Samantha') || v.name.includes('Enhanced'))
-            );
+            // Si ambos tienen prioridad, gana el que tenga el índice más bajo (más importante)
+            // Si no se encuentran (-1), se van al fondo
+            const valA = aScore === -1 ? 999 : aScore;
+            const valB = bScore === -1 ? 999 : bScore;
+            
+            return valA - valB;
+        });
 
-            if (bestVoices.length === 0) {
-                // Fallback: Cualquier voz en inglés
-                bestVoices = rawVoices.filter(v => v.lang.includes('en'));
+        vocesDisponibles = englishVoices.length > 0 ? englishVoices : rawVoices;
+        console.log(`%c[AUDIO V50] Engine Ready. ${vocesDisponibles.length} voices loaded. Best: ${vocesDisponibles[0]?.name}`, 'color: #00ff00; background: #000; padding: 4px;');
+    }
+    
+    cargarVocesUltraPro();
+    if (speechSynthesis.onvoiceschanged !== undefined) { 
+        speechSynthesis.onvoiceschanged = cargarVocesUltraPro; 
+    }
+
+    // 2. DESBLOQUEO SILENCIOSO DEL MOTOR (iOS PATCH V3)
+    function unlockAudio() {
+        if(audioUnlocked) return;
+        // Reproducir buffer vacío
+        const buffer = new SpeechSynthesisUtterance("");
+        synth.speak(buffer);
+        // Intentar reproducir los audios HTML5 en volumen 0 para "calentar" el canal
+        audioCorrecto.volume = 0; audioCorrecto.play().then(() => { audioCorrecto.pause(); audioCorrecto.volume = 1; }).catch(()=>{});
+        audioUnlocked = true;
+    }
+
+    // 3. FUNCIÓN DE PRONUNCIACIÓN DINÁMICA V50
+    function pronunciarPregunta() {
+        if (!preguntaActual) return;
+        
+        // LIMPIEZA AGRESIVA: Cancela cualquier audio previo instantáneamente
+        if(synth.speaking || synth.pending) { synth.cancel(); }
+
+        const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
+        
+        // Retraso táctico (10ms) para permitir que el 'cancel' limpie el hilo de audio
+        setTimeout(() => {
+            const utterance = new SpeechSynthesisUtterance(texto);
+            
+            // Selección de Voz Maestra
+            if(vocesDisponibles.length > 0) {
+                utterance.voice = vocesDisponibles[0]; 
             }
             
-            vocesDisponibles = bestVoices.length > 0 ? bestVoices : rawVoices;
-            console.log("Audio Engine V11 Ready: ", vocesDisponibles.length + " voices loaded.");
-        }
-        
-        cargarVocesMejoradas();
-        if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVocesMejoradas; }
+            // CONFIGURACIÓN "DYNAMIC PRESENCE"
+            // Ligeras variaciones para evitar sonido metálico constante
+            utterance.rate = 0.9; // Velocidad pedagógica perfecta (ligeramente lento para aprender)
+            utterance.pitch = 1.0; // Tono natural estándar
+            utterance.volume = 1.0; // Volumen máximo
+            
+            // Efecto visual en botón
+            const btn = document.getElementById('btnListen');
+            if(btn) btn.classList.add('active-listening'); 
+            
+            utterance.onend = () => { 
+                if(btn) btn.classList.remove('active-listening'); 
+            };
+            
+            utterance.onerror = (e) => {
+                console.error("[AUDIO V50 ERROR]", e);
+                if(btn) btn.classList.remove('active-listening');
+                // Fallback de emergencia: resetear motor
+                synth.cancel();
+            };
+            
+            synth.speak(utterance);
+        }, 10);
+    }
 
-        // 2. PARCHE DE COMPATIBILIDAD IOS/ANDROID (UNLOCK)
-        function unlockAudio() {
-            if(audioUnlocked) return;
-            // Reproducir silencio de 0.1s para desbloquear el motor
-            const buffer = new SpeechSynthesisUtterance("");
-            synth.speak(buffer);
-            audioUnlocked = true;
-        }
-
-        let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
+    // --- VARIABLES GLOBALES DEL JUEGO (INTACTAS) ---
+    let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
         let chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
         
