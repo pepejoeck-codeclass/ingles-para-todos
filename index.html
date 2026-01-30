@@ -38,6 +38,7 @@
         .btn-shop:active { transform: translateY(4px); box-shadow: none; }
         .btn-pay { background: linear-gradient(45deg, #11998e, #38ef7d); box-shadow: 0 4px 0 #0b6623; }
         .btn-code { background: linear-gradient(45deg, #8e44ad, #c0392b); box-shadow: 0 4px 0 #5b2c6f; }
+        .btn-review { background: linear-gradient(45deg, #FF512F, #DD2476); box-shadow: 0 4px 0 #9e184e; color: white; }
         
         /* BOTÓN DONACIÓN ESPECIAL */
         .btn-donate { background: linear-gradient(45deg, #ff416c, #ff4b2b); box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4); animation: pulseDonate 2s infinite; }
@@ -234,7 +235,7 @@
         <div class="card">
             <div style="text-align: center; margin-bottom: 15px;">
                 <span id="levelText" style="background:#ffd700; padding:5px 15px; border-radius:15px; font-weight:800; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Nivel 1</span>
-                <div id="repsText" style="font-size: 11px; color: #666; margin-top: 5px;">Intentos: 0/5</div>
+                <div id="repsText" style="font-size: 11px; color: #666; margin-top: 5px;">Intentos: 0/10</div>
             </div>
             
             <div class="progress-container"><div id="lessonProgressBar" class="progress-bar"></div></div>
@@ -306,8 +307,9 @@
             <h2 id="modalLevelTitle">¡Nivel Completado! 🎉</h2>
             <div id="modalLevelMessage" style="font-size: 14px; margin-bottom: 20px;"></div>
             <div class="level-complete-options">
+                <button onclick="opcionSuperReview()" class="btn btn-review" style="background: linear-gradient(45deg, #FF512F, #DD2476); margin-top:5px;">🧠 Super Review / Repaso de Unidad</button>
                 <button onclick="opcionRepetirNivel()" class="btn btn-secondary">🔄 Repetir Nivel (Gratis)</button>
-                <p style="font-size:12px; color:#777;">Debes completar el nivel 5 veces para avanzar.</p>
+                <p style="font-size:12px; color:#777;">Debes completar el nivel 10 veces para avanzar.</p>
                 <hr style="width:100%">
                 <button onclick="opcionIngresarCodigo()" class="btn btn-code">🔐 Tengo Código Secreto</button>
                 <button onclick="opcionPagarNivel()" class="btn btn-pay">💸 Pagar $25 MXN (Saltar)</button>
@@ -413,25 +415,36 @@
         let loginMode = 'student'; let teacherViewMode = 'student';
         const LEVEL_CODES = { 1: "angysanti1", 2: "angysanti2", 3: "angysanti3" };
 
+        // --- CATÁLOGO EXPANDIDO MASTER V50 ---
         const shopCatalog = [
-            { id: 'av_1', type: 'avatar', name: 'Super Boy Prime', price: 25000, icon: '🦸‍♂️' }, 
-            { id: 'av_2', type: 'avatar', name: 'Super Girl Prime', price: 25000, icon: '🦸‍♀️' },
-            { id: 'av_dc_1', type: 'avatar', name: 'Dark Knight', price: 8000, icon: '🦇' },
-            { id: 'av_dc_2', type: 'avatar', name: 'Amazon', price: 7000, icon: '⚔️' },
-            { id: 'av_dc_3', type: 'avatar', name: 'Clown Prince', price: 6500, icon: '🤡' },
-            { id: 'av_dc_4', type: 'avatar', name: 'Speedster', price: 5000, icon: '⚡' },
-            { id: 'av_dc_5', type: 'avatar', name: 'Sea King', price: 5000, icon: '🔱' },
-            { id: 'av_dc_6', type: 'avatar', name: 'Cyborg', price: 4000, icon: '🦾' },
-            { id: 'av_dc_7', type: 'avatar', name: 'Emerald Ring', price: 4500, icon: '🟢' },
+            // SUPER EXPENSIVE 50K
+            { id: 'av_sup1', type: 'avatar', name: 'Superman Prime', price: 50000, icon: '🦸‍♂️⚡' }, 
+            { id: 'av_sup2', type: 'avatar', name: 'Supergirl Prime', price: 50000, icon: '🦸‍♀️⚡' },
+            // HIGH TIER HEROES
+            { id: 'av_bat', type: 'avatar', name: 'The Bat', price: 15000, icon: '🦇' },
+            { id: 'av_ww', type: 'avatar', name: 'Wonder Amazon', price: 15000, icon: '👸🏻' },
+            { id: 'av_fla', type: 'avatar', name: 'Speedster', price: 12000, icon: '⚡' },
+            { id: 'av_arr', type: 'avatar', name: 'Green Archer', price: 12000, icon: '🏹' },
+            { id: 'av_cap', type: 'avatar', name: 'Captain USA', price: 14000, icon: '🛡️' },
+            { id: 'av_mex', type: 'avatar', name: 'Capitán Mex', price: 14000, icon: '🦅' },
+            { id: 'av_spi', type: 'avatar', name: 'Wall Crawler', price: 13000, icon: '🕷️' },
+            { id: 'av_bw', type: 'avatar', name: 'Bat Woman', price: 13000, icon: '🦇‍♀️' },
+            { id: 'av_hlk', type: 'avatar', name: 'Big Green', price: 13500, icon: '🟢' },
+            { id: 'av_av', type: 'avatar', name: 'The Avenger', price: 14500, icon: '🔨' },
+            // LEGACY
             { id: 'av_3', type: 'avatar', name: 'Ninja', price: 200, icon: '🥷' }, 
             { id: 'av_4', type: 'avatar', name: 'Robot', price: 300, icon: '🤖' }, 
             { id: 'fr_1', type: 'frame', name: 'Gold', price: 150, class: 'frame-gold' }, 
             { id: 'fr_2', type: 'frame', name: 'Fire', price: 300, class: 'frame-fire' },
             { id: 'fr_3', type: 'frame', name: 'Neon', price: 400, class: 'frame-neon' }, 
             { id: 'fr_4', type: 'frame', name: 'Matrix', price: 600, class: 'frame-matrix' },
+            // NEW THEMES
             { id: 'th_1', type: 'theme', name: 'Dark Mode', price: 200, colors: {bg:'linear-gradient(135deg, #000000, #434343)', card:'#222', text:'#fff'} },
-            { id: 'th_2', type: 'theme', name: 'Forest', price: 200, colors: {bg:'linear-gradient(135deg, #134e5e, #71b280)', card:'#fff', text:'#333'} },
-            { id: 'th_3', type: 'theme', name: 'Candy', price: 200, colors: {bg:'linear-gradient(135deg, #ff9a9e, #fecfef)', card:'#fff', text:'#333'} }
+            { id: 'th_beach', type: 'theme', name: 'Beach Paradise', price: 500, colors: {bg:'linear-gradient(to bottom, #2980b9, #6dd5fa, #ffffff)', card:'#fff8e1', text:'#00695c'} },
+            { id: 'th_moon', type: 'theme', name: 'Mystic Moon', price: 600, colors: {bg:'linear-gradient(to top, #30cfd0 0%, #330867 100%)', card:'#e0f7fa', text:'#1a237e'} },
+            { id: 'th_par', type: 'theme', name: 'Sunset Vibes', price: 600, colors: {bg:'linear-gradient(to right, #fa709a 0%, #fee140 100%)', card:'#fff3e0', text:'#d84315'} },
+            { id: 'th_cyb', type: 'theme', name: 'Cyberpunk', price: 800, colors: {bg:'linear-gradient(135deg, #0f0c29, #302b63, #24243e)', card:'#000000', text:'#00ff00'} },
+            { id: 'th_for', type: 'theme', name: 'Forest Calm', price: 400, colors: {bg:'linear-gradient(135deg, #5a3f37, #2c7744)', card:'#f1f8e9', text:'#33691e'} }
         ];
 
         const preguntasDB = {
@@ -518,7 +531,8 @@
             const r = datosUsuario.currentStreak||1;
             document.getElementById("streakDisplay").textContent = `${r>1?'🔥':'😔'} ${r} días seguidos`;
             const reps = (datosUsuario.levelRepetitions && datosUsuario.levelRepetitions[nivelActual]) ? datosUsuario.levelRepetitions[nivelActual] : 0;
-            document.getElementById("repsText").textContent = `Intentos: ${reps}/5`;
+            // UPDATE: Show /10 for new logic
+            document.getElementById("repsText").textContent = `Intentos: ${reps}/10`;
         }
 
         function cargarPregunta() {
@@ -575,11 +589,13 @@
                 db.collection("students").doc(usuarioActual).update({ levelRepetitions: datosUsuario.levelRepetitions });
             }
             const reps = datosUsuario.levelRepetitions[nivelActual] || 0;
-            if (reps >= 5) {
-                Swal.fire({title: msg, text: "¡Has dominado este nivel! (5/5 completado)", icon: 'success'}).then(() => { desbloquearSiguienteNivel(); });
+            
+            // UPDATE: Check for 10 repetitions instead of 5
+            if (reps >= 10) {
+                Swal.fire({title: msg, text: "¡Has dominado este nivel! (10/10 completado)", icon: 'success'}).then(() => { desbloquearSiguienteNivel(); });
             } else {
                 document.getElementById("modalLevelTitle").textContent = msg;
-                document.getElementById("modalLevelMessage").innerHTML = `Has completado el nivel.<br>Repeticiones: <b>${reps}/5</b><br>Tienes 3 opciones:`;
+                document.getElementById("modalLevelMessage").innerHTML = `Has completado el nivel.<br>Repeticiones: <b>${reps}/10</b><br>Tienes opciones:`;
                 document.getElementById("modalNivelCompleto").style.display = "flex";
             }
         }
@@ -595,6 +611,17 @@
         }
 
         function opcionRepetirNivel() { cerrarModal('modalNivelCompleto'); contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); }
+        
+        // NEW FUNCTION: SUPER REVIEW
+        function opcionSuperReview() {
+            cerrarModal('modalNivelCompleto');
+            Swal.fire({
+                title: 'Super Review Time!',
+                text: 'Selecciona un nivel anterior en la barra de abajo para repasar, o repite este nivel para mejorar tu score.',
+                icon: 'info'
+            });
+        }
+
         function opcionIngresarCodigo() { Swal.fire({ title: 'Código Secreto', input: 'text', inputPlaceholder: 'Ingresa el código...', showCancelButton: true }).then((result) => { if (result.value === LEVEL_CODES[nivelActual]) { Swal.fire("¡Código Correcto!", "Nivel desbloqueado.", "success"); desbloquearSiguienteNivel(); } else if(result.value) { Swal.fire("Error", "Código incorrecto.", "error"); } }); }
         function opcionPagarNivel() { window.open('https://mpago.li/2aeNocU', '_blank'); Swal.fire({ title: 'Verificar Pago 🔍', html: '<p style="font-size:14px">Ingresa el <b>Número de Operación o Folio</b> de tu comprobante de pago.</p>', input: 'text', inputPlaceholder: 'Ej: 1234567890', showCancelButton: true, confirmButtonText: 'Enviar para Revisión', cancelButtonText: 'Cancelar' }).then((result) => { if (result.isConfirmed && result.value) { registrarSolicitudPago(result.value); } else if (result.isConfirmed) { Swal.fire("Error", "Debes escribir el folio para verificar.", "warning"); } }); }
         function registrarSolicitudPago(folio) { const solicitud = { fecha: new Date().toLocaleString(), monto: 25, concepto: `Salto Nivel ${nivelActual}`, estado: `Pendiente (Folio: ${folio})`, folio: folio }; if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; datosUsuario.paymentHistory.push(solicitud); db.collection("students").doc(usuarioActual).update({ paymentHistory: datosUsuario.paymentHistory, pendingPayment: { nivel: nivelActual, fecha: new Date().toLocaleString(), folio: folio } }).then(() => { cerrarModal('modalNivelCompleto'); Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado al maestro.`, "info"); }); }
@@ -616,7 +643,7 @@
         function aplicarCosmeticos() { document.getElementById("myAvatar").textContent = datosUsuario.equipped.avatar || '👤'; document.getElementById("myAvatar").className = "avatar-display " + (datosUsuario.equipped.frame || ""); const t = datosUsuario.equipped.theme; if(t) { document.body.style.background = t.bg; document.querySelectorAll(".card").forEach(c => { c.style.background = t.card; c.style.color = t.text; }); } else { document.body.style.background = "linear-gradient(135deg, #000428, #004e92)"; document.querySelectorAll(".card").forEach(c => { c.style.background = "#ffffff"; c.style.color = "#333"; }); } }
 
         function actualizarCandados() { for(let i=2;i<=3;i++) { const e=document.getElementById(`navL${i}`); if(datosUsuario.unlockedLevels.includes(i)) {e.classList.remove("locked");e.innerHTML=`Nivel ${i}`;} else {e.classList.add("locked");e.innerHTML=`🔐 Nivel ${i}`;}} }
-        function cambiarNivel(n) { if(datosUsuario.unlockedLevels.includes(n)) { nivelActual=n; document.getElementById("levelText").textContent="Nivel "+n; contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active")); event.target.classList.add("active"); } else Swal.fire("BLOQUEADO","Necesitas completar el nivel anterior 5 veces o usar un código.","error"); }
+        function cambiarNivel(n) { if(datosUsuario.unlockedLevels.includes(n)) { nivelActual=n; document.getElementById("levelText").textContent="Nivel "+n; contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active")); event.target.classList.add("active"); } else Swal.fire("BLOQUEADO","Necesitas completar el nivel anterior 10 veces o usar un código.","error"); }
 
         function mostrarLoginMaestro() { document.getElementById("loginContainerWrapper").style.display="none"; document.getElementById("teacherLogin").style.display="block"; }
         function volverInicio() { document.getElementById("teacherLogin").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("loginContainerWrapper").style.display="flex"; }
