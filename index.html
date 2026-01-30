@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V50 AI ULTRA</title>
+    <title>Inglés Para Todos - MASTER V50 AI ULTRA STABLE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -354,7 +354,6 @@
         const auth = firebase.auth(); const db = firebase.firestore();
         
         // --- MOTOR DE AUDIO V50 ULTRA EXPERT (ENGINEERED BY AI) ---
-        // Mejoras: Buffer agresivo, Selección Heurística Neural, Compatibilidad iOS/Android Pro
         const audioCorrecto = new Audio('./assets/sounds/correct.mp3'); 
         const audioError = new Audio('./assets/sounds/wrong.mp3'); 
         const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
@@ -362,110 +361,56 @@
         let vocesDisponibles = [];
         let audioUnlocked = false;
 
-        // SISTEMA DE PRE-CARGA DE SONIDOS (LATENCIA CERO)
         audioCorrecto.preload = 'auto';
         audioError.preload = 'auto';
         audioLevelUp.preload = 'auto';
 
-        // 1. CARGA DE VOCES CON ALGORITMO DE SELECCIÓN "DIAMOND"
         function cargarVocesUltraPro() {
             const rawVoices = synth.getVoices();
             if (rawVoices.length === 0) { setTimeout(cargarVocesUltraPro, 50); return; }
-            
-            // Algoritmo de Prioridad V50:
-            // 1. Voces "Natural" o "Online" (Android Alta Calidad)
-            // 2. Voces "Google" (Chrome PC/Android)
-            // 3. Voces "Samantha" / "Daniel" / "Karen" (iOS Alta Calidad)
-            // 4. Microsoft (Edge Neural)
-            
             const priorities = ['Natural', 'Online', 'Premium', 'Enhanced', 'Google', 'Microsoft', 'Samantha', 'Daniel', 'Karen'];
-            
             let englishVoices = rawVoices.filter(v => v.lang.includes('en'));
-
-            // Ordenamiento Heurístico: Si el nombre contiene una palabra de alta prioridad, sube al top
             englishVoices.sort((a, b) => {
                 const aScore = priorities.findIndex(p => a.name.includes(p));
                 const bScore = priorities.findIndex(p => b.name.includes(p));
-                
-                // Si ambos tienen prioridad, gana el que tenga el índice más bajo (más importante)
-                // Si no se encuentran (-1), se van al fondo
                 const valA = aScore === -1 ? 999 : aScore;
                 const valB = bScore === -1 ? 999 : bScore;
-                
                 return valA - valB;
             });
-
             vocesDisponibles = englishVoices.length > 0 ? englishVoices : rawVoices;
             console.log(`%c[AUDIO V50] Engine Ready. ${vocesDisponibles.length} voices loaded. Best: ${vocesDisponibles[0]?.name}`, 'color: #00ff00; background: #000; padding: 4px;');
         }
-        
         cargarVocesUltraPro();
-        if (speechSynthesis.onvoiceschanged !== undefined) { 
-            speechSynthesis.onvoiceschanged = cargarVocesUltraPro; 
-        }
+        if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVocesUltraPro; }
 
-        // 2. DESBLOQUEO SILENCIOSO DEL MOTOR (iOS PATCH V3)
         function unlockAudio() {
             if(audioUnlocked) return;
-            // Reproducir buffer vacío
             const buffer = new SpeechSynthesisUtterance("");
             synth.speak(buffer);
-            // Intentar reproducir los audios HTML5 en volumen 0 para "calentar" el canal
             audioCorrecto.volume = 0; audioCorrecto.play().then(() => { audioCorrecto.pause(); audioCorrecto.volume = 1; }).catch(()=>{});
             audioUnlocked = true;
         }
 
-        // 3. FUNCIÓN DE PRONUNCIACIÓN DINÁMICA V50
         function pronunciarPregunta() {
             if (!preguntaActual) return;
-            
-            // LIMPIEZA AGRESIVA: Cancela cualquier audio previo instantáneamente
             if(synth.speaking || synth.pending) { synth.cancel(); }
-
             const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
-            
-            // Retraso táctico (10ms) para permitir que el 'cancel' limpie el hilo de audio
             setTimeout(() => {
                 const utterance = new SpeechSynthesisUtterance(texto);
-                
-                // Selección de Voz Maestra
-                if(vocesDisponibles.length > 0) {
-                    utterance.voice = vocesDisponibles[0]; 
-                }
-                
-                // CONFIGURACIÓN "DYNAMIC PRESENCE"
-                // Ligeras variaciones para evitar sonido metálico constante
-                utterance.rate = 0.9; // Velocidad pedagógica perfecta (ligeramente lento para aprender)
-                utterance.pitch = 1.0; // Tono natural estándar
-                utterance.volume = 1.0; // Volumen máximo
-                
-                // Efecto visual en botón
+                if(vocesDisponibles.length > 0) { utterance.voice = vocesDisponibles[0]; }
+                utterance.rate = 0.9; utterance.pitch = 1.0; utterance.volume = 1.0; 
                 const btn = document.getElementById('btnListen');
                 if(btn) btn.classList.add('active-listening'); 
-                
-                utterance.onend = () => { 
-                    if(btn) btn.classList.remove('active-listening'); 
-                };
-                
-                utterance.onerror = (e) => {
-                    console.error("[AUDIO V50 ERROR]", e);
-                    if(btn) btn.classList.remove('active-listening');
-                    // Fallback de emergencia: resetear motor
-                    synth.cancel();
-                };
-                
+                utterance.onend = () => { if(btn) btn.classList.remove('active-listening'); };
+                utterance.onerror = (e) => { console.error("[AUDIO V50 ERROR]", e); if(btn) btn.classList.remove('active-listening'); synth.cancel(); };
                 synth.speak(utterance);
             }, 10);
         }
 
-        // --- VARIABLES GLOBALES DEL JUEGO (INTACTAS) ---
         let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
         let chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
-        
-        let loginMode = 'student'; 
-        let teacherViewMode = 'student';
-
+        let loginMode = 'student'; let teacherViewMode = 'student';
         const LEVEL_CODES = { 1: "angysanti1", 2: "angysanti2", 3: "angysanti3" };
 
         const shopCatalog = [
@@ -519,7 +464,6 @@
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
-                        // Inicialización de datos
                         if(!datosUsuario.timeWorked) datosUsuario.timeWorked = 0;
                         if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
                         if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {};
@@ -541,16 +485,13 @@
                     }
                 });
             } else { 
-                usuarioActual = null; 
-                detenerCronometro(); 
+                usuarioActual = null; detenerCronometro(); 
                 if(document.getElementById("teacherPanel").style.display === "none") mostrarLogin(); 
             }
         });
 
         document.addEventListener("DOMContentLoaded", () => { 
-            cargarNoticias(); 
-            cargarLeaderboard(); 
-            cargarVocesUltraPro(); // Usar la versión mejorada V50
+            cargarNoticias(); cargarLeaderboard(); cargarVocesUltraPro(); 
         });
 
         function mostrarLogin() { document.getElementById("loginContainerWrapper").style.display="flex"; document.getElementById("loginCard").style.display="block"; document.getElementById("communitySection").style.display="flex"; document.getElementById("mainContent").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("teacherLogin").style.display="none"; cargarLeaderboard(); }
@@ -559,15 +500,10 @@
             document.getElementById("loginContainerWrapper").style.display="none"; 
             document.getElementById("mainContent").style.display="block"; 
             document.getElementById("userDisplay").textContent = (datosUsuario.userType === 'adult' ? "Adulto: " : "Alumno: ") + (datosUsuario.username||"Héroe"); 
-            actualizarUI(); 
-            actualizarCandados(); 
-            
-            // FIX: Carga inmediata
+            actualizarUI(); atualizarCandados(); 
             cargarPregunta(); 
             setTimeout(() => { if(document.getElementById("questionText").textContent === "Cargando...") cargarPregunta(); }, 1000);
-
-            iniciarCronometro(); 
-            aplicarCosmeticos();
+            iniciarCronometro(); aplicarCosmeticos();
         }
         
         function actualizarUI() {
@@ -589,25 +525,13 @@
             if(!nivelActual) nivelActual = 1;
             const pool = preguntasDB[nivelActual] || preguntasDB[1];
             preguntaActual = pool[Math.floor(Math.random() * pool.length)];
-            
             if (!preguntaActual) return;
-
             const qt = document.getElementById("questionText");
             const inp = document.getElementById("answerInput");
-            
-            inp.value = "";
-            document.getElementById("feedback").textContent = "";
-            inp.style.borderColor = "#ddd";
-            inp.style.backgroundColor = "white";
-
-            // CARGA VISUAL INMEDIATA
-            if (preguntaActual.type === 'dictation') { 
-                qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
-                setTimeout(() => pronunciarPregunta(), 300); 
-            } else { 
-                qt.textContent = "Translate: " + preguntaActual.q; 
-            }
-            
+            inp.value = ""; document.getElementById("feedback").textContent = "";
+            inp.style.borderColor = "#ddd"; inp.style.backgroundColor = "white";
+            if (preguntaActual.type === 'dictation') { qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; setTimeout(() => pronunciarPregunta(), 300); } 
+            else { qt.textContent = "Translate: " + preguntaActual.q; }
             document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active-listening', 'active-speaking', 'active-writing', 'mic-listening'));
             inp.focus();
         }
@@ -616,8 +540,7 @@
             if (!preguntaActual) return;
             const inputEl = document.getElementById("answerInput");
             const r = inputEl.value.trim().toLowerCase(); 
-            if(!r) return; 
-            contadorPreguntas++; 
+            if(!r) return; contadorPreguntas++; 
             const fd = document.getElementById("feedback");
             if(r === preguntaActual.a.toLowerCase()) {
                 try { audioCorrecto.currentTime=0; audioCorrecto.play(); } catch(e){}
@@ -629,10 +552,8 @@
                 fd.textContent = "WRONG. Answer: " + preguntaActual.a; fd.style.color = "red";
                 inputEl.style.borderColor = "#e74c3c"; inputEl.style.backgroundColor = "#fdedec";
                 datosUsuario.totalWrong = (datosUsuario.totalWrong || 0) + 1; 
-                // Feedback audio V50
                 const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); 
-                u.lang='en-US'; 
-                if(vocesDisponibles.length > 0) u.voice = vocesDisponibles[0];
+                u.lang='en-US'; if(vocesDisponibles.length > 0) u.voice = vocesDisponibles[0];
                 synth.speak(u);
             }
             db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, totalCorrect: datosUsuario.totalCorrect, totalWrong: datosUsuario.totalWrong });
@@ -720,29 +641,22 @@
             });
         }
         
-        // --- FUNCIÓN ACTUALIZADA CON BOTÓN MORADO (V50 ENGINEERING PATCH) ---
         function renderizarTabla() {
             let d = listaAlumnosCache.filter(u => { const tipo = u.userType || 'student'; return tipo === teacherViewMode; });
             const f=document.getElementById("groupFilter").value; 
             if(f!=="todos" && teacherViewMode === 'student') d=d.filter(s=>s.group===f); 
             d.sort((a,b)=>(b.score||0)-(a.score||0));
-            
             const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy(); 
             const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;}); 
             chartGlobalInstance=new Chart(ctx,{type:'bar',data:{labels:gl,datasets:[{label:'Promedio',data:prom,backgroundColor:'#004e92'}]},options:{maintainAspectRatio:false}});
-            
             const tb=document.getElementById("cuerpoTabla"); tb.innerHTML=""; 
             d.forEach(s=>{ 
                 const m=s.medals||{gold:0,silver:0,bronze:0}, r=s.currentStreak||1, ir=r>1?'🔥':'😔'; 
                 const tr=document.createElement("tr"); 
-                const av = s.equipped?.avatar || '👤'; 
-                const fr = s.equipped?.frame || ''; 
+                const av = s.equipped?.avatar || '👤'; const fr = s.equipped?.frame || ''; 
                 const nombreMostrar = s.username || s.nombre || s.name || "Alumno";
-                
                 let btnPago = "";
                 if(s.pendingPayment) { const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio"; btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">💸 ${folioInfo}</button>`; }
-                
-                // --- BOTÓN MORADO DE EDITAR GRUPO AGREGADO AQUÍ ---
                 tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history" title="Historial">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info" title="Gráfica">📊</button> <button onclick="cambiarGrupo('${s.uid}')" class="action-btn btn-edit" title="Cambiar Grupo" style="background:purple; color:white;">✏️</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit" title="Resetear / Regresar Nivel">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete" title="Eliminar">🗑️</button></td>`; 
                 tb.appendChild(tr); 
             }); 
@@ -752,92 +666,24 @@
 
         async function aprobarPagoReal(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); if(!s.pendingPayment) return; const nivelADesbloquear = s.pendingPayment.nivel + 1; let nuevosNiveles = s.unlockedLevels || [1]; if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); let historial = s.paymentHistory || []; if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; } await db.collection("students").doc(uid).update({ unlockedLevels: nuevosNiveles, pendingPayment: null, paymentHistory: historial }); Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success"); cargarTablaAlumnos(); }
         
-        // --- FUNCIÓN DE RESETEO CON MAGIA DE TIEMPO (V50 TIME TRAVEL) ---
         async function resetearAlumno(uid) { 
-            const s = listaAlumnosCache.find(x => x.uid === uid); 
-            const maxLevel = Math.max(...(s.unlockedLevels || [1])); 
-            
-            const { value: action } = await Swal.fire({ 
-                title: `Gestionar: ${s.username}`, 
-                text: `Nivel Actual: ${maxLevel}`, 
-                input: 'select', 
-                inputOptions: { 
-                    'level_jump': '⏪ Regresar a un Nivel Específico', 
-                    'reset_points': '📉 Resetear Solo Puntos', 
-                    'hard_reset': '⚠️ REINICIO TOTAL (Cero)' 
-                }, 
-                showCancelButton: true 
-            }); 
-            
+            const s = listaAlumnosCache.find(x => x.uid === uid); const maxLevel = Math.max(...(s.unlockedLevels || [1])); 
+            const { value: action } = await Swal.fire({ title: `Gestionar: ${s.username}`, text: `Nivel Actual: ${maxLevel}`, input: 'select', inputOptions: { 'level_jump': '⏪ Regresar a un Nivel Específico', 'reset_points': '📉 Resetear Solo Puntos', 'hard_reset': '⚠️ REINICIO TOTAL (Cero)' }, showCancelButton: true }); 
             if (!action) return; 
-            
-            if (action === 'reset_points') { 
-                await db.collection("students").doc(uid).update({score:0}); 
-                Swal.fire("Listo", "Puntos en 0", "success"); 
-            } 
-            else if (action === 'hard_reset') { 
-                await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); 
-                Swal.fire("Reinicio Total", "El alumno empieza desde cero.", "warning"); 
-            } 
+            if (action === 'reset_points') { await db.collection("students").doc(uid).update({score:0}); Swal.fire("Listo", "Puntos en 0", "success"); } 
+            else if (action === 'hard_reset') { await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); Swal.fire("Reinicio Total", "El alumno empieza desde cero.", "warning"); } 
             else if (action === 'level_jump') { 
-                if (maxLevel <= 1) { 
-                    return Swal.fire("Aviso", "El alumno ya está en el Nivel 1. No puede bajar más.", "info"); 
-                } 
-                
-                // Generar opciones de niveles anteriores
-                const options = {}; 
-                for (let i = 1; i < maxLevel; i++) { 
-                    options[i] = `Regresar a Nivel ${i}`; 
-                } 
-                
-                const { value: targetLevel } = await Swal.fire({ 
-                    title: 'Viaje en el Tiempo ⏳', 
-                    text: `El alumno está en Nivel ${maxLevel}. ¿A dónde lo regresamos?`, 
-                    input: 'select', 
-                    inputOptions: options, 
-                    showCancelButton: true 
-                }); 
-                
-                if (targetLevel) { 
-                    const target = parseInt(targetLevel); 
-                    // Crear nuevo array [1, 2, ... target]
-                    const newLevels = Array.from({length: target}, (_, i) => i + 1); 
-                    await db.collection("students").doc(uid).update({ unlockedLevels: newLevels }); 
-                    Swal.fire("¡Hecho!", `Alumno regresado al Nivel ${target}`, "success"); 
-                } 
-            } 
-            cargarTablaAlumnos(); 
+                if (maxLevel <= 1) { return Swal.fire("Aviso", "El alumno ya está en el Nivel 1. No puede bajar más.", "info"); } 
+                const options = {}; for (let i = 1; i < maxLevel; i++) { options[i] = `Regresar a Nivel ${i}`; } 
+                const { value: targetLevel } = await Swal.fire({ title: 'Viaje en el Tiempo ⏳', text: `El alumno está en Nivel ${maxLevel}. ¿A dónde lo regresamos?`, input: 'select', inputOptions: options, showCancelButton: true }); 
+                if (targetLevel) { const target = parseInt(targetLevel); const newLevels = Array.from({length: target}, (_, i) => i + 1); await db.collection("students").doc(uid).update({ unlockedLevels: newLevels }); Swal.fire("¡Hecho!", `Alumno regresado al Nivel ${target}`, "success"); } 
+            } cargarTablaAlumnos(); 
         }
 
         function borrarAlumno(uid) { if(confirm("¿Eliminar?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos()); }
-        
-        // --- FUNCIÓN NUEVA: CAMBIO DE GRUPO (V50 ENGINEERING) ---
-        async function cambiarGrupo(uid) { 
-            const s = listaAlumnosCache.find(x => x.uid === uid);
-            const gpoActual = s.group || "Sin Grupo";
-            
-            const { value: nuevoGpo } = await Swal.fire({
-                title: `Cambiar Grupo a ${s.username}`,
-                input: 'text',
-                inputLabel: `Grupo Actual: ${gpoActual}`,
-                inputPlaceholder: 'Escribe el nuevo grupo (Ej: 4A)',
-                inputValue: s.group || "",
-                showCancelButton: true,
-                confirmButtonText: 'Guardar Cambio',
-                inputValidator: (value) => {
-                    if (!value) { return '¡Necesitas escribir un grupo!'; }
-                }
-            });
+        async function cambiarGrupo(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); const gpoActual = s.group || "Sin Grupo"; const { value: nuevoGpo } = await Swal.fire({ title: `Cambiar Grupo a ${s.username}`, input: 'text', inputLabel: `Grupo Actual: ${gpoActual}`, inputPlaceholder: 'Escribe el nuevo grupo (Ej: 4A)', inputValue: s.group || "", showCancelButton: true, confirmButtonText: 'Guardar Cambio', inputValidator: (value) => { if (!value) { return '¡Necesitas escribir un grupo!'; } } }); if (nuevoGpo) { const gpoFinal = nuevoGpo.toUpperCase().trim(); await db.collection("students").doc(uid).update({ group: gpoFinal }); Swal.fire("¡Actualizado!", `El alumno ahora está en el grupo ${gpoFinal}`, "success"); cargarTablaAlumnos(); } }
 
-            if (nuevoGpo) {
-                const gpoFinal = nuevoGpo.toUpperCase().trim();
-                await db.collection("students").doc(uid).update({ group: gpoFinal });
-                Swal.fire("¡Actualizado!", `El alumno ahora está en el grupo ${gpoFinal}`, "success");
-                cargarTablaAlumnos(); // Refresca la tabla automáticamente
-            }
-        }
-
-        // --- SISTEMA DE DONACIONES V50 (NUEVO) ---
+        // --- SISTEMA DE DONACIONES V50 (CORREGIDO - ERROR TRAPPING) ---
         function abrirMenuDonacion() {
             Swal.fire({
                 title: 'Apoya el Proyecto ❤️',
@@ -850,15 +696,12 @@
                         <button onclick="irADonar(200, 'https://mpago.li/1Exy4z9')" class="btn" style="width:120px; background:#009ee3">$200 MXN</button>
                     </div>
                 `,
-                showConfirmButton: false,
-                showCancelButton: true,
-                cancelButtonText: 'Cancelar'
+                showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Cancelar'
             });
         }
 
         function irADonar(monto, link) {
             window.open(link, '_blank');
-            // Pedir folio inmediatamente
             Swal.fire({
                 title: '¡Gracias! 🙏',
                 text: 'Por favor registra tu donativo para agradecerte.',
@@ -875,15 +718,14 @@
                 if(result.isConfirmed) {
                     const nombre = result.value[0];
                     const folio = result.value[1];
-                    // Guardar en coleccion 'donations' (Separado de students para seguridad)
+                    // V50 FIX: Validar escritura antes de agradecer
                     db.collection('donations').add({
-                        nombre: nombre,
-                        folio: folio,
-                        monto: monto,
-                        fecha: new Date().toLocaleString(),
-                        tipo: 'Externo/Alumno' 
+                        nombre: nombre, folio: folio, monto: monto, fecha: new Date().toLocaleString(), tipo: 'Externo/Alumno' 
+                    }).then(() => {
+                        Swal.fire("Thank you for your donation", "Tu apoyo ha sido registrado y enviado al maestro.", "success");
+                    }).catch((error) => {
+                        Swal.fire("Error", "No se pudo guardar el registro: " + error.message, "error");
                     });
-                    Swal.fire("Thank you for your donation", "Tu apoyo ha sido registrado y enviado al maestro.", "success");
                 }
             });
         }
@@ -891,14 +733,26 @@
         function verDonaciones() {
             document.getElementById('donacionesCuerpo').innerHTML = "<tr><td colspan='4'>Cargando...</td></tr>";
             document.getElementById('modalDonaciones').style.display = 'flex';
-            db.collection('donations').orderBy('fecha', 'desc').get().then((snap) => {
+            // V50 FIX: Quitamos orderBy para evitar bloqueo de índice y ordenamos manualmente en JS
+            db.collection('donations').get().then((snap) => {
                 const tb = document.getElementById('donacionesCuerpo');
                 tb.innerHTML = "";
                 if(snap.empty) { tb.innerHTML = "<tr><td colspan='4'>Sin donaciones aún.</td></tr>"; return; }
-                snap.forEach(doc => {
-                    const d = doc.data();
+                
+                let data = [];
+                snap.forEach(doc => data.push(doc.data()));
+                // Ordenamiento manual seguro
+                data.sort((a, b) => {
+                    // Intenta convertir fechas, si falla usa orden simple
+                    const dateA = new Date(a.fecha); const dateB = new Date(b.fecha);
+                    return isNaN(dateA) ? 0 : dateB - dateA;
+                });
+
+                data.forEach(d => {
                     tb.innerHTML += `<tr><td>${d.fecha}</td><td><b>${d.nombre}</b></td><td style="color:green; font-weight:bold;">$${d.monto}</td><td>${d.folio}</td></tr>`;
                 });
+            }).catch((error) => {
+                document.getElementById('donacionesCuerpo').innerHTML = `<tr><td colspan='4' style='color:red; font-weight:bold'>Error de acceso: ${error.message}</td></tr>`;
             });
         }
 
@@ -911,7 +765,6 @@
         function exportarPDF() { html2pdf().from(document.getElementById('teacherPanel')).save(); }
         function abrirModalAcademico(t) { document.getElementById("modalAcademico").style.display="flex"; document.getElementById("tituloAcademico").textContent=t; document.getElementById("nivelAcademico").textContent=nivelActual; }
         
-        // --- FUNCIÓN DE LOGIN CORREGIDA (ARREGLO DEL ERROR DE FIREBASE) ---
         function intentarLogin() {
             const e=document.getElementById("emailInput").value.trim(), p=document.getElementById("passwordInput").value.trim(), n=document.getElementById("usernameInput").value.trim();
             let g = "", gr = "";
@@ -921,7 +774,6 @@
             if(!e||!p) { Swal.fire("Error","Faltan datos","error"); return; }
             
             auth.signInWithEmailAndPassword(e,p).catch((err) => {
-                // FIX: AÑADIDO auth/invalid-login-credentials PARA DETECTAR ADULTOS NUEVOS
                 if(['auth/user-not-found','auth/wrong-password','auth/invalid-credential','auth/invalid-login-credentials'].includes(err.code)) {
                     if(loginMode === 'student' && (!n||!g||!gr)) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo alumno, llena todos los datos para registrarte.'}); return; }
                     if(loginMode === 'adult' && !n) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo, pon tu nombre para registrarte.'}); return; }
@@ -945,7 +797,6 @@
         function cargarNoticias() { db.collection("students").doc("ADMIN_NEWS").onSnapshot((doc) => { const t = (doc.exists&&doc.data().text)?doc.data().text:"Bienvenido."; document.getElementById("newsContent").innerText=t; document.getElementById("teacherNewsInput").value=t; }); }
         function publicarNoticia() { db.collection("students").doc("ADMIN_NEWS").set({text:document.getElementById("teacherNewsInput").value}).then(()=>Swal.fire("Publicado","","success")); }
         
-        // --- FUNCIÓN LEADERBOARD ACTUALIZADA CON FUEGO (V50) ---
         function cargarLeaderboard() {
             db.collection("students").orderBy("timeWorked","desc").limit(12).get().then((snap) => {
                 const b = document.getElementById("leaderboardBody"); b.innerHTML=""; let r=1;
@@ -953,7 +804,6 @@
                     if(doc.id==='ADMIN_NEWS') return; if(r>10) return; const d=doc.data(); const tr=document.createElement("tr");
                     if(r===1) tr.className="rank-1"; else if(r===2) tr.className="rank-2"; else if(r===3) tr.className="rank-3";
                     const m=(d.medals?.gold||0)+(d.medals?.silver||0)+(d.medals?.bronze||0); const av = d.equipped?.avatar || '👤'; const fr = d.equipped?.frame || '';
-                    // AQUÍ ESTÁ EL CAMBIO: AGREGUÉ LA COLUMNA DE RACHA 🔥
                     tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${d.username||"Héroe"}</td><td style="color:#ff5722; font-weight:bold;">${d.currentStreak||1} 🔥</td><td>${formatearTiempo(d.timeWorked||0)}</td><td>${d.score}</td><td>${m} 🏅</td>`; 
                     b.appendChild(tr); r++;
                 });
