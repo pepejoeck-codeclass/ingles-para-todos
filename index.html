@@ -55,12 +55,15 @@
         @keyframes pulseMic { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
         .mic-listening { background: #ff0000 !important; color: white !important; animation: pulseMic 1.5s infinite; }
 
-        /* BOTONES ACADÉMICOS */
-        .academic-nav { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn-academic { flex: 1; padding: 12px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        /* BOTONES ACADÉMICOS Y AYUDA */
+        .academic-nav { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; }
+        .btn-academic { flex: 1; padding: 10px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
         .btn-academic:active { transform: translateY(2px); }
         .btn-vocab { background: linear-gradient(45deg, #11998e, #38ef7d); }
         .btn-grammar { background: linear-gradient(45deg, #833ab4, #fd1d1d); }
+        /* NEW HELP BUTTON STYLE */
+        .btn-help { background: linear-gradient(45deg, #FF9800, #F44336); box-shadow: 0 4px 0 #E65100; flex: 0.8; font-size: 13px; animation: popHelp 3s infinite; }
+        @keyframes popHelp { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
         /* OTROS ESTILOS */
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
@@ -229,6 +232,7 @@
 
         <div class="academic-nav">
             <button onclick="abrirModalAcademico('Vocabulary 📚')" class="btn-academic btn-vocab"><i class="fas fa-book"></i> Vocabulary</button>
+            <button onclick="mostrarAyuda()" class="btn-academic btn-help"><i class="fas fa-question-circle"></i> Ayuda / Help</button>
             <button onclick="abrirModalAcademico('Grammar 📖')" class="btn-academic btn-grammar"><i class="fas fa-pen-fancy"></i> Grammar</button>
         </div>
 
@@ -409,18 +413,33 @@
             }, 10);
         }
 
+        function hablarTexto(texto, idioma='en-US') {
+            if(synth.speaking || synth.pending) { synth.cancel(); }
+            const utterance = new SpeechSynthesisUtterance(texto);
+            if(idioma === 'en-US' && vocesDisponibles.length > 0) { utterance.voice = vocesDisponibles[0]; }
+            utterance.lang = idioma;
+            utterance.rate = 0.9;
+            synth.speak(utterance);
+        }
+
         let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
+        let breakTimer = null; // NEW TIMER
         let chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
         let loginMode = 'student'; let teacherViewMode = 'student';
         const LEVEL_CODES = { 1: "angysanti1", 2: "angysanti2", 3: "angysanti3" };
 
-        // --- CATÁLOGO EXPANDIDO MASTER V50 ---
+        // --- INSTRUCCIONES DINÁMICAS (HELP BUTTON) ---
+        const levelInstructions = {
+            1: { es: "Escucha la palabra y escríbela correctamente. Son saludos y colores básicos.", en: "Listen to the word and write it correctly. Basic greetings and colors." },
+            2: { es: "Aprende animales y números. Traduce lo que veas en pantalla.", en: "Learn animals and numbers. Translate what you see on screen." },
+            3: { es: "Días de la semana y naturaleza. Escribe en inglés.", en: "Days of the week and nature. Write in English." }
+        };
+
+        // --- CATÁLOGO ---
         const shopCatalog = [
-            // SUPER EXPENSIVE 50K
             { id: 'av_sup1', type: 'avatar', name: 'Superman Prime', price: 50000, icon: '🦸‍♂️⚡' }, 
             { id: 'av_sup2', type: 'avatar', name: 'Supergirl Prime', price: 50000, icon: '🦸‍♀️⚡' },
-            // HIGH TIER HEROES
             { id: 'av_bat', type: 'avatar', name: 'The Bat', price: 15000, icon: '🦇' },
             { id: 'av_ww', type: 'avatar', name: 'Wonder Amazon', price: 15000, icon: '👸🏻' },
             { id: 'av_fla', type: 'avatar', name: 'Speedster', price: 12000, icon: '⚡' },
@@ -431,14 +450,12 @@
             { id: 'av_bw', type: 'avatar', name: 'Bat Woman', price: 13000, icon: '🦇‍♀️' },
             { id: 'av_hlk', type: 'avatar', name: 'Big Green', price: 13500, icon: '🟢' },
             { id: 'av_av', type: 'avatar', name: 'The Avenger', price: 14500, icon: '🔨' },
-            // LEGACY
             { id: 'av_3', type: 'avatar', name: 'Ninja', price: 200, icon: '🥷' }, 
             { id: 'av_4', type: 'avatar', name: 'Robot', price: 300, icon: '🤖' }, 
             { id: 'fr_1', type: 'frame', name: 'Gold', price: 150, class: 'frame-gold' }, 
             { id: 'fr_2', type: 'frame', name: 'Fire', price: 300, class: 'frame-fire' },
             { id: 'fr_3', type: 'frame', name: 'Neon', price: 400, class: 'frame-neon' }, 
             { id: 'fr_4', type: 'frame', name: 'Matrix', price: 600, class: 'frame-matrix' },
-            // NEW THEMES
             { id: 'th_1', type: 'theme', name: 'Dark Mode', price: 200, colors: {bg:'linear-gradient(135deg, #000000, #434343)', card:'#222', text:'#fff'} },
             { id: 'th_beach', type: 'theme', name: 'Beach Paradise', price: 500, colors: {bg:'linear-gradient(to bottom, #2980b9, #6dd5fa, #ffffff)', card:'#fff8e1', text:'#00695c'} },
             { id: 'th_moon', type: 'theme', name: 'Mystic Moon', price: 600, colors: {bg:'linear-gradient(to top, #30cfd0 0%, #330867 100%)', card:'#e0f7fa', text:'#1a237e'} },
@@ -484,6 +501,7 @@
                         if(!datosUsuario.equipped) datosUsuario.equipped = { avatar: '👤', frame: '', theme: '' };
                         if(!datosUsuario.unlockedLevels) datosUsuario.unlockedLevels = [1];
                         if(!datosUsuario.userType) datosUsuario.userType = 'student'; 
+                        if(datosUsuario.hasSeenWelcome === undefined) datosUsuario.hasSeenWelcome = false; // Initialize welcome flag
 
                         const hoy = new Date().toLocaleDateString('es-ES');
                         if (!datosUsuario.lastLoginDate) { datosUsuario.lastLoginDate = hoy; datosUsuario.currentStreak = 1; }
@@ -517,8 +535,98 @@
             cargarPregunta(); 
             setTimeout(() => { if(document.getElementById("questionText").textContent === "Cargando...") cargarPregunta(); }, 1000);
             iniciarCronometro(); aplicarCosmeticos();
+            
+            // AI PRO 3 FEATURES:
+            initBreakTimer(); // Start 30 min timer
+            checkWelcomeVideo(); // Check if new user
         }
         
+        // --- NEW: BREAK TIMER LOGIC (30 MINS) ---
+        function initBreakTimer() {
+            if(breakTimer) clearTimeout(breakTimer);
+            // 30 minutes = 30 * 60 * 1000 = 1800000 ms
+            breakTimer = setTimeout(() => {
+                Swal.fire({
+                    title: 'Time for a break! 🌿',
+                    html: `
+                        <div style="font-size:50px; margin-bottom:10px;">🧘‍♂️</div>
+                        <p style="font-size:18px; color:#555;">Haz una pausa, respira y relájate.</p>
+                        <p style="font-size:16px; color:#777; font-style:italic;">"Take a break, breathe, and relax"</p>
+                    `,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Continuar / Continue',
+                    cancelButtonText: 'Salir / Logout',
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        initBreakTimer(); // Reset timer
+                    } else {
+                        cerrarSesion();
+                    }
+                });
+            }, 1800000); 
+        }
+
+        // --- NEW: WELCOME VIDEO SIMULATION ---
+        function checkWelcomeVideo() {
+            if(!datosUsuario.hasSeenWelcome) {
+                // Show simulated video modal
+                Swal.fire({
+                    title: 'Welcome! 🤖',
+                    html: `
+                        <div style="background:#000; border-radius:10px; padding:20px; color:white; margin-bottom:10px;">
+                            <div style="font-size:60px;">👨‍🏫</div>
+                            <p style="margin-top:10px; font-weight:bold; color:#00c6ff;">AI Teacher Bot</p>
+                            <div style="margin-top:15px; font-size:14px; text-align:left; line-height:1.5;">
+                                "Bienvenidos a su curso de English (Inglés para todos).<br>
+                                Welcome to your English course (English for everyone).<br><br>
+                                Aprenderás inglés desde nivel A1.1 hasta un nivel B2.<br>
+                                Debes guiarte usando los botones de <b>Ayuda</b>, <b>Vocabulary</b> y <b>Grammar</b> para contestar tus actividades.<br><br>
+                                Good luck!"
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonText: "Let's Start!",
+                    didOpen: () => {
+                        // Play Audio when modal opens
+                        const msg = "Welcome to your English course, English for everyone. You will learn English from level A 1 point 1 to B 2. Please guide yourself using the Help, Vocabulary and Grammar buttons to answer your activities. Good luck!";
+                        hablarTexto(msg, 'en-US');
+                    }
+                }).then(() => {
+                    // Update database so it doesn't show again
+                    datosUsuario.hasSeenWelcome = true;
+                    db.collection("students").doc(usuarioActual).update({ hasSeenWelcome: true });
+                });
+            }
+        }
+
+        // --- NEW: HELP BUTTON LOGIC ---
+        function mostrarAyuda() {
+            const instruccion = levelInstructions[nivelActual] || {es: "Completa la actividad.", en: "Complete the activity."};
+            
+            Swal.fire({
+                title: `Ayuda Nivel ${nivelActual} 💡`,
+                html: `
+                    <div style="background:#e3f2fd; padding:15px; border-radius:10px; border-left:5px solid #2196f3; text-align:left;">
+                        <p><b>🇪🇸 Indicación:</b> ${instruccion.es}</p>
+                        <hr>
+                        <p><b>🇺🇸 Instruction:</b> ${instruccion.en}</p>
+                    </div>
+                    <p style="font-size:12px; color:#666; margin-top:10px;">Tip: Revisa primero Vocabulary y Grammar.</p>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '🔊 Escuchar (Listen)',
+                cancelButtonText: 'Entendido',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    hablarTexto(instruccion.en, 'en-US');
+                }
+            });
+        }
+
         function actualizarUI() {
             document.getElementById("timerDisplay").textContent = formatearTiempo(datosUsuario.timeWorked||0);
             document.getElementById("correctDisplay").textContent = datosUsuario.totalCorrect||0;
@@ -531,7 +639,6 @@
             const r = datosUsuario.currentStreak||1;
             document.getElementById("streakDisplay").textContent = `${r>1?'🔥':'😔'} ${r} días seguidos`;
             const reps = (datosUsuario.levelRepetitions && datosUsuario.levelRepetitions[nivelActual]) ? datosUsuario.levelRepetitions[nivelActual] : 0;
-            // UPDATE: Show /10 for new logic
             document.getElementById("repsText").textContent = `Intentos: ${reps}/10`;
         }
 
@@ -590,7 +697,6 @@
             }
             const reps = datosUsuario.levelRepetitions[nivelActual] || 0;
             
-            // UPDATE: Check for 10 repetitions instead of 5
             if (reps >= 10) {
                 Swal.fire({title: msg, text: "¡Has dominado este nivel! (10/10 completado)", icon: 'success'}).then(() => { desbloquearSiguienteNivel(); });
             } else {
@@ -612,7 +718,6 @@
 
         function opcionRepetirNivel() { cerrarModal('modalNivelCompleto'); contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); }
         
-        // NEW FUNCTION: SUPER REVIEW
         function opcionSuperReview() {
             cerrarModal('modalNivelCompleto');
             Swal.fire({
@@ -905,7 +1010,8 @@
                             score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, 
                             medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, 
                             lastLoginDate:new Date().toLocaleDateString('es-ES'), currentStreak:1, 
-                            inventory:[], equipped:{avatar:'👤',frame:'',theme:''}, levelRepetitions:{}, paymentHistory:[], pendingPayment:null
+                            inventory:[], equipped:{avatar:'👤',frame:'',theme:''}, levelRepetitions:{}, paymentHistory:[], pendingPayment:null,
+                            hasSeenWelcome: false // DEFAULT FLAG FOR WELCOME VIDEO
                         }).then(()=>Swal.fire("¡Bienvenido!","Tu cuenta ha sido creada.","success"));
                     }).catch(e=>Swal.fire("Error al Registrar",e.message,"error"));
                 } else Swal.fire("Error",err.message,"error");
@@ -913,7 +1019,7 @@
         }
         
         async function recuperarPassword() { const {value:e}=await Swal.fire({title:'Recuperar',input:'email',showCancelButton:true}); if(e) auth.sendPasswordResetEmail(e).then(()=>Swal.fire('Enviado','','success')); }
-        function cerrarSesion() { db.collection("students").doc(usuarioActual).update({timeWorked:datosUsuario.timeWorked, dailyLogs:datosUsuario.dailyLogs||{}}).then(()=>auth.signOut().then(()=>location.reload())); }
+        function cerrarSesion() { if(breakTimer) clearTimeout(breakTimer); db.collection("students").doc(usuarioActual).update({timeWorked:datosUsuario.timeWorked, dailyLogs:datosUsuario.dailyLogs||{}}).then(()=>auth.signOut().then(()=>location.reload())); }
         function cargarNoticias() { db.collection("students").doc("ADMIN_NEWS").onSnapshot((doc) => { const t = (doc.exists&&doc.data().text)?doc.data().text:"Bienvenido."; document.getElementById("newsContent").innerText=t; document.getElementById("teacherNewsInput").value=t; }); }
         function publicarNoticia() { db.collection("students").doc("ADMIN_NEWS").set({text:document.getElementById("teacherNewsInput").value}).then(()=>Swal.fire("Publicado","","success")); }
         
