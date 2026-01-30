@@ -783,7 +783,7 @@
             Swal.fire({
                 title: '¡Gracias! 🙏',
                 text: 'Por favor registra tu donativo para agradecerte.',
-                html: '<input id="donanteName" class="swal2-input" placeholder="Tu Nombre">' +
+                html: `<input id="donanteName" class="swal2-input" placeholder="Tu Nombre" value="${(datosUsuario && datosUsuario.username) ? datosUsuario.username : ''}">` +
                       '<input id="donanteFolio" class="swal2-input" placeholder="Folio de Pago">',
                 confirmButtonText: 'Registrar',
                 preConfirm: () => {
@@ -800,15 +800,17 @@
                     // V50 INGENIERIA: Usamos la colección 'students' porque 'donations' está bloqueada por permisos
                     // Creamos un ID único con prefijo DON_
                     const docId = 'DON_' + Date.now();
-                    
-                    db.collection('students').doc(docId).set({
+                    const donationData = {
                         nombre: nombre,
                         folio: folio,
                         monto: monto,
                         fecha: new Date().toLocaleString(),
                         isDonation: true, // BANDERA IMPORTANTE
-                        type: 'external_donation' 
-                    }).then(() => {
+                        type: 'external_donation',
+                        uid: usuarioActual || null // LINK AL ALUMNO REGISTRADO
+                    };
+
+                    db.collection('students').doc(docId).set(donationData).then(() => {
                         Swal.fire("Thank you for your donation", "Tu apoyo ha sido registrado.", "success");
                     }).catch((error) => {
                         console.error(error);
