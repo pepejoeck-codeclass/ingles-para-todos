@@ -328,113 +328,113 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
         
-       // --- MOTOR DE AUDIO V50 ULTRA EXPERT (ENGINEERED BY AI) ---
-    // Mejoras: Buffer agresivo, Selección Heurística Neural, Compatibilidad iOS/Android Pro
-    const audioCorrecto = new Audio('./assets/sounds/correct.mp3'); 
-    const audioError = new Audio('./assets/sounds/wrong.mp3'); 
-    const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
-    const synth = window.speechSynthesis;
-    let vocesDisponibles = [];
-    let audioUnlocked = false;
+        // --- MOTOR DE AUDIO V50 ULTRA EXPERT (ENGINEERED BY AI) ---
+        // Mejoras: Buffer agresivo, Selección Heurística Neural, Compatibilidad iOS/Android Pro
+        const audioCorrecto = new Audio('./assets/sounds/correct.mp3'); 
+        const audioError = new Audio('./assets/sounds/wrong.mp3'); 
+        const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
+        const synth = window.speechSynthesis;
+        let vocesDisponibles = [];
+        let audioUnlocked = false;
 
-    // SISTEMA DE PRE-CARGA DE SONIDOS (LATENCIA CERO)
-    audioCorrecto.preload = 'auto';
-    audioError.preload = 'auto';
-    audioLevelUp.preload = 'auto';
+        // SISTEMA DE PRE-CARGA DE SONIDOS (LATENCIA CERO)
+        audioCorrecto.preload = 'auto';
+        audioError.preload = 'auto';
+        audioLevelUp.preload = 'auto';
 
-    // 1. CARGA DE VOCES CON ALGORITMO DE SELECCIÓN "DIAMOND"
-    function cargarVocesUltraPro() {
-        const rawVoices = synth.getVoices();
-        if (rawVoices.length === 0) { setTimeout(cargarVocesUltraPro, 50); return; }
+        // 1. CARGA DE VOCES CON ALGORITMO DE SELECCIÓN "DIAMOND"
+        function cargarVocesUltraPro() {
+            const rawVoices = synth.getVoices();
+            if (rawVoices.length === 0) { setTimeout(cargarVocesUltraPro, 50); return; }
+            
+            // Algoritmo de Prioridad V50:
+            // 1. Voces "Natural" o "Online" (Android Alta Calidad)
+            // 2. Voces "Google" (Chrome PC/Android)
+            // 3. Voces "Samantha" / "Daniel" / "Karen" (iOS Alta Calidad)
+            // 4. Microsoft (Edge Neural)
+            
+            const priorities = ['Natural', 'Online', 'Premium', 'Enhanced', 'Google', 'Microsoft', 'Samantha', 'Daniel', 'Karen'];
+            
+            let englishVoices = rawVoices.filter(v => v.lang.includes('en'));
+
+            // Ordenamiento Heurístico: Si el nombre contiene una palabra de alta prioridad, sube al top
+            englishVoices.sort((a, b) => {
+                const aScore = priorities.findIndex(p => a.name.includes(p));
+                const bScore = priorities.findIndex(p => b.name.includes(p));
+                
+                // Si ambos tienen prioridad, gana el que tenga el índice más bajo (más importante)
+                // Si no se encuentran (-1), se van al fondo
+                const valA = aScore === -1 ? 999 : aScore;
+                const valB = bScore === -1 ? 999 : bScore;
+                
+                return valA - valB;
+            });
+
+            vocesDisponibles = englishVoices.length > 0 ? englishVoices : rawVoices;
+            console.log(`%c[AUDIO V50] Engine Ready. ${vocesDisponibles.length} voices loaded. Best: ${vocesDisponibles[0]?.name}`, 'color: #00ff00; background: #000; padding: 4px;');
+        }
         
-        // Algoritmo de Prioridad V50:
-        // 1. Voces "Natural" o "Online" (Android Alta Calidad)
-        // 2. Voces "Google" (Chrome PC/Android)
-        // 3. Voces "Samantha" / "Daniel" / "Karen" (iOS Alta Calidad)
-        // 4. Microsoft (Edge Neural)
-        
-        const priorities = ['Natural', 'Online', 'Premium', 'Enhanced', 'Google', 'Microsoft', 'Samantha', 'Daniel', 'Karen'];
-        
-        let englishVoices = rawVoices.filter(v => v.lang.includes('en'));
+        cargarVocesUltraPro();
+        if (speechSynthesis.onvoiceschanged !== undefined) { 
+            speechSynthesis.onvoiceschanged = cargarVocesUltraPro; 
+        }
 
-        // Ordenamiento Heurístico: Si el nombre contiene una palabra de alta prioridad, sube al top
-        englishVoices.sort((a, b) => {
-            const aScore = priorities.findIndex(p => a.name.includes(p));
-            const bScore = priorities.findIndex(p => b.name.includes(p));
-            
-            // Si ambos tienen prioridad, gana el que tenga el índice más bajo (más importante)
-            // Si no se encuentran (-1), se van al fondo
-            const valA = aScore === -1 ? 999 : aScore;
-            const valB = bScore === -1 ? 999 : bScore;
-            
-            return valA - valB;
-        });
+        // 2. DESBLOQUEO SILENCIOSO DEL MOTOR (iOS PATCH V3)
+        function unlockAudio() {
+            if(audioUnlocked) return;
+            // Reproducir buffer vacío
+            const buffer = new SpeechSynthesisUtterance("");
+            synth.speak(buffer);
+            // Intentar reproducir los audios HTML5 en volumen 0 para "calentar" el canal
+            audioCorrecto.volume = 0; audioCorrecto.play().then(() => { audioCorrecto.pause(); audioCorrecto.volume = 1; }).catch(()=>{});
+            audioUnlocked = true;
+        }
 
-        vocesDisponibles = englishVoices.length > 0 ? englishVoices : rawVoices;
-        console.log(`%c[AUDIO V50] Engine Ready. ${vocesDisponibles.length} voices loaded. Best: ${vocesDisponibles[0]?.name}`, 'color: #00ff00; background: #000; padding: 4px;');
-    }
-    
-    cargarVocesUltraPro();
-    if (speechSynthesis.onvoiceschanged !== undefined) { 
-        speechSynthesis.onvoiceschanged = cargarVocesUltraPro; 
-    }
+        // 3. FUNCIÓN DE PRONUNCIACIÓN DINÁMICA V50
+        function pronunciarPregunta() {
+            if (!preguntaActual) return;
+            
+            // LIMPIEZA AGRESIVA: Cancela cualquier audio previo instantáneamente
+            if(synth.speaking || synth.pending) { synth.cancel(); }
 
-    // 2. DESBLOQUEO SILENCIOSO DEL MOTOR (iOS PATCH V3)
-    function unlockAudio() {
-        if(audioUnlocked) return;
-        // Reproducir buffer vacío
-        const buffer = new SpeechSynthesisUtterance("");
-        synth.speak(buffer);
-        // Intentar reproducir los audios HTML5 en volumen 0 para "calentar" el canal
-        audioCorrecto.volume = 0; audioCorrecto.play().then(() => { audioCorrecto.pause(); audioCorrecto.volume = 1; }).catch(()=>{});
-        audioUnlocked = true;
-    }
+            const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
+            
+            // Retraso táctico (10ms) para permitir que el 'cancel' limpie el hilo de audio
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(texto);
+                
+                // Selección de Voz Maestra
+                if(vocesDisponibles.length > 0) {
+                    utterance.voice = vocesDisponibles[0]; 
+                }
+                
+                // CONFIGURACIÓN "DYNAMIC PRESENCE"
+                // Ligeras variaciones para evitar sonido metálico constante
+                utterance.rate = 0.9; // Velocidad pedagógica perfecta (ligeramente lento para aprender)
+                utterance.pitch = 1.0; // Tono natural estándar
+                utterance.volume = 1.0; // Volumen máximo
+                
+                // Efecto visual en botón
+                const btn = document.getElementById('btnListen');
+                if(btn) btn.classList.add('active-listening'); 
+                
+                utterance.onend = () => { 
+                    if(btn) btn.classList.remove('active-listening'); 
+                };
+                
+                utterance.onerror = (e) => {
+                    console.error("[AUDIO V50 ERROR]", e);
+                    if(btn) btn.classList.remove('active-listening');
+                    // Fallback de emergencia: resetear motor
+                    synth.cancel();
+                };
+                
+                synth.speak(utterance);
+            }, 10);
+        }
 
-    // 3. FUNCIÓN DE PRONUNCIACIÓN DINÁMICA V50
-    function pronunciarPregunta() {
-        if (!preguntaActual) return;
-        
-        // LIMPIEZA AGRESIVA: Cancela cualquier audio previo instantáneamente
-        if(synth.speaking || synth.pending) { synth.cancel(); }
-
-        const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
-        
-        // Retraso táctico (10ms) para permitir que el 'cancel' limpie el hilo de audio
-        setTimeout(() => {
-            const utterance = new SpeechSynthesisUtterance(texto);
-            
-            // Selección de Voz Maestra
-            if(vocesDisponibles.length > 0) {
-                utterance.voice = vocesDisponibles[0]; 
-            }
-            
-            // CONFIGURACIÓN "DYNAMIC PRESENCE"
-            // Ligeras variaciones para evitar sonido metálico constante
-            utterance.rate = 0.9; // Velocidad pedagógica perfecta (ligeramente lento para aprender)
-            utterance.pitch = 1.0; // Tono natural estándar
-            utterance.volume = 1.0; // Volumen máximo
-            
-            // Efecto visual en botón
-            const btn = document.getElementById('btnListen');
-            if(btn) btn.classList.add('active-listening'); 
-            
-            utterance.onend = () => { 
-                if(btn) btn.classList.remove('active-listening'); 
-            };
-            
-            utterance.onerror = (e) => {
-                console.error("[AUDIO V50 ERROR]", e);
-                if(btn) btn.classList.remove('active-listening');
-                // Fallback de emergencia: resetear motor
-                synth.cancel();
-            };
-            
-            synth.speak(utterance);
-        }, 10);
-    }
-
-    // --- VARIABLES GLOBALES DEL JUEGO (INTACTAS) ---
-    let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
+        // --- VARIABLES GLOBALES DEL JUEGO (INTACTAS) ---
+        let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
         let chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
         
@@ -525,7 +525,7 @@
         document.addEventListener("DOMContentLoaded", () => { 
             cargarNoticias(); 
             cargarLeaderboard(); 
-            cargarVocesMejoradas(); // Usar la versión mejorada
+            cargarVocesUltraPro(); // Usar la versión mejorada V50
         });
 
         function mostrarLogin() { document.getElementById("loginContainerWrapper").style.display="flex"; document.getElementById("loginCard").style.display="block"; document.getElementById("communitySection").style.display="flex"; document.getElementById("mainContent").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("teacherLogin").style.display="none"; cargarLeaderboard(); }
@@ -587,35 +587,6 @@
             inp.focus();
         }
 
-        // 3. AUDIO ENGINE V11 (SIN CORTES)
-        function pronunciarPregunta() {
-            if (!preguntaActual) return;
-            
-            // Limpieza proactiva del buffer de audio
-            if(synth.speaking) { synth.cancel(); }
-
-            const texto = (preguntaActual.type === 'dictation') ? preguntaActual.q : preguntaActual.a;
-            
-            // Retraso técnico de 50ms para evitar colisiones en Safari
-            setTimeout(() => {
-                const utterance = new SpeechSynthesisUtterance(texto);
-                
-                // Selección inteligente V11
-                if(vocesDisponibles.length > 0) {
-                    utterance.voice = vocesDisponibles[0]; // La mejor voz ya está ordenada al principio
-                }
-                
-                utterance.rate = 0.9;
-                utterance.pitch = 1.0;
-                
-                const btn = document.getElementById('btnListen');
-                if(btn) btn.classList.add('active-listening'); 
-                utterance.onend = () => { if(btn) btn.classList.remove('active-listening'); };
-                
-                synth.speak(utterance);
-            }, 50);
-        }
-
         function verificarRespuesta() {
             if (!preguntaActual) return;
             const inputEl = document.getElementById("answerInput");
@@ -633,7 +604,7 @@
                 fd.textContent = "WRONG. Answer: " + preguntaActual.a; fd.style.color = "red";
                 inputEl.style.borderColor = "#e74c3c"; inputEl.style.backgroundColor = "#fdedec";
                 datosUsuario.totalWrong = (datosUsuario.totalWrong || 0) + 1; 
-                // Feedback audio
+                // Feedback audio V50
                 const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); 
                 u.lang='en-US'; 
                 if(vocesDisponibles.length > 0) u.voice = vocesDisponibles[0];
@@ -723,14 +694,18 @@
                 renderizarTabla();
             });
         }
+        
+        // --- FUNCIÓN ACTUALIZADA CON BOTÓN MORADO (V50 ENGINEERING PATCH) ---
         function renderizarTabla() {
             let d = listaAlumnosCache.filter(u => { const tipo = u.userType || 'student'; return tipo === teacherViewMode; });
             const f=document.getElementById("groupFilter").value; 
             if(f!=="todos" && teacherViewMode === 'student') d=d.filter(s=>s.group===f); 
             d.sort((a,b)=>(b.score||0)-(a.score||0));
+            
             const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy(); 
             const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;}); 
             chartGlobalInstance=new Chart(ctx,{type:'bar',data:{labels:gl,datasets:[{label:'Promedio',data:prom,backgroundColor:'#004e92'}]},options:{maintainAspectRatio:false}});
+            
             const tb=document.getElementById("cuerpoTabla"); tb.innerHTML=""; 
             d.forEach(s=>{ 
                 const m=s.medals||{gold:0,silver:0,bronze:0}, r=s.currentStreak||1, ir=r>1?'🔥':'😔'; 
@@ -738,9 +713,12 @@
                 const av = s.equipped?.avatar || '👤'; 
                 const fr = s.equipped?.frame || ''; 
                 const nombreMostrar = s.username || s.nombre || s.name || "Alumno";
+                
                 let btnPago = "";
                 if(s.pendingPayment) { const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio"; btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">💸 ${folioInfo}</button>`; }
-                tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info">📊</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete">🗑️</button></td>`; 
+                
+                // --- BOTÓN MORADO DE EDITAR GRUPO AGREGADO AQUÍ ---
+                tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history" title="Historial">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info" title="Gráfica">📊</button> <button onclick="cambiarGrupo('${s.uid}')" class="action-btn btn-edit" title="Cambiar Grupo" style="background:purple; color:white;">✏️</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit" title="Resetear">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete" title="Eliminar">🗑️</button></td>`; 
                 tb.appendChild(tr); 
             }); 
             document.getElementById("totalAlumnos").textContent=d.length; 
@@ -750,6 +728,33 @@
         async function aprobarPagoReal(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); if(!s.pendingPayment) return; const nivelADesbloquear = s.pendingPayment.nivel + 1; let nuevosNiveles = s.unlockedLevels || [1]; if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); let historial = s.paymentHistory || []; if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; } await db.collection("students").doc(uid).update({ unlockedLevels: nuevosNiveles, pendingPayment: null, paymentHistory: historial }); Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success"); cargarTablaAlumnos(); }
         async function resetearAlumno(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), nm=Math.max(...(s.unlockedLevels||[1])); const {value:o}=await Swal.fire({title:s.username, input:'select', inputOptions:{'puntos':'📉 Reset Puntos','nivel':'🔙 Regresar Nivel','total':'⚠️ Reset Total'}, showCancelButton:true}); if(o==='puntos') await db.collection("students").doc(uid).update({score:0}); else if(o==='nivel') { if(nm<=1) return; await db.collection("students").doc(uid).update({unlockedLevels:s.unlockedLevels.filter(n=>n!==nm)}); } else if(o==='total') await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); cargarTablaAlumnos(); }
         function borrarAlumno(uid) { if(confirm("¿Eliminar?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos()); }
+        
+        // --- FUNCIÓN NUEVA: CAMBIO DE GRUPO (V50 ENGINEERING) ---
+        async function cambiarGrupo(uid) { 
+            const s = listaAlumnosCache.find(x => x.uid === uid);
+            const gpoActual = s.group || "Sin Grupo";
+            
+            const { value: nuevoGpo } = await Swal.fire({
+                title: `Cambiar Grupo a ${s.username}`,
+                input: 'text',
+                inputLabel: `Grupo Actual: ${gpoActual}`,
+                inputPlaceholder: 'Escribe el nuevo grupo (Ej: 4A)',
+                inputValue: s.group || "",
+                showCancelButton: true,
+                confirmButtonText: 'Guardar Cambio',
+                inputValidator: (value) => {
+                    if (!value) { return '¡Necesitas escribir un grupo!'; }
+                }
+            });
+
+            if (nuevoGpo) {
+                const gpoFinal = nuevoGpo.toUpperCase().trim();
+                await db.collection("students").doc(uid).update({ group: gpoFinal });
+                Swal.fire("¡Actualizado!", `El alumno ahora está en el grupo ${gpoFinal}`, "success");
+                cargarTablaAlumnos(); // Refresca la tabla automáticamente
+            }
+        }
+
         function verHistorial(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), l=s.dailyLogs||{}, tb=document.getElementById("historialCuerpo"); tb.innerHTML=""; document.getElementById("modalHistorial").style.display="flex"; document.getElementById("historialNombre").textContent="Historial: "+(s.username||"Alumno"); Object.keys(l).sort().reverse().forEach(f=>{ tb.innerHTML+=`<tr><td>${f}</td><td style="color:blue;font-weight:bold">${formatearTiempo(l[f])}</td></tr>`; }); }
         function verGraficaInd(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid); document.getElementById("modalGrafica").style.display="flex"; document.getElementById("modalNombre").textContent=s.username||"Alumno"; const m = s.medals || {gold:0, silver:0, bronze:0}; let itemsTexto = "Ninguna compra"; if (s.inventory && s.inventory.length > 0) { itemsTexto = s.inventory.map(id => { const item = shopCatalog.find(i => i.id === id); return item ? `${item.icon} ${item.name}` : id; }).join(', '); } let pagosHTML = "<p>No hay pagos registrados.</p>"; if (s.paymentHistory && s.paymentHistory.length > 0) { pagosHTML = `<ul style="text-align:left; font-size:12px; list-style:none; padding:0;">`; s.paymentHistory.forEach(p => { const color = p.estado.includes("Aprobado") ? "green" : "orange"; pagosHTML += `<li style="margin-bottom:5px; border-bottom:1px solid #eee; padding-bottom:3px;">📅 ${p.fecha} - <b>$${p.monto}</b> - <span style="color:${color}">${p.estado}</span></li>`; }); pagosHTML += `</ul>`; } document.getElementById("modalStats").innerHTML = `<p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p><p><b>Racha:</b> ${s.currentStreak||1} 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p><p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p><hr><p><b>🎒 Inventario:</b></p><p style="font-size:12px; color:#555;">${itemsTexto}</p><hr><p style="color:green;"><b>💰 Historial de Pagos:</b></p>${pagosHTML}`; if(chartStudentInstance) chartStudentInstance.destroy(); chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅ Correctas','❌ Incorrectas'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}}); }
         function verGraficaGrupal() { const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>b.score-a.score); document.getElementById("modalGraficaGrupal").style.display="flex"; const totalPuntos = d.reduce((acc, curr) => acc + Number(curr.score || 0), 0); const promedio = d.length > 0 ? (totalPuntos / d.length).toFixed(1) : 0; document.getElementById("modalStatsGroup").innerHTML = `<p><b>Total Alumnos:</b> ${d.length} | <b>Promedio Puntos:</b> ${promedio}</p>`; const ctx=document.getElementById('groupBigChart').getContext('2d'); if(chartGroupInstance) chartGroupInstance.destroy(); chartGroupInstance=new Chart(ctx,{type:'bar',data:{labels:d.map(s=>s.username),datasets:[{label:'Puntos Totales',data:d.map(s=>s.score),backgroundColor:'#004e92'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}}); }
