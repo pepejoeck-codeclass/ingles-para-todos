@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V11 AUDIO REVOLUTION</title>
+    <title>Inglés Para Todos - MASTER V50 AI ULTRA</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTILOS GENERALES (INTACTOS V10) --- */
+        /* --- ESTILOS GENERALES (INTACTOS) --- */
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; }
@@ -718,7 +718,7 @@
                 if(s.pendingPayment) { const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio"; btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">💸 ${folioInfo}</button>`; }
                 
                 // --- BOTÓN MORADO DE EDITAR GRUPO AGREGADO AQUÍ ---
-                tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history" title="Historial">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info" title="Gráfica">📊</button> <button onclick="cambiarGrupo('${s.uid}')" class="action-btn btn-edit" title="Cambiar Grupo" style="background:purple; color:white;">✏️</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit" title="Resetear">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete" title="Eliminar">🗑️</button></td>`; 
+                tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history" title="Historial">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info" title="Gráfica">📊</button> <button onclick="cambiarGrupo('${s.uid}')" class="action-btn btn-edit" title="Cambiar Grupo" style="background:purple; color:white;">✏️</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit" title="Resetear / Regresar Nivel">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete" title="Eliminar">🗑️</button></td>`; 
                 tb.appendChild(tr); 
             }); 
             document.getElementById("totalAlumnos").textContent=d.length; 
@@ -726,7 +726,64 @@
         }
 
         async function aprobarPagoReal(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); if(!s.pendingPayment) return; const nivelADesbloquear = s.pendingPayment.nivel + 1; let nuevosNiveles = s.unlockedLevels || [1]; if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); let historial = s.paymentHistory || []; if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; } await db.collection("students").doc(uid).update({ unlockedLevels: nuevosNiveles, pendingPayment: null, paymentHistory: historial }); Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success"); cargarTablaAlumnos(); }
-        async function resetearAlumno(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), nm=Math.max(...(s.unlockedLevels||[1])); const {value:o}=await Swal.fire({title:s.username, input:'select', inputOptions:{'puntos':'📉 Reset Puntos','nivel':'🔙 Regresar Nivel','total':'⚠️ Reset Total'}, showCancelButton:true}); if(o==='puntos') await db.collection("students").doc(uid).update({score:0}); else if(o==='nivel') { if(nm<=1) return; await db.collection("students").doc(uid).update({unlockedLevels:s.unlockedLevels.filter(n=>n!==nm)}); } else if(o==='total') await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); cargarTablaAlumnos(); }
+        
+        // --- FUNCIÓN DE RESETEO CON MAGIA DE TIEMPO (V50 TIME TRAVEL) ---
+        async function resetearAlumno(uid) { 
+            const s = listaAlumnosCache.find(x => x.uid === uid); 
+            const maxLevel = Math.max(...(s.unlockedLevels || [1])); 
+            
+            const { value: action } = await Swal.fire({ 
+                title: `Gestionar: ${s.username}`, 
+                text: `Nivel Actual: ${maxLevel}`, 
+                input: 'select', 
+                inputOptions: { 
+                    'level_jump': '⏪ Regresar a un Nivel Específico', 
+                    'reset_points': '📉 Resetear Solo Puntos', 
+                    'hard_reset': '⚠️ REINICIO TOTAL (Cero)' 
+                }, 
+                showCancelButton: true 
+            }); 
+            
+            if (!action) return; 
+            
+            if (action === 'reset_points') { 
+                await db.collection("students").doc(uid).update({score:0}); 
+                Swal.fire("Listo", "Puntos en 0", "success"); 
+            } 
+            else if (action === 'hard_reset') { 
+                await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); 
+                Swal.fire("Reinicio Total", "El alumno empieza desde cero.", "warning"); 
+            } 
+            else if (action === 'level_jump') { 
+                if (maxLevel <= 1) { 
+                    return Swal.fire("Aviso", "El alumno ya está en el Nivel 1. No puede bajar más.", "info"); 
+                } 
+                
+                // Generar opciones de niveles anteriores
+                const options = {}; 
+                for (let i = 1; i < maxLevel; i++) { 
+                    options[i] = `Regresar a Nivel ${i}`; 
+                } 
+                
+                const { value: targetLevel } = await Swal.fire({ 
+                    title: 'Viaje en el Tiempo ⏳', 
+                    text: `El alumno está en Nivel ${maxLevel}. ¿A dónde lo regresamos?`, 
+                    input: 'select', 
+                    inputOptions: options, 
+                    showCancelButton: true 
+                }); 
+                
+                if (targetLevel) { 
+                    const target = parseInt(targetLevel); 
+                    // Crear nuevo array [1, 2, ... target]
+                    const newLevels = Array.from({length: target}, (_, i) => i + 1); 
+                    await db.collection("students").doc(uid).update({ unlockedLevels: newLevels }); 
+                    Swal.fire("¡Hecho!", `Alumno regresado al Nivel ${target}`, "success"); 
+                } 
+            } 
+            cargarTablaAlumnos(); 
+        }
+
         function borrarAlumno(uid) { if(confirm("¿Eliminar?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos()); }
         
         // --- FUNCIÓN NUEVA: CAMBIO DE GRUPO (V50 ENGINEERING) ---
