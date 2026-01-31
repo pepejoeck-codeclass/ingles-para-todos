@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Creador - MASTER V50 (INFINITE SCALING)</title>
+    <title>Panel de Creador - MASTER V50 (EDIT & INFINITE)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -36,6 +36,8 @@
         
         .level-control { display: flex; gap: 10px; align-items: center; }
         .btn-add-level { background: #8e44ad; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; padding: 10px; white-space: nowrap; }
+        .search-container { display: flex; gap: 5px; align-items: flex-end; }
+        .btn-load { background: #3498db; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; padding: 10px; }
     </style>
 </head>
 <body>
@@ -51,6 +53,10 @@
     </div>
 
     <div id="mainPanel" class="creator-card">
+        <div style="display:flex; justify-content:flex-end;">
+            <button onclick="cerrarSesionCreador()" style="background:#c0392b; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Cerrar Sesión</button>
+        </div>
+        
         <h2>🛠️ Panel de Creador V50</h2>
         <p style="text-align: center; font-size: 14px; color: #666; margin-bottom: 20px;">Conectado como: <span id="userDisplay" style="color:green; font-weight:bold;">...</span></p>
         
@@ -67,8 +73,11 @@
             </div>
 
             <label>2. ID Único de la Lección:</label>
-            <input type="text" id="inputLessonId" placeholder="Ej: leccion_zoologico_1">
-            <div class="helper-text">Debe ser único, sin espacios (usa guiones bajos).</div>
+            <div class="search-container">
+                <input type="text" id="inputLessonId" placeholder="Ej: leccion_zoologico_1">
+                <button onclick="cargarLeccionExistente()" class="btn-load" title="Buscar y Editar">🔍 Cargar</button>
+            </div>
+            <div class="helper-text">Escribe el ID y dale a la lupa para EDITAR una lección existente.</div>
             
             <label>3. Título de la Lección:</label>
             <input type="text" id="inputLessonTitle" placeholder="Ej: Lesson 5: The Zoo 🦁">
@@ -105,11 +114,11 @@
         </div>
 
         <div class="preview-box">
-            <strong>Preguntas agregadas:</strong>
+            <strong>Preguntas agregadas (Nuevas + Existentes):</strong>
             <ul id="listaPreguntasTemp" style="padding-left: 20px;"></ul>
         </div>
 
-        <button onclick="guardarEnNube()" class="btn-save">💾 GUARDAR TODO EN LA NUBE</button>
+        <button onclick="guardarEnNube()" class="btn-save">💾 GUARDAR CAMBIOS EN LA NUBE</button>
     </div>
 
     <script>
@@ -132,6 +141,10 @@
             if(!e || !p) return Swal.fire("Ups", "Faltan datos", "warning");
             auth.signInWithEmailAndPassword(e, p).catch(error => Swal.fire("Error", "Revisa tu correo/contraseña", "error"));
         }
+        
+        function cerrarSesionCreador() {
+            auth.signOut().then(() => location.reload());
+        }
 
         let preguntasTemporales = [];
 
@@ -141,35 +154,82 @@
             const type = document.getElementById('inputType').value;
             if(!q || !a) return Swal.fire("Faltan datos", "Llena pregunta y respuesta", "warning");
             preguntasTemporales.push({ type, q, a });
-            const ul = document.getElementById('listaPreguntasTemp');
-            const li = document.createElement('li');
-            li.textContent = `${type === 'dictation' ? '🎧' : '📝'} ${q} -> ${a}`;
-            ul.appendChild(li);
+            renderizarListaPreguntas();
             document.getElementById('inputQ').value = '';
             document.getElementById('inputA').value = '';
             document.getElementById('inputQ').focus();
         }
 
+        function renderizarListaPreguntas() {
+            const ul = document.getElementById('listaPreguntasTemp');
+            ul.innerHTML = "";
+            preguntasTemporales.forEach((p, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `${p.type === 'dictation' ? '🎧' : '📝'} ${p.q} -> ${p.a} <span style='color:red; cursor:pointer; margin-left:10px;' onclick='borrarPregunta(${index})'>[X]</span>`;
+                ul.appendChild(li);
+            });
+        }
+
+        function borrarPregunta(index) {
+            preguntasTemporales.splice(index, 1);
+            renderizarListaPreguntas();
+        }
+
         function agregarSiguienteNivel() {
             const select = document.getElementById('inputLevel');
-            // Obtener el valor máximo actual
             let maxVal = 0;
             for(let i=0; i<select.options.length; i++) {
                 const val = parseInt(select.options[i].value);
                 if(val > maxVal) maxVal = val;
             }
             const nextLevel = maxVal + 1;
-            
-            // Crear nueva opción
             const opt = document.createElement('option');
             opt.value = nextLevel;
             opt.text = "Nivel " + nextLevel;
             select.add(opt);
-            
-            // Seleccionar el nuevo nivel
             select.value = nextLevel;
-            
             Swal.fire("Nivel Creado", `Ahora estás editando para el <b>Nivel ${nextLevel}</b>`, "info");
+        }
+
+        // --- FUNCIÓN DE EDICIÓN (MASTER V50) ---
+        async function cargarLeccionExistente() {
+            const nivel = document.getElementById('inputLevel').value;
+            let rawId = document.getElementById('inputLessonId').value.trim();
+            const lessonId = rawId.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
+
+            if (!lessonId) return Swal.fire("Error", "Escribe el ID de la lección para buscarla.", "warning");
+
+            try {
+                const doc = await db.collection('contenido_curso').doc(`nivel_${nivel}`).get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data && data[lessonId]) {
+                        // DATOS ENCONTRADOS -> LLENAR CAMPOS
+                        const leccion = data[lessonId];
+                        document.getElementById('inputLessonTitle').value = leccion.title || "";
+                        
+                        if (leccion.content) {
+                            document.getElementById('inputVocab').value = leccion.content.vocab || "";
+                            document.getElementById('inputHelp').value = leccion.content.help || "";
+                            document.getElementById('inputGrammar').value = leccion.content.grammar || "";
+                        }
+
+                        if (leccion.questions && Array.isArray(leccion.questions)) {
+                            preguntasTemporales = leccion.questions;
+                            renderizarListaPreguntas();
+                        }
+                        
+                        Swal.fire("Cargado", "Datos listos para editar. Agrega preguntas o cambia textos y guarda.", "success");
+                    } else {
+                        Swal.fire("No encontrado", `No existe una lección con ID "${lessonId}" en el Nivel ${nivel}.`, "info");
+                    }
+                } else {
+                    Swal.fire("Vacío", `Aún no hay nada creado en el Nivel ${nivel}.`, "info");
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire("Error", "No se pudo conectar a la base de datos.", "error");
+            }
         }
 
         function guardarEnNube() {
@@ -181,7 +241,6 @@
             const lessonId = rawId.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
             const lessonTitle = document.getElementById('inputLessonTitle').value.trim();
             
-            // Datos de botones
             const vocabContent = document.getElementById('inputVocab').value;
             const helpContent = document.getElementById('inputHelp').value;
             const grammarContent = document.getElementById('inputGrammar').value;
@@ -207,10 +266,7 @@
             updateData[lessonId] = nuevaLeccion;
 
             docRef.set(updateData, { merge: true }).then(() => {
-                Swal.fire({ title: '¡Guardado!', text: `Se guardó "${lessonTitle}" en el Nivel ${nivel}.`, icon: 'success' });
-                // Limpiar preguntas para la siguiente lección
-                preguntasTemporales = [];
-                document.getElementById('listaPreguntasTemp').innerHTML = '';
+                Swal.fire({ title: '¡Guardado!', text: `Se actualizó "${lessonTitle}" en el Nivel ${nivel}.`, icon: 'success' });
             }).catch((error) => {
                 Swal.fire("Error", "Problema de permisos o conexión.", "error");
             });
