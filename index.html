@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V50 STABLE RECOVERY</title>
+    <title>Inglés Para Todos - MASTER V50 AI ULTRA (STABLE)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTILOS ORIGINALES RESTAURADOS --- */
+        /* --- ESTILOS ORIGINALES INTACTOS --- */
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; }
@@ -38,14 +38,13 @@
         .btn-shop:active { transform: translateY(4px); box-shadow: none; }
         .btn-pay { background: linear-gradient(45deg, #11998e, #38ef7d); box-shadow: 0 4px 0 #0b6623; }
         .btn-code { background: linear-gradient(45deg, #8e44ad, #c0392b); box-shadow: 0 4px 0 #5b2c6f; }
-        /* Boton nuevo agregado sin romper estilos viejos */
-        .btn-help { background: linear-gradient(45deg, #FF9800, #F44336); box-shadow: 0 4px 0 #E65100; flex: 0.8; font-size: 13px; animation: popHelp 3s infinite; }
-        @keyframes popHelp { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         .btn-review { background: linear-gradient(45deg, #FF512F, #DD2476); box-shadow: 0 4px 0 #9e184e; color: white; }
         
+        /* BOTÓN DONACIÓN ESPECIAL */
         .btn-donate { background: linear-gradient(45deg, #ff416c, #ff4b2b); box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4); animation: pulseDonate 2s infinite; }
         @keyframes pulseDonate { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
 
+        /* SKILLS BAR */
         .skills-bar { display: flex; justify-content: center; gap: 15px; margin: 20px 0; background: #f0f2f5; padding: 10px; border-radius: 50px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
         .skill-btn { width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 24px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #555; }
         .skill-label { font-size: 9px; margin-top: 2px; font-weight: bold; text-transform: uppercase; }
@@ -56,11 +55,18 @@
         @keyframes pulseMic { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
         .mic-listening { background: #ff0000 !important; color: white !important; animation: pulseMic 1.5s infinite; }
 
+        /* BOTONES ACADÉMICOS Y AYUDA */
         .academic-nav { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; }
         .btn-academic { flex: 1; padding: 10px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
         .btn-academic:active { transform: translateY(2px); }
         .btn-vocab { background: linear-gradient(45deg, #11998e, #38ef7d); }
         .btn-grammar { background: linear-gradient(45deg, #833ab4, #fd1d1d); }
+        .btn-help { background: linear-gradient(45deg, #FF9800, #F44336); box-shadow: 0 4px 0 #E65100; flex: 0.8; font-size: 13px; animation: popHelp 3s infinite; }
+        @keyframes popHelp { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        /* SELECTOR DE LECCIONES */
+        .lesson-selector-container { margin: 10px 0; }
+        .lesson-select { width: 100%; padding: 10px; border-radius: 15px; border: 2px solid var(--primary); font-weight: bold; color: var(--primary); background: #f0f8ff; cursor: pointer; }
 
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
@@ -92,6 +98,7 @@
         .shop-tab { padding: 5px 15px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; background: #f1f1f1; }
         .shop-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
+        /* MAESTRO Y COMUNIDAD */
         .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
@@ -105,12 +112,14 @@
         .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
         .mini-avatar { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 2px solid transparent; font-size: 18px; background: #eee; }
         
+        /* TABS */
         .tabs-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
         .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; background: #f0f2f5; color: #666; transition: all 0.3s; text-transform: uppercase; font-size: 14px; }
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,78,146,0.3); }
         .tab-btn-teacher { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; background: white; font-weight: bold; }
         .tab-btn-teacher.active { background: var(--primary); color: white; border-color: var(--primary); }
 
+        /* COMUNIDAD */
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
@@ -121,6 +130,7 @@
         .rank-2 { background-color: #f8f9fa; } .rank-2 td:first-child::before { content: '🥈 '; }
         .rank-3 { background-color: #fff0e6; } .rank-3 td:first-child::before { content: '🥉 '; }
 
+        /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; text-align: center; }
         .level-complete-options { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
@@ -128,10 +138,6 @@
         .report-summary { background: #f8f9fa; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--primary); text-align: left; font-size: 14px; }
         .history-table { width: 100%; margin-top: 15px; text-align: left; }
         .history-table th { background: #6c757d; }
-        
-        /* ESTILO PARA SELECTOR DE LECCIONES */
-        .lesson-selector-container { margin: 10px 0; }
-        .lesson-select { width: 100%; padding: 10px; border-radius: 15px; border: 2px solid var(--primary); font-weight: bold; color: var(--primary); background: #f0f8ff; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -344,9 +350,7 @@
         <div class="modal-content">
             <h3 id="tituloAcademico">...</h3>
             <hr>
-            <div id="contenidoAcademicoBody" style="padding: 20px; font-size: 16px; color: #333; text-align: left; white-space: pre-wrap;">
-                Cargando...
-            </div>
+            <div id="contenidoAcademicoBody" style="padding: 20px; font-size: 16px; color: #333; text-align: left; white-space: pre-wrap;">Cargando...</div>
             <br>
             <button onclick="cerrarModal('modalAcademico')" class="btn btn-secondary">Cerrar</button>
         </div>
@@ -371,7 +375,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
         
-        // --- MOTOR DE AUDIO V50 ULTRA EXPERT (ENGINEERED BY AI) ---
+        // --- AUDIO ---
         const audioCorrecto = new Audio('./assets/sounds/correct.mp3'); 
         const audioError = new Audio('./assets/sounds/wrong.mp3'); 
         const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
@@ -379,9 +383,7 @@
         let vocesDisponibles = [];
         let audioUnlocked = false;
 
-        audioCorrecto.preload = 'auto';
-        audioError.preload = 'auto';
-        audioLevelUp.preload = 'auto';
+        audioCorrecto.preload = 'auto'; audioError.preload = 'auto'; audioLevelUp.preload = 'auto';
 
         function cargarVocesUltraPro() {
             const rawVoices = synth.getVoices();
@@ -440,7 +442,7 @@
         let loginMode = 'student'; let teacherViewMode = 'student';
         const LEVEL_CODES = { 1: "angysanti1", 2: "angysanti2", 3: "angysanti3" };
 
-        // --- BASE DE DATOS LOCAL + NUBE ---
+        // --- BASE DE DATOS LOCAL INICIAL (FALLBACK) ---
         let cursoProDB = {
             1: [
                 { id: "l1_default", title: "Lesson 1: Greetings 👋", questions: [
@@ -515,7 +517,6 @@
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
-                        // Inicialización de datos faltantes
                         if(!datosUsuario.timeWorked) datosUsuario.timeWorked = 0;
                         if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
                         if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {};
@@ -536,14 +537,9 @@
                         db.collection("students").doc(usuarioActual).update({ lastLoginDate: datosUsuario.lastLoginDate, currentStreak: datosUsuario.currentStreak });
                         
                         // INTENTO DE CARGA DE NUBE (PROTEGIDO)
-                        try {
-                            cargarContenidoNube(() => {
-                                mostrarJuego(); // Callback seguro
-                            });
-                        } catch (e) {
-                            console.log("Error nube, cargando local...");
-                            mostrarJuego(); // Fallback
-                        }
+                        cargarContenidoNube(function() {
+                            mostrarJuego();
+                        });
                     }
                 });
             } else { 
@@ -561,7 +557,7 @@
             db.collection('contenido_curso').get().then((snapshot) => {
                 if(!snapshot.empty) {
                     snapshot.forEach(doc => {
-                        const levelKey = doc.id; // "nivel_1"
+                        const levelKey = doc.id; 
                         const levelNum = parseInt(levelKey.split('_')[1]); 
                         if (levelNum) {
                             const data = doc.data(); 
