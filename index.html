@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V50 AI ULTRA (RECOVERY)</title>
+    <title>Inglés Para Todos - MASTER V50 STABLE RECOVERY</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTILOS GENERALES --- */
+        /* --- ESTILOS ORIGINALES RESTAURADOS --- */
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; }
@@ -38,6 +38,9 @@
         .btn-shop:active { transform: translateY(4px); box-shadow: none; }
         .btn-pay { background: linear-gradient(45deg, #11998e, #38ef7d); box-shadow: 0 4px 0 #0b6623; }
         .btn-code { background: linear-gradient(45deg, #8e44ad, #c0392b); box-shadow: 0 4px 0 #5b2c6f; }
+        /* Boton nuevo agregado sin romper estilos viejos */
+        .btn-help { background: linear-gradient(45deg, #FF9800, #F44336); box-shadow: 0 4px 0 #E65100; flex: 0.8; font-size: 13px; animation: popHelp 3s infinite; }
+        @keyframes popHelp { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         .btn-review { background: linear-gradient(45deg, #FF512F, #DD2476); box-shadow: 0 4px 0 #9e184e; color: white; }
         
         .btn-donate { background: linear-gradient(45deg, #ff416c, #ff4b2b); box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4); animation: pulseDonate 2s infinite; }
@@ -58,11 +61,6 @@
         .btn-academic:active { transform: translateY(2px); }
         .btn-vocab { background: linear-gradient(45deg, #11998e, #38ef7d); }
         .btn-grammar { background: linear-gradient(45deg, #833ab4, #fd1d1d); }
-        .btn-help { background: linear-gradient(45deg, #FF9800, #F44336); box-shadow: 0 4px 0 #E65100; flex: 0.8; font-size: 13px; animation: popHelp 3s infinite; }
-        @keyframes popHelp { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-
-        .lesson-selector-container { margin: 10px 0; }
-        .lesson-select { width: 100%; padding: 10px; border-radius: 15px; border: 2px solid var(--primary); font-weight: bold; color: var(--primary); background: #f0f8ff; cursor: pointer; }
 
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
@@ -76,6 +74,7 @@
         .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .avatar-display { font-size: 24px; width: 50px; height: 50px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
         
+        /* FRAMES & TIENDA */
         .frame-gold { border: 3px solid gold !important; box-shadow: 0 0 10px gold; }
         .frame-fire { border: 3px solid orangered !important; box-shadow: 0 0 10px red; }
         .frame-neon { border: 3px solid cyan !important; box-shadow: 0 0 10px cyan; }
@@ -129,6 +128,10 @@
         .report-summary { background: #f8f9fa; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--primary); text-align: left; font-size: 14px; }
         .history-table { width: 100%; margin-top: 15px; text-align: left; }
         .history-table th { background: #6c757d; }
+        
+        /* ESTILO PARA SELECTOR DE LECCIONES */
+        .lesson-selector-container { margin: 10px 0; }
+        .lesson-select { width: 100%; padding: 10px; border-radius: 15px; border: 2px solid var(--primary); font-weight: bold; color: var(--primary); background: #f0f8ff; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -437,51 +440,27 @@
         let loginMode = 'student'; let teacherViewMode = 'student';
         const LEVEL_CODES = { 1: "angysanti1", 2: "angysanti2", 3: "angysanti3" };
 
-        // --- BASE DE DATOS HÍBRIDA (CÓDIGO + NUBE) ---
+        // --- BASE DE DATOS LOCAL + NUBE ---
         let cursoProDB = {
             1: [
-                { id: "l1_1", title: "Lesson 1: Greetings 👋", questions: [
+                { id: "l1_default", title: "Lesson 1: Greetings 👋", questions: [
                     { type: "translation", q: "Hola", a: "hello" },
                     { type: "translation", q: "Adiós", a: "goodbye" },
                     { type: "dictation", q: "Good morning", a: "good morning" },
                     { type: "translation", q: "Buenos días", a: "good morning" },
                     { type: "translation", q: "Gracias", a: "thank you" }
-                ], content: { vocab: "Hola - Hello\nAdiós - Goodbye", help: "Aprende saludos básicos.", grammar: "Usa 'Hello' para saludar." } },
-                { id: "l1_2", title: "Lesson 2: Colors 🎨", questions: [
-                    { type: "translation", q: "Rojo", a: "red" },
-                    { type: "translation", q: "Azul", a: "blue" },
-                    { type: "dictation", q: "Yellow", a: "yellow" },
-                    { type: "translation", q: "Verde", a: "green" },
-                    { type: "dictation", q: "Black", a: "black" }
-                ], content: { vocab: "Rojo - Red\nAzul - Blue", help: "Colores básicos.", grammar: "Los colores van antes del sustantivo." } },
-                 { id: "l1_3", title: "Lesson 3: Introduction 🤝", questions: [
-                    { type: "dictation", q: "My name is", a: "my name is" },
-                    { type: "translation", q: "Yo soy", a: "i am" },
-                    { type: "translation", q: "Mucho gusto", a: "nice to meet you" }
-                ]}
+                ], content: { vocab: "Hola - Hello\nAdiós - Goodbye", help: "Aprende saludos básicos.", grammar: "Usa 'Hello' para saludar." } }
             ],
             2: [
-                { id: "l2_1", title: "Lesson 1: Animals 🦁", questions: [
+                { id: "l2_default", title: "Lesson 1: Animals 🦁", questions: [
                     { type: "translation", q: "Gato", a: "cat" },
-                    { type: "translation", q: "Perro", a: "dog" },
-                    { type: "dictation", q: "Elephant", a: "elephant" }
-                ]},
-                { id: "l2_2", title: "Lesson 2: Numbers 1-10 🔢", questions: [
-                    { type: "translation", q: "Uno", a: "one" },
-                    { type: "translation", q: "Dos", a: "two" },
-                    { type: "translation", q: "Tres", a: "three" }
-                ]}
+                    { type: "translation", q: "Perro", a: "dog" }
+                ], content: { vocab: "Gato - Cat", help: "Traduce los animales.", grammar: "Sustantivos simples." } }
             ],
             3: [
-                { id: "l3_1", title: "Lesson 1: Days 📅", questions: [
-                    { type: "translation", q: "Lunes", a: "monday" },
-                    { type: "translation", q: "Martes", a: "tuesday" }
-                ]},
-                { id: "l3_2", title: "Lesson 2: Nature 🌳", questions: [
-                    { type: "translation", q: "Sol", a: "sun" },
-                    { type: "translation", q: "Luna", a: "moon" },
-                    { type: "translation", q: "Agua", a: "water" }
-                ]}
+                { id: "l3_default", title: "Lesson 1: Days 📅", questions: [
+                    { type: "translation", q: "Lunes", a: "monday" }
+                ], content: { vocab: "Lunes - Monday", help: "Días de la semana.", grammar: "Capitalize days." } }
             ]
         };
 
@@ -536,6 +515,7 @@
                 db.collection("students").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         datosUsuario = doc.data();
+                        // Inicialización de datos faltantes
                         if(!datosUsuario.timeWorked) datosUsuario.timeWorked = 0;
                         if(!datosUsuario.medals) datosUsuario.medals = {gold:0, silver:0, bronze:0};
                         if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {};
@@ -555,12 +535,15 @@
                         }
                         db.collection("students").doc(usuarioActual).update({ lastLoginDate: datosUsuario.lastLoginDate, currentStreak: datosUsuario.currentStreak });
                         
-                        // --- SOLUCIÓN V50: CARGAR NUBE ANTES DE MOSTRAR JUEGO ---
-                        // Esto asegura que el selector de lecciones ya tenga datos cuando el usuario entre
-                        cargarContenidoNube(() => {
-                            mostrarJuego();
-                        });
-                        
+                        // INTENTO DE CARGA DE NUBE (PROTEGIDO)
+                        try {
+                            cargarContenidoNube(() => {
+                                mostrarJuego(); // Callback seguro
+                            });
+                        } catch (e) {
+                            console.log("Error nube, cargando local...");
+                            mostrarJuego(); // Fallback
+                        }
                     }
                 });
             } else { 
@@ -573,30 +556,30 @@
             cargarNoticias(); cargarLeaderboard(); cargarVocesUltraPro();
         });
 
-        // --- FUNCIÓN MAESTRA CORREGIDA: CALLBACK PARA EVITAR CONGELAMIENTO ---
+        // --- FUNCIÓN DE NUBE PROTEGIDA PARA NO CONGELAR ---
         function cargarContenidoNube(callback) {
             db.collection('contenido_curso').get().then((snapshot) => {
                 if(!snapshot.empty) {
                     snapshot.forEach(doc => {
-                        const levelKey = doc.id; 
+                        const levelKey = doc.id; // "nivel_1"
                         const levelNum = parseInt(levelKey.split('_')[1]); 
                         if (levelNum) {
                             const data = doc.data(); 
                             if (!cursoProDB[levelNum]) cursoProDB[levelNum] = [];
+                            
                             Object.values(data).forEach(lesson => {
+                                // Evitar duplicados
                                 const exists = cursoProDB[levelNum].find(l => l.id === lesson.id);
-                                if (!exists) { cursoProDB[levelNum].push(lesson); }
+                                if (!exists) { 
+                                    cursoProDB[levelNum].push(lesson); 
+                                }
                             });
                         }
                     });
-                    console.log("¡Contenido cargado! ☁️");
                 }
-                // Si existe un callback (como iniciar el juego), lo ejecutamos
                 if(callback) callback();
-                
             }).catch(error => {
-                console.error("Error nube:", error);
-                // Aún si falla la nube, DEBEMOS dejar entrar al usuario
+                console.error("Error nube (Continuando offline):", error);
                 if(callback) callback();
             });
         }
@@ -652,7 +635,7 @@
             }
         }
 
-        // --- FUNCIONES PARA MOSTRAR CONTENIDO DINÁMICO (V50) ---
+        // --- FUNCIONES CONTENIDO DINÁMICO ---
         function obtenerDatosLeccionActual() {
             if(!nivelActual) return null;
             const nivelData = cursoProDB[nivelActual] || [];
@@ -716,6 +699,7 @@
             if(nivelData.length === 0) { console.error("No data for level"); return; }
 
             const selectElement = document.getElementById('lessonSelect');
+            // Llenar selector si está vacío
             if (selectElement.options.length === 0 || selectElement.getAttribute('data-level') != nivelActual) {
                 selectElement.innerHTML = ""; 
                 selectElement.setAttribute('data-level', nivelActual); 
@@ -728,12 +712,16 @@
             }
 
             const selectedLessonIndex = selectElement.value || 0;
-            const lessonQuestions = nivelData[selectedLessonIndex].questions;
-            
-            if(!lessonQuestions || lessonQuestions.length === 0) {
-                 preguntaActual = { type: "translation", q: "No questions", a: "error" };
+            // Verificar que exista la lección antes de acceder
+            if (nivelData[selectedLessonIndex] && nivelData[selectedLessonIndex].questions) {
+                 const lessonQuestions = nivelData[selectedLessonIndex].questions;
+                 if(lessonQuestions.length > 0) {
+                     preguntaActual = lessonQuestions[Math.floor(Math.random() * lessonQuestions.length)];
+                 } else {
+                     preguntaActual = { type: "translation", q: "No questions", a: "error" };
+                 }
             } else {
-                 preguntaActual = lessonQuestions[Math.floor(Math.random() * lessonQuestions.length)];
+                 preguntaActual = { type: "translation", q: "Error loading", a: "error" };
             }
             
             const qt = document.getElementById("questionText");
@@ -837,20 +825,7 @@
         function aplicarCosmeticos() { document.getElementById("myAvatar").textContent = datosUsuario.equipped.avatar || '👤'; document.getElementById("myAvatar").className = "avatar-display " + (datosUsuario.equipped.frame || ""); const t = datosUsuario.equipped.theme; if(t) { document.body.style.background = t.bg; document.querySelectorAll(".card").forEach(c => { c.style.background = t.card; c.style.color = t.text; }); } else { document.body.style.background = "linear-gradient(135deg, #000428, #004e92)"; document.querySelectorAll(".card").forEach(c => { c.style.background = "#ffffff"; c.style.color = "#333"; }); } }
 
         function actualizarCandados() { for(let i=2;i<=3;i++) { const e=document.getElementById(`navL${i}`); if(datosUsuario.unlockedLevels.includes(i)) {e.classList.remove("locked");e.innerHTML=`Nivel ${i}`;} else {e.classList.add("locked");e.innerHTML=`🔐 Nivel ${i}`;}} }
-        
-        // --- NEW CAMBIAR NIVEL: CLEARS LESSON SELECTOR SO IT RELOADS ---
-        function cambiarNivel(n) { 
-            if(datosUsuario.unlockedLevels.includes(n)) { 
-                nivelActual=n; 
-                document.getElementById("levelText").textContent="Nivel "+n; 
-                // Force reload of selector options
-                document.getElementById('lessonSelect').innerHTML = ""; 
-                contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; 
-                cargarPregunta(); 
-                document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active")); 
-                event.target.classList.add("active"); 
-            } else Swal.fire("BLOQUEADO","Necesitas completar el nivel anterior 10 veces o usar un código.","error"); 
-        }
+        function cambiarNivel(n) { if(datosUsuario.unlockedLevels.includes(n)) { nivelActual=n; document.getElementById("levelText").textContent="Nivel "+n; document.getElementById('lessonSelect').innerHTML = ""; contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active")); event.target.classList.add("active"); } else Swal.fire("BLOQUEADO","Necesitas completar el nivel anterior 10 veces o usar un código.","error"); }
 
         function mostrarLoginMaestro() { document.getElementById("loginContainerWrapper").style.display="none"; document.getElementById("teacherLogin").style.display="block"; }
         function volverInicio() { document.getElementById("teacherLogin").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("loginContainerWrapper").style.display="flex"; }
@@ -906,8 +881,13 @@
         }
 
         async function aprobarPagoReal(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); if(!s.pendingPayment) return; const nivelADesbloquear = s.pendingPayment.nivel + 1; let nuevosNiveles = s.unlockedLevels || [1]; if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); let historial = s.paymentHistory || []; if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; } await db.collection("students").doc(uid).update({ unlockedLevels: nuevosNiveles, pendingPayment: null, paymentHistory: historial }); Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success"); cargarTablaAlumnos(); }
+        function verGraficaGrupal() { const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>b.score-a.score); document.getElementById("modalGraficaGrupal").style.display="flex"; const totalPuntos = d.reduce((acc, curr) => acc + Number(curr.score || 0), 0); const promedio = d.length > 0 ? (totalPuntos / d.length).toFixed(1) : 0; document.getElementById("modalStatsGroup").innerHTML = `<p><b>Total Alumnos:</b> ${d.length} | <b>Promedio Puntos:</b> ${promedio}</p>`; const ctx=document.getElementById('groupBigChart').getContext('2d'); if(chartGroupInstance) chartGroupInstance.destroy(); chartGroupInstance=new Chart(ctx,{type:'bar',data:{labels:d.map(s=>s.username),datasets:[{label:'Puntos Totales',data:d.map(s=>s.score),backgroundColor:'#004e92'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}}); }
+        function descargarCaptura(divId, nombre) { const el = document.getElementById(divId); html2canvas(el).then(c => { const l = document.createElement('a'); l.download = nombre; l.href = c.toDataURL(); l.click(); }); }
+        function cerrarModal(id) { document.getElementById(id).style.display="none"; }
+        function exportarExcel() { const ws=XLSX.utils.json_to_sheet(listaAlumnosCache.map(s=>({Nombre:s.username,Grupo:s.group,Puntos:s.score,Tiempo:formatearTiempo(s.timeWorked||0)}))); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Reporte"); XLSX.writeFile(wb,"Reporte.xlsx"); }
+        function exportarPDF() { html2pdf().from(document.getElementById('teacherPanel')).save(); }
+        function abrirModalAcademico(t) { document.getElementById("modalAcademico").style.display="flex"; document.getElementById("tituloAcademico").textContent=t; document.getElementById("nivelAcademico").textContent=nivelActual; }
         
-        // --- FUNCIÓN DE LOGIN CORREGIDA (ARREGLO DEL ERROR DE FIREBASE) ---
         function intentarLogin() {
             const e=document.getElementById("emailInput").value.trim(), p=document.getElementById("passwordInput").value.trim(), n=document.getElementById("usernameInput").value.trim();
             let g = "", gr = "";
