@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Creador - MASTER V50</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body { font-family: 'Nunito', sans-serif; background: #2c3e50; color: white; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .creator-card { background: white; color: #333; padding: 30px; border-radius: 20px; width: 100%; max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h2 { color: #004e92; text-align: center; }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .btn-save { background: #27ae60; color: white; width: 100%; padding: 15px; border: none; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-save:hover { background: #2ecc71; transform: scale(1.02); }
+        .preview-box { background: #f0f8ff; padding: 10px; border-radius: 10px; margin-top: 20px; border: 1px dashed #004e92; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <div class="creator-card">
+        <h2>🛠️ Panel de Creador AI V50</h2>
+        <p style="text-align: center; font-size: 14px; color: #666;">Agrega lecciones sin tocar código.</p>
+        <hr>
+
+        <label>1. Selecciona el Nivel:</label>
+        <select id="inputLevel">
+            <option value="1">Nivel 1</option>
+            <option value="2">Nivel 2</option>
+            <option value="3">Nivel 3</option>
+            <option value="4">Nivel 4 (Nuevo)</option>
+            <option value="5">Nivel 5 (Nuevo)</option>
+        </select>
+
+        <label>2. ID de la Lección (Ej: lesson_1_greeting):</label>
+        <input type="text" id="inputLessonId" placeholder="Ej: l1_comida">
+
+        <label>3. Título de la Lección (Lo que ve el alumno):</label>
+        <input type="text" id="inputLessonTitle" placeholder="Ej: Lesson 4: Food 🍔">
+
+        <hr style="margin: 20px 0;">
+        <h3>Agregar Pregunta a esta Lección</h3>
+        
+        <label>Tipo de Pregunta:</label>
+        <select id="inputType">
+            <option value="translation">Traducción (Texto)</option>
+            <option value="dictation">Dictado (Audio)</option>
+        </select>
+
+        <label>Pregunta (Lo que aparece en pantalla):</label>
+        <input type="text" id="inputQ" placeholder="Ej: Manzana">
+
+        <label>Respuesta Correcta (En Inglés):</label>
+        <input type="text" id="inputA" placeholder="Ej: apple">
+
+        <button onclick="agregarPreguntaLista()" class="btn-save" style="background:#3498db; margin-top:10px;">➕ Agregar a la Lista</button>
+
+        <div class="preview-box">
+            <strong>Preguntas listas para guardar:</strong>
+            <ul id="listaPreguntasTemp" style="padding-left: 20px;"></ul>
+        </div>
+
+        <button onclick="guardarEnNube()" class="btn-save">💾 GUARDAR LECCIÓN EN LA NUBE</button>
+    </div>
+
+    <script>
+        // TU CONFIGURACIÓN DE FIREBASE (EXACTAMENTE IGUAL A TU INDEX)
+        const firebaseConfig = { apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s", authDomain: "ingles-pepejoeck.firebaseapp.com", databaseURL: "https://ingles-pepejoeck-default-rtdb.firebaseio.com", projectId: "ingles-pepejoeck", storageBucket: "ingles-pepejoeck.firebasestorage.app", messagingSenderId: "519995763844", appId: "1:519995763844:web:350df130a6673b4002a6d1", measurementId: "G-5MEQGW13ZE" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let preguntasTemporales = [];
+
+        function agregarPreguntaLista() {
+            const q = document.getElementById('inputQ').value.trim();
+            const a = document.getElementById('inputA').value.trim().toLowerCase();
+            const type = document.getElementById('inputType').value;
+
+            if(!q || !a) return Swal.fire("Error", "Llena pregunta y respuesta", "warning");
+
+            preguntasTemporales.push({ type, q, a });
+            
+            // Actualizar vista previa
+            const ul = document.getElementById('listaPreguntasTemp');
+            const li = document.createElement('li');
+            li.textContent = `${type === 'dictation' ? '🎧' : '📝'} P: ${q} | R: ${a}`;
+            ul.appendChild(li);
+
+            // Limpiar inputs
+            document.getElementById('inputQ').value = '';
+            document.getElementById('inputA').value = '';
+            document.getElementById('inputQ').focus();
+        }
+
+        function guardarEnNube() {
+            const nivel = document.getElementById('inputLevel').value;
+            const lessonId = document.getElementById('inputLessonId').value.trim();
+            const lessonTitle = document.getElementById('inputLessonTitle').value.trim();
+
+            if(!lessonId || !lessonTitle || preguntasTemporales.length === 0) {
+                return Swal.fire("Falta información", "Asegúrate de poner ID, Título y al menos una pregunta.", "error");
+            }
+
+            // ESTRUCTURA DE INGENIERÍA V50
+            // Guardamos en una colección llamada 'contenido_curso'
+            // El documento será 'nivel_X'
+            // Dentro habrá un campo con el ID de la lección
+            
+            const docRef = db.collection('contenido_curso').doc(`nivel_${nivel}`);
+            
+            // Usamos 'merge: true' para no borrar las otras lecciones de ese nivel
+            const nuevaData = {};
+            nuevaData[lessonId] = {
+                id: lessonId,
+                title: lessonTitle,
+                questions: preguntasTemporales
+            };
+
+            docRef.set(nuevaData, { merge: true }).then(() => {
+                Swal.fire({
+                    title: '¡Éxito! 🚀',
+                    text: `La lección "${lessonTitle}" se ha guardado en el Nivel ${nivel} en la nube.`,
+                    icon: 'success'
+                });
+                // Limpiar todo para la siguiente
+                preguntasTemporales = [];
+                document.getElementById('listaPreguntasTemp').innerHTML = '';
+                document.getElementById('inputLessonId').value = '';
+                document.getElementById('inputLessonTitle').value = '';
+            }).catch((error) => {
+                Swal.fire("Error", error.message, "error");
+            });
+        }
+    </script>
+</body>
+</html>
