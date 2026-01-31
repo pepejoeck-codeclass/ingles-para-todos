@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Creador - MASTER V50 (EDIT & INFINITE)</title>
+    <title>Panel de Creador - MASTER V50 (IMAGES & DRAG DROP)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -102,19 +102,24 @@
             <select id="inputType">
                 <option value="translation">Traducción (Texto)</option>
                 <option value="dictation">Dictado (Audio)</option>
+                <option value="drag_drop">Arrastrar (Drag & Drop) 🖼️</option>
             </select>
 
-            <label>Pregunta / Texto:</label>
-            <input type="text" id="inputQ" placeholder="Ej: Gato">
+            <label>Pregunta / Texto (o Instrucción Drag&Drop):</label>
+            <input type="text" id="inputQ" placeholder="Ej: Arrastra el nombre correcto">
 
-            <label>Respuesta (Inglés):</label>
+            <label>Respuesta Correcta (Inglés):</label>
             <input type="text" id="inputA" placeholder="Ej: cat">
+            
+            <label>Link de Imagen (Solo para Drag & Drop):</label>
+            <input type="text" id="inputImg" placeholder="https://cdn-icons-png.flaticon.com/512/616/616430.png">
+            <div class="helper-text">Pega aquí la URL de la imagen.</div>
 
             <button onclick="agregarPreguntaLista()" class="btn-save" style="background:#3498db; margin-top:10px; font-size:14px; padding: 10px;">➕ Agregar Pregunta</button>
         </div>
 
         <div class="preview-box">
-            <strong>Preguntas agregadas (Nuevas + Existentes):</strong>
+            <strong>Preguntas agregadas:</strong>
             <ul id="listaPreguntasTemp" style="padding-left: 20px;"></ul>
         </div>
 
@@ -151,12 +156,22 @@
         function agregarPreguntaLista() {
             const q = document.getElementById('inputQ').value.trim();
             const a = document.getElementById('inputA').value.trim().toLowerCase();
+            const img = document.getElementById('inputImg').value.trim();
             const type = document.getElementById('inputType').value;
+            
             if(!q || !a) return Swal.fire("Faltan datos", "Llena pregunta y respuesta", "warning");
-            preguntasTemporales.push({ type, q, a });
+            
+            // Creamos el objeto de pregunta con el campo de imagen
+            const nuevaPregunta = { type, q, a };
+            if(type === 'drag_drop' && img) nuevaPregunta.img = img;
+            
+            preguntasTemporales.push(nuevaPregunta);
             renderizarListaPreguntas();
+            
+            // Limpiar campos
             document.getElementById('inputQ').value = '';
             document.getElementById('inputA').value = '';
+            document.getElementById('inputImg').value = '';
             document.getElementById('inputQ').focus();
         }
 
@@ -165,7 +180,11 @@
             ul.innerHTML = "";
             preguntasTemporales.forEach((p, index) => {
                 const li = document.createElement('li');
-                li.innerHTML = `${p.type === 'dictation' ? '🎧' : '📝'} ${p.q} -> ${p.a} <span style='color:red; cursor:pointer; margin-left:10px;' onclick='borrarPregunta(${index})'>[X]</span>`;
+                let icono = '📝';
+                if(p.type === 'dictation') icono = '🎧';
+                if(p.type === 'drag_drop') icono = '🖼️';
+                
+                li.innerHTML = `${icono} ${p.q} -> ${p.a} ${p.img ? '(Con Imagen)' : ''} <span style='color:red; cursor:pointer; margin-left:10px;' onclick='borrarPregunta(${index})'>[X]</span>`;
                 ul.appendChild(li);
             });
         }
@@ -191,7 +210,6 @@
             Swal.fire("Nivel Creado", `Ahora estás editando para el <b>Nivel ${nextLevel}</b>`, "info");
         }
 
-        // --- FUNCIÓN DE EDICIÓN (MASTER V50) ---
         async function cargarLeccionExistente() {
             const nivel = document.getElementById('inputLevel').value;
             let rawId = document.getElementById('inputLessonId').value.trim();
@@ -204,24 +222,20 @@
                 if (doc.exists) {
                     const data = doc.data();
                     if (data && data[lessonId]) {
-                        // DATOS ENCONTRADOS -> LLENAR CAMPOS
                         const leccion = data[lessonId];
                         document.getElementById('inputLessonTitle').value = leccion.title || "";
-                        
                         if (leccion.content) {
                             document.getElementById('inputVocab').value = leccion.content.vocab || "";
                             document.getElementById('inputHelp').value = leccion.content.help || "";
                             document.getElementById('inputGrammar').value = leccion.content.grammar || "";
                         }
-
                         if (leccion.questions && Array.isArray(leccion.questions)) {
                             preguntasTemporales = leccion.questions;
                             renderizarListaPreguntas();
                         }
-                        
-                        Swal.fire("Cargado", "Datos listos para editar. Agrega preguntas o cambia textos y guarda.", "success");
+                        Swal.fire("Cargado", "Datos listos para editar.", "success");
                     } else {
-                        Swal.fire("No encontrado", `No existe una lección con ID "${lessonId}" en el Nivel ${nivel}.`, "info");
+                        Swal.fire("No encontrado", `No existe lección con ID "${lessonId}".`, "info");
                     }
                 } else {
                     Swal.fire("Vacío", `Aún no hay nada creado en el Nivel ${nivel}.`, "info");
