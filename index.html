@@ -328,7 +328,7 @@
             <h3 id="tituloAcademico">...</h3>
             <hr>
             <div id="contenidoAcademicoBody" style="padding: 20px; font-size: 16px; color: #333; text-align: left; white-space: pre-wrap; background: #f9f9f9; border-radius: 10px;">
-            </div>
+                </div>
             <br>
             <button onclick="cerrarModal('modalAcademico')" class="btn btn-secondary">Cerrar</button>
         </div>
@@ -567,7 +567,7 @@
             });
         }
  
-        // --- FUNCIÓN RECUPERAR CONTRASEÑA (NUEVA) ---
+        // --- FUNCIÓN RECUPERAR CONTRASEÑA ---
         async function recuperarPassword() {
             const { value: email } = await Swal.fire({
                 title: 'Recuperar Contraseña 🔒',
@@ -590,7 +590,7 @@
             }
         }
  
-        // --- FUNCIÓN CERRAR SESIÓN (CORREGIDA) ---
+        // --- FUNCIÓN CERRAR SESIÓN ---
         function cerrarSesion() {
             if(breakTimer) clearTimeout(breakTimer);
             if(usuarioActual && db) {
@@ -650,7 +650,7 @@
             Swal.fire({ title: `Ayuda Nivel ${nivelActual} 💡`, html: `<div style="background:#e3f2fd; padding:15px; border-radius:10px; border-left:5px solid #2196f3; text-align:left;"><p><b>Instrucción:</b> ${helpTextEN}</p><hr><p style="font-size:12px; color:#555;">${helpTextES}</p></div>`, showCancelButton: true, confirmButtonText: '🔊 Escuchar (Listen)', cancelButtonText: 'Entendido', }).then((result) => { if (result.isConfirmed) { hablarTexto(helpTextEN, 'en-US'); } });
         }
         
-        // --- MODAL ACADÉMICO (AUDIO V50 ULTRA) ---
+        // --- MODAL ACADÉMICO MEJORADO (AUDIO V50 ULTRA) ---
         function abrirModalAcademico(titulo, tipo) {
             document.getElementById("modalAcademico").style.display="flex";
             document.getElementById("tituloAcademico").textContent=titulo;
@@ -666,11 +666,13 @@
 
             // Inyectamos el Texto VISUAL + El Botón de AUDIO
             document.getElementById("contenidoAcademicoBody").innerHTML = `
-                <div style="white-space: pre-wrap;">${contenido}</div>
+                <div style="white-space: pre-wrap; font-size: 16px; color: #333; margin-bottom: 15px;">${contenido}</div>
                 <hr>
-                <button onclick="hablarTexto('${textoParaAudio}', 'en-US')" class="btn" style="background:#5e35b1; margin-top:10px; box-shadow: 0 4px 0 #4527a0;">
-                    🔊 Escuchar (Listen)
-                </button>
+                <div style="text-align:center; margin-top:10px;">
+                    <button onclick="hablarTexto('${textoParaAudio}', 'en-US')" class="btn" style="width: auto; background: #6f42c1; box-shadow: 0 4px 0 #4527a0;">
+                        🔊 Escuchar (Listen)
+                    </button>
+                </div>
             `;
         }
  
