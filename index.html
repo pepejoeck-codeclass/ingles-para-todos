@@ -567,7 +567,7 @@
             });
         }
  
-        // --- FUNCIÓN RECUPERAR CONTRASEÑA (NUEVA) ---
+        // --- FUNCIÓN RECUPERAR CONTRASEÑA ---
         async function recuperarPassword() {
             const { value: email } = await Swal.fire({
                 title: 'Recuperar Contraseña 🔒',
@@ -590,7 +590,7 @@
             }
         }
  
-        // --- FUNCIÓN CERRAR SESIÓN (CORREGIDA) ---
+        // --- FUNCIÓN CERRAR SESIÓN ---
         function cerrarSesion() {
             if(breakTimer) clearTimeout(breakTimer);
             if(usuarioActual && db) {
@@ -738,8 +738,88 @@
         function opcionIngresarCodigo() { Swal.fire({ title: 'Código Secreto', input: 'text', inputPlaceholder: 'Ingresa el código...', showCancelButton: true }).then((result) => { if (result.value === LEVEL_CODES[nivelActual]) { Swal.fire("¡Código Correcto!", "Nivel desbloqueado.", "success"); desbloquearSiguienteNivel(); } else if(result.value) { Swal.fire("Error", "Código incorrecto.", "error"); } }); }
         function opcionPagarNivel() { window.open('https://mpago.li/2aeNocU', '_blank'); Swal.fire({ title: 'Verificar Pago 🔍', html: '<p style="font-size:14px">Ingresa el <b>Número de Operación o Folio</b> de tu comprobante de pago.</p>', input: 'text', inputPlaceholder: 'Ej: 1234567890', showCancelButton: true, confirmButtonText: 'Enviar para Revisión', cancelButtonText: 'Cancelar' }).then((result) => { if (result.isConfirmed && result.value) { registrarSolicitudPago(result.value); } else if (result.isConfirmed) { Swal.fire("Error", "Debes escribir el folio para verificar.", "warning"); } }); }
         function registrarSolicitudPago(folio) { const solicitud = { fecha: new Date().toLocaleString(), monto: 25, concepto: `Salto Nivel ${nivelActual}`, estado: `Pendiente (Folio: ${folio})`, folio: folio }; if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; datosUsuario.paymentHistory.push(solicitud); db.collection("students").doc(usuarioActual).update({ paymentHistory: datosUsuario.paymentHistory, pendingPayment: { nivel: nivelActual, fecha: new Date().toLocaleString(), folio: folio } }).then(() => { cerrarModal('modalNivelCompleto'); Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado al maestro.`, "info"); }); }
-        function pagarPuntos() { Swal.fire({ title: 'Comprar Puntos 💰', html: `<button onclick="procesarPagoPuntos(10, 50)" class="btn" style="margin:5px">$10 MXN = 50 Pts</button><button onclick="procesarPagoPuntos(20, 100)" class="btn" style="margin:5px">$20 MXN = 100 Pts</button><button onclick="procesarPagoPuntos(50, 300)" class="btn" style="margin:5px; background:gold; color:black;">$50 MXN = 300 Pts</button>`, showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Cerrar' }); }
-        function procesarPagoPuntos(dinero, puntos) { Swal.fire({ title: 'Ir a Pagar', text: `Se abrirá Mercado Pago para pagar $${dinero}. Avísale a tu maestro.`, confirmButtonText: 'Pagar', showCancelButton: true }).then((r) => { if(r.isConfirmed) { window.open('https://mpago.li/2aeNocU', '_blank'); datosUsuario.score += puntos; db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score }); actualizarUI(); } }); }
+        
+        // --- FUNCIÓN COMPRAR PUNTOS CORREGIDA (MASTER V50) ---
+        function pagarPuntos() { 
+            Swal.fire({ 
+                title: 'Comprar Puntos 💰', 
+                html: `
+                    <button onclick="procesarPagoPuntos(10, 50, 'https://mpago.li/25UzZWv')" class="btn" style="margin:5px; width:100%;">$10 MXN = 50 Pts</button>
+                    <button onclick="procesarPagoPuntos(20, 100, 'https://mpago.li/31mW9PJ')" class="btn" style="margin:5px; width:100%;">$20 MXN = 100 Pts</button>
+                    <button onclick="procesarPagoPuntos(50, 300, 'https://mpago.li/2S7f8YX')" class="btn" style="margin:5px; background:gold; color:black; width:100%;">$50 MXN = 300 Pts</button>
+                `, 
+                showConfirmButton: false, 
+                showCancelButton: true, 
+                cancelButtonText: 'Cerrar' 
+            }); 
+        }
+ 
+        function procesarPagoPuntos(dinero, puntos, link) { 
+            window.open(link, '_blank');
+            Swal.fire({ 
+                title: 'Verificar Compra de Puntos 🔍', 
+                html: `<p style="font-size:14px">Por favor escribe el <b>Folio de Pago</b> para validar tus ${puntos} puntos.</p>`, 
+                input: 'text', 
+                inputPlaceholder: 'Ej: 1234567890', 
+                showCancelButton: true, 
+                confirmButtonText: 'Enviar para Validación',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => { 
+                if(result.isConfirmed && result.value) { 
+                    const folio = result.value;
+                    const solicitud = { 
+                        fecha: new Date().toLocaleString(), 
+                        monto: dinero, 
+                        concepto: `Compra ${puntos} Puntos`, 
+                        estado: `Pendiente (Folio: ${folio})`, 
+                        folio: folio 
+                    }; 
+                    if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; 
+                    datosUsuario.paymentHistory.push(solicitud); 
+                    
+                    // IMPORTANTE: NO SUMAMOS PUNTOS AÚN. SE DEJA PENDIENTE PARA EL MAESTRO.
+                    // Se usa el campo 'pendingPayment' para que salga el botón de aprobar en la tabla del maestro.
+                    db.collection("students").doc(usuarioActual).update({ 
+                        paymentHistory: datosUsuario.paymentHistory,
+                        pendingPayment: { 
+                            tipo: 'puntos', // Marcamos que es compra de puntos
+                            cantidad: puntos,
+                            monto: dinero,
+                            fecha: new Date().toLocaleString(), 
+                            folio: folio 
+                        } 
+                    }).then(() => { 
+                        Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado. Los puntos se sumarán cuando el maestro apruebe el pago.`, "info"); 
+                    }); 
+                } 
+            }); 
+        }
+ 
+        // --- FUNCIÓN APROBAR PAGO CORREGIDA PARA ACEPTAR PUNTOS Y NIVELES ---
+        async function aprobarPagoReal(uid) { 
+            const s = listaAlumnosCache.find(x => x.uid === uid); 
+            if(!s.pendingPayment) return; 
+            
+            let historial = s.paymentHistory || []; 
+            if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; }
+ 
+            // LÓGICA DUAL: ¿Es nivel o son puntos?
+            if (s.pendingPayment.tipo === 'puntos') {
+                // ES COMPRA DE PUNTOS
+                const puntosASumar = s.pendingPayment.cantidad || 0;
+                const nuevoScore = (s.score || 0) + puntosASumar;
+                await db.collection("students").doc(uid).update({ score: nuevoScore, pendingPayment: null, paymentHistory: historial });
+                Swal.fire("¡Puntos Aprobados!", `Se han sumado ${puntosASumar} puntos a ${s.username}.`, "success");
+            } else {
+                // ES SUBIDA DE NIVEL (Lógica Original)
+                const nivelADesbloquear = s.pendingPayment.nivel + 1; 
+                let nuevosNiveles = s.unlockedLevels || [1]; 
+                if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); 
+                await db.collection("students").doc(uid).update({ unlockedLevels: nuevosNiveles, pendingPayment: null, paymentHistory: historial }); 
+                Swal.fire("¡Nivel Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success");
+            }
+            cargarTablaAlumnos(); 
+        }
  
         function activarEscritura() { const btn = document.getElementById("btnWrite"); btn.classList.add("active-writing"); document.getElementById("answerInput").focus(); setTimeout(() => btn.classList.remove("active-writing"), 500); }
         function activarMicrofono() { const btn = document.getElementById("btnMicrofono"); const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) { Swal.fire("Aviso", "Navegador no compatible. Usa Chrome.", "info"); activarEscritura(); return; } const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.interimResults = false; recognition.maxAlternatives = 1; recognition.start(); btn.classList.add("mic-listening", "active-speaking"); recognition.onresult = (e) => { const t = e.results[0][0].transcript.toLowerCase().replace('.',''); document.getElementById("answerInput").value = t; btn.classList.remove("mic-listening", "active-speaking"); verificarRespuesta(); }; recognition.onerror = () => { btn.classList.remove("mic-listening", "active-speaking"); }; }
@@ -829,7 +909,12 @@
                 const av = s.equipped?.avatar || '👤'; const fr = s.equipped?.frame || ''; 
                 const nombreMostrar = s.username || s.nombre || s.name || "Alumno";
                 let btnPago = "";
-                if(s.pendingPayment) { const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio"; btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">💸 ${folioInfo}</button>`; }
+                if(s.pendingPayment) { 
+                    const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio"; 
+                    // DIFERENCIAR VISUALMENTE SI ES PAGO DE NIVEL O PUNTOS
+                    const tipoPago = s.pendingPayment.tipo === 'puntos' ? '💰 Puntos' : '💸 Nivel';
+                    btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">${tipoPago} ${folioInfo}</button>`; 
+                }
                 tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history" title="Historial">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info" title="Gráfica">📊</button> <button onclick="cambiarGrupo('${s.uid}')" class="action-btn btn-edit" title="Cambiar Grupo" style="background:purple; color:white;">✏️</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit" title="Resetear / Regresar Nivel">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete" title="Eliminar">🗑️</button></td>`; 
                 tb.appendChild(tr); 
             }); 
@@ -837,11 +922,10 @@
             document.getElementById("promedioAciertos").textContent=d.reduce((a,b)=>a+(Number(b.totalCorrect)||0),0);
         }
  
-        async function aprobarPagoReal(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); if(!s.pendingPayment) return; const nivelADesbloquear = s.pendingPayment.nivel + 1; let nuevosNiveles = s.unlockedLevels || [1]; if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); let historial = s.paymentHistory || []; if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; } await db.collection("students").doc(uid).update({ unlockedLevels: nuevosNiveles, pendingPayment: null, paymentHistory: historial }); Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success"); cargarTablaAlumnos(); }
-        async function resetearAlumno(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); const maxLevel = Math.max(...(s.unlockedLevels || [1])); const { value: action } = await Swal.fire({ title: `Gestionar: ${s.username}`, text: `Nivel Actual: ${maxLevel}`, input: 'select', inputOptions: { 'level_jump': '⏪ Regresar a un Nivel Específico', 'reset_points': '📉 Resetear Solo Puntos', 'hard_reset': '⚠️ REINICIO TOTAL (Cero)' }, showCancelButton: true }); if (!action) return; if (action === 'reset_points') { await db.collection("students").doc(uid).update({score:0}); Swal.fire("Listo", "Puntos en 0", "success"); } else if (action === 'hard_reset') { await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); Swal.fire("Reinicio Total", "El alumno empieza desde cero.", "warning"); } else if (action === 'level_jump') { if (maxLevel <= 1) { return Swal.fire("Aviso", "El alumno ya está en el Nivel 1. No puede bajar más.", "info"); } const options = {}; for (let i = 1; i < maxLevel; i++) { options[i] = `Regresar a Nivel ${i}`; } const { value: targetLevel } = await Swal.fire({ title: 'Viaje en el Tiempo ⏳', text: `El alumno está en Nivel ${maxLevel}. ¿A dónde lo regresamos?`, input: 'select', inputOptions: options, showCancelButton: true }); if (targetLevel) { const target = parseInt(targetLevel); const newLevels = Array.from({length: target}, (_, i) => i + 1); await db.collection("students").doc(uid).update({ unlockedLevels: newLevels }); Swal.fire("¡Hecho!", `Alumno regresado al Nivel ${target}`, "success"); } } cargarTablaAlumnos(); }
+        // ... (RESTO DE FUNCIONES DE ADMIN INTACTAS) ...
         function borrarAlumno(uid) { if(confirm("¿Eliminar?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos()); }
         async function cambiarGrupo(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); const gpoActual = s.group || "Sin Grupo"; const { value: nuevoGpo } = await Swal.fire({ title: `Cambiar Grupo a ${s.username}`, input: 'text', inputLabel: `Grupo Actual: ${gpoActual}`, inputPlaceholder: 'Escribe el nuevo grupo (Ej: 4A)', inputValue: s.group || "", showCancelButton: true, confirmButtonText: 'Guardar Cambio', inputValidator: (value) => { if (!value) { return '¡Necesitas escribir un grupo!'; } } }); if (nuevoGpo) { const gpoFinal = nuevoGpo.toUpperCase().trim(); await db.collection("students").doc(uid).update({ group: gpoFinal }); Swal.fire("¡Actualizado!", `El alumno ahora está en el grupo ${gpoFinal}`, "success"); cargarTablaAlumnos(); } }
-        
+        async function resetearAlumno(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); const maxLevel = Math.max(...(s.unlockedLevels || [1])); const { value: action } = await Swal.fire({ title: `Gestionar: ${s.username}`, text: `Nivel Actual: ${maxLevel}`, input: 'select', inputOptions: { 'level_jump': '⏪ Regresar a un Nivel Específico', 'reset_points': '📉 Resetear Solo Puntos', 'hard_reset': '⚠️ REINICIO TOTAL (Cero)' }, showCancelButton: true }); if (!action) return; if (action === 'reset_points') { await db.collection("students").doc(uid).update({score:0}); Swal.fire("Listo", "Puntos en 0", "success"); } else if (action === 'hard_reset') { await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); Swal.fire("Reinicio Total", "El alumno empieza desde cero.", "warning"); } else if (action === 'level_jump') { if (maxLevel <= 1) { return Swal.fire("Aviso", "El alumno ya está en el Nivel 1. No puede bajar más.", "info"); } const options = {}; for (let i = 1; i < maxLevel; i++) { options[i] = `Regresar a Nivel ${i}`; } const { value: targetLevel } = await Swal.fire({ title: 'Viaje en el Tiempo ⏳', text: `El alumno está en Nivel ${maxLevel}. ¿A dónde lo regresamos?`, input: 'select', inputOptions: options, showCancelButton: true }); if (targetLevel) { const target = parseInt(targetLevel); const newLevels = Array.from({length: target}, (_, i) => i + 1); await db.collection("students").doc(uid).update({ unlockedLevels: newLevels }); Swal.fire("¡Hecho!", `Alumno regresado al Nivel ${target}`, "success"); } } cargarTablaAlumnos(); }
         function abrirMenuDonacion() { Swal.fire({ title: 'Apoya el Proyecto ❤️', html: ` <p style="font-size:14px; margin-bottom:15px;">Elige tu donativo para mantener la app activa:</p> <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;"> <button onclick="irADonar(40, 'https://mpago.li/1HvLXiy')" class="btn" style="width:120px; background:#009ee3">$40 MXN</button> <button onclick="irADonar(70, 'https://mpago.li/1r3jbNf')" class="btn" style="width:120px; background:#009ee3">$70 MXN</button> <button onclick="irADonar(100, 'https://mpago.li/1irBKzH')" class="btn" style="width:120px; background:#009ee3">$100 MXN</button> <button onclick="irADonar(200, 'https://mpago.li/1Exy4z9')" class="btn" style="width:120px; background:#009ee3">$200 MXN</button> </div> `, showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Cancelar' }); }
         function irADonar(monto, link) { window.open(link, '_blank'); Swal.fire({ title: '¡Gracias! 🙏', text: 'Por favor registra tu donativo para agradecerte.', html: `<input id="donanteName" class="swal2-input" placeholder="Tu Nombre" value="${(datosUsuario && datosUsuario.username) ? datosUsuario.username : ''}">` + '<input id="donanteFolio" class="swal2-input" placeholder="Folio de Pago">', confirmButtonText: 'Registrar', preConfirm: () => { const n = document.getElementById('donanteName').value; const f = document.getElementById('donanteFolio').value; if (!n || !f) { Swal.showValidationMessage('Escribe ambos datos por favor'); } return [n, f]; } }).then((result) => { if(result.isConfirmed) { const nombre = result.value[0]; const folio = result.value[1]; const docId = 'DON_' + Date.now(); const donationData = { nombre: nombre, folio: folio, monto: monto, fecha: new Date().toLocaleString(), isDonation: true, type: 'external_donation', uid: usuarioActual || null }; db.collection('students').doc(docId).set(donationData).then(() => { Swal.fire("Thank you for your donation", "Tu apoyo ha sido registrado.", "success"); }).catch((error) => { console.error(error); Swal.fire("Aviso", "Pago abierto. Nota: Para registrar el folio automático necesitas iniciar sesión, pero tu apoyo cuenta igual. ¡Gracias!", "warning"); }); } }); }
         function verDonaciones() { document.getElementById('donacionesCuerpo').innerHTML = "<tr><td colspan='4'>Cargando...</td></tr>"; document.getElementById('modalDonaciones').style.display = 'flex'; db.collection('students').where('isDonation', '==', true).get().then((snap) => { const tb = document.getElementById('donacionesCuerpo'); tb.innerHTML = ""; if(snap.empty) { tb.innerHTML = "<tr><td colspan='4'>Sin donaciones aún.</td></tr>"; return; } let data = []; snap.forEach(doc => data.push(doc.data())); data.sort((a, b) => { const dateA = new Date(a.fecha); const dateB = new Date(b.fecha); return isNaN(dateA) ? 0 : dateB - dateA; }); data.forEach(d => { tb.innerHTML += `<tr><td>${d.fecha}</td><td><b>${d.nombre}</b></td><td style="color:green; font-weight:bold;">$${d.monto}</td><td>${d.folio}</td></tr>`; }); }).catch((error) => { document.getElementById('donacionesCuerpo').innerHTML = `<tr><td colspan='4' style='color:red; font-weight:bold'>Error de acceso: ${error.message}</td></tr>`; }); }
