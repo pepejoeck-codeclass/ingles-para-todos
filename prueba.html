@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Drag & Drop - V50</title>
+    <style>
+        body { font-family: 'Nunito', sans-serif; text-align: center; background: #f0f2f5; padding: 20px; }
+        
+        /* LA ZONA DE META (IMAGEN) */
+        .drop-zone {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border: 4px dashed #ccc;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            transition: all 0.3s;
+        }
+        
+        /* Cuando arrastras algo encima, se ilumina */
+        .drop-zone.hover { border-color: #004e92; background-color: #e3f2fd; }
+        .drop-zone.correct { border-color: #2ecc71; background-color: #eafaf1; }
+        .drop-zone.wrong { border-color: #e74c3c; background-color: #fdedec; }
+
+        .target-img { width: 80%; height: 80%; object-fit: contain; pointer-events: none; }
+
+        /* LAS PALABRAS FLOTANTES */
+        .options-container { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
+        
+        .draggable-item {
+            background: #004e92;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        .draggable-item:active { cursor: grabbing; transform: scale(0.9); }
+    </style>
+</head>
+<body>
+
+    <h2>🐶 Prueba de Arrastrar 🐱</h2>
+    <p>Arrastra la palabra correcta sobre la imagen.</p>
+
+    <div class="drop-zone" id="dropZone" ondragover="permitirSoltar(event)" ondragleave="salirZona(event)" ondrop="soltar(event)" data-answer="cat">
+        <img src="https://cdn-icons-png.flaticon.com/512/616/616430.png" class="target-img">
+    </div>
+
+    <div class="options-container">
+        <div class="draggable-item" draggable="true" ondragstart="empezarArrastre(event)" id="opt1">Dog</div>
+        <div class="draggable-item" draggable="true" ondragstart="empezarArrastre(event)" id="opt2">Cat</div>
+        <div class="draggable-item" draggable="true" ondragstart="empezarArrastre(event)" id="opt3">Bird</div>
+    </div>
+
+    <h3 id="resultado" style="margin-top:20px; height:30px;">...</h3>
+
+    <script>
+        // 1. Cuando empiezas a arrastrar una palabra
+        function empezarArrastre(e) {
+            // Guardamos el texto de la palabra que estás moviendo (Ej: "Cat")
+            e.dataTransfer.setData("text", e.target.innerText.toLowerCase());
+        }
+
+        // 2. Cuando pasas la palabra por encima de la imagen
+        function permitirSoltar(e) {
+            e.preventDefault(); // Necesario para permitir soltar
+            document.getElementById("dropZone").classList.add("hover"); // Efecto visual
+        }
+
+        // 3. Si te sales de la imagen sin soltar
+        function salirZona(e) {
+            document.getElementById("dropZone").classList.remove("hover");
+        }
+
+        // 4. EL JUEZ: Cuando sueltas la palabra
+        function soltar(e) {
+            e.preventDefault();
+            const zona = document.getElementById("dropZone");
+            zona.classList.remove("hover");
+
+            // Obtenemos la palabra que soltaste
+            const palabraSoltada = e.dataTransfer.getData("text");
+            // Obtenemos la respuesta correcta secreta de la imagen
+            const respuestaCorrecta = zona.getAttribute("data-answer");
+
+            const textoResultado = document.getElementById("resultado");
+
+            // COMPARACIÓN
+            if (palabraSoltada === respuestaCorrecta) {
+                // ¡CORRECTO!
+                zona.classList.add("correct");
+                textoResultado.innerText = "🎉 ¡EXCELLENT! That is a Cat.";
+                textoResultado.style.color = "green";
+                // Aquí sonaría tu audio "Ding!"
+            } else {
+                // INCORRECTO
+                zona.classList.add("wrong");
+                textoResultado.innerText = "❌ Try again.";
+                textoResultado.style.color = "red";
+                // Quitamos el rojo después de 1 segundo
+                setTimeout(() => zona.classList.remove("wrong"), 1000);
+            }
+        }
+    </script>
+
+</body>
+</html>
