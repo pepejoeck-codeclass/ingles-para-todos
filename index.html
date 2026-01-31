@@ -517,6 +517,7 @@
             cargarContenidoDinamico(); 
         });
  
+        // --- FUNCIÓN LOGIN ROBUSTA ---
         function intentarLogin() {
             unlockAudio();
             const e = document.getElementById("emailInput").value.trim();
@@ -564,6 +565,46 @@
                     Swal.fire("Error", err.message, "error");
                 }
             });
+        }
+ 
+        // --- FUNCIÓN RECUPERAR CONTRASEÑA (NUEVA) ---
+        async function recuperarPassword() {
+            const { value: email } = await Swal.fire({
+                title: 'Recuperar Contraseña 🔒',
+                input: 'email',
+                inputLabel: 'Escribe tu correo electrónico',
+                inputPlaceholder: 'tu@correo.com',
+                showCancelButton: true,
+                confirmButtonText: 'Enviar',
+                cancelButtonText: 'Cancelar'
+            });
+ 
+            if (email) {
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        Swal.fire('¡Enviado! 📧', 'Revisa tu correo para restablecer tu contraseña.', 'success');
+                    })
+                    .catch((error) => {
+                        Swal.fire('Error', error.message, 'error');
+                    });
+            }
+        }
+ 
+        // --- FUNCIÓN CERRAR SESIÓN (CORREGIDA) ---
+        function cerrarSesion() {
+            if(breakTimer) clearTimeout(breakTimer);
+            if(usuarioActual && db) {
+                // Intentamos guardar, pero usamos finally para salir SIEMPRE
+                db.collection("students").doc(usuarioActual).update({
+                    timeWorked: datosUsuario.timeWorked || 0,
+                    dailyLogs: datosUsuario.dailyLogs || {}
+                }).finally(() => {
+                    auth.signOut().then(() => location.reload());
+                });
+            } else {
+                // Si no hay usuario activo, forzamos salida
+                auth.signOut().then(() => location.reload());
+            }
         }
  
         function mostrarLogin() {
