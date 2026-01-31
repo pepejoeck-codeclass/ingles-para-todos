@@ -115,6 +115,41 @@
         .report-summary { background: #f8f9fa; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid var(--primary); text-align: left; font-size: 14px; }
         .history-table { width: 100%; margin-top: 15px; text-align: left; }
         .history-table th { background: #6c757d; }
+        
+        /* --- ESTILOS DRAG & DROP (NUEVOS V50) --- */
+        .drop-zone {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            margin: 15px auto;
+            border: 3px dashed #ccc;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f9f9f9;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .drop-zone img { max-width: 90%; max-height: 90%; object-fit: contain; pointer-events: none; }
+        .drop-zone.hover { border-color: var(--primary); background-color: #e3f2fd; transform: scale(1.02); }
+        .drop-zone.correct { border-color: #2ecc71; background-color: #eafaf1; }
+        .drop-zone.wrong { border-color: #e74c3c; background-color: #fdedec; }
+        
+        .options-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 15px; }
+        .draggable-item {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            touch-action: none; /* Crucial para móvil */
+            transform: translate(0,0); /* Para GPU accel */
+        }
+        .draggable-item:active { cursor: grabbing; transform: scale(0.95); background: #003366; }
     </style>
 </head>
 <body>
@@ -230,14 +265,23 @@
             
             <h3 id="questionText" style="text-align: center; color: var(--secondary); margin: 25px 0; font-size: 24px;">Cargando...</h3>
             
-            <div class="skills-bar">
-                <button onclick="pronunciarPregunta()" class="skill-btn" id="btnListen" title="Listening">👂<span class="skill-label">Listen</span></button>
-                <button onclick="activarMicrofono()" class="skill-btn" id="btnMicrofono" title="Speaking">🎤<span class="skill-label">Speak</span></button>
-                <button onclick="activarEscritura()" class="skill-btn" id="btnWrite" title="Writing">✍️<span class="skill-label">Write</span></button>
+            <div id="dragDropArea" style="display:none;">
+                <div class="drop-zone" id="dropZone" ondragover="permitirSoltar(event)" ondragleave="salirZona(event)" ondrop="soltar(event)">
+                    </div>
+                <div id="dragOptions" class="options-container">
+                    </div>
             </div>
- 
-            <input type="text" id="answerInput" placeholder="Write or Speak..." autocomplete="off">
-            <button onclick="verificarRespuesta()" class="btn">CHECK</button>
+
+            <div id="standardControls">
+                <div class="skills-bar">
+                    <button onclick="pronunciarPregunta()" class="skill-btn" id="btnListen" title="Listening">👂<span class="skill-label">Listen</span></button>
+                    <button onclick="activarMicrofono()" class="skill-btn" id="btnMicrofono" title="Speaking">🎤<span class="skill-label">Speak</span></button>
+                    <button onclick="activarEscritura()" class="skill-btn" id="btnWrite" title="Writing">✍️<span class="skill-label">Write</span></button>
+                </div>
+                <input type="text" id="answerInput" placeholder="Write or Speak..." autocomplete="off">
+                <button onclick="verificarRespuesta()" class="btn">CHECK</button>
+            </div>
+
             <div id="feedback" style="margin-top: 15px; font-weight: bold; height: 20px;"></div>
         </div>
  
@@ -328,7 +372,7 @@
             <h3 id="tituloAcademico">...</h3>
             <hr>
             <div id="contenidoAcademicoBody" style="padding: 20px; font-size: 16px; color: #333; text-align: left; white-space: pre-wrap; background: #f9f9f9; border-radius: 10px;">
-                </div>
+            </div>
             <br>
             <button onclick="cerrarModal('modalAcademico')" class="btn btn-secondary">Cerrar</button>
         </div>
@@ -567,7 +611,7 @@
             });
         }
  
-        // --- FUNCIÓN RECUPERAR CONTRASEÑA ---
+        // --- FUNCIÓN RECUPERAR CONTRASEÑA (NUEVA) ---
         async function recuperarPassword() {
             const { value: email } = await Swal.fire({
                 title: 'Recuperar Contraseña 🔒',
@@ -590,7 +634,7 @@
             }
         }
  
-        // --- FUNCIÓN CERRAR SESIÓN ---
+        // --- FUNCIÓN CERRAR SESIÓN (CORREGIDA) ---
         function cerrarSesion() {
             if(breakTimer) clearTimeout(breakTimer);
             if(usuarioActual && db) {
@@ -705,16 +749,196 @@
             const lessonQuestions = leccionActualCompleta.questions;
             if(!lessonQuestions || lessonQuestions.length === 0) return;
             preguntaActual = lessonQuestions[Math.floor(Math.random() * lessonQuestions.length)];
+            
             if (!preguntaActual) return;
+
+            // --- LÓGICA V50: DRAG & DROP VS STANDARD ---
+            const standardControls = document.getElementById("standardControls");
+            const dragDropArea = document.getElementById("dragDropArea");
             const qt = document.getElementById("questionText");
-            const inp = document.getElementById("answerInput");
-            inp.value = ""; document.getElementById("feedback").textContent = "";
-            inp.style.borderColor = "#ddd"; inp.style.backgroundColor = "white";
-            if (preguntaActual.type === 'dictation') { qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; setTimeout(() => pronunciarPregunta(), 300); } else { qt.textContent = "Translate: " + preguntaActual.q; }
-            document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active-listening', 'active-speaking', 'active-writing', 'mic-listening'));
-            inp.focus();
+            const feedback = document.getElementById("feedback");
+
+            // Limpieza inicial
+            feedback.textContent = "";
+
+            if (preguntaActual.type === 'drag_drop') {
+                // MODO DRAG & DROP
+                standardControls.style.display = "none"; // Ocultamos teclado y botones
+                dragDropArea.style.display = "block";    // Mostramos zona de imagen
+                qt.textContent = preguntaActual.q;       // Pregunta o Instrucción
+
+                const dropZone = document.getElementById("dropZone");
+                const dragOptions = document.getElementById("dragOptions");
+
+                // Configurar Imagen
+                dropZone.innerHTML = `<img src="${preguntaActual.img}" alt="Imagen Pregunta">`;
+                dropZone.className = "drop-zone"; // Resetear colores
+                dropZone.setAttribute("data-answer", preguntaActual.a.toLowerCase()); // Guardar respuesta correcta secreta
+
+                // Generar Opciones (Correcta + Distractores)
+                let opciones = [preguntaActual.a];
+                
+                // Algoritmo de Distractores Inteligentes V50
+                // Intentamos sacar respuestas incorrectas de la misma lección
+                const distractores = lessonQuestions
+                    .filter(q => q.a.toLowerCase() !== preguntaActual.a.toLowerCase())
+                    .map(q => q.a);
+                
+                // Mezclamos distractores y tomamos 2 o 3
+                distractores.sort(() => 0.5 - Math.random());
+                opciones = opciones.concat(distractores.slice(0, 3));
+                
+                // Si faltan distractores (lección muy corta), agregamos genéricos
+                if (opciones.length < 3) opciones.push("Cat", "Dog", "Blue"); // Fallback seguro
+
+                // Mezclar todo para que la correcta no sea siempre la primera
+                opciones.sort(() => 0.5 - Math.random());
+
+                // Renderizar Botones Arrastrables
+                dragOptions.innerHTML = "";
+                opciones.forEach(opt => {
+                    const btn = document.createElement("div");
+                    btn.className = "draggable-item";
+                    btn.textContent = opt;
+                    btn.draggable = true; // Para Desktop
+                    
+                    // Eventos Desktop
+                    btn.addEventListener("dragstart", (e) => {
+                        e.dataTransfer.setData("text", opt.toLowerCase());
+                    });
+
+                    // Eventos Móvil (Touch) V50
+                    btn.addEventListener("touchstart", handleTouchStart, {passive: false});
+                    btn.addEventListener("touchmove", handleTouchMove, {passive: false});
+                    btn.addEventListener("touchend", handleTouchEnd, {passive: false});
+
+                    dragOptions.appendChild(btn);
+                });
+
+            } else {
+                // MODO ESTÁNDAR (TEXTO/DICTADO)
+                standardControls.style.display = "block";
+                dragDropArea.style.display = "none";
+                
+                const inp = document.getElementById("answerInput");
+                inp.value = ""; 
+                inp.style.borderColor = "#ddd"; inp.style.backgroundColor = "white";
+
+                if (preguntaActual.type === 'dictation') { 
+                    qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
+                    setTimeout(() => pronunciarPregunta(), 300); 
+                } else { 
+                    qt.textContent = "Translate: " + preguntaActual.q; 
+                }
+                
+                // Resetear botones de skills
+                document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active-listening', 'active-speaking', 'active-writing', 'mic-listening'));
+                inp.focus();
+            }
         }
  
+        // --- LÓGICA DRAG & DROP MÓVIL Y DESKTOP (V50) ---
+        
+        // 1. DESKTOP: Permitir soltar
+        function permitirSoltar(e) {
+            e.preventDefault();
+            document.getElementById("dropZone").classList.add("hover");
+        }
+        function salirZona(e) {
+            document.getElementById("dropZone").classList.remove("hover");
+        }
+        function soltar(e) {
+            e.preventDefault();
+            const data = e.dataTransfer.getData("text");
+            validarDragDrop(data);
+        }
+
+        // 2. MÓVIL: Variables para Touch
+        let activeTouchElement = null;
+        let originalPosition = {x: 0, y: 0};
+
+        function handleTouchStart(e) {
+            activeTouchElement = e.target;
+            const touch = e.touches[0];
+            const rect = activeTouchElement.getBoundingClientRect();
+            // Guardamos posición relativa al dedo
+            originalPosition.x = touch.clientX - rect.left;
+            originalPosition.y = touch.clientY - rect.top;
+            
+            activeTouchElement.style.position = 'fixed';
+            activeTouchElement.style.zIndex = '1000';
+            activeTouchElement.style.width = rect.width + 'px'; // Mantener tamaño
+        }
+
+        function handleTouchMove(e) {
+            if (!activeTouchElement) return;
+            e.preventDefault(); // Evitar scroll
+            const touch = e.touches[0];
+            activeTouchElement.style.left = (touch.clientX - originalPosition.x) + 'px';
+            activeTouchElement.style.top = (touch.clientY - originalPosition.y) + 'px';
+        }
+
+        function handleTouchEnd(e) {
+            if (!activeTouchElement) return;
+            e.preventDefault();
+            
+            // Detectar si soltamos sobre la zona
+            const touch = e.changedTouches[0];
+            const dropZone = document.getElementById("dropZone");
+            const rect = dropZone.getBoundingClientRect();
+
+            // Verificamos colisión
+            if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                validarDragDrop(activeTouchElement.textContent.toLowerCase());
+            }
+
+            // Resetear estilo del elemento (volver a la lista o desaparecer)
+            activeTouchElement.style.position = 'static';
+            activeTouchElement.style.zIndex = '';
+            activeTouchElement = null;
+            document.getElementById("dropZone").classList.remove("hover");
+        }
+
+        // 3. VALIDACIÓN CENTRALIZADA
+        function validarDragDrop(respuestaUsuario) {
+            const dropZone = document.getElementById("dropZone");
+            const respuestaCorrecta = dropZone.getAttribute("data-answer");
+            const feedback = document.getElementById("feedback");
+
+            if (respuestaUsuario === respuestaCorrecta) {
+                // CORRECTO
+                try { audioCorrecto.currentTime=0; audioCorrecto.play(); } catch(e){}
+                dropZone.classList.add("correct");
+                feedback.textContent = "CORRECT! 🔥"; feedback.style.color = "green";
+                
+                datosUsuario.score = (datosUsuario.score || 0) + 10; 
+                datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1; 
+                aciertosSesion++;
+                
+                db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, totalCorrect: datosUsuario.totalCorrect });
+                actualizarUI();
+                
+                document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100)+"%";
+                contadorPreguntas++;
+
+                if(contadorPreguntas >= 5) setTimeout(finSesion, 2000); 
+                else setTimeout(cargarPregunta, 1500);
+
+            } else {
+                // INCORRECTO
+                try { audioError.currentTime=0; audioError.play(); } catch(e){}
+                dropZone.classList.add("wrong");
+                feedback.textContent = "WRONG. Try again."; feedback.style.color = "red";
+                
+                datosUsuario.totalWrong = (datosUsuario.totalWrong || 0) + 1;
+                db.collection("students").doc(usuarioActual).update({ totalWrong: datosUsuario.totalWrong });
+                actualizarUI();
+
+                setTimeout(() => dropZone.classList.remove("wrong"), 1000);
+            }
+        }
+
         function verificarRespuesta() {
             if (!preguntaActual) return;
             const inputEl = document.getElementById("answerInput"); const r = inputEl.value.trim().toLowerCase(); 
@@ -757,80 +981,21 @@
         function opcionIngresarCodigo() { Swal.fire({ title: 'Código Secreto', input: 'text', inputPlaceholder: 'Ingresa el código...', showCancelButton: true }).then((result) => { if (result.value === LEVEL_CODES[nivelActual]) { Swal.fire("¡Código Correcto!", "Nivel desbloqueado.", "success"); desbloquearSiguienteNivel(); } else if(result.value) { Swal.fire("Error", "Código incorrecto.", "error"); } }); }
         function opcionPagarNivel() { window.open('https://mpago.li/2aeNocU', '_blank'); Swal.fire({ title: 'Verificar Pago 🔍', html: '<p style="font-size:14px">Ingresa el <b>Número de Operación o Folio</b> de tu comprobante de pago.</p>', input: 'text', inputPlaceholder: 'Ej: 1234567890', showCancelButton: true, confirmButtonText: 'Enviar para Revisión', cancelButtonText: 'Cancelar' }).then((result) => { if (result.isConfirmed && result.value) { registrarSolicitudPago(result.value); } else if (result.isConfirmed) { Swal.fire("Error", "Debes escribir el folio para verificar.", "warning"); } }); }
         function registrarSolicitudPago(folio) { const solicitud = { fecha: new Date().toLocaleString(), monto: 25, concepto: `Salto Nivel ${nivelActual}`, estado: `Pendiente (Folio: ${folio})`, folio: folio }; if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; datosUsuario.paymentHistory.push(solicitud); db.collection("students").doc(usuarioActual).update({ paymentHistory: datosUsuario.paymentHistory, pendingPayment: { nivel: nivelActual, fecha: new Date().toLocaleString(), folio: folio } }).then(() => { cerrarModal('modalNivelCompleto'); Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado al maestro.`, "info"); }); }
-        
-        // --- FUNCIÓN COMPRAR PUNTOS CORREGIDA (MASTER V50) ---
-        function pagarPuntos() { 
-            Swal.fire({ 
-                title: 'Comprar Puntos 💰', 
-                html: `
-                    <button onclick="procesarPagoPuntos(10, 50, 'https://mpago.li/25UzZWv')" class="btn" style="margin:5px; width:100%;">$10 MXN = 50 Pts</button>
-                    <button onclick="procesarPagoPuntos(20, 100, 'https://mpago.li/31mW9PJ')" class="btn" style="margin:5px; width:100%;">$20 MXN = 100 Pts</button>
-                    <button onclick="procesarPagoPuntos(50, 300, 'https://mpago.li/2S7f8YX')" class="btn" style="margin:5px; background:gold; color:black; width:100%;">$50 MXN = 300 Pts</button>
-                `, 
-                showConfirmButton: false, 
-                showCancelButton: true, 
-                cancelButtonText: 'Cerrar' 
-            }); 
-        }
- 
-        function procesarPagoPuntos(dinero, puntos, link) { 
-            window.open(link, '_blank');
-            Swal.fire({ 
-                title: 'Verificar Compra de Puntos 🔍', 
-                html: `<p style="font-size:14px">Por favor escribe el <b>Folio de Pago</b> para validar tus ${puntos} puntos.</p>`, 
-                input: 'text', 
-                inputPlaceholder: 'Ej: 1234567890', 
-                showCancelButton: true, 
-                confirmButtonText: 'Enviar para Validación',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => { 
-                if(result.isConfirmed && result.value) { 
-                    const folio = result.value;
-                    const solicitud = { 
-                        fecha: new Date().toLocaleString(), 
-                        monto: dinero, 
-                        concepto: `Compra ${puntos} Puntos`, 
-                        estado: `Pendiente (Folio: ${folio})`, 
-                        folio: folio 
-                    }; 
-                    if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; 
-                    datosUsuario.paymentHistory.push(solicitud); 
-                    
-                    // IMPORTANTE: NO SUMAMOS PUNTOS AÚN. SE DEJA PENDIENTE PARA EL MAESTRO.
-                    // Se usa el campo 'pendingPayment' para que salga el botón de aprobar en la tabla del maestro.
-                    db.collection("students").doc(usuarioActual).update({ 
-                        paymentHistory: datosUsuario.paymentHistory,
-                        pendingPayment: { 
-                            tipo: 'puntos', // Marcamos que es compra de puntos
-                            cantidad: puntos,
-                            monto: dinero,
-                            fecha: new Date().toLocaleString(), 
-                            folio: folio 
-                        } 
-                    }).then(() => { 
-                        Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado. Los puntos se sumarán cuando el maestro apruebe el pago.`, "info"); 
-                    }); 
-                } 
-            }); 
-        }
+        function pagarPuntos() { Swal.fire({ title: 'Comprar Puntos 💰', html: `<button onclick="procesarPagoPuntos(10, 50, 'https://mpago.li/25UzZWv')" class="btn" style="margin:5px; width:100%;">$10 MXN = 50 Pts</button><button onclick="procesarPagoPuntos(20, 100, 'https://mpago.li/31mW9PJ')" class="btn" style="margin:5px; width:100%;">$20 MXN = 100 Pts</button><button onclick="procesarPagoPuntos(50, 300, 'https://mpago.li/2S7f8YX')" class="btn" style="margin:5px; background:gold; color:black; width:100%;">$50 MXN = 300 Pts</button>`, showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Cerrar' }); }
+        function procesarPagoPuntos(dinero, puntos, link) { window.open(link, '_blank'); Swal.fire({ title: 'Verificar Compra de Puntos 🔍', html: `<p style="font-size:14px">Por favor escribe el <b>Folio de Pago</b> para validar tus ${puntos} puntos.</p>`, input: 'text', inputPlaceholder: 'Ej: 1234567890', showCancelButton: true, confirmButtonText: 'Enviar para Validación', cancelButtonText: 'Cancelar' }).then((result) => { if(result.isConfirmed && result.value) { const folio = result.value; const solicitud = { fecha: new Date().toLocaleString(), monto: dinero, concepto: `Compra ${puntos} Puntos`, estado: `Pendiente (Folio: ${folio})`, folio: folio }; if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; datosUsuario.paymentHistory.push(solicitud); db.collection("students").doc(usuarioActual).update({ paymentHistory: datosUsuario.paymentHistory, pendingPayment: { tipo: 'puntos', cantidad: puntos, monto: dinero, fecha: new Date().toLocaleString(), folio: folio } }).then(() => { Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado. Los puntos se sumarán cuando el maestro apruebe el pago.`, "info"); }); } }); }
  
         // --- FUNCIÓN APROBAR PAGO CORREGIDA PARA ACEPTAR PUNTOS Y NIVELES ---
         async function aprobarPagoReal(uid) { 
             const s = listaAlumnosCache.find(x => x.uid === uid); 
             if(!s.pendingPayment) return; 
-            
             let historial = s.paymentHistory || []; 
             if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; }
- 
-            // LÓGICA DUAL: ¿Es nivel o son puntos?
             if (s.pendingPayment.tipo === 'puntos') {
-                // ES COMPRA DE PUNTOS
                 const puntosASumar = s.pendingPayment.cantidad || 0;
                 const nuevoScore = (s.score || 0) + puntosASumar;
                 await db.collection("students").doc(uid).update({ score: nuevoScore, pendingPayment: null, paymentHistory: historial });
                 Swal.fire("¡Puntos Aprobados!", `Se han sumado ${puntosASumar} puntos a ${s.username}.`, "success");
             } else {
-                // ES SUBIDA DE NIVEL (Lógica Original)
                 const nivelADesbloquear = s.pendingPayment.nivel + 1; 
                 let nuevosNiveles = s.unlockedLevels || [1]; 
                 if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); 
