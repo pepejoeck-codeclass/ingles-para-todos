@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Creador - MASTER V50 (SECURE)</title>
+    <title>Panel de Creador - MASTER V50 (FULL CONTENT)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,19 +16,23 @@
     <style>
         body { font-family: 'Nunito', sans-serif; background: #2c3e50; color: white; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* LOGIN OVERLAY */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
         .login-box { background: white; padding: 30px; border-radius: 15px; text-align: center; color: #333; width: 300px; }
         
-        .creator-card { background: white; color: #333; padding: 30px; border-radius: 20px; width: 100%; max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; } /* Oculto al inicio */
+        .creator-card { background: white; color: #333; padding: 30px; border-radius: 20px; width: 100%; max-width: 700px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; }
         
-        h2 { color: #004e92; text-align: center; }
-        label { font-weight: bold; display: block; margin-top: 10px; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn-save { background: #27ae60; color: white; width: 100%; padding: 15px; border: none; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        h2 { color: #004e92; text-align: center; margin-top: 0; }
+        h3 { color: #e67e22; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 30px; }
+        label { font-weight: bold; display: block; margin-top: 15px; color: #004e92; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: 'Nunito'; }
+        textarea { resize: vertical; min-height: 80px; }
+        
+        .btn-save { background: #27ae60; color: white; width: 100%; padding: 15px; border: none; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 30px; transition: 0.3s; }
         .btn-save:hover { background: #2ecc71; transform: scale(1.02); }
         .preview-box { background: #f0f8ff; padding: 10px; border-radius: 10px; margin-top: 20px; border: 1px dashed #004e92; font-size: 12px; }
         .btn-login { background: #004e92; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
+        .helper-text { font-size: 11px; color: #777; margin-top: 2px; }
+        .section-box { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-top: 10px; border: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -36,58 +40,72 @@
     <div id="loginOverlay">
         <div class="login-box">
             <h3 style="color:#004e92;">🔐 Acceso Creador</h3>
-            <p style="font-size:12px;">Ingresa con una cuenta registrada para tener permisos de escritura.</p>
-            <input type="email" id="adminEmail" placeholder="Correo (Ej: tu correo de alumno)">
+            <p style="font-size:12px;">Ingresa con una cuenta registrada.</p>
+            <input type="email" id="adminEmail" placeholder="Correo">
             <input type="password" id="adminPass" placeholder="Contraseña">
-            <button onclick="autenticarCreador()" class="btn-login">ENTRAR AL PANEL</button>
+            <button onclick="autenticarCreador()" class="btn-login">ENTRAR</button>
         </div>
     </div>
 
     <div id="mainPanel" class="creator-card">
-        <h2>🛠️ Panel de Creador AI V50</h2>
-        <p style="text-align: center; font-size: 14px; color: #666;">Conectado como: <span id="userDisplay" style="color:green; font-weight:bold;">...</span></p>
-        <hr>
-
-        <label>1. Selecciona el Nivel:</label>
-        <select id="inputLevel">
-            <option value="1">Nivel 1</option>
-            <option value="2">Nivel 2</option>
-            <option value="3">Nivel 3</option>
-            <option value="4">Nivel 4 (Nuevo)</option>
-            <option value="5">Nivel 5 (Nuevo)</option>
-        </select>
-
-        <label>2. ID Único (Ej: l4_comida):</label>
-        <input type="text" id="inputLessonId" placeholder="Sin espacios (Ej: l4_1)">
-
-        <label>3. Título de la Lección (Lo que ve el alumno):</label>
-        <input type="text" id="inputLessonTitle" placeholder="Ej: Lesson 4: Fast Food 🍔">
-
-        <hr style="margin: 20px 0;">
-        <h3 style="text-align:center; color:#e67e22;">Agregar Preguntas</h3>
+        <h2>🛠️ Panel de Creador V50</h2>
+        <p style="text-align: center; font-size: 14px; color: #666; margin-bottom: 20px;">Conectado como: <span id="userDisplay" style="color:green; font-weight:bold;">...</span></p>
         
-        <div style="background:#eee; padding:10px; border-radius:10px;">
+        <div class="section-box">
+            <label>1. Nivel:</label>
+            <select id="inputLevel">
+                <option value="1">Nivel 1</option>
+                <option value="2">Nivel 2</option>
+                <option value="3">Nivel 3</option>
+                <option value="4">Nivel 4 (Nuevo)</option>
+                <option value="5">Nivel 5 (Nuevo)</option>
+            </select>
+
+            <label>2. ID Único:</label>
+            <input type="text" id="inputLessonId" placeholder="Ej: leccion_animales">
+            
+            <label>3. Título de la Lección:</label>
+            <input type="text" id="inputLessonTitle" placeholder="Ej: Lesson 5: The Zoo 🦁">
+        </div>
+
+        <h3>📚 Contenido Educativo (Botones)</h3>
+        <div class="section-box" style="background: #e8f6f3;">
+            <label>📖 Contenido para "Vocabulary":</label>
+            <textarea id="inputVocab" placeholder="Escribe la lista de palabras aquí... Ej:&#10;Cat - Gato&#10;Dog - Perro"></textarea>
+            <div class="helper-text">Esto aparecerá cuando el alumno de clic en el botón 'Vocabulary'.</div>
+
+            <label>📝 Contenido para "Ayuda/Help" (Instrucción):</label>
+            <textarea id="inputHelp" placeholder="Ej: En esta lección aprenderás animales. Escucha con atención y escribe el nombre en inglés."></textarea>
+            <div class="helper-text">Esto saldrá en el botón 'Ayuda' y el robot lo leerá.</div>
+
+            <label>✒️ Contenido para "Grammar":</label>
+            <textarea id="inputGrammar" placeholder="Ej: Usamos 'It is a...' para animales singulares."></textarea>
+            <div class="helper-text">Esto aparecerá en el botón 'Grammar'.</div>
+        </div>
+
+        <h3>⚡ Preguntas del Juego</h3>
+        <div class="section-box">
             <label>Tipo:</label>
             <select id="inputType">
                 <option value="translation">Traducción (Texto)</option>
                 <option value="dictation">Dictado (Audio)</option>
             </select>
 
-            <label>Pregunta / Texto a decir:</label>
-            <input type="text" id="inputQ" placeholder="Ej: Manzana (o Apple si es dictado)">
+            <label>Pregunta / Texto:</label>
+            <input type="text" id="inputQ" placeholder="Ej: Gato">
 
-            <label>Respuesta Correcta (Inglés):</label>
-            <input type="text" id="inputA" placeholder="Ej: apple">
+            <label>Respuesta (Inglés):</label>
+            <input type="text" id="inputA" placeholder="Ej: cat">
 
-            <button onclick="agregarPreguntaLista()" class="btn-save" style="background:#3498db; margin-top:10px; font-size:14px;">➕ Agregar a la Lista</button>
+            <button onclick="agregarPreguntaLista()" class="btn-save" style="background:#3498db; margin-top:10px; font-size:14px; padding: 10px;">➕ Agregar Pregunta</button>
         </div>
 
         <div class="preview-box">
-            <strong>Preguntas listas para guardar:</strong>
+            <strong>Preguntas agregadas:</strong>
             <ul id="listaPreguntasTemp" style="padding-left: 20px;"></ul>
         </div>
 
-        <button onclick="guardarEnNube()" class="btn-save">💾 GUARDAR LECCIÓN EN LA NUBE</button>
+        <button onclick="guardarEnNube()" class="btn-save">💾 GUARDAR TODO EN LA NUBE</button>
     </div>
 
     <script>
@@ -96,7 +114,6 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // VERIFICAR ESTADO DE LOGIN AL INICIAR
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('loginOverlay').style.display = 'none';
@@ -108,16 +125,8 @@
         function autenticarCreador() {
             const e = document.getElementById('adminEmail').value;
             const p = document.getElementById('adminPass').value;
-            if(!e || !p) return Swal.fire("Ups", "Pon correo y contraseña", "warning");
-
-            auth.signInWithEmailAndPassword(e, p)
-                .then(() => {
-                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
-                    Toast.fire({ icon: 'success', title: 'Acceso Permitido' });
-                })
-                .catch(error => {
-                    Swal.fire("Error de Acceso", "Usuario no encontrado o contraseña mal. Usa una cuenta válida de tu app.", "error");
-                });
+            if(!e || !p) return Swal.fire("Ups", "Faltan datos", "warning");
+            auth.signInWithEmailAndPassword(e, p).catch(error => Swal.fire("Error", "Revisa tu correo/contraseña", "error"));
         }
 
         let preguntasTemporales = [];
@@ -126,16 +135,12 @@
             const q = document.getElementById('inputQ').value.trim();
             const a = document.getElementById('inputA').value.trim().toLowerCase();
             const type = document.getElementById('inputType').value;
-
             if(!q || !a) return Swal.fire("Faltan datos", "Llena pregunta y respuesta", "warning");
-
             preguntasTemporales.push({ type, q, a });
-            
             const ul = document.getElementById('listaPreguntasTemp');
             const li = document.createElement('li');
-            li.textContent = `${type === 'dictation' ? '🎧' : '📝'} Q: ${q} | A: ${a}`;
+            li.textContent = `${type === 'dictation' ? '🎧' : '📝'} ${q} -> ${a}`;
             ul.appendChild(li);
-
             document.getElementById('inputQ').value = '';
             document.getElementById('inputA').value = '';
             document.getElementById('inputQ').focus();
@@ -143,49 +148,47 @@
 
         function guardarEnNube() {
             const user = auth.currentUser;
-            if (!user) return Swal.fire("Error de Seguridad", "No estás logueado. Recarga la página.", "error");
+            if (!user) return Swal.fire("Seguridad", "Debes iniciar sesión.", "error");
 
             const nivel = document.getElementById('inputLevel').value;
-            const lessonId = document.getElementById('inputLessonId').value.trim();
+            let rawId = document.getElementById('inputLessonId').value.trim();
+            const lessonId = rawId.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
             const lessonTitle = document.getElementById('inputLessonTitle').value.trim();
+            
+            // --- CAPTURA DE DATOS NUEVOS ---
+            const vocabContent = document.getElementById('inputVocab').value;
+            const helpContent = document.getElementById('inputHelp').value;
+            const grammarContent = document.getElementById('inputGrammar').value;
 
             if(!lessonId || !lessonTitle || preguntasTemporales.length === 0) {
-                return Swal.fire("Incompleto", "Pon ID, Título y agrega al menos una pregunta.", "error");
+                return Swal.fire("Incompleto", "Faltan datos básicos o preguntas.", "error");
             }
 
-            // GUARDA EN FIREBASE (La estructura que lee tu nuevo index)
             const docRef = db.collection('contenido_curso').doc(`nivel_${nivel}`);
             
-            // Preparamos los datos con el formato que lee el Array del index
-            // OJO: Guardamos un objeto donde la clave es el lessonIndex lógico para ordenarlo luego
-            // Pero para simplificar, usaremos un array de objetos en un campo 'lessons' si fuera posible, 
-            // pero para mantener consistencia con tu index Architect, usaremos la estructura de objeto.
-            
+            // Estructura V50 Full Content
             const nuevaLeccion = {
                 id: lessonId,
                 title: lessonTitle,
-                questions: preguntasTemporales
+                questions: preguntasTemporales,
+                // Aquí guardamos lo que escribiste para los botones
+                content: {
+                    vocab: vocabContent || "No vocabulary list provided.",
+                    help: helpContent || "Complete the activity.",
+                    grammar: grammarContent || "No grammar notes."
+                }
             };
 
-            // Usamos notación de corchetes para crear una llave dinámica
-            // Esto agregará o actualizará SOLO esta lección en el documento del nivel
             const updateData = {};
             updateData[lessonId] = nuevaLeccion;
 
             docRef.set(updateData, { merge: true }).then(() => {
-                Swal.fire({
-                    title: '¡Guardado! 🎉',
-                    text: `La lección "${lessonTitle}" ya está en la nube segura.`,
-                    icon: 'success'
-                });
-                // Limpiar formulario
+                Swal.fire({ title: '¡Guardado con Contenido!', text: `Se guardó Vocabulario, Gramática y Ayuda para "${lessonTitle}".`, icon: 'success' });
+                // Limpiar (Opcional, para seguir agregando)
                 preguntasTemporales = [];
                 document.getElementById('listaPreguntasTemp').innerHTML = '';
-                document.getElementById('inputLessonId').value = '';
-                document.getElementById('inputLessonTitle').value = '';
             }).catch((error) => {
-                console.error(error);
-                Swal.fire("Error al guardar", "Verifica tu conexión o permisos: " + error.message, "error");
+                Swal.fire("Error", "Problema de permisos o conexión.", "error");
             });
         }
     </script>
