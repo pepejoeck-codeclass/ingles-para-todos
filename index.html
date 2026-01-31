@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V50 AI ULTRA (STABLE)</title>
+    <title>Inglés Para Todos - MASTER V50 AI ULTRA (ARCHITECT)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,25 +11,22 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
+ 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+ 
     <style>
-        /* --- ESTILOS ORIGINALES INTACTOS --- */
+        /* --- MANTENIENDO TODOS TUS ESTILOS ORIGINALES INTACTOS --- */
         :root { --primary: #004e92; --secondary: #000428; --accent: #ff0000; --gold: #ffd700; --silver: #C0C0C0; --bronze: #CD7F32; --white: #ffffff; }
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0; min-height: 100vh; color: #333; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 95%; padding: 20px; box-sizing: border-box; }
         .login-width { max-width: 500px; margin: 0 auto; }
-        
         .card { background: var(--white); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; margin-bottom: 20px; position: relative; transition: all 0.3s; }
-        
         .logo-img { width: 100%; max-width: 300px; margin-bottom: 10px; }
         .teacher-badge-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); cursor: pointer; margin: 10px auto; display: block; object-fit: cover; }
         .teacher-header-img { width: 100%; max-height: 180px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 10px; }
-        
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; font-family: 'Nunito'; }
         .btn { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; color: white; background: var(--primary); }
         .btn-danger { background: var(--accent); } .btn-secondary { background: #6c757d; }
@@ -39,12 +36,8 @@
         .btn-pay { background: linear-gradient(45deg, #11998e, #38ef7d); box-shadow: 0 4px 0 #0b6623; }
         .btn-code { background: linear-gradient(45deg, #8e44ad, #c0392b); box-shadow: 0 4px 0 #5b2c6f; }
         .btn-review { background: linear-gradient(45deg, #FF512F, #DD2476); box-shadow: 0 4px 0 #9e184e; color: white; }
-        
-        /* BOTÓN DONACIÓN ESPECIAL */
         .btn-donate { background: linear-gradient(45deg, #ff416c, #ff4b2b); box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4); animation: pulseDonate 2s infinite; }
         @keyframes pulseDonate { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-
-        /* SKILLS BAR */
         .skills-bar { display: flex; justify-content: center; gap: 15px; margin: 20px 0; background: #f0f2f5; padding: 10px; border-radius: 50px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
         .skill-btn { width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 24px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #555; }
         .skill-label { font-size: 9px; margin-top: 2px; font-weight: bold; text-transform: uppercase; }
@@ -54,8 +47,6 @@
         .skill-btn:active { transform: scale(0.95); }
         @keyframes pulseMic { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
         .mic-listening { background: #ff0000 !important; color: white !important; animation: pulseMic 1.5s infinite; }
-
-        /* BOTONES ACADÉMICOS Y AYUDA */
         .academic-nav { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; }
         .btn-academic { flex: 1; padding: 10px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
         .btn-academic:active { transform: translateY(2px); }
@@ -63,24 +54,18 @@
         .btn-grammar { background: linear-gradient(45deg, #833ab4, #fd1d1d); }
         .btn-help { background: linear-gradient(45deg, #FF9800, #F44336); box-shadow: 0 4px 0 #E65100; flex: 0.8; font-size: 13px; animation: popHelp 3s infinite; }
         @keyframes popHelp { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-
-        /* SELECTOR DE LECCIONES */
         .lesson-selector-container { margin: 10px 0; }
         .lesson-select { width: 100%; padding: 10px; border-radius: 15px; border: 2px solid var(--primary); font-weight: bold; color: var(--primary); background: #f0f8ff; cursor: pointer; }
-
         .progress-container { width: 100%; background: #e9ecef; border-radius: 10px; height: 15px; margin: 15px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: #00c6ff; width: 0%; transition: width 0.3s; }
-        .bottom-nav { display: flex; justify-content: space-around; background: white; padding: 10px; border-radius: 15px; margin-top: 10px; }
-        .nav-item { cursor: pointer; color: #aaa; font-size: 12px; text-align: center; }
+        .bottom-nav { display: flex; justify-content: space-around; background: white; padding: 10px; border-radius: 15px; margin-top: 10px; flex-wrap: wrap; }
+        .nav-item { cursor: pointer; color: #aaa; font-size: 12px; text-align: center; padding: 5px; }
         .nav-item.active { color: var(--primary); font-weight: bold; }
         .nav-item.locked { opacity: 0.5; pointer-events: none; }
-        
         .hud-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 11px; font-weight: bold; background: #f0f2f5; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
         .hud-item { display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 5px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .avatar-display { font-size: 24px; width: 50px; height: 50px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
-        
-        /* FRAMES & TIENDA */
         .frame-gold { border: 3px solid gold !important; box-shadow: 0 0 10px gold; }
         .frame-fire { border: 3px solid orangered !important; box-shadow: 0 0 10px red; }
         .frame-neon { border: 3px solid cyan !important; box-shadow: 0 0 10px cyan; }
@@ -97,8 +82,6 @@
         .shop-tabs { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
         .shop-tab { padding: 5px 15px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; background: #f1f1f1; }
         .shop-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-        /* MAESTRO Y COMUNIDAD */
         .teacher-panel-container { width: 100%; max-width: 1200px; display: none; padding-bottom: 50px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
@@ -111,15 +94,11 @@
         .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; }
         .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
         .mini-avatar { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 2px solid transparent; font-size: 18px; background: #eee; }
-        
-        /* TABS */
         .tabs-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
         .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; background: #f0f2f5; color: #666; transition: all 0.3s; text-transform: uppercase; font-size: 14px; }
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,78,146,0.3); }
         .tab-btn-teacher { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; background: white; font-weight: bold; }
         .tab-btn-teacher.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-        /* COMUNIDAD */
         .community-section { width: 100%; max-width: 800px; margin: 20px auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .news-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left; border-top: 5px solid #ffc107; }
         .leaderboard-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #004e92; }
@@ -129,8 +108,6 @@
         .rank-1 { background-color: #fff9db; font-weight: bold; } .rank-1 td:first-child::before { content: '🥇 '; }
         .rank-2 { background-color: #f8f9fa; } .rank-2 td:first-child::before { content: '🥈 '; }
         .rank-3 { background-color: #fff0e6; } .rank-3 td:first-child::before { content: '🥉 '; }
-
-        /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; text-align: center; }
         .level-complete-options { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
@@ -141,7 +118,7 @@
     </style>
 </head>
 <body>
-
+ 
     <div id="loginContainerWrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
         <div id="loginCard" class="app-container login-width">
             <div class="card">
@@ -152,7 +129,7 @@
                     <button class="tab-btn active" id="tabStudent" onclick="setLoginMode('student')">🎓 Soy Alumno</button>
                     <button class="tab-btn" id="tabAdult" onclick="setLoginMode('adult')">💼 Soy Adulto</button>
                 </div>
-
+ 
                 <input type="email" id="emailInput" placeholder="Correo Electrónico">
                 <input type="password" id="passwordInput" placeholder="Contraseña">
                 <hr>
@@ -163,7 +140,7 @@
                     <input type="number" id="gradeInput" placeholder="Grado" style="width:50%">
                     <input type="text" id="groupInput" placeholder="Grupo" style="width:50%">
                 </div>
-
+ 
                 <button onclick="intentarLogin(); unlockAudio();" class="btn">🚀 ENTRAR / REGISTRAR</button>
                 <div style="margin-top: 15px;"><a href="#" onclick="recuperarPassword()" style="font-size: 13px; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a></div>
                 
@@ -178,7 +155,7 @@
                 <img src="assets/images/super_teacher_btn.jpg.jpg" onclick="mostrarLoginMaestro()" class="teacher-badge-img">
             </div>
         </div>
-
+ 
         <div id="communitySection" class="community-section">
             <div class="news-box">
                 <h3 style="margin-top:0; color:#333;"><i class="fas fa-bullhorn"></i> Noticias / News</h3>
@@ -192,7 +169,7 @@
             </div>
         </div>
     </div>
-
+ 
     <div id="teacherLogin" class="app-container login-width" style="display: none;">
         <div class="card">
             <img src="assets/images/teacher_header.jpg.jpg" class="teacher-header-img">
@@ -203,7 +180,7 @@
             <button onclick="volverInicio()" class="btn btn-secondary" style="margin-top:10px">Cancelar</button>
         </div>
     </div>
-
+ 
     <div id="mainContent" class="app-container login-width" style="display: none;">
         <div class="card" style="padding: 15px; margin-bottom: 15px;">
             <div class="user-header">
@@ -230,22 +207,22 @@
                 <button onclick="pagarPuntos()" class="add-points-btn" title="Comprar Puntos">+</button>
             </div>
         </div>
-
+ 
         <div class="academic-nav">
-            <button onclick="mostrarModalContenido('vocab')" class="btn-academic btn-vocab"><i class="fas fa-book"></i> Vocabulary</button>
+            <button onclick="abrirModalAcademico('Vocabulary 📚', 'vocab')" class="btn-academic btn-vocab"><i class="fas fa-book"></i> Vocabulary</button>
             <button onclick="mostrarAyuda()" class="btn-academic btn-help"><i class="fas fa-question-circle"></i> Ayuda / Help</button>
-            <button onclick="mostrarModalContenido('grammar')" class="btn-academic btn-grammar"><i class="fas fa-pen-fancy"></i> Grammar</button>
+            <button onclick="abrirModalAcademico('Grammar 📖', 'grammar')" class="btn-academic btn-grammar"><i class="fas fa-pen-fancy"></i> Grammar</button>
         </div>
-
+ 
         <div class="card">
             <div style="text-align: center; margin-bottom: 15px;">
                 <span id="levelText" style="background:#ffd700; padding:5px 15px; border-radius:15px; font-weight:800; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Nivel 1</span>
                 
                 <div class="lesson-selector-container">
                     <select id="lessonSelect" class="lesson-select" onchange="cargarPregunta()">
-                        </select>
+                    </select>
                 </div>
-
+ 
                 <div id="repsText" style="font-size: 11px; color: #666; margin-top: 5px;">Intentos: 0/10</div>
             </div>
             
@@ -258,19 +235,19 @@
                 <button onclick="activarMicrofono()" class="skill-btn" id="btnMicrofono" title="Speaking">🎤<span class="skill-label">Speak</span></button>
                 <button onclick="activarEscritura()" class="skill-btn" id="btnWrite" title="Writing">✍️<span class="skill-label">Write</span></button>
             </div>
-
+ 
             <input type="text" id="answerInput" placeholder="Write or Speak..." autocomplete="off">
             <button onclick="verificarRespuesta()" class="btn">CHECK</button>
             <div id="feedback" style="margin-top: 15px; font-weight: bold; height: 20px;"></div>
         </div>
-
-        <div class="bottom-nav">
+ 
+        <div class="bottom-nav" id="bottomNavContainer">
             <div class="nav-item active" onclick="cambiarNivel(1)">Nivel 1</div>
             <div class="nav-item locked" id="navL2" onclick="cambiarNivel(2)">🔐 Nivel 2</div>
             <div class="nav-item locked" id="navL3" onclick="cambiarNivel(3)">🔐 Nivel 3</div>
-        </div>
+            </div>
     </div>
-
+ 
     <div id="teacherPanel" class="teacher-panel-container">
         <div class="card" style="text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -283,7 +260,7 @@
                 <button class="tab-btn-teacher active" id="btnTabStudents" onclick="setTeacherTab('student')">👨‍🎓 Students</button>
                 <button class="tab-btn-teacher" id="btnTabAdults" onclick="setTeacherTab('adult')">🤵 Adults</button>
             </div>
-
+ 
             <div style="background: #fff3cd; padding: 10px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ffeeba;">
                 <h4 style="margin: 0 0 5px 0;">📢 Publicar Noticia</h4>
                 <div style="display: flex; gap: 10px;">
@@ -312,7 +289,7 @@
             </div>
         </div>
     </div>
-
+ 
     <div id="modalNivelCompleto" class="modal-overlay">
         <div class="modal-content">
             <h2 id="modalLevelTitle">¡Nivel Completado! 🎉</h2>
@@ -327,7 +304,7 @@
             </div>
         </div>
     </div>
-
+ 
     <div id="modalDonaciones" class="modal-overlay">
         <div class="modal-content">
             <h3>🎁 Historial de Donaciones</h3>
@@ -341,7 +318,7 @@
             <button onclick="cerrarModal('modalDonaciones')" class="btn btn-secondary">Cerrar</button>
         </div>
     </div>
-
+ 
     <div id="modalGrafica" class="modal-overlay"><div class="modal-content"><h3 id="modalNombre">Individual</h3><div id="printAreaInd" style="background: white; padding: 10px; border-radius: 10px;"><div id="modalStats" class="report-summary"></div><canvas id="studentChart"></canvas></div><br><button onclick="descargarCaptura('printAreaInd', 'Reporte_Individual.png')" class="btn btn-download">Descargar</button> <button onclick="cerrarModal('modalGrafica')" class="btn btn-secondary">Cerrar</button></div></div>
     <div id="modalGraficaGrupal" class="modal-overlay"><div class="modal-content" style="max-width: 900px;"><h3>📊 Rendimiento del Grupo</h3><div id="printAreaGroup" style="background: white; padding: 10px;"><div id="modalStatsGroup" class="report-summary" style="text-align: center;"></div><canvas id="groupBigChart"></canvas></div><br><button onclick="descargarCaptura('printAreaGroup', 'Grafica_Grupal.png')" class="btn btn-download">Descargar</button> <button onclick="cerrarModal('modalGraficaGrupal')" class="btn btn-secondary">Cerrar</button></div></div>
     <div id="modalHistorial" class="modal-overlay"><div class="modal-content"><h3 id="historialNombre">Historial 📜</h3><div style="overflow-y: auto; max-height: 300px;"><table class="history-table"><thead><tr><th>Fecha</th><th>Tiempo</th></tr></thead><tbody id="historialCuerpo"></tbody></table></div><br><button onclick="cerrarModal('modalHistorial')" class="btn btn-secondary">Cerrar</button></div></div>
@@ -350,12 +327,13 @@
         <div class="modal-content">
             <h3 id="tituloAcademico">...</h3>
             <hr>
-            <div id="contenidoAcademicoBody" style="padding: 20px; font-size: 16px; color: #333; text-align: left; white-space: pre-wrap;">Cargando...</div>
+            <div id="contenidoAcademicoBody" style="padding: 20px; font-size: 16px; color: #333; text-align: left; white-space: pre-wrap; background: #f9f9f9; border-radius: 10px;">
+                </div>
             <br>
             <button onclick="cerrarModal('modalAcademico')" class="btn btn-secondary">Cerrar</button>
         </div>
     </div>
-
+ 
     <div id="modalTienda" class="modal-overlay">
         <div class="modal-content">
             <h3>🛒 Tienda de Héroes</h3>
@@ -369,22 +347,22 @@
             <br><button onclick="cerrarModal('modalTienda')" class="btn btn-secondary">Cerrar</button>
         </div>
     </div>
-
+ 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s", authDomain: "ingles-pepejoeck.firebaseapp.com", databaseURL: "https://ingles-pepejoeck-default-rtdb.firebaseio.com", projectId: "ingles-pepejoeck", storageBucket: "ingles-pepejoeck.firebasestorage.app", messagingSenderId: "519995763844", appId: "1:519995763844:web:350df130a6673b4002a6d1", measurementId: "G-5MEQGW13ZE" };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
         
-        // --- AUDIO ---
+        // --- MOTOR DE AUDIO V50 ULTRA EXPERT ---
         const audioCorrecto = new Audio('./assets/sounds/correct.mp3'); 
         const audioError = new Audio('./assets/sounds/wrong.mp3'); 
         const audioLevelUp = new Audio('./assets/sounds/levelup.mp3');
         const synth = window.speechSynthesis;
         let vocesDisponibles = [];
         let audioUnlocked = false;
-
+ 
         audioCorrecto.preload = 'auto'; audioError.preload = 'auto'; audioLevelUp.preload = 'auto';
-
+ 
         function cargarVocesUltraPro() {
             const rawVoices = synth.getVoices();
             if (rawVoices.length === 0) { setTimeout(cargarVocesUltraPro, 50); return; }
@@ -393,15 +371,13 @@
             englishVoices.sort((a, b) => {
                 const aScore = priorities.findIndex(p => a.name.includes(p));
                 const bScore = priorities.findIndex(p => b.name.includes(p));
-                const valA = aScore === -1 ? 999 : aScore;
-                const valB = bScore === -1 ? 999 : bScore;
-                return valA - valB;
+                return (aScore === -1 ? 999 : aScore) - (bScore === -1 ? 999 : bScore);
             });
             vocesDisponibles = englishVoices.length > 0 ? englishVoices : rawVoices;
         }
         cargarVocesUltraPro();
         if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVocesUltraPro; }
-
+ 
         function unlockAudio() {
             if(audioUnlocked) return;
             const buffer = new SpeechSynthesisUtterance("");
@@ -409,7 +385,7 @@
             audioCorrecto.volume = 0; audioCorrecto.play().then(() => { audioCorrecto.pause(); audioCorrecto.volume = 1; }).catch(()=>{});
             audioUnlocked = true;
         }
-
+ 
         function pronunciarPregunta() {
             if (!preguntaActual) return;
             if(synth.speaking || synth.pending) { synth.cancel(); }
@@ -425,47 +401,86 @@
                 synth.speak(utterance);
             }, 10);
         }
-
+ 
         function hablarTexto(texto, idioma='en-US') {
             if(synth.speaking || synth.pending) { synth.cancel(); }
             const utterance = new SpeechSynthesisUtterance(texto);
             if(idioma === 'en-US' && vocesDisponibles.length > 0) { utterance.voice = vocesDisponibles[0]; }
-            utterance.lang = idioma;
-            utterance.rate = 0.9;
+            utterance.lang = idioma; utterance.rate = 0.9;
             synth.speak(utterance);
         }
-
-        let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null;
+ 
+        let usuarioActual = null, datosUsuario = {}, nivelActual = 1, preguntaActual = null, leccionActualCompleta = null;
         let contadorPreguntas = 0, aciertosSesion = 0, timerInterval = null, listaAlumnosCache = [];
         let breakTimer = null; 
         let chartGlobalInstance = null, chartStudentInstance = null, chartGroupInstance = null;
         let loginMode = 'student'; let teacherViewMode = 'student';
         const LEVEL_CODES = { 1: "angysanti1", 2: "angysanti2", 3: "angysanti3" };
-
-        // --- BASE DE DATOS LOCAL INICIAL (FALLBACK) ---
+ 
+        // --- ESTRUCTURA DE DATOS HÍBRIDA (MASTER V50) ---
+        // Se cargará con tus datos de Firebase al iniciar.
         let cursoProDB = {
             1: [
-                { id: "l1_default", title: "Lesson 1: Greetings 👋", questions: [
-                    { type: "translation", q: "Hola", a: "hello" },
-                    { type: "translation", q: "Adiós", a: "goodbye" },
-                    { type: "dictation", q: "Good morning", a: "good morning" },
-                    { type: "translation", q: "Buenos días", a: "good morning" },
-                    { type: "translation", q: "Gracias", a: "thank you" }
-                ], content: { vocab: "Hola - Hello\nAdiós - Goodbye", help: "Aprende saludos básicos.", grammar: "Usa 'Hello' para saludar." } }
+                { id: "l1_1", title: "Lesson 1: Greetings 👋", questions: [ { type: "translation", q: "Hola", a: "hello" }, { type: "translation", q: "Adiós", a: "goodbye" }, { type: "dictation", q: "Good morning", a: "good morning" }, { type: "translation", q: "Buenos días", a: "good morning" }, { type: "translation", q: "Gracias", a: "thank you" } ]},
+                { id: "l1_2", title: "Lesson 2: Colors 🎨", questions: [ { type: "translation", q: "Rojo", a: "red" }, { type: "translation", q: "Azul", a: "blue" }, { type: "dictation", q: "Yellow", a: "yellow" }, { type: "translation", q: "Verde", a: "green" }, { type: "dictation", q: "Black", a: "black" } ]},
+                { id: "l1_3", title: "Lesson 3: Introduction 🤝", questions: [ { type: "dictation", q: "My name is", a: "my name is" }, { type: "translation", q: "Yo soy", a: "i am" }, { type: "translation", q: "Mucho gusto", a: "nice to meet you" } ]}
             ],
             2: [
-                { id: "l2_default", title: "Lesson 1: Animals 🦁", questions: [
-                    { type: "translation", q: "Gato", a: "cat" },
-                    { type: "translation", q: "Perro", a: "dog" }
-                ], content: { vocab: "Gato - Cat", help: "Traduce los animales.", grammar: "Sustantivos simples." } }
+                { id: "l2_1", title: "Lesson 1: Animals 🦁", questions: [ { type: "translation", q: "Gato", a: "cat" }, { type: "translation", q: "Perro", a: "dog" }, { type: "dictation", q: "Elephant", a: "elephant" } ]},
+                { id: "l2_2", title: "Lesson 2: Numbers 1-10 🔢", questions: [ { type: "translation", q: "Uno", a: "one" }, { type: "translation", q: "Dos", a: "two" }, { type: "translation", q: "Tres", a: "three" } ]}
             ],
             3: [
-                { id: "l3_default", title: "Lesson 1: Days 📅", questions: [
-                    { type: "translation", q: "Lunes", a: "monday" }
-                ], content: { vocab: "Lunes - Monday", help: "Días de la semana.", grammar: "Capitalize days." } }
+                { id: "l3_1", title: "Lesson 1: Days 📅", questions: [ { type: "translation", q: "Lunes", a: "monday" }, { type: "translation", q: "Martes", a: "tuesday" } ]},
+                { id: "l3_2", title: "Lesson 2: Nature 🌳", questions: [ { type: "translation", q: "Sol", a: "sun" }, { type: "translation", q: "Luna", a: "moon" }, { type: "translation", q: "Agua", a: "water" } ]}
             ]
         };
-
+ 
+        // --- FUNCIÓN CLAVE V50: CARGAR CONTENIDO CREADO ---
+        // Esta función lee de Firebase y fusiona con lo que tienes, respetando tu audio y lógica.
+        async function cargarContenidoDinamico() {
+            // Intentar cargar niveles del 1 al 20 (escalable)
+            for (let i = 1; i <= 20; i++) {
+                try {
+                    const doc = await db.collection('contenido_curso').doc(`nivel_${i}`).get();
+                    if (doc.exists) {
+                        const data = doc.data();
+                        const leccionesArray = Object.values(data); // Convierte el objeto en array de lecciones
+                        
+                        // Si ya existen datos locales (ej. Niveles 1-3 hardcoded), los sobrescribimos o fusionamos
+                        // Estrategia: Si hay datos en la nube, la nube manda.
+                        if (leccionesArray.length > 0) {
+                            cursoProDB[i] = leccionesArray;
+                            // Actualizar candados visuales
+                            actualizarCandadosDinamicos(i);
+                        }
+                    }
+                } catch (e) {
+                    console.log("No hay contenido extra para nivel " + i);
+                }
+            }
+            console.log("Contenido V50 sincronizado.", cursoProDB);
+            // Si el usuario ya estaba logueado y en juego, recargar pregunta para reflejar cambios
+            if (usuarioActual && document.getElementById("mainContent").style.display === "block") {
+                cargarPregunta();
+            }
+        }
+ 
+        function actualizarCandadosDinamicos(lvl) {
+            const navContainer = document.getElementById('bottomNavContainer');
+            // Verificar si ya existe el botón
+            let btn = document.getElementById(`navL${lvl}`);
+            if (!btn) {
+                // Crear botón si es un nivel nuevo (ej. Nivel 4, 5, etc.)
+                btn = document.createElement('div');
+                btn.className = 'nav-item locked';
+                btn.id = `navL${lvl}`;
+                btn.onclick = function() { cambiarNivel(lvl); };
+                btn.innerHTML = `🔐 Nivel ${lvl}`;
+                navContainer.appendChild(btn);
+            }
+            // Estado Locked/Unlocked se maneja en 'actualizarCandados' estándar
+        }
+ 
         const shopCatalog = [
             { id: 'av_sup1', type: 'avatar', name: 'Superman Prime', price: 50000, icon: '🦸‍♂️⚡' }, 
             { id: 'av_sup2', type: 'avatar', name: 'Supergirl Prime', price: 50000, icon: '🦸‍♀️⚡' },
@@ -492,7 +507,7 @@
             { id: 'th_cyb', type: 'theme', name: 'Cyberpunk', price: 800, colors: {bg:'linear-gradient(135deg, #0f0c29, #302b63, #24243e)', card:'#000000', text:'#00ff00'} },
             { id: 'th_for', type: 'theme', name: 'Forest Calm', price: 400, colors: {bg:'linear-gradient(135deg, #5a3f37, #2c7744)', card:'#f1f8e9', text:'#33691e'} }
         ];
-
+ 
         function setLoginMode(mode) {
             loginMode = mode;
             const tabS = document.getElementById('tabStudent');
@@ -501,7 +516,7 @@
             if(mode === 'student') { tabS.classList.add('active'); tabA.classList.remove('active'); fields.style.display = 'flex'; } 
             else { tabA.classList.add('active'); tabS.classList.remove('active'); fields.style.display = 'none'; }
         }
-
+ 
         function setTeacherTab(mode) {
             teacherViewMode = mode;
             document.getElementById('btnTabStudents').classList.toggle('active', mode === 'student');
@@ -510,7 +525,7 @@
             if(mode === 'adult') { groupFilter.value = 'todos'; groupFilter.style.display = 'none'; } else { groupFilter.style.display = 'block'; }
             renderizarTabla();
         }
-
+ 
         auth.onAuthStateChanged((user) => {
             if (user) {
                 usuarioActual = user.uid;
@@ -525,7 +540,7 @@
                         if(!datosUsuario.unlockedLevels) datosUsuario.unlockedLevels = [1];
                         if(!datosUsuario.userType) datosUsuario.userType = 'student'; 
                         if(datosUsuario.hasSeenWelcome === undefined) datosUsuario.hasSeenWelcome = false; 
-
+ 
                         const hoy = new Date().toLocaleDateString('es-ES');
                         if (!datosUsuario.lastLoginDate) { datosUsuario.lastLoginDate = hoy; datosUsuario.currentStreak = 1; }
                         else if (datosUsuario.lastLoginDate !== hoy) {
@@ -535,11 +550,7 @@
                             datosUsuario.lastLoginDate = hoy;
                         }
                         db.collection("students").doc(usuarioActual).update({ lastLoginDate: datosUsuario.lastLoginDate, currentStreak: datosUsuario.currentStreak });
-                        
-                        // INTENTO DE CARGA DE NUBE (PROTEGIDO)
-                        cargarContenidoNube(function() {
-                            mostrarJuego();
-                        });
+                        mostrarJuego();
                     }
                 });
             } else { 
@@ -547,52 +558,31 @@
                 if(document.getElementById("teacherPanel").style.display === "none") mostrarLogin(); 
             }
         });
-
+ 
         document.addEventListener("DOMContentLoaded", () => { 
             cargarNoticias(); cargarLeaderboard(); cargarVocesUltraPro();
+            cargarContenidoDinamico(); // INICIA CARGA HÍBRIDA
         });
-
-        // --- FUNCIÓN DE NUBE PROTEGIDA PARA NO CONGELAR ---
-        function cargarContenidoNube(callback) {
-            db.collection('contenido_curso').get().then((snapshot) => {
-                if(!snapshot.empty) {
-                    snapshot.forEach(doc => {
-                        const levelKey = doc.id; 
-                        const levelNum = parseInt(levelKey.split('_')[1]); 
-                        if (levelNum) {
-                            const data = doc.data(); 
-                            if (!cursoProDB[levelNum]) cursoProDB[levelNum] = [];
-                            
-                            Object.values(data).forEach(lesson => {
-                                // Evitar duplicados
-                                const exists = cursoProDB[levelNum].find(l => l.id === lesson.id);
-                                if (!exists) { 
-                                    cursoProDB[levelNum].push(lesson); 
-                                }
-                            });
-                        }
-                    });
-                }
-                if(callback) callback();
-            }).catch(error => {
-                console.error("Error nube (Continuando offline):", error);
-                if(callback) callback();
-            });
+ 
+        function mostrarLogin() {
+            document.getElementById("loginContainerWrapper").style.display="flex";
+            document.getElementById("loginCard").style.display="block";
+            document.getElementById("communitySection").style.display="flex";
+            document.getElementById("mainContent").style.display="none";
+            document.getElementById("teacherPanel").style.display="none";
+            document.getElementById("teacherLogin").style.display="none";
+            cargarLeaderboard(); 
         }
-
-        function mostrarLogin() { document.getElementById("loginContainerWrapper").style.display="flex"; document.getElementById("loginCard").style.display="block"; document.getElementById("communitySection").style.display="flex"; document.getElementById("mainContent").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("teacherLogin").style.display="none"; cargarLeaderboard(); }
-
+ 
         function mostrarJuego() { 
-            document.getElementById("loginContainerWrapper").style.display="none"; 
-            document.getElementById("mainContent").style.display="block"; 
+            document.getElementById("loginContainerWrapper").style.display="none";
+            document.getElementById("mainContent").style.display="block";
             document.getElementById("userDisplay").textContent = (datosUsuario.userType === 'adult' ? "Adulto: " : "Alumno: ") + (datosUsuario.username||"Héroe"); 
             actualizarUI(); actualizarCandados(); 
             cargarPregunta(); 
             setTimeout(() => { if(document.getElementById("questionText").textContent === "Cargando...") cargarPregunta(); }, 1000);
             iniciarCronometro(); aplicarCosmeticos();
-            
-            initBreakTimer(); 
-            checkWelcomeVideo(); 
+            initBreakTimer(); checkWelcomeVideo(); 
         }
         
         function initBreakTimer() {
@@ -601,79 +591,63 @@
                 Swal.fire({
                     title: 'Time for a break! 🌿',
                     html: `<div style="font-size:50px; margin-bottom:10px;">🧘‍♂️</div><p style="font-size:18px; color:#555;">Haz una pausa, respira y relájate.</p><p style="font-size:16px; color:#777; font-style:italic;">"Take a break, breathe, and relax"</p>`,
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonText: 'Continuar / Continue',
-                    cancelButtonText: 'Salir / Logout',
-                    confirmButtonColor: '#28a745',
-                    cancelButtonColor: '#d33',
-                    allowOutsideClick: false
-                }).then((result) => {
-                    if (result.isConfirmed) { initBreakTimer(); } else { cerrarSesion(); }
-                });
+                    icon: 'info', showCancelButton: true, confirmButtonText: 'Continuar / Continue', cancelButtonText: 'Salir / Logout', confirmButtonColor: '#28a745', cancelButtonColor: '#d33', allowOutsideClick: false
+                }).then((result) => { if (result.isConfirmed) { initBreakTimer(); } else { cerrarSesion(); } });
             }, 1800000); 
         }
-
+ 
         function checkWelcomeVideo() {
             if(!datosUsuario.hasSeenWelcome) {
-                Swal.fire({
-                    title: 'Welcome! 🤖',
-                    html: `<div style="background:#000; border-radius:10px; padding:20px; color:white; margin-bottom:10px;"><div style="font-size:60px;">👨‍🏫</div><p style="margin-top:10px; font-weight:bold; color:#00c6ff;">AI Teacher Bot</p><div style="margin-top:15px; font-size:14px; text-align:left; line-height:1.5;">"Bienvenidos a su curso de English (Inglés para todos).<br>Welcome to your English course (English for everyone).<br><br>Aprenderás inglés desde nivel A1.1 hasta un nivel B2.<br>Debes guiarte usando los botones de <b>Ayuda</b>, <b>Vocabulary</b> y <b>Grammar</b> para contestar tus actividades.<br><br>Good luck!"</div></div>`,
-                    confirmButtonText: "Let's Start!",
-                    didOpen: () => {
-                        const msg = "Welcome to your English course, English for everyone. You will learn English from level A 1 point 1 to B 2. Please guide yourself using the Help, Vocabulary and Grammar buttons to answer your activities. Good luck!";
-                        hablarTexto(msg, 'en-US');
-                    }
-                }).then(() => {
-                    datosUsuario.hasSeenWelcome = true;
-                    db.collection("students").doc(usuarioActual).update({ hasSeenWelcome: true });
-                });
+                const msg = "Welcome to your English course, English for everyone. You will learn English from level A 1 point 1 to B 2. Please guide yourself using the Help, Vocabulary and Grammar buttons to answer your activities. Good luck!";
+                Swal.fire({ title: 'Welcome! 🤖', html: `<div style="background:#000; border-radius:10px; padding:20px; color:white; margin-bottom:10px;"><div style="font-size:60px;">👨‍🏫</div><p style="margin-top:10px; font-weight:bold; color:#00c6ff;">AI Teacher Bot</p><div style="margin-top:15px; font-size:14px; text-align:left; line-height:1.5;">${msg}</div></div>`, confirmButtonText: "Let's Start!", didOpen: () => { hablarTexto(msg, 'en-US'); }
+                }).then(() => { datosUsuario.hasSeenWelcome = true; db.collection("students").doc(usuarioActual).update({ hasSeenWelcome: true }); });
             }
         }
-
-        // --- FUNCIONES CONTENIDO DINÁMICO ---
-        function obtenerDatosLeccionActual() {
-            if(!nivelActual) return null;
-            const nivelData = cursoProDB[nivelActual] || [];
-            const selectElement = document.getElementById('lessonSelect');
-            const selectedLessonIndex = selectElement.value || 0;
-            return nivelData[selectedLessonIndex];
-        }
-
+ 
+        // --- MOSTRAR AYUDA (DINÁMICO V50) ---
         function mostrarAyuda() {
-            const lesson = obtenerDatosLeccionActual();
-            const defaultHelp = "Completa la actividad. / Complete the activity.";
-            const helpText = (lesson && lesson.content && lesson.content.help) ? lesson.content.help : defaultHelp;
-            
-            Swal.fire({
-                title: `Ayuda / Help 💡`,
-                html: `<div style="background:#e3f2fd; padding:15px; border-radius:10px; border-left:5px solid #2196f3; text-align:left; white-space: pre-wrap;">${helpText}</div>`,
-                showCancelButton: true,
-                confirmButtonText: '🔊 Escuchar (Listen)',
-                cancelButtonText: 'Entendido',
-            }).then((result) => {
-                if (result.isConfirmed) { hablarTexto(helpText, 'en-US'); }
-            });
-        }
-
-        function mostrarModalContenido(tipo) {
-            const lesson = obtenerDatosLeccionActual();
-            let content = "No content available.";
-            let title = "...";
-            
-            if (tipo === 'vocab') {
-                title = "Vocabulary 📚";
-                content = (lesson && lesson.content && lesson.content.vocab) ? lesson.content.vocab : "No vocabulary list for this lesson.";
-            } else if (tipo === 'grammar') {
-                title = "Grammar 📖";
-                content = (lesson && lesson.content && lesson.content.grammar) ? lesson.content.grammar : "No grammar notes for this lesson.";
+            let helpTextES = "Completa la actividad.";
+            let helpTextEN = "Complete the activity.";
+ 
+            // Si hay contenido dinámico cargado para esta lección
+            if (leccionActualCompleta && leccionActualCompleta.content && leccionActualCompleta.content.help) {
+                helpTextES = "Mira la instrucción:";
+                helpTextEN = leccionActualCompleta.content.help;
+            } else {
+                // Fallback para niveles viejos hardcoded
+                const oldInstructions = {
+                    1: { es: "Escucha y escribe. Saludos y colores.", en: "Listen and write. Greetings and colors." },
+                    2: { es: "Animales y números.", en: "Animals and numbers." },
+                    3: { es: "Días y naturaleza.", en: "Days and nature." }
+                };
+                if(oldInstructions[nivelActual]) {
+                    helpTextES = oldInstructions[nivelActual].es;
+                    helpTextEN = oldInstructions[nivelActual].en;
+                }
             }
-
-            document.getElementById('tituloAcademico').textContent = title;
-            document.getElementById('contenidoAcademicoBody').textContent = content;
-            document.getElementById('modalAcademico').style.display = 'flex';
+ 
+            Swal.fire({
+                title: `Ayuda Nivel ${nivelActual} 💡`,
+                html: `<div style="background:#e3f2fd; padding:15px; border-radius:10px; border-left:5px solid #2196f3; text-align:left;"><p><b>Instrucción:</b> ${helpTextEN}</p><hr><p style="font-size:12px; color:#555;">${helpTextES}</p></div>`,
+                showCancelButton: true, confirmButtonText: '🔊 Escuchar (Listen)', cancelButtonText: 'Entendido',
+            }).then((result) => { if (result.isConfirmed) { hablarTexto(helpTextEN, 'en-US'); } });
         }
-
+        
+        // --- MODAL ACADÉMICO (DINÁMICO V50) ---
+        function abrirModalAcademico(titulo, tipo) {
+            document.getElementById("modalAcademico").style.display="flex";
+            document.getElementById("tituloAcademico").textContent=titulo;
+            
+            let contenido = "Contenido próximamente.";
+            
+            if (leccionActualCompleta && leccionActualCompleta.content) {
+                if (tipo === 'vocab' && leccionActualCompleta.content.vocab) contenido = leccionActualCompleta.content.vocab;
+                if (tipo === 'grammar' && leccionActualCompleta.content.grammar) contenido = leccionActualCompleta.content.grammar;
+            }
+ 
+            document.getElementById("contenidoAcademicoBody").innerText = contenido;
+        }
+ 
         function actualizarUI() {
             document.getElementById("timerDisplay").textContent = formatearTiempo(datosUsuario.timeWorked||0);
             document.getElementById("correctDisplay").textContent = datosUsuario.totalCorrect||0;
@@ -688,17 +662,19 @@
             const reps = (datosUsuario.levelRepetitions && datosUsuario.levelRepetitions[nivelActual]) ? datosUsuario.levelRepetitions[nivelActual] : 0;
             document.getElementById("repsText").textContent = `Intentos: ${reps}/10`;
         }
-
+ 
+        // --- CARGAR PREGUNTA (OPTIMIZADO PARA DYNAMIC CONTENT) ---
         function cargarPregunta() {
             if(!nivelActual) nivelActual = 1;
             const nivelData = cursoProDB[nivelActual] || [];
-            if(nivelData.length === 0) { console.error("No data for level"); return; }
-
+            
+            if(nivelData.length === 0) { console.error("No data for level " + nivelActual); return; }
+ 
             const selectElement = document.getElementById('lessonSelect');
-            // Llenar selector si está vacío
+            // Recargar selector si está vacío O si cambiamos de nivel
             if (selectElement.options.length === 0 || selectElement.getAttribute('data-level') != nivelActual) {
                 selectElement.innerHTML = ""; 
-                selectElement.setAttribute('data-level', nivelActual); 
+                selectElement.setAttribute('data-level', nivelActual);
                 nivelData.forEach((lesson, index) => {
                     const opt = document.createElement('option');
                     opt.value = index;
@@ -706,30 +682,31 @@
                     selectElement.appendChild(opt);
                 });
             }
-
+ 
             const selectedLessonIndex = selectElement.value || 0;
-            // Verificar que exista la lección antes de acceder
-            if (nivelData[selectedLessonIndex] && nivelData[selectedLessonIndex].questions) {
-                 const lessonQuestions = nivelData[selectedLessonIndex].questions;
-                 if(lessonQuestions.length > 0) {
-                     preguntaActual = lessonQuestions[Math.floor(Math.random() * lessonQuestions.length)];
-                 } else {
-                     preguntaActual = { type: "translation", q: "No questions", a: "error" };
-                 }
-            } else {
-                 preguntaActual = { type: "translation", q: "Error loading", a: "error" };
-            }
+            leccionActualCompleta = nivelData[selectedLessonIndex]; // Guardamos la lección actual completa
+            const lessonQuestions = leccionActualCompleta.questions;
+ 
+            if(!lessonQuestions || lessonQuestions.length === 0) return;
+ 
+            preguntaActual = lessonQuestions[Math.floor(Math.random() * lessonQuestions.length)];
             
+            if (!preguntaActual) return;
             const qt = document.getElementById("questionText");
             const inp = document.getElementById("answerInput");
             inp.value = ""; document.getElementById("feedback").textContent = "";
             inp.style.borderColor = "#ddd"; inp.style.backgroundColor = "white";
-            if (preguntaActual.type === 'dictation') { qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; setTimeout(() => pronunciarPregunta(), 300); } 
-            else { qt.textContent = "Translate: " + preguntaActual.q; }
+            
+            if (preguntaActual.type === 'dictation') { 
+                qt.innerHTML = '<i class="fas fa-headphones-alt"></i> Listen & Write...'; 
+                setTimeout(() => pronunciarPregunta(), 300); 
+            } else { 
+                qt.textContent = "Translate: " + preguntaActual.q; 
+            }
             document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active-listening', 'active-speaking', 'active-writing', 'mic-listening'));
             inp.focus();
         }
-
+ 
         function verificarRespuesta() {
             if (!preguntaActual) return;
             const inputEl = document.getElementById("answerInput");
@@ -740,7 +717,8 @@
                 try { audioCorrecto.currentTime=0; audioCorrecto.play(); } catch(e){}
                 fd.textContent = "CORRECT! 🔥"; fd.style.color = "green";
                 inputEl.style.borderColor = "#2ecc71"; inputEl.style.backgroundColor = "#eafaf1";
-                datosUsuario.score = (datosUsuario.score || 0) + 10; datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1; aciertosSesion++; 
+                datosUsuario.score = (datosUsuario.score || 0) + 10; datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1;
+                aciertosSesion++; 
             } else {
                 try { audioError.currentTime=0; audioError.play(); } catch(e){}
                 fd.textContent = "WRONG. Answer: " + preguntaActual.a; fd.style.color = "red";
@@ -755,7 +733,7 @@
             document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100)+"%";
             if(contadorPreguntas >= 5) setTimeout(finSesion, 2000); else setTimeout(cargarPregunta, 2000);
         }
-
+ 
         function finSesion() {
             let msg="", medal="";
             if(aciertosSesion===5) { msg="🏆 PERFECT!"; medal="gold"; datosUsuario.medals.gold++; try{audioLevelUp.play();}catch(e){} }
@@ -769,7 +747,6 @@
                 db.collection("students").doc(usuarioActual).update({ levelRepetitions: datosUsuario.levelRepetitions });
             }
             const reps = datosUsuario.levelRepetitions[nivelActual] || 0;
-            
             if (reps >= 10) {
                 Swal.fire({title: msg, text: "¡Has dominado este nivel! (10/10 completado)", icon: 'success'}).then(() => { desbloquearSiguienteNivel(); });
             } else {
@@ -778,51 +755,88 @@
                 document.getElementById("modalNivelCompleto").style.display = "flex";
             }
         }
-
+ 
         function desbloquearSiguienteNivel() {
             const n = nivelActual + 1;
-            if(!datosUsuario.unlockedLevels.includes(n) && n <= 3) {
+            if(!datosUsuario.unlockedLevels.includes(n)) {
                 datosUsuario.unlockedLevels.push(n);
                 db.collection("students").doc(usuarioActual).update({ unlockedLevels: datosUsuario.unlockedLevels });
             }
             cerrarModal('modalNivelCompleto'); actualizarCandados(); contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%";
-            if(datosUsuario.unlockedLevels.includes(nivelActual+1)) { Swal.fire({title: 'Level Up!', text: '¿Ir al siguiente nivel?', showCancelButton: true, confirmButtonText: 'Sí, vamos!'}).then((res)=>{ if(res.isConfirmed) cambiarNivel(nivelActual+1); else cargarPregunta(); }); } else { cargarPregunta(); }
+            if(datosUsuario.unlockedLevels.includes(nivelActual+1)) {
+                Swal.fire({title: 'Level Up!', text: '¿Ir al siguiente nivel?', showCancelButton: true, confirmButtonText: 'Sí, vamos!'}).then((res)=>{ if(res.isConfirmed) cambiarNivel(nivelActual+1); else cargarPregunta(); }); 
+            } else { cargarPregunta(); }
         }
-
+ 
         function opcionRepetirNivel() { cerrarModal('modalNivelCompleto'); contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); }
-        
-        function opcionSuperReview() {
-            cerrarModal('modalNivelCompleto');
-            Swal.fire({
-                title: 'Super Review Time!',
-                text: 'Selecciona un nivel anterior en la barra de abajo para repasar, o repite este nivel para mejorar tu score.',
-                icon: 'info'
-            });
-        }
-
+        function opcionSuperReview() { cerrarModal('modalNivelCompleto'); Swal.fire({ title: 'Super Review Time!', text: 'Selecciona un nivel anterior en la barra de abajo para repasar, o repite este nivel para mejorar tu score.', icon: 'info' }); }
         function opcionIngresarCodigo() { Swal.fire({ title: 'Código Secreto', input: 'text', inputPlaceholder: 'Ingresa el código...', showCancelButton: true }).then((result) => { if (result.value === LEVEL_CODES[nivelActual]) { Swal.fire("¡Código Correcto!", "Nivel desbloqueado.", "success"); desbloquearSiguienteNivel(); } else if(result.value) { Swal.fire("Error", "Código incorrecto.", "error"); } }); }
         function opcionPagarNivel() { window.open('https://mpago.li/2aeNocU', '_blank'); Swal.fire({ title: 'Verificar Pago 🔍', html: '<p style="font-size:14px">Ingresa el <b>Número de Operación o Folio</b> de tu comprobante de pago.</p>', input: 'text', inputPlaceholder: 'Ej: 1234567890', showCancelButton: true, confirmButtonText: 'Enviar para Revisión', cancelButtonText: 'Cancelar' }).then((result) => { if (result.isConfirmed && result.value) { registrarSolicitudPago(result.value); } else if (result.isConfirmed) { Swal.fire("Error", "Debes escribir el folio para verificar.", "warning"); } }); }
         function registrarSolicitudPago(folio) { const solicitud = { fecha: new Date().toLocaleString(), monto: 25, concepto: `Salto Nivel ${nivelActual}`, estado: `Pendiente (Folio: ${folio})`, folio: folio }; if(!datosUsuario.paymentHistory) datosUsuario.paymentHistory = []; datosUsuario.paymentHistory.push(solicitud); db.collection("students").doc(usuarioActual).update({ paymentHistory: datosUsuario.paymentHistory, pendingPayment: { nivel: nivelActual, fecha: new Date().toLocaleString(), folio: folio } }).then(() => { cerrarModal('modalNivelCompleto'); Swal.fire("¡Enviado! 📨", `Tu folio <b>${folio}</b> ha sido enviado al maestro.`, "info"); }); }
         function pagarPuntos() { Swal.fire({ title: 'Comprar Puntos 💰', html: `<button onclick="procesarPagoPuntos(10, 50)" class="btn" style="margin:5px">$10 MXN = 50 Pts</button><button onclick="procesarPagoPuntos(20, 100)" class="btn" style="margin:5px">$20 MXN = 100 Pts</button><button onclick="procesarPagoPuntos(50, 300)" class="btn" style="margin:5px; background:gold; color:black;">$50 MXN = 300 Pts</button>`, showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Cerrar' }); }
         function procesarPagoPuntos(dinero, puntos) { Swal.fire({ title: 'Ir a Pagar', text: `Se abrirá Mercado Pago para pagar $${dinero}. Avísale a tu maestro.`, confirmButtonText: 'Pagar', showCancelButton: true }).then((r) => { if(r.isConfirmed) { window.open('https://mpago.li/2aeNocU', '_blank'); datosUsuario.score += puntos; db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score }); actualizarUI(); } }); }
-
+ 
         function activarEscritura() { const btn = document.getElementById("btnWrite"); btn.classList.add("active-writing"); document.getElementById("answerInput").focus(); setTimeout(() => btn.classList.remove("active-writing"), 500); }
         function activarMicrofono() { const btn = document.getElementById("btnMicrofono"); const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) { Swal.fire("Aviso", "Navegador no compatible. Usa Chrome.", "info"); activarEscritura(); return; } const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.interimResults = false; recognition.maxAlternatives = 1; recognition.start(); btn.classList.add("mic-listening", "active-speaking"); recognition.onresult = (e) => { const t = e.results[0][0].transcript.toLowerCase().replace('.',''); document.getElementById("answerInput").value = t; btn.classList.remove("mic-listening", "active-speaking"); verificarRespuesta(); }; recognition.onerror = () => { btn.classList.remove("mic-listening", "active-speaking"); }; }
-
+ 
         function iniciarCronometro() { if(timerInterval) clearInterval(timerInterval); timerInterval = setInterval(() => { datosUsuario.timeWorked = (datosUsuario.timeWorked||0)+1; actualizarUI(); if(datosUsuario.timeWorked % 15 === 0) { const hoy = new Date().toLocaleDateString('es-ES'); if(!datosUsuario.dailyLogs) datosUsuario.dailyLogs = {}; if(!datosUsuario.dailyLogs[hoy]) datosUsuario.dailyLogs[hoy] = 0; datosUsuario.dailyLogs[hoy]++; db.collection("students").doc(usuarioActual).update({ timeWorked: datosUsuario.timeWorked, dailyLogs: datosUsuario.dailyLogs }); } }, 1000); }
         function detenerCronometro() { clearInterval(timerInterval); }
         function formatearTiempo(s) { const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60; return h>0 ? `${h}h ${m}m ${sec}s` : `${m}m ${sec}s`; }
         document.getElementById("answerInput").addEventListener("keypress", function(e) { if (e.key === "Enter") verificarRespuesta(); });
-
+ 
         function abrirTienda() { document.getElementById("modalTienda").style.display="flex"; document.getElementById("shopPoints").textContent = datosUsuario.score || 0; filtrarTienda('avatar'); }
-        function filtrarTienda(tipo) { document.querySelectorAll(".shop-tab").forEach(t => t.classList.remove("active")); document.querySelector(`.shop-tab[onclick="filtrarTienda('${tipo}')"]`).classList.add("active"); const grid = document.getElementById("shopGrid"); grid.innerHTML = ""; shopCatalog.filter(i => i.type === tipo).forEach(item => { const owned = (datosUsuario.inventory || []).includes(item.id); let equipped = false; if(tipo === 'avatar' && datosUsuario.equipped.avatar === item.icon) equipped = true; if(tipo === 'frame' && datosUsuario.equipped.frame === item.class) equipped = true; if(tipo === 'theme' && JSON.stringify(datosUsuario.equipped.theme) === JSON.stringify(item.colors)) equipped = true; const div = document.createElement("div"); div.className = "shop-item"; div.innerHTML = `<div class="shop-icon">${item.icon || (tipo==='frame'?'🖼️':'🎨')}</div><div>${item.name}</div>${equipped ? '<div class="shop-equipped">✅</div>' : ''}<div class="${owned ? 'shop-owned' : 'shop-price'}">${owned ? (equipped ? 'En uso' : 'Adquirido') : '💰 ' + item.price}</div>`; div.onclick = () => { if(equipped) return; if(owned) equiparItem(item); else comprarItem(item); }; grid.appendChild(div); }); }
+        function filtrarTienda(tipo) {
+            document.querySelectorAll(".shop-tab").forEach(t => t.classList.remove("active"));
+            document.querySelector(`.shop-tab[onclick="filtrarTienda('${tipo}')"]`).classList.add("active");
+            const grid = document.getElementById("shopGrid"); grid.innerHTML = "";
+            shopCatalog.filter(i => i.type === tipo).forEach(item => {
+                const owned = (datosUsuario.inventory || []).includes(item.id); let equipped = false;
+                if(tipo === 'avatar' && datosUsuario.equipped.avatar === item.icon) equipped = true;
+                if(tipo === 'frame' && datosUsuario.equipped.frame === item.class) equipped = true;
+                if(tipo === 'theme' && JSON.stringify(datosUsuario.equipped.theme) === JSON.stringify(item.colors)) equipped = true;
+                const div = document.createElement("div");
+                div.className = "shop-item"; div.innerHTML = `<div class="shop-icon">${item.icon || (tipo==='frame'?'🖼️':'🎨')}</div><div>${item.name}</div>${equipped ? '<div class="shop-equipped">✅</div>' : ''}<div class="${owned ? 'shop-owned' : 'shop-price'}">${owned ? (equipped ? 'En uso' : 'Adquirido') : '💰 ' + item.price}</div>`; div.onclick = () => { if(equipped) return; if(owned) equiparItem(item); else comprarItem(item); }; grid.appendChild(div);
+            });
+        }
         function comprarItem(item) { if (datosUsuario.score >= item.price) { Swal.fire({title: `¿Comprar ${item.name}?`, text: `Cuesta ${item.price} puntos.`, showCancelButton: true, confirmButtonText: 'Sí'}).then((res) => { if (res.isConfirmed) { datosUsuario.score -= item.price; datosUsuario.inventory.push(item.id); db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, inventory: datosUsuario.inventory }); document.getElementById("shopPoints").textContent = datosUsuario.score; filtrarTienda(item.type); Swal.fire("¡Comprado!", "", "success"); actualizarUI(); } }); } else Swal.fire("Saldo Insuficiente", "", "error"); }
         function equiparItem(item) { if(item.type === 'avatar') datosUsuario.equipped.avatar = item.icon; if(item.type === 'frame') datosUsuario.equipped.frame = item.class; if(item.type === 'theme') datosUsuario.equipped.theme = item.colors; db.collection("students").doc(usuarioActual).update({ equipped: datosUsuario.equipped }); aplicarCosmeticos(); filtrarTienda(item.type); }
         function aplicarCosmeticos() { document.getElementById("myAvatar").textContent = datosUsuario.equipped.avatar || '👤'; document.getElementById("myAvatar").className = "avatar-display " + (datosUsuario.equipped.frame || ""); const t = datosUsuario.equipped.theme; if(t) { document.body.style.background = t.bg; document.querySelectorAll(".card").forEach(c => { c.style.background = t.card; c.style.color = t.text; }); } else { document.body.style.background = "linear-gradient(135deg, #000428, #004e92)"; document.querySelectorAll(".card").forEach(c => { c.style.background = "#ffffff"; c.style.color = "#333"; }); } }
-
-        function actualizarCandados() { for(let i=2;i<=3;i++) { const e=document.getElementById(`navL${i}`); if(datosUsuario.unlockedLevels.includes(i)) {e.classList.remove("locked");e.innerHTML=`Nivel ${i}`;} else {e.classList.add("locked");e.innerHTML=`🔐 Nivel ${i}`;}} }
-        function cambiarNivel(n) { if(datosUsuario.unlockedLevels.includes(n)) { nivelActual=n; document.getElementById("levelText").textContent="Nivel "+n; document.getElementById('lessonSelect').innerHTML = ""; contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%"; cargarPregunta(); document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active")); event.target.classList.add("active"); } else Swal.fire("BLOQUEADO","Necesitas completar el nivel anterior 10 veces o usar un código.","error"); }
-
+ 
+        function actualizarCandados() { 
+            // Niveles estáticos
+            for(let i=2;i<=3;i++) { 
+                const e=document.getElementById(`navL${i}`); 
+                if(!e) continue;
+                if(datosUsuario.unlockedLevels.includes(i)) {e.classList.remove("locked");e.innerHTML=`Nivel ${i}`;} 
+                else {e.classList.add("locked");e.innerHTML=`🔐 Nivel ${i}`;}
+            } 
+            // Niveles dinámicos cargados
+            Object.keys(cursoProDB).forEach(k => {
+                const lvl = parseInt(k);
+                if(lvl > 3) {
+                    actualizarCandadosDinamicos(lvl); // Asegurar que el botón exista
+                    const e=document.getElementById(`navL${lvl}`);
+                    if(e) {
+                         if(datosUsuario.unlockedLevels.includes(lvl)) {e.classList.remove("locked");e.innerHTML=`Nivel ${lvl}`;} 
+                         else {e.classList.add("locked");e.innerHTML=`🔐 Nivel ${lvl}`;}
+                    }
+                }
+            });
+        }
+        
+        function cambiarNivel(n) { 
+            if(datosUsuario.unlockedLevels.includes(n)) { 
+                nivelActual=n; 
+                document.getElementById("levelText").textContent="Nivel "+n; 
+                document.getElementById('lessonSelect').innerHTML = ""; 
+                contadorPreguntas=0; aciertosSesion=0; document.getElementById("lessonProgressBar").style.width="0%";
+                cargarPregunta(); 
+                document.querySelectorAll(".nav-item").forEach(e=>e.classList.remove("active"));
+                // Intentar resaltar el botón clickeado si se pasó el evento
+                if(event && event.target) event.target.classList.add("active"); 
+            } else Swal.fire("BLOQUEADO","Necesitas completar el nivel anterior 10 veces o usar un código.","error"); 
+        }
+ 
         function mostrarLoginMaestro() { document.getElementById("loginContainerWrapper").style.display="none"; document.getElementById("teacherLogin").style.display="block"; }
         function volverInicio() { document.getElementById("teacherLogin").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("loginContainerWrapper").style.display="flex"; }
         function loginMaestro() { if(document.getElementById("teacherUserInput").value==="Jose de Jesus Ramos Flores" && document.getElementById("teacherPassInput").value==="161286") { document.getElementById("teacherLogin").style.display="none"; document.getElementById("teacherPanel").style.display="block"; cargarTablaAlumnos(); } else Swal.fire("Error","Datos mal","error"); }
@@ -832,16 +846,9 @@
             document.getElementById("cuerpoTabla").innerHTML="<tr><td colspan='10'>Cargando...</td></tr>";
             db.collection("students").get().then((snap) => {
                 listaAlumnosCache=[]; 
-                snap.forEach(d=>{ 
-                    if(d.id!=='ADMIN_NEWS') {
-                        const data = d.data() || {};
-                        listaAlumnosCache.push({...data, uid:d.id}); 
-                    }
-                });
+                snap.forEach(d=>{ if(d.id!=='ADMIN_NEWS') { const data = d.data() || {}; listaAlumnosCache.push({...data, uid:d.id}); } });
                 const gs=[...new Set(listaAlumnosCache.map(s=>s.group))].sort(), sel=document.getElementById("groupFilter"), v=sel.value; 
-                sel.innerHTML='<option value="todos">Todos</option>'; 
-                gs.forEach(g=>{if(g)sel.innerHTML+=`<option value="${g}">Gpo ${g}</option>`}); 
-                sel.value=v; 
+                sel.innerHTML='<option value="todos">Todos</option>'; gs.forEach(g=>{if(g)sel.innerHTML+=`<option value="${g}">Gpo ${g}</option>`}); sel.value=v; 
                 renderizarTabla();
             });
         }
@@ -851,89 +858,45 @@
             const f=document.getElementById("groupFilter").value; 
             if(f!=="todos" && teacherViewMode === 'student') d=d.filter(s=>s.group===f); 
             d.sort((a,b)=>(b.score||0)-(a.score||0));
-            
             const ctx=document.getElementById('globalChart').getContext('2d'); if(chartGlobalInstance) chartGlobalInstance.destroy(); 
             const gl=[...new Set(d.map(s=>s.group))], prom=gl.map(g=>{const gs=d.filter(s=>s.group===g); return gs.reduce((a,b)=>a+(Number(b.score)||0),0)/gs.length;}); 
             chartGlobalInstance=new Chart(ctx,{type:'bar',data:{labels:gl,datasets:[{label:'Promedio',data:prom,backgroundColor:'#004e92'}]},options:{maintainAspectRatio:false}});
-            
-            const tb=document.getElementById("cuerpoTabla"); tb.innerHTML=""; 
+            const tb=document.getElementById("cuerpoTabla"); tb.innerHTML="";
             d.forEach(s=>{ 
                 if(s.isDonation) return;
-
                 const m=s.medals||{gold:0,silver:0,bronze:0}, r=s.currentStreak||1, ir=r>1?'🔥':'😔'; 
                 const tr=document.createElement("tr"); 
-                const av = s.equipped?.avatar || '👤'; 
-                const fr = s.equipped?.frame || ''; 
+                const av = s.equipped?.avatar || '👤'; const fr = s.equipped?.frame || ''; 
                 const nombreMostrar = s.username || s.nombre || s.name || "Alumno";
-                
                 let btnPago = "";
                 if(s.pendingPayment) { const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio"; btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">💸 ${folioInfo}</button>`; }
-                
                 tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${nombreMostrar}</td><td>${s.group || '-'}</td><td>${Math.max(...(s.unlockedLevels||[1]))}</td><td style="color:blue">${formatearTiempo(s.timeWorked||0)}</td><td>${ir} ${r}</td><td style="color:#d4af37;font-weight:bold">${m.gold}</td><td style="color:#C0C0C0;font-weight:bold">${m.silver}</td><td style="color:#CD7F32;font-weight:bold">${m.bronze}</td><td>${btnPago} <button onclick="verHistorial('${s.uid}')" class="action-btn btn-history" title="Historial">📜</button> <button onclick="verGraficaInd('${s.uid}')" class="action-btn btn-info" title="Gráfica">📊</button> <button onclick="cambiarGrupo('${s.uid}')" class="action-btn btn-edit" title="Cambiar Grupo" style="background:purple; color:white;">✏️</button> <button onclick="resetearAlumno('${s.uid}')" class="action-btn btn-edit" title="Resetear / Regresar Nivel">🔄</button> <button onclick="borrarAlumno('${s.uid}')" class="action-btn btn-delete" title="Eliminar">🗑️</button></td>`; 
                 tb.appendChild(tr); 
             }); 
             document.getElementById("totalAlumnos").textContent=d.length; 
             document.getElementById("promedioAciertos").textContent=d.reduce((a,b)=>a+(Number(b.totalCorrect)||0),0);
         }
-
+ 
         async function aprobarPagoReal(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); if(!s.pendingPayment) return; const nivelADesbloquear = s.pendingPayment.nivel + 1; let nuevosNiveles = s.unlockedLevels || [1]; if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); let historial = s.paymentHistory || []; if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; } await db.collection("students").doc(uid).update({ unlockedLevels: nuevosNiveles, pendingPayment: null, paymentHistory: historial }); Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success"); cargarTablaAlumnos(); }
+        async function resetearAlumno(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); const maxLevel = Math.max(...(s.unlockedLevels || [1])); const { value: action } = await Swal.fire({ title: `Gestionar: ${s.username}`, text: `Nivel Actual: ${maxLevel}`, input: 'select', inputOptions: { 'level_jump': '⏪ Regresar a un Nivel Específico', 'reset_points': '📉 Resetear Solo Puntos', 'hard_reset': '⚠️ REINICIO TOTAL (Cero)' }, showCancelButton: true }); if (!action) return; if (action === 'reset_points') { await db.collection("students").doc(uid).update({score:0}); Swal.fire("Listo", "Puntos en 0", "success"); } else if (action === 'hard_reset') { await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); Swal.fire("Reinicio Total", "El alumno empieza desde cero.", "warning"); } else if (action === 'level_jump') { if (maxLevel <= 1) { return Swal.fire("Aviso", "El alumno ya está en el Nivel 1. No puede bajar más.", "info"); } const options = {}; for (let i = 1; i < maxLevel; i++) { options[i] = `Regresar a Nivel ${i}`; } const { value: targetLevel } = await Swal.fire({ title: 'Viaje en el Tiempo ⏳', text: `El alumno está en Nivel ${maxLevel}. ¿A dónde lo regresamos?`, input: 'select', inputOptions: options, showCancelButton: true }); if (targetLevel) { const target = parseInt(targetLevel); const newLevels = Array.from({length: target}, (_, i) => i + 1); await db.collection("students").doc(uid).update({ unlockedLevels: newLevels }); Swal.fire("¡Hecho!", `Alumno regresado al Nivel ${target}`, "success"); } } cargarTablaAlumnos(); }
+        function borrarAlumno(uid) { if(confirm("¿Eliminar?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos()); }
+        async function cambiarGrupo(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); const gpoActual = s.group || "Sin Grupo"; const { value: nuevoGpo } = await Swal.fire({ title: `Cambiar Grupo a ${s.username}`, input: 'text', inputLabel: `Grupo Actual: ${gpoActual}`, inputPlaceholder: 'Escribe el nuevo grupo (Ej: 4A)', inputValue: s.group || "", showCancelButton: true, confirmButtonText: 'Guardar Cambio', inputValidator: (value) => { if (!value) { return '¡Necesitas escribir un grupo!'; } } }); if (nuevoGpo) { const gpoFinal = nuevoGpo.toUpperCase().trim(); await db.collection("students").doc(uid).update({ group: gpoFinal }); Swal.fire("¡Actualizado!", `El alumno ahora está en el grupo ${gpoFinal}`, "success"); cargarTablaAlumnos(); } }
+        
+        function abrirMenuDonacion() { Swal.fire({ title: 'Apoya el Proyecto ❤️', html: ` <p style="font-size:14px; margin-bottom:15px;">Elige tu donativo para mantener la app activa:</p> <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;"> <button onclick="irADonar(40, 'https://mpago.li/1HvLXiy')" class="btn" style="width:120px; background:#009ee3">$40 MXN</button> <button onclick="irADonar(70, 'https://mpago.li/1r3jbNf')" class="btn" style="width:120px; background:#009ee3">$70 MXN</button> <button onclick="irADonar(100, 'https://mpago.li/1irBKzH')" class="btn" style="width:120px; background:#009ee3">$100 MXN</button> <button onclick="irADonar(200, 'https://mpago.li/1Exy4z9')" class="btn" style="width:120px; background:#009ee3">$200 MXN</button> </div> `, showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Cancelar' }); }
+        function irADonar(monto, link) { window.open(link, '_blank'); Swal.fire({ title: '¡Gracias! 🙏', text: 'Por favor registra tu donativo para agradecerte.', html: `<input id="donanteName" class="swal2-input" placeholder="Tu Nombre" value="${(datosUsuario && datosUsuario.username) ? datosUsuario.username : ''}">` + '<input id="donanteFolio" class="swal2-input" placeholder="Folio de Pago">', confirmButtonText: 'Registrar', preConfirm: () => { const n = document.getElementById('donanteName').value; const f = document.getElementById('donanteFolio').value; if (!n || !f) { Swal.showValidationMessage('Escribe ambos datos por favor'); } return [n, f]; } }).then((result) => { if(result.isConfirmed) { const nombre = result.value[0]; const folio = result.value[1]; const docId = 'DON_' + Date.now(); const donationData = { nombre: nombre, folio: folio, monto: monto, fecha: new Date().toLocaleString(), isDonation: true, type: 'external_donation', uid: usuarioActual || null }; db.collection('students').doc(docId).set(donationData).then(() => { Swal.fire("Thank you for your donation", "Tu apoyo ha sido registrado.", "success"); }).catch((error) => { console.error(error); Swal.fire("Aviso", "Pago abierto. Nota: Para registrar el folio automático necesitas iniciar sesión, pero tu apoyo cuenta igual. ¡Gracias!", "warning"); }); } }); }
+        function verDonaciones() { document.getElementById('donacionesCuerpo').innerHTML = "<tr><td colspan='4'>Cargando...</td></tr>"; document.getElementById('modalDonaciones').style.display = 'flex'; db.collection('students').where('isDonation', '==', true).get().then((snap) => { const tb = document.getElementById('donacionesCuerpo'); tb.innerHTML = ""; if(snap.empty) { tb.innerHTML = "<tr><td colspan='4'>Sin donaciones aún.</td></tr>"; return; } let data = []; snap.forEach(doc => data.push(doc.data())); data.sort((a, b) => { const dateA = new Date(a.fecha); const dateB = new Date(b.fecha); return isNaN(dateA) ? 0 : dateB - dateA; }); data.forEach(d => { tb.innerHTML += `<tr><td>${d.fecha}</td><td><b>${d.nombre}</b></td><td style="color:green; font-weight:bold;">$${d.monto}</td><td>${d.folio}</td></tr>`; }); }).catch((error) => { document.getElementById('donacionesCuerpo').innerHTML = `<tr><td colspan='4' style='color:red; font-weight:bold'>Error de acceso: ${error.message}</td></tr>`; }); }
+        
+        function verHistorial(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), l=s.dailyLogs||{}, tb=document.getElementById("historialCuerpo"); tb.innerHTML=""; document.getElementById("modalHistorial").style.display="flex"; document.getElementById("historialNombre").textContent="Historial: "+(s.username||"Alumno"); Object.keys(l).sort().reverse().forEach(f=>{ tb.innerHTML+=`<tr><td>${f}</td><td style="color:blue;font-weight:bold">${formatearTiempo(l[f])}</td></tr>`; }); }
+        function verGraficaInd(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid); document.getElementById("modalGrafica").style.display="flex"; document.getElementById("modalNombre").textContent=s.username||"Alumno"; const m = s.medals || {gold:0, silver:0, bronze:0}; let itemsTexto = "Ninguna compra"; if (s.inventory && s.inventory.length > 0) { itemsTexto = s.inventory.map(id => { const item = shopCatalog.find(i => i.id === id); return item ? `${item.icon} ${item.name}` : id; }).join(', '); } let pagosHTML = "<p>No hay pagos registrados.</p>"; if (s.paymentHistory && s.paymentHistory.length > 0) { pagosHTML = `<ul style="text-align:left; font-size:12px; list-style:none; padding:0;">`; s.paymentHistory.forEach(p => { const color = p.estado.includes("Aprobado") ? "green" : "orange"; pagosHTML += `<li style="margin-bottom:5px; border-bottom:1px solid #eee; padding-bottom:3px;">📅 ${p.fecha} - <b>$${p.monto}</b> - <span style="color:${color}">${p.estado}</span></li>`; }); pagosHTML += `</ul>`; } document.getElementById("modalStats").innerHTML = `<p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p><p><b>Racha:</b> ${s.currentStreak||1} 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p><p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p><hr><p><b>🎒 Inventario:</b></p><p style="font-size:12px; color:#555;">${itemsTexto}</p><hr><p style="color:green;"><b>💰 Historial de Pagos:</b></p>${pagosHTML}`; if(chartStudentInstance) chartStudentInstance.destroy(); chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅ Correctas','❌ Incorrectas'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}}); }
         function verGraficaGrupal() { const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>b.score-a.score); document.getElementById("modalGraficaGrupal").style.display="flex"; const totalPuntos = d.reduce((acc, curr) => acc + Number(curr.score || 0), 0); const promedio = d.length > 0 ? (totalPuntos / d.length).toFixed(1) : 0; document.getElementById("modalStatsGroup").innerHTML = `<p><b>Total Alumnos:</b> ${d.length} | <b>Promedio Puntos:</b> ${promedio}</p>`; const ctx=document.getElementById('groupBigChart').getContext('2d'); if(chartGroupInstance) chartGroupInstance.destroy(); chartGroupInstance=new Chart(ctx,{type:'bar',data:{labels:d.map(s=>s.username),datasets:[{label:'Puntos Totales',data:d.map(s=>s.score),backgroundColor:'#004e92'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}}); }
         function descargarCaptura(divId, nombre) { const el = document.getElementById(divId); html2canvas(el).then(c => { const l = document.createElement('a'); l.download = nombre; l.href = c.toDataURL(); l.click(); }); }
         function cerrarModal(id) { document.getElementById(id).style.display="none"; }
         function exportarExcel() { const ws=XLSX.utils.json_to_sheet(listaAlumnosCache.map(s=>({Nombre:s.username,Grupo:s.group,Puntos:s.score,Tiempo:formatearTiempo(s.timeWorked||0)}))); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Reporte"); XLSX.writeFile(wb,"Reporte.xlsx"); }
         function exportarPDF() { html2pdf().from(document.getElementById('teacherPanel')).save(); }
-        function abrirModalAcademico(t) { document.getElementById("modalAcademico").style.display="flex"; document.getElementById("tituloAcademico").textContent=t; document.getElementById("nivelAcademico").textContent=nivelActual; }
         
-        function intentarLogin() {
-            const e=document.getElementById("emailInput").value.trim(), p=document.getElementById("passwordInput").value.trim(), n=document.getElementById("usernameInput").value.trim();
-            let g = "", gr = "";
-            if(loginMode === 'student') { g = document.getElementById("gradeInput").value.trim(); gr = document.getElementById("groupInput").value.trim().toUpperCase(); } 
-            else { g = "N/A"; gr = "Adults"; }
-
-            if(!e||!p) { Swal.fire("Error","Faltan datos","error"); return; }
-            
-            auth.signInWithEmailAndPassword(e,p).catch((err) => {
-                if(['auth/user-not-found','auth/wrong-password','auth/invalid-credential','auth/invalid-login-credentials'].includes(err.code)) {
-                    if(loginMode === 'student' && (!n||!g||!gr)) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo alumno, llena todos los datos para registrarte.'}); return; }
-                    if(loginMode === 'adult' && !n) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo, pon tu nombre para registrarte.'}); return; }
-
-                    auth.createUserWithEmailAndPassword(e,p).then((c) => {
-                        db.collection("students").doc(c.user.uid).set({ 
-                            uid:c.user.uid, username:n, grade:g, group:gr, email:e, password:p, 
-                            userType: loginMode, 
-                            score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, 
-                            medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, 
-                            lastLoginDate:new Date().toLocaleDateString('es-ES'), currentStreak:1, 
-                            inventory:[], equipped:{avatar:'👤',frame:'',theme:''}, levelRepetitions:{}, paymentHistory:[], pendingPayment:null,
-                            hasSeenWelcome: false 
-                        }).then(()=>Swal.fire("¡Bienvenido!","Tu cuenta ha sido creada.","success"));
-                    }).catch(e=>Swal.fire("Error al Registrar",e.message,"error"));
-                } else Swal.fire("Error",err.message,"error");
-            });
-        }
-        
-        async function recuperarPassword() { const {value:e}=await Swal.fire({title:'Recuperar',input:'email',showCancelButton:true}); if(e) auth.sendPasswordResetEmail(e).then(()=>Swal.fire('Enviado','','success')); }
-        function cerrarSesion() { if(breakTimer) clearTimeout(breakTimer); db.collection("students").doc(usuarioActual).update({timeWorked:datosUsuario.timeWorked, dailyLogs:datosUsuario.dailyLogs||{}}).then(()=>auth.signOut().then(()=>location.reload())); }
         function cargarNoticias() { db.collection("students").doc("ADMIN_NEWS").onSnapshot((doc) => { const t = (doc.exists&&doc.data().text)?doc.data().text:"Bienvenido."; document.getElementById("newsContent").innerText=t; document.getElementById("teacherNewsInput").value=t; }); }
         function publicarNoticia() { db.collection("students").doc("ADMIN_NEWS").set({text:document.getElementById("teacherNewsInput").value}).then(()=>Swal.fire("Publicado","","success")); }
-        
-        function cargarLeaderboard() {
-            db.collection("students").orderBy("timeWorked","desc").limit(12).get().then((snap) => {
-                const b = document.getElementById("leaderboardBody"); b.innerHTML=""; let r=1;
-                snap.forEach(doc => {
-                    const d=doc.data();
-                    if(doc.id==='ADMIN_NEWS' || d.isDonation) return; 
-                    if(r>10) return; 
-                    
-                    const tr=document.createElement("tr");
-                    if(r===1) tr.className="rank-1"; else if(r===2) tr.className="rank-2"; else if(r===3) tr.className="rank-3";
-                    const m=(d.medals?.gold||0)+(d.medals?.silver||0)+(d.medals?.bronze||0); const av = d.equipped?.avatar || '👤'; const fr = d.equipped?.frame || '';
-                    
-                    tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${d.username||"Héroe"}</td><td style="color:#ff5722; font-weight:bold;">${d.currentStreak||1} 🔥</td><td>${formatearTiempo(d.timeWorked||0)}</td><td>${d.score}</td><td>${m} 🏅</td>`; 
-                    b.appendChild(tr); r++;
-                });
-            });
-        }
+        function cargarLeaderboard() { db.collection("students").orderBy("timeWorked","desc").limit(12).get().then((snap) => { const b = document.getElementById("leaderboardBody"); b.innerHTML=""; let r=1; snap.forEach(doc => { const d=doc.data(); if(doc.id==='ADMIN_NEWS' || d.isDonation) return; if(r>10) return; const tr=document.createElement("tr"); if(r===1) tr.className="rank-1"; else if(r===2) tr.className="rank-2"; else if(r===3) tr.className="rank-3"; const m=(d.medals?.gold||0)+(d.medals?.silver||0)+(d.medals?.bronze||0); const av = d.equipped?.avatar || '👤'; const fr = d.equipped?.frame || ''; tr.innerHTML=`<td><div class="mini-avatar ${fr}">${av}</div> ${d.username||"Héroe"}</td><td style="color:#ff5722; font-weight:bold;">${d.currentStreak||1} 🔥</td><td>${formatearTiempo(d.timeWorked||0)}</td><td>${d.score}</td><td>${m}🏅</td>`; b.appendChild(tr); r++; }); }); }
     </script>
 </body>
 </html>
