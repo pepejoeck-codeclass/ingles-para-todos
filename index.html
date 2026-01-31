@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglés Para Todos - MASTER V50 AI ULTRA (ARCHITECT)</title>
+    <title>Inglés Para Todos - MASTER V50 AI ULTRA (FINAL)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -64,7 +64,7 @@
         .btn-help { background: linear-gradient(45deg, #FF9800, #F44336); box-shadow: 0 4px 0 #E65100; flex: 0.8; font-size: 13px; animation: popHelp 3s infinite; }
         @keyframes popHelp { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        /* NUEVO SELECTOR DE LECCIONES (ARCHITECT PRO) */
+        /* SELECTOR DE LECCIONES (ARCHITECT PRO) */
         .lesson-selector-container { margin: 10px 0; }
         .lesson-select { width: 100%; padding: 10px; border-radius: 15px; border: 2px solid var(--primary); font-weight: bold; color: var(--primary); background: #f0f8ff; cursor: pointer; }
 
@@ -234,9 +234,9 @@
         </div>
 
         <div class="academic-nav">
-            <button onclick="abrirModalAcademico('Vocabulary 📚')" class="btn-academic btn-vocab"><i class="fas fa-book"></i> Vocabulary</button>
+            <button onclick="mostrarModalContenido('vocab')" class="btn-academic btn-vocab"><i class="fas fa-book"></i> Vocabulary</button>
             <button onclick="mostrarAyuda()" class="btn-academic btn-help"><i class="fas fa-question-circle"></i> Ayuda / Help</button>
-            <button onclick="abrirModalAcademico('Grammar 📖')" class="btn-academic btn-grammar"><i class="fas fa-pen-fancy"></i> Grammar</button>
+            <button onclick="mostrarModalContenido('grammar')" class="btn-academic btn-grammar"><i class="fas fa-pen-fancy"></i> Grammar</button>
         </div>
 
         <div class="card">
@@ -347,7 +347,18 @@
     <div id="modalGrafica" class="modal-overlay"><div class="modal-content"><h3 id="modalNombre">Individual</h3><div id="printAreaInd" style="background: white; padding: 10px; border-radius: 10px;"><div id="modalStats" class="report-summary"></div><canvas id="studentChart"></canvas></div><br><button onclick="descargarCaptura('printAreaInd', 'Reporte_Individual.png')" class="btn btn-download">Descargar</button> <button onclick="cerrarModal('modalGrafica')" class="btn btn-secondary">Cerrar</button></div></div>
     <div id="modalGraficaGrupal" class="modal-overlay"><div class="modal-content" style="max-width: 900px;"><h3>📊 Rendimiento del Grupo</h3><div id="printAreaGroup" style="background: white; padding: 10px;"><div id="modalStatsGroup" class="report-summary" style="text-align: center;"></div><canvas id="groupBigChart"></canvas></div><br><button onclick="descargarCaptura('printAreaGroup', 'Grafica_Grupal.png')" class="btn btn-download">Descargar</button> <button onclick="cerrarModal('modalGraficaGrupal')" class="btn btn-secondary">Cerrar</button></div></div>
     <div id="modalHistorial" class="modal-overlay"><div class="modal-content"><h3 id="historialNombre">Historial 📜</h3><div style="overflow-y: auto; max-height: 300px;"><table class="history-table"><thead><tr><th>Fecha</th><th>Tiempo</th></tr></thead><tbody id="historialCuerpo"></tbody></table></div><br><button onclick="cerrarModal('modalHistorial')" class="btn btn-secondary">Cerrar</button></div></div>
-    <div id="modalAcademico" class="modal-overlay"><div class="modal-content"><h3 id="tituloAcademico">...</h3><hr><div style="padding: 20px; font-size: 18px; color: #555;"><i class="fas fa-tools"></i><br>Contenido para <b>Nivel <span id="nivelAcademico">1</span></b> próximamente.</div><br><button onclick="cerrarModal('modalAcademico')" class="btn btn-secondary">Cerrar</button></div></div>
+    
+    <div id="modalAcademico" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="tituloAcademico">...</h3>
+            <hr>
+            <div id="contenidoAcademicoBody" style="padding: 20px; font-size: 16px; color: #333; text-align: left; white-space: pre-wrap;">
+                Cargando...
+            </div>
+            <br>
+            <button onclick="cerrarModal('modalAcademico')" class="btn btn-secondary">Cerrar</button>
+        </div>
+    </div>
 
     <div id="modalTienda" class="modal-overlay">
         <div class="modal-content">
@@ -393,7 +404,6 @@
                 return valA - valB;
             });
             vocesDisponibles = englishVoices.length > 0 ? englishVoices : rawVoices;
-            console.log(`%c[AUDIO V50] Engine Ready. ${vocesDisponibles.length} voices loaded. Best: ${vocesDisponibles[0]?.name}`, 'color: #00ff00; background: #000; padding: 4px;');
         }
         cargarVocesUltraPro();
         if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = cargarVocesUltraPro; }
@@ -417,7 +427,7 @@
                 const btn = document.getElementById('btnListen');
                 if(btn) btn.classList.add('active-listening'); 
                 utterance.onend = () => { if(btn) btn.classList.remove('active-listening'); };
-                utterance.onerror = (e) => { console.error("[AUDIO V50 ERROR]", e); if(btn) btn.classList.remove('active-listening'); synth.cancel(); };
+                utterance.onerror = (e) => { console.error("[AUDIO ERROR]", e); if(btn) btn.classList.remove('active-listening'); synth.cancel(); };
                 synth.speak(utterance);
             }, 10);
         }
@@ -438,9 +448,8 @@
         let loginMode = 'student'; let teacherViewMode = 'student';
         const LEVEL_CODES = { 1: "angysanti1", 2: "angysanti2", 3: "angysanti3" };
 
-        // --- ESTRUCTURA DE DATOS ACTUALIZADA (MASTER V50) ---
-        // ESTA ESTRUCTURA ES ESCALABLE Y LISTA PARA LA NUBE
-        const cursoProDB = {
+        // --- BASE DE DATOS HÍBRIDA (CÓDIGO + NUBE) ---
+        let cursoProDB = {
             1: [
                 { id: "l1_1", title: "Lesson 1: Greetings 👋", questions: [
                     { type: "translation", q: "Hola", a: "hello" },
@@ -448,15 +457,15 @@
                     { type: "dictation", q: "Good morning", a: "good morning" },
                     { type: "translation", q: "Buenos días", a: "good morning" },
                     { type: "translation", q: "Gracias", a: "thank you" }
-                ]},
+                ], content: { vocab: "Hola - Hello\nAdiós - Goodbye", help: "Aprende saludos básicos.", grammar: "Usa 'Hello' para saludar." } },
                 { id: "l1_2", title: "Lesson 2: Colors 🎨", questions: [
                     { type: "translation", q: "Rojo", a: "red" },
                     { type: "translation", q: "Azul", a: "blue" },
                     { type: "dictation", q: "Yellow", a: "yellow" },
                     { type: "translation", q: "Verde", a: "green" },
                     { type: "dictation", q: "Black", a: "black" }
-                ]},
-                { id: "l1_3", title: "Lesson 3: Introduction 🤝", questions: [
+                ], content: { vocab: "Rojo - Red\nAzul - Blue", help: "Colores básicos.", grammar: "Los colores van antes del sustantivo." } },
+                 { id: "l1_3", title: "Lesson 3: Introduction 🤝", questions: [
                     { type: "dictation", q: "My name is", a: "my name is" },
                     { type: "translation", q: "Yo soy", a: "i am" },
                     { type: "translation", q: "Mucho gusto", a: "nice to meet you" }
@@ -487,14 +496,6 @@
             ]
         };
 
-        // --- INSTRUCCIONES DINÁMICAS (HELP BUTTON) ---
-        const levelInstructions = {
-            1: { es: "Escucha la palabra y escríbela correctamente. Son saludos y colores básicos.", en: "Listen to the word and write it correctly. Basic greetings and colors." },
-            2: { es: "Aprende animales y números. Traduce lo que veas en pantalla.", en: "Learn animals and numbers. Translate what you see on screen." },
-            3: { es: "Días de la semana y naturaleza. Escribe en inglés.", en: "Days of the week and nature. Write in English." }
-        };
-
-        // --- CATÁLOGO ---
         const shopCatalog = [
             { id: 'av_sup1', type: 'avatar', name: 'Superman Prime', price: 50000, icon: '🦸‍♂️⚡' }, 
             { id: 'av_sup2', type: 'avatar', name: 'Supergirl Prime', price: 50000, icon: '🦸‍♀️⚡' },
@@ -574,8 +575,49 @@
         });
 
         document.addEventListener("DOMContentLoaded", () => { 
-            cargarNoticias(); cargarLeaderboard(); cargarVocesUltraPro(); 
+            cargarNoticias(); cargarLeaderboard(); cargarVocesUltraPro();
+            // --- CONEXIÓN A LA NUBE (MASTER V50) ---
+            cargarContenidoNube();
         });
+
+        // --- FUNCIÓN MAESTRA: DESCARGAR LECCIONES DEL PANEL DE CREADOR ---
+        function cargarContenidoNube() {
+            // Buscamos documentos en la colección 'contenido_curso'
+            db.collection('contenido_curso').get().then((snapshot) => {
+                if(snapshot.empty) {
+                    console.log("No hay contenido extra en la nube todavía.");
+                    return;
+                }
+                
+                snapshot.forEach(doc => {
+                    // El ID del documento es 'nivel_1', 'nivel_2', etc.
+                    const levelKey = doc.id; // ej: "nivel_1"
+                    const levelNum = parseInt(levelKey.split('_')[1]); // ej: 1
+
+                    if (levelNum) {
+                        const data = doc.data(); // Aquí están las lecciones como objetos { l1_test: {...}, l1_otro: {...} }
+                        
+                        // Si no existe el nivel en la DB local, lo creamos
+                        if (!cursoProDB[levelNum]) cursoProDB[levelNum] = [];
+
+                        // Convertimos el objeto de objetos a un array
+                        Object.values(data).forEach(lesson => {
+                            // Verificamos si ya existe para no duplicar (por si acaso)
+                            const exists = cursoProDB[levelNum].find(l => l.id === lesson.id);
+                            if (!exists) {
+                                // INYECTAMOS LA LECCIÓN DE LA NUBE AL JUEGO
+                                cursoProDB[levelNum].push(lesson);
+                            }
+                        });
+                    }
+                });
+                console.log("¡Contenido de la nube cargado y fusionado! ☁️🚀");
+                // Si el usuario ya estaba logueado y viendo un nivel, refrescamos el selector
+                if(usuarioActual) cambiarNivel(nivelActual);
+            }).catch(error => {
+                console.error("Error cargando contenido nube:", error);
+            });
+        }
 
         function mostrarLogin() { document.getElementById("loginContainerWrapper").style.display="flex"; document.getElementById("loginCard").style.display="block"; document.getElementById("communitySection").style.display="flex"; document.getElementById("mainContent").style.display="none"; document.getElementById("teacherPanel").style.display="none"; document.getElementById("teacherLogin").style.display="none"; cargarLeaderboard(); }
 
@@ -597,11 +639,7 @@
             breakTimer = setTimeout(() => {
                 Swal.fire({
                     title: 'Time for a break! 🌿',
-                    html: `
-                        <div style="font-size:50px; margin-bottom:10px;">🧘‍♂️</div>
-                        <p style="font-size:18px; color:#555;">Haz una pausa, respira y relájate.</p>
-                        <p style="font-size:16px; color:#777; font-style:italic;">"Take a break, breathe, and relax"</p>
-                    `,
+                    html: `<div style="font-size:50px; margin-bottom:10px;">🧘‍♂️</div><p style="font-size:18px; color:#555;">Haz una pausa, respira y relájate.</p><p style="font-size:16px; color:#777; font-style:italic;">"Take a break, breathe, and relax"</p>`,
                     icon: 'info',
                     showCancelButton: true,
                     confirmButtonText: 'Continuar / Continue',
@@ -610,11 +648,7 @@
                     cancelButtonColor: '#d33',
                     allowOutsideClick: false
                 }).then((result) => {
-                    if (result.isConfirmed) {
-                        initBreakTimer(); 
-                    } else {
-                        cerrarSesion();
-                    }
+                    if (result.isConfirmed) { initBreakTimer(); } else { cerrarSesion(); }
                 });
             }, 1800000); 
         }
@@ -623,19 +657,7 @@
             if(!datosUsuario.hasSeenWelcome) {
                 Swal.fire({
                     title: 'Welcome! 🤖',
-                    html: `
-                        <div style="background:#000; border-radius:10px; padding:20px; color:white; margin-bottom:10px;">
-                            <div style="font-size:60px;">👨‍🏫</div>
-                            <p style="margin-top:10px; font-weight:bold; color:#00c6ff;">AI Teacher Bot</p>
-                            <div style="margin-top:15px; font-size:14px; text-align:left; line-height:1.5;">
-                                "Bienvenidos a su curso de English (Inglés para todos).<br>
-                                Welcome to your English course (English for everyone).<br><br>
-                                Aprenderás inglés desde nivel A1.1 hasta un nivel B2.<br>
-                                Debes guiarte usando los botones de <b>Ayuda</b>, <b>Vocabulary</b> y <b>Grammar</b> para contestar tus actividades.<br><br>
-                                Good luck!"
-                            </div>
-                        </div>
-                    `,
+                    html: `<div style="background:#000; border-radius:10px; padding:20px; color:white; margin-bottom:10px;"><div style="font-size:60px;">👨‍🏫</div><p style="margin-top:10px; font-weight:bold; color:#00c6ff;">AI Teacher Bot</p><div style="margin-top:15px; font-size:14px; text-align:left; line-height:1.5;">"Bienvenidos a su curso de English (Inglés para todos).<br>Welcome to your English course (English for everyone).<br><br>Aprenderás inglés desde nivel A1.1 hasta un nivel B2.<br>Debes guiarte usando los botones de <b>Ayuda</b>, <b>Vocabulary</b> y <b>Grammar</b> para contestar tus actividades.<br><br>Good luck!"</div></div>`,
                     confirmButtonText: "Let's Start!",
                     didOpen: () => {
                         const msg = "Welcome to your English course, English for everyone. You will learn English from level A 1 point 1 to B 2. Please guide yourself using the Help, Vocabulary and Grammar buttons to answer your activities. Good luck!";
@@ -648,26 +670,48 @@
             }
         }
 
+        // --- FUNCIONES PARA MOSTRAR CONTENIDO DINÁMICO (V50) ---
+        function obtenerDatosLeccionActual() {
+            if(!nivelActual) return null;
+            const nivelData = cursoProDB[nivelActual] || [];
+            const selectElement = document.getElementById('lessonSelect');
+            const selectedLessonIndex = selectElement.value || 0;
+            return nivelData[selectedLessonIndex];
+        }
+
         function mostrarAyuda() {
-            const instruccion = levelInstructions[nivelActual] || {es: "Completa la actividad.", en: "Complete the activity."};
+            const lesson = obtenerDatosLeccionActual();
+            const defaultHelp = "Completa la actividad. / Complete the activity.";
+            // Buscamos si hay contenido guardado desde el panel, si no, usamos default
+            const helpText = (lesson && lesson.content && lesson.content.help) ? lesson.content.help : defaultHelp;
+            
             Swal.fire({
-                title: `Ayuda Nivel ${nivelActual} 💡`,
-                html: `
-                    <div style="background:#e3f2fd; padding:15px; border-radius:10px; border-left:5px solid #2196f3; text-align:left;">
-                        <p><b>🇪🇸 Indicación:</b> ${instruccion.es}</p>
-                        <hr>
-                        <p><b>🇺🇸 Instruction:</b> ${instruccion.en}</p>
-                    </div>
-                    <p style="font-size:12px; color:#666; margin-top:10px;">Tip: Revisa primero Vocabulary y Grammar.</p>
-                `,
+                title: `Ayuda / Help 💡`,
+                html: `<div style="background:#e3f2fd; padding:15px; border-radius:10px; border-left:5px solid #2196f3; text-align:left; white-space: pre-wrap;">${helpText}</div>`,
                 showCancelButton: true,
                 confirmButtonText: '🔊 Escuchar (Listen)',
                 cancelButtonText: 'Entendido',
             }).then((result) => {
-                if (result.isConfirmed) {
-                    hablarTexto(instruccion.en, 'en-US');
-                }
+                if (result.isConfirmed) { hablarTexto(helpText, 'en-US'); }
             });
+        }
+
+        function mostrarModalContenido(tipo) {
+            const lesson = obtenerDatosLeccionActual();
+            let content = "No content available.";
+            let title = "...";
+            
+            if (tipo === 'vocab') {
+                title = "Vocabulary 📚";
+                content = (lesson && lesson.content && lesson.content.vocab) ? lesson.content.vocab : "No vocabulary list for this lesson.";
+            } else if (tipo === 'grammar') {
+                title = "Grammar 📖";
+                content = (lesson && lesson.content && lesson.content.grammar) ? lesson.content.grammar : "No grammar notes for this lesson.";
+            }
+
+            document.getElementById('tituloAcademico').textContent = title;
+            document.getElementById('contenidoAcademicoBody').textContent = content;
+            document.getElementById('modalAcademico').style.display = 'flex';
         }
 
         function actualizarUI() {
@@ -685,23 +729,15 @@
             document.getElementById("repsText").textContent = `Intentos: ${reps}/10`;
         }
 
-        // --- NEW LOAD FUNCTION: SUPPORTS LESSONS ---
         function cargarPregunta() {
             if(!nivelActual) nivelActual = 1;
-            
-            // 1. Obtener datos del nivel actual desde la nueva estructura
             const nivelData = cursoProDB[nivelActual] || [];
-            
-            // 2. Si no hay datos, fallback de seguridad
             if(nivelData.length === 0) { console.error("No data for level"); return; }
 
-            // 3. Obtener el selector de lecciones
             const selectElement = document.getElementById('lessonSelect');
-            
-            // 4. Si el selector está vacío (primera carga), llénalo
             if (selectElement.options.length === 0 || selectElement.getAttribute('data-level') != nivelActual) {
-                selectElement.innerHTML = ""; // Limpiar
-                selectElement.setAttribute('data-level', nivelActual); // Marcar para no recargar si no cambia nivel
+                selectElement.innerHTML = ""; 
+                selectElement.setAttribute('data-level', nivelActual); 
                 nivelData.forEach((lesson, index) => {
                     const opt = document.createElement('option');
                     opt.value = index;
@@ -710,14 +746,16 @@
                 });
             }
 
-            // 5. Obtener preguntas de la lección seleccionada
             const selectedLessonIndex = selectElement.value || 0;
             const lessonQuestions = nivelData[selectedLessonIndex].questions;
-
-            // 6. Elegir pregunta al azar de esa lección
-            preguntaActual = lessonQuestions[Math.floor(Math.random() * lessonQuestions.length)];
             
-            if (!preguntaActual) return;
+            // Seguridad por si la lección no tiene preguntas
+            if(!lessonQuestions || lessonQuestions.length === 0) {
+                 preguntaActual = { type: "translation", q: "No questions", a: "error" };
+            } else {
+                 preguntaActual = lessonQuestions[Math.floor(Math.random() * lessonQuestions.length)];
+            }
+            
             const qt = document.getElementById("questionText");
             const inp = document.getElementById("answerInput");
             inp.value = ""; document.getElementById("feedback").textContent = "";
@@ -888,199 +926,6 @@
         }
 
         async function aprobarPagoReal(uid) { const s = listaAlumnosCache.find(x => x.uid === uid); if(!s.pendingPayment) return; const nivelADesbloquear = s.pendingPayment.nivel + 1; let nuevosNiveles = s.unlockedLevels || [1]; if(!nuevosNiveles.includes(nivelADesbloquear)) nuevosNiveles.push(nivelADesbloquear); let historial = s.paymentHistory || []; if(historial.length > 0) { historial[historial.length - 1].estado = "Aprobado ✅"; } await db.collection("students").doc(uid).update({ unlockedLevels: nuevosNiveles, pendingPayment: null, paymentHistory: historial }); Swal.fire("¡Aprobado!", `Se ha desbloqueado el Nivel ${nivelADesbloquear} para ${s.username}.`, "success"); cargarTablaAlumnos(); }
-        
-        async function resetearAlumno(uid) { 
-            const s = listaAlumnosCache.find(x => x.uid === uid); 
-            const maxLevel = Math.max(...(s.unlockedLevels || [1])); 
-            
-            const { value: action } = await Swal.fire({ 
-                title: `Gestionar: ${s.username}`, 
-                text: `Nivel Actual: ${maxLevel}`, 
-                input: 'select', 
-                inputOptions: { 
-                    'level_jump': '⏪ Regresar a un Nivel Específico', 
-                    'reset_points': '📉 Resetear Solo Puntos', 
-                    'hard_reset': '⚠️ REINICIO TOTAL (Cero)' 
-                }, 
-                showCancelButton: true 
-            }); 
-            
-            if (!action) return; 
-            
-            if (action === 'reset_points') { 
-                await db.collection("students").doc(uid).update({score:0}); 
-                Swal.fire("Listo", "Puntos en 0", "success"); 
-            } 
-            else if (action === 'hard_reset') { 
-                await db.collection("students").doc(uid).update({score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, currentStreak:1, levelRepetitions:{}, paymentHistory:[], pendingPayment:null}); 
-                Swal.fire("Reinicio Total", "El alumno empieza desde cero.", "warning"); 
-            } 
-            else if (action === 'level_jump') { 
-                if (maxLevel <= 1) { 
-                    return Swal.fire("Aviso", "El alumno ya está en el Nivel 1. No puede bajar más.", "info"); 
-                } 
-                const options = {}; 
-                for (let i = 1; i < maxLevel; i++) { 
-                    options[i] = `Regresar a Nivel ${i}`; 
-                } 
-                const { value: targetLevel } = await Swal.fire({ 
-                    title: 'Viaje en el Tiempo ⏳', 
-                    text: `El alumno está en Nivel ${maxLevel}. ¿A dónde lo regresamos?`, 
-                    input: 'select', 
-                    inputOptions: options, 
-                    showCancelButton: true 
-                }); 
-                if (targetLevel) { 
-                    const target = parseInt(targetLevel); 
-                    const newLevels = Array.from({length: target}, (_, i) => i + 1); 
-                    await db.collection("students").doc(uid).update({ unlockedLevels: newLevels }); 
-                    Swal.fire("¡Hecho!", `Alumno regresado al Nivel ${target}`, "success"); 
-                } 
-            } 
-            cargarTablaAlumnos(); 
-        }
-
-        function borrarAlumno(uid) { if(confirm("¿Eliminar?")) db.collection("students").doc(uid).delete().then(()=>cargarTablaAlumnos()); }
-        
-        async function cambiarGrupo(uid) { 
-            const s = listaAlumnosCache.find(x => x.uid === uid);
-            const gpoActual = s.group || "Sin Grupo";
-            const { value: nuevoGpo } = await Swal.fire({
-                title: `Cambiar Grupo a ${s.username}`,
-                input: 'text',
-                inputLabel: `Grupo Actual: ${gpoActual}`,
-                inputPlaceholder: 'Escribe el nuevo grupo (Ej: 4A)',
-                inputValue: s.group || "",
-                showCancelButton: true,
-                confirmButtonText: 'Guardar Cambio',
-                inputValidator: (value) => {
-                    if (!value) { return '¡Necesitas escribir un grupo!'; }
-                }
-            });
-            if (nuevoGpo) {
-                const gpoFinal = nuevoGpo.toUpperCase().trim();
-                await db.collection("students").doc(uid).update({ group: gpoFinal });
-                Swal.fire("¡Actualizado!", `El alumno ahora está en el grupo ${gpoFinal}`, "success");
-                cargarTablaAlumnos(); 
-            }
-        }
-
-        function abrirMenuDonacion() {
-            Swal.fire({
-                title: 'Apoya el Proyecto ❤️',
-                html: `
-                    <p style="font-size:14px; margin-bottom:15px;">Elige tu donativo para mantener la app activa:</p>
-                    <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;">
-                        <button onclick="irADonar(40, 'https://mpago.li/1HvLXiy')" class="btn" style="width:120px; background:#009ee3">$40 MXN</button>
-                        <button onclick="irADonar(70, 'https://mpago.li/1r3jbNf')" class="btn" style="width:120px; background:#009ee3">$70 MXN</button>
-                        <button onclick="irADonar(100, 'https://mpago.li/1irBKzH')" class="btn" style="width:120px; background:#009ee3">$100 MXN</button>
-                        <button onclick="irADonar(200, 'https://mpago.li/1Exy4z9')" class="btn" style="width:120px; background:#009ee3">$200 MXN</button>
-                    </div>
-                `,
-                showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Cancelar'
-            });
-        }
-
-        function irADonar(monto, link) {
-            window.open(link, '_blank');
-            Swal.fire({
-                title: '¡Gracias! 🙏',
-                text: 'Por favor registra tu donativo para agradecerte.',
-                html: `<input id="donanteName" class="swal2-input" placeholder="Tu Nombre" value="${(datosUsuario && datosUsuario.username) ? datosUsuario.username : ''}">` +
-                      '<input id="donanteFolio" class="swal2-input" placeholder="Folio de Pago">',
-                confirmButtonText: 'Registrar',
-                preConfirm: () => {
-                    const n = document.getElementById('donanteName').value;
-                    const f = document.getElementById('donanteFolio').value;
-                    if (!n || !f) { Swal.showValidationMessage('Escribe ambos datos por favor'); }
-                    return [n, f];
-                }
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    const nombre = result.value[0];
-                    const folio = result.value[1];
-                    const docId = 'DON_' + Date.now();
-                    const donationData = {
-                        nombre: nombre,
-                        folio: folio,
-                        monto: monto,
-                        fecha: new Date().toLocaleString(),
-                        isDonation: true, 
-                        type: 'external_donation',
-                        uid: usuarioActual || null 
-                    };
-                    db.collection('students').doc(docId).set(donationData).then(() => {
-                        Swal.fire("Thank you for your donation", "Tu apoyo ha sido registrado.", "success");
-                    }).catch((error) => {
-                        console.error(error);
-                        Swal.fire("Aviso", "Pago abierto. Nota: Para registrar el folio automático necesitas iniciar sesión, pero tu apoyo cuenta igual. ¡Gracias!", "warning");
-                    });
-                }
-            });
-        }
-
-        function verDonaciones() {
-            document.getElementById('donacionesCuerpo').innerHTML = "<tr><td colspan='4'>Cargando...</td></tr>";
-            document.getElementById('modalDonaciones').style.display = 'flex';
-            db.collection('students').where('isDonation', '==', true).get().then((snap) => {
-                const tb = document.getElementById('donacionesCuerpo');
-                tb.innerHTML = "";
-                if(snap.empty) { tb.innerHTML = "<tr><td colspan='4'>Sin donaciones aún.</td></tr>"; return; }
-                let data = [];
-                snap.forEach(doc => data.push(doc.data()));
-                data.sort((a, b) => {
-                    const dateA = new Date(a.fecha); const dateB = new Date(b.fecha);
-                    return isNaN(dateA) ? 0 : dateB - dateA;
-                });
-                data.forEach(d => {
-                    tb.innerHTML += `<tr><td>${d.fecha}</td><td><b>${d.nombre}</b></td><td style="color:green; font-weight:bold;">$${d.monto}</td><td>${d.folio}</td></tr>`;
-                });
-            }).catch((error) => {
-                document.getElementById('donacionesCuerpo').innerHTML = `<tr><td colspan='4' style='color:red; font-weight:bold'>Error de acceso: ${error.message}</td></tr>`;
-            });
-        }
-
-        function verHistorial(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid), l=s.dailyLogs||{}, tb=document.getElementById("historialCuerpo"); tb.innerHTML=""; document.getElementById("modalHistorial").style.display="flex"; document.getElementById("historialNombre").textContent="Historial: "+(s.username||"Alumno"); Object.keys(l).sort().reverse().forEach(f=>{ tb.innerHTML+=`<tr><td>${f}</td><td style="color:blue;font-weight:bold">${formatearTiempo(l[f])}</td></tr>`; }); }
-        function verGraficaInd(uid) { const s=listaAlumnosCache.find(x=>x.uid===uid); document.getElementById("modalGrafica").style.display="flex"; document.getElementById("modalNombre").textContent=s.username||"Alumno"; const m = s.medals || {gold:0, silver:0, bronze:0}; let itemsTexto = "Ninguna compra"; if (s.inventory && s.inventory.length > 0) { itemsTexto = s.inventory.map(id => { const item = shopCatalog.find(i => i.id === id); return item ? `${item.icon} ${item.name}` : id; }).join(', '); } let pagosHTML = "<p>No hay pagos registrados.</p>"; if (s.paymentHistory && s.paymentHistory.length > 0) { pagosHTML = `<ul style="text-align:left; font-size:12px; list-style:none; padding:0;">`; s.paymentHistory.forEach(p => { const color = p.estado.includes("Aprobado") ? "green" : "orange"; pagosHTML += `<li style="margin-bottom:5px; border-bottom:1px solid #eee; padding-bottom:3px;">📅 ${p.fecha} - <b>$${p.monto}</b> - <span style="color:${color}">${p.estado}</span></li>`; }); pagosHTML += `</ul>`; } document.getElementById("modalStats").innerHTML = `<p><b>Nivel:</b> ${Math.max(...(s.unlockedLevels||[1]))} | <b>Puntos:</b> ${s.score}</p><p><b>Racha:</b> ${s.currentStreak||1} 🔥 | <b>Errores:</b> ${s.totalWrong||0}</p><p>🥇 ${m.gold} | 🥈 ${m.silver} | 🥉 ${m.bronze}</p><hr><p><b>🎒 Inventario:</b></p><p style="font-size:12px; color:#555;">${itemsTexto}</p><hr><p style="color:green;"><b>💰 Historial de Pagos:</b></p>${pagosHTML}`; if(chartStudentInstance) chartStudentInstance.destroy(); chartStudentInstance=new Chart(document.getElementById('studentChart'),{type:'doughnut',data:{labels:['✅ Correctas','❌ Incorrectas'],datasets:[{data:[s.totalCorrect,s.totalWrong],backgroundColor:['#28a745','#dc3545']}]}}); }
-        function verGraficaGrupal() { const f=document.getElementById("groupFilter").value; let d=listaAlumnosCache; if(f!=="todos") d=d.filter(s=>s.group===f); d.sort((a,b)=>b.score-a.score); document.getElementById("modalGraficaGrupal").style.display="flex"; const totalPuntos = d.reduce((acc, curr) => acc + Number(curr.score || 0), 0); const promedio = d.length > 0 ? (totalPuntos / d.length).toFixed(1) : 0; document.getElementById("modalStatsGroup").innerHTML = `<p><b>Total Alumnos:</b> ${d.length} | <b>Promedio Puntos:</b> ${promedio}</p>`; const ctx=document.getElementById('groupBigChart').getContext('2d'); if(chartGroupInstance) chartGroupInstance.destroy(); chartGroupInstance=new Chart(ctx,{type:'bar',data:{labels:d.map(s=>s.username),datasets:[{label:'Puntos Totales',data:d.map(s=>s.score),backgroundColor:'#004e92'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}}); }
-        function descargarCaptura(divId, nombre) { const el = document.getElementById(divId); html2canvas(el).then(c => { const l = document.createElement('a'); l.download = nombre; l.href = c.toDataURL(); l.click(); }); }
-        function cerrarModal(id) { document.getElementById(id).style.display="none"; }
-        function exportarExcel() { const ws=XLSX.utils.json_to_sheet(listaAlumnosCache.map(s=>({Nombre:s.username,Grupo:s.group,Puntos:s.score,Tiempo:formatearTiempo(s.timeWorked||0)}))); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Reporte"); XLSX.writeFile(wb,"Reporte.xlsx"); }
-        function exportarPDF() { html2pdf().from(document.getElementById('teacherPanel')).save(); }
-        function abrirModalAcademico(t) { document.getElementById("modalAcademico").style.display="flex"; document.getElementById("tituloAcademico").textContent=t; document.getElementById("nivelAcademico").textContent=nivelActual; }
-        
-        function intentarLogin() {
-            const e=document.getElementById("emailInput").value.trim(), p=document.getElementById("passwordInput").value.trim(), n=document.getElementById("usernameInput").value.trim();
-            let g = "", gr = "";
-            if(loginMode === 'student') { g = document.getElementById("gradeInput").value.trim(); gr = document.getElementById("groupInput").value.trim().toUpperCase(); } 
-            else { g = "N/A"; gr = "Adults"; }
-
-            if(!e||!p) { Swal.fire("Error","Faltan datos","error"); return; }
-            
-            auth.signInWithEmailAndPassword(e,p).catch((err) => {
-                if(['auth/user-not-found','auth/wrong-password','auth/invalid-credential','auth/invalid-login-credentials'].includes(err.code)) {
-                    if(loginMode === 'student' && (!n||!g||!gr)) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo alumno, llena todos los datos para registrarte.'}); return; }
-                    if(loginMode === 'adult' && !n) { Swal.fire({icon:'warning',title:'Acceso',text:'Si eres nuevo, pon tu nombre para registrarte.'}); return; }
-
-                    auth.createUserWithEmailAndPassword(e,p).then((c) => {
-                        db.collection("students").doc(c.user.uid).set({ 
-                            uid:c.user.uid, username:n, grade:g, group:gr, email:e, password:p, 
-                            userType: loginMode, 
-                            score:0, unlockedLevels:[1], totalCorrect:0, totalWrong:0, timeWorked:0, 
-                            medals:{gold:0,silver:0,bronze:0}, dailyLogs:{}, 
-                            lastLoginDate:new Date().toLocaleDateString('es-ES'), currentStreak:1, 
-                            inventory:[], equipped:{avatar:'👤',frame:'',theme:''}, levelRepetitions:{}, paymentHistory:[], pendingPayment:null,
-                            hasSeenWelcome: false 
-                        }).then(()=>Swal.fire("¡Bienvenido!","Tu cuenta ha sido creada.","success"));
-                    }).catch(e=>Swal.fire("Error al Registrar",e.message,"error"));
-                } else Swal.fire("Error",err.message,"error");
-            });
-        }
-        
-        async function recuperarPassword() { const {value:e}=await Swal.fire({title:'Recuperar',input:'email',showCancelButton:true}); if(e) auth.sendPasswordResetEmail(e).then(()=>Swal.fire('Enviado','','success')); }
-        function cerrarSesion() { if(breakTimer) clearTimeout(breakTimer); db.collection("students").doc(usuarioActual).update({timeWorked:datosUsuario.timeWorked, dailyLogs:datosUsuario.dailyLogs||{}}).then(()=>auth.signOut().then(()=>location.reload())); }
-        function cargarNoticias() { db.collection("students").doc("ADMIN_NEWS").onSnapshot((doc) => { const t = (doc.exists&&doc.data().text)?doc.data().text:"Bienvenido."; document.getElementById("newsContent").innerText=t; document.getElementById("teacherNewsInput").value=t; }); }
-        function publicarNoticia() { db.collection("students").doc("ADMIN_NEWS").set({text:document.getElementById("teacherNewsInput").value}).then(()=>Swal.fire("Publicado","","success")); }
         
         function cargarLeaderboard() {
             db.collection("students").orderBy("timeWorked","desc").limit(12).get().then((snap) => {
