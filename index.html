@@ -150,6 +150,30 @@
             transform: translate(0,0); /* Para GPU accel */
         }
         .draggable-item:active { cursor: grabbing; transform: scale(0.95); background: #003366; }
+
+        /* --- NUEVOS ESTILOS V50 ULTRA (Opción Múltiple & Order Sentence) --- */
+        .choice-btn {
+            display: block; width: 100%; padding: 15px; margin: 8px 0;
+            border: 2px solid #ddd; border-radius: 15px; background: white;
+            font-size: 18px; font-weight: bold; color: #555; cursor: pointer; transition: all 0.2s;
+        }
+        .choice-btn:hover { border-color: var(--primary); background: #f0f8ff; color: var(--primary); }
+        .choice-btn:active { transform: scale(0.98); }
+        .choice-btn.correct { background: #2ecc71; color: white; border-color: #27ae60; }
+        .choice-btn.wrong { background: #e74c3c; color: white; border-color: #c0392b; animation: shake 0.5s; }
+        
+        .sentence-drop-zone {
+            min-height: 60px; border-bottom: 3px solid var(--primary);
+            margin: 20px 0; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; padding: 10px;
+        }
+        .word-btn {
+            background: var(--primary); color: white; padding: 8px 15px;
+            border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px;
+            border: none; box-shadow: 0 3px 0 #003366; transition: 0.1s;
+        }
+        .word-btn:active { transform: translateY(3px); box-shadow: none; }
+        
+        @keyframes shake { 0%{transform:translateX(0)} 25%{transform:translateX(-5px)} 50%{transform:translateX(5px)} 75%{transform:translateX(-5px)} 100%{transform:translateX(0)} }
     </style>
 </head>
 <body>
@@ -270,6 +294,16 @@
                     </div>
                 <div id="dragOptions" class="options-container">
                     </div>
+            </div>
+
+            <div id="multipleChoiceArea" style="display:none;">
+                <div id="choiceContainer"></div>
+            </div>
+
+            <div id="orderSentenceArea" style="display:none;">
+                <div id="builtSentence" class="sentence-drop-zone"></div>
+                <div id="wordBank" class="options-container"></div>
+                <button onclick="resetSentence()" class="btn btn-secondary" style="margin-top:5px; font-size:12px; padding:8px;">♻️ Reset</button>
             </div>
 
             <div id="standardControls">
@@ -735,6 +769,10 @@
             document.getElementById("repsText").textContent = `Intentos: ${reps}/10`;
         }
  
+        // --- VARIABLES GLOBALES PARA ORDENAR FRASE ---
+        let userBuiltSentence = [];
+        let correctSentenceArray = [];
+
         function cargarPregunta() {
             if(!nivelActual) nivelActual = 1;
             const nivelData = cursoProDB[nivelActual] || [];
@@ -752,73 +790,109 @@
             
             if (!preguntaActual) return;
 
-            // --- LÓGICA V50: DRAG & DROP VS STANDARD ---
+            // --- LÓGICA V50 ULTRA: SWITCH DE TIPOS ---
             const standardControls = document.getElementById("standardControls");
             const dragDropArea = document.getElementById("dragDropArea");
+            const multipleChoiceArea = document.getElementById("multipleChoiceArea");
+            const orderSentenceArea = document.getElementById("orderSentenceArea");
             const qt = document.getElementById("questionText");
             const feedback = document.getElementById("feedback");
 
-            // Limpieza inicial
+            // Resetear Visibilidad
+            standardControls.style.display = "none";
+            dragDropArea.style.display = "none";
+            multipleChoiceArea.style.display = "none";
+            orderSentenceArea.style.display = "none";
             feedback.textContent = "";
 
             if (preguntaActual.type === 'drag_drop') {
-                // MODO DRAG & DROP
-                standardControls.style.display = "none"; // Ocultamos teclado y botones
-                dragDropArea.style.display = "block";    // Mostramos zona de imagen
-                qt.textContent = preguntaActual.q;       // Pregunta o Instrucción
+                // --- MODO DRAG & DROP ---
+                dragDropArea.style.display = "block";
+                qt.textContent = preguntaActual.q;
 
                 const dropZone = document.getElementById("dropZone");
                 const dragOptions = document.getElementById("dragOptions");
 
-                // Configurar Imagen
                 dropZone.innerHTML = `<img src="${preguntaActual.img}" alt="Imagen Pregunta">`;
-                dropZone.className = "drop-zone"; // Resetear colores
-                dropZone.setAttribute("data-answer", preguntaActual.a.toLowerCase()); // Guardar respuesta correcta secreta
+                dropZone.className = "drop-zone"; 
+                dropZone.setAttribute("data-answer", preguntaActual.a.toLowerCase());
 
-                // Generar Opciones (Correcta + Distractores)
                 let opciones = [preguntaActual.a];
-                
-                // Algoritmo de Distractores Inteligentes V50
-                // Intentamos sacar respuestas incorrectas de la misma lección
                 const distractores = lessonQuestions
                     .filter(q => q.a.toLowerCase() !== preguntaActual.a.toLowerCase())
                     .map(q => q.a);
-                
-                // Mezclamos distractores y tomamos 2 o 3
-                distractores.sort(() => 0.5 - Math.random());
                 opciones = opciones.concat(distractores.slice(0, 3));
-                
-                // Si faltan distractores (lección muy corta), agregamos genéricos
-                if (opciones.length < 3) opciones.push("Cat", "Dog", "Blue"); // Fallback seguro
-
-                // Mezclar todo para que la correcta no sea siempre la primera
+                if (opciones.length < 3) opciones.push("Cat", "Dog", "Blue"); 
                 opciones.sort(() => 0.5 - Math.random());
 
-                // Renderizar Botones Arrastrables
                 dragOptions.innerHTML = "";
                 opciones.forEach(opt => {
                     const btn = document.createElement("div");
                     btn.className = "draggable-item";
                     btn.textContent = opt;
-                    btn.draggable = true; // Para Desktop
-                    
-                    // Eventos Desktop
-                    btn.addEventListener("dragstart", (e) => {
-                        e.dataTransfer.setData("text", opt.toLowerCase());
-                    });
-
-                    // Eventos Móvil (Touch) V50
+                    btn.draggable = true; 
+                    btn.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text", opt.toLowerCase()); });
                     btn.addEventListener("touchstart", handleTouchStart, {passive: false});
                     btn.addEventListener("touchmove", handleTouchMove, {passive: false});
                     btn.addEventListener("touchend", handleTouchEnd, {passive: false});
-
                     dragOptions.appendChild(btn);
                 });
 
+            } else if (preguntaActual.type === 'multiple_choice') {
+                // --- MODO OPCIÓN MÚLTIPLE (NUEVO V50) ---
+                multipleChoiceArea.style.display = "block";
+                qt.textContent = preguntaActual.q;
+                
+                const container = document.getElementById("choiceContainer");
+                container.innerHTML = "";
+
+                // Generar distractores inteligentes
+                let opciones = [preguntaActual.a];
+                const distractores = lessonQuestions
+                    .filter(q => q.a && q.a.toLowerCase() !== preguntaActual.a.toLowerCase())
+                    .map(q => q.a);
+                
+                // Shuffle distractors and pick 2
+                distractores.sort(() => 0.5 - Math.random());
+                opciones = opciones.concat(distractores.slice(0, 2));
+                
+                // Fallback si no hay suficientes preguntas en la lección
+                if(opciones.length < 3) opciones.push("Yes", "No");
+
+                // Mezclar opciones finales
+                opciones.sort(() => 0.5 - Math.random());
+
+                opciones.forEach(opt => {
+                    const btn = document.createElement("button");
+                    btn.className = "choice-btn";
+                    btn.textContent = opt;
+                    btn.onclick = () => checkMultipleChoice(opt, btn);
+                    container.appendChild(btn);
+                });
+
+            } else if (preguntaActual.type === 'order_sentence') {
+                // --- MODO ORDENAR FRASE (NUEVO V50) ---
+                orderSentenceArea.style.display = "block";
+                standardControls.style.display = "block"; // Usamos el botón CHECK del standard
+                document.getElementById("standardControls").querySelector("input").style.display = "none"; // Ocultamos input texto
+                document.getElementById("standardControls").querySelector(".skills-bar").style.display = "none"; // Ocultamos skills
+                
+                qt.textContent = preguntaActual.q; // Ej: "Ordena la frase"
+
+                // Preparar frase
+                const sentence = preguntaActual.a;
+                correctSentenceArray = sentence.split(" ");
+                let shuffledWords = [...correctSentenceArray];
+                shuffledWords.sort(() => 0.5 - Math.random());
+
+                userBuiltSentence = [];
+                renderOrderSentence(shuffledWords);
+
             } else {
-                // MODO ESTÁNDAR (TEXTO/DICTADO)
+                // --- MODO ESTÁNDAR (TEXTO/DICTADO) ---
                 standardControls.style.display = "block";
-                dragDropArea.style.display = "none";
+                document.getElementById("standardControls").querySelector("input").style.display = "block";
+                document.getElementById("standardControls").querySelector(".skills-bar").style.display = "flex";
                 
                 const inp = document.getElementById("answerInput");
                 inp.value = ""; 
@@ -831,29 +905,16 @@
                     qt.textContent = "Translate: " + preguntaActual.q; 
                 }
                 
-                // Resetear botones de skills
                 document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active-listening', 'active-speaking', 'active-writing', 'mic-listening'));
                 inp.focus();
             }
         }
  
         // --- LÓGICA DRAG & DROP MÓVIL Y DESKTOP (V50) ---
-        
-        // 1. DESKTOP: Permitir soltar
-        function permitirSoltar(e) {
-            e.preventDefault();
-            document.getElementById("dropZone").classList.add("hover");
-        }
-        function salirZona(e) {
-            document.getElementById("dropZone").classList.remove("hover");
-        }
-        function soltar(e) {
-            e.preventDefault();
-            const data = e.dataTransfer.getData("text");
-            validarDragDrop(data);
-        }
+        function permitirSoltar(e) { e.preventDefault(); document.getElementById("dropZone").classList.add("hover"); }
+        function salirZona(e) { document.getElementById("dropZone").classList.remove("hover"); }
+        function soltar(e) { e.preventDefault(); const data = e.dataTransfer.getData("text"); validarDragDrop(data); }
 
-        // 2. MÓVIL: Variables para Touch
         let activeTouchElement = null;
         let originalPosition = {x: 0, y: 0};
 
@@ -861,18 +922,16 @@
             activeTouchElement = e.target;
             const touch = e.touches[0];
             const rect = activeTouchElement.getBoundingClientRect();
-            // Guardamos posición relativa al dedo
             originalPosition.x = touch.clientX - rect.left;
             originalPosition.y = touch.clientY - rect.top;
-            
             activeTouchElement.style.position = 'fixed';
             activeTouchElement.style.zIndex = '1000';
-            activeTouchElement.style.width = rect.width + 'px'; // Mantener tamaño
+            activeTouchElement.style.width = rect.width + 'px';
         }
 
         function handleTouchMove(e) {
             if (!activeTouchElement) return;
-            e.preventDefault(); // Evitar scroll
+            e.preventDefault(); 
             const touch = e.touches[0];
             activeTouchElement.style.left = (touch.clientX - originalPosition.x) + 'px';
             activeTouchElement.style.top = (touch.clientY - originalPosition.y) + 'px';
@@ -881,80 +940,158 @@
         function handleTouchEnd(e) {
             if (!activeTouchElement) return;
             e.preventDefault();
-            
-            // Detectar si soltamos sobre la zona
             const touch = e.changedTouches[0];
             const dropZone = document.getElementById("dropZone");
             const rect = dropZone.getBoundingClientRect();
-
-            // Verificamos colisión
             if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
                 touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
                 validarDragDrop(activeTouchElement.textContent.toLowerCase());
             }
-
-            // Resetear estilo del elemento (volver a la lista o desaparecer)
             activeTouchElement.style.position = 'static';
             activeTouchElement.style.zIndex = '';
             activeTouchElement = null;
             document.getElementById("dropZone").classList.remove("hover");
         }
 
-        // 3. VALIDACIÓN CENTRALIZADA
+        // --- FUNCIONES ESPECÍFICAS V50 ---
+
+        // 1. Validar Drag & Drop
         function validarDragDrop(respuestaUsuario) {
             const dropZone = document.getElementById("dropZone");
             const respuestaCorrecta = dropZone.getAttribute("data-answer");
-            const feedback = document.getElementById("feedback");
-
-            if (respuestaUsuario === respuestaCorrecta) {
-                // CORRECTO
-                try { audioCorrecto.currentTime=0; audioCorrecto.play(); } catch(e){}
-                dropZone.classList.add("correct");
-                feedback.textContent = "CORRECT! 🔥"; feedback.style.color = "green";
-                
-                datosUsuario.score = (datosUsuario.score || 0) + 10; 
-                datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1; 
-                aciertosSesion++;
-                
-                db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, totalCorrect: datosUsuario.totalCorrect });
-                actualizarUI();
-                
-                document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100)+"%";
-                contadorPreguntas++;
-
-                if(contadorPreguntas >= 5) setTimeout(finSesion, 2000); 
-                else setTimeout(cargarPregunta, 1500);
-
-            } else {
-                // INCORRECTO
-                try { audioError.currentTime=0; audioError.play(); } catch(e){}
+            procesarResultado(respuestaUsuario === respuestaCorrecta);
+            if(respuestaUsuario !== respuestaCorrecta) {
                 dropZone.classList.add("wrong");
-                feedback.textContent = "WRONG. Try again."; feedback.style.color = "red";
-                
-                datosUsuario.totalWrong = (datosUsuario.totalWrong || 0) + 1;
-                db.collection("students").doc(usuarioActual).update({ totalWrong: datosUsuario.totalWrong });
-                actualizarUI();
-
                 setTimeout(() => dropZone.classList.remove("wrong"), 1000);
+            } else {
+                dropZone.classList.add("correct");
             }
+        }
+
+        // 2. Validar Opción Múltiple
+        function checkMultipleChoice(selectedOption, btnElement) {
+            const isCorrect = selectedOption.toLowerCase() === preguntaActual.a.toLowerCase();
+            
+            if(isCorrect) {
+                btnElement.classList.add("correct");
+            } else {
+                btnElement.classList.add("wrong");
+            }
+            
+            // Deshabilitar botones para evitar spam
+            document.querySelectorAll(".choice-btn").forEach(b => b.disabled = true);
+            
+            procesarResultado(isCorrect);
+        }
+
+        // 3. Lógica Order Sentence
+        function renderOrderSentence(words) {
+            const bank = document.getElementById("wordBank");
+            const zone = document.getElementById("builtSentence");
+            bank.innerHTML = "";
+            zone.innerHTML = ""; // Clear zone initially or on reset
+
+            // Renderizar palabras en el banco
+            words.forEach((word, index) => {
+                const btn = document.createElement("button");
+                btn.className = "word-btn";
+                btn.textContent = word;
+                btn.onclick = () => addWordToSentence(word, btn);
+                bank.appendChild(btn);
+            });
+            
+            // Renderizar frase construida
+            userBuiltSentence.forEach((word) => {
+                const span = document.createElement("span");
+                span.className = "word-btn";
+                span.style.background = "#fff"; 
+                span.style.color = "#333";
+                span.style.border = "1px solid #ccc";
+                span.textContent = word;
+                zone.appendChild(span);
+            });
+        }
+
+        function addWordToSentence(word, btnElement) {
+            userBuiltSentence.push(word);
+            btnElement.style.display = "none"; // Hide used word
+            
+            // Re-render built sentence
+            const zone = document.getElementById("builtSentence");
+            const span = document.createElement("span");
+            span.className = "word-btn";
+            span.style.background = "#fff"; 
+            span.style.color = "#333";
+            span.style.border = "1px solid #ccc";
+            span.textContent = word;
+            zone.appendChild(span);
+        }
+
+        function resetSentence() {
+            // Reiniciar lógica
+            const sentence = preguntaActual.a;
+            correctSentenceArray = sentence.split(" ");
+            let shuffledWords = [...correctSentenceArray];
+            shuffledWords.sort(() => 0.5 - Math.random());
+            userBuiltSentence = [];
+            renderOrderSentence(shuffledWords);
         }
 
         function verificarRespuesta() {
             if (!preguntaActual) return;
+
+            // CASO ORDENAR FRASE
+            if(preguntaActual.type === 'order_sentence') {
+                const userString = userBuiltSentence.join(" ");
+                const correctString = preguntaActual.a;
+                const isCorrect = userString === correctString;
+                
+                const zone = document.getElementById("builtSentence");
+                if(!isCorrect) {
+                    zone.style.borderBottomColor = "red";
+                    setTimeout(() => zone.style.borderBottomColor = "#004e92", 1000);
+                }
+                procesarResultado(isCorrect);
+                return;
+            }
+
+            // CASO ESTÁNDAR
             const inputEl = document.getElementById("answerInput"); const r = inputEl.value.trim().toLowerCase(); 
-            if(!r) return; contadorPreguntas++; const fd = document.getElementById("feedback");
-            if(r === preguntaActual.a.toLowerCase()) {
+            if(!r) return; 
+            const isCorrect = r === preguntaActual.a.toLowerCase();
+            
+            if(isCorrect) {
+                inputEl.style.borderColor = "#2ecc71"; inputEl.style.backgroundColor = "#eafaf1";
+            } else {
+                inputEl.style.borderColor = "#e74c3c"; inputEl.style.backgroundColor = "#fdedec";
+            }
+            procesarResultado(isCorrect);
+        }
+
+        // --- FUNCIÓN CENTRAL DE RESULTADOS (DRY) ---
+        function procesarResultado(isCorrect) {
+            contadorPreguntas++; 
+            const fd = document.getElementById("feedback");
+            
+            if (isCorrect) {
                 try { audioCorrecto.currentTime=0; audioCorrecto.play(); } catch(e){}
-                fd.textContent = "CORRECT! 🔥"; fd.style.color = "green"; inputEl.style.borderColor = "#2ecc71"; inputEl.style.backgroundColor = "#eafaf1";
-                datosUsuario.score = (datosUsuario.score || 0) + 10; datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1; aciertosSesion++; 
+                fd.textContent = "CORRECT! 🔥"; fd.style.color = "green";
+                datosUsuario.score = (datosUsuario.score || 0) + 10; 
+                datosUsuario.totalCorrect = (datosUsuario.totalCorrect || 0) + 1; 
+                aciertosSesion++; 
             } else {
                 try { audioError.currentTime=0; audioError.play(); } catch(e){}
-                fd.textContent = "WRONG. Answer: " + preguntaActual.a; fd.style.color = "red"; inputEl.style.borderColor = "#e74c3c"; inputEl.style.backgroundColor = "#fdedec";
+                fd.textContent = "WRONG. Answer: " + preguntaActual.a; fd.style.color = "red";
                 datosUsuario.totalWrong = (datosUsuario.totalWrong || 0) + 1; 
-                const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); u.lang='en-US'; if(vocesDisponibles.length > 0) u.voice = vocesDisponibles[0]; synth.speak(u);
+                const u = new SpeechSynthesisUtterance("The answer is " + preguntaActual.a); u.lang='en-US'; 
+                if(vocesDisponibles.length > 0) u.voice = vocesDisponibles[0]; 
+                synth.speak(u);
             }
+            
             db.collection("students").doc(usuarioActual).update({ score: datosUsuario.score, totalCorrect: datosUsuario.totalCorrect, totalWrong: datosUsuario.totalWrong });
-            actualizarUI(); document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100)+"%";
+            actualizarUI(); 
+            document.getElementById("lessonProgressBar").style.width = ((contadorPreguntas/5)*100)+"%";
+            
             if(contadorPreguntas >= 5) setTimeout(finSesion, 2000); else setTimeout(cargarPregunta, 2000);
         }
  
@@ -1095,7 +1232,6 @@
                 let btnPago = "";
                 if(s.pendingPayment) { 
                     const folioInfo = s.pendingPayment.folio ? `Ref:${s.pendingPayment.folio}` : "Sin Folio"; 
-                    // DIFERENCIAR VISUALMENTE SI ES PAGO DE NIVEL O PUNTOS
                     const tipoPago = s.pendingPayment.tipo === 'puntos' ? '💰 Puntos' : '💸 Nivel';
                     btnPago = `<button onclick="aprobarPagoReal('${s.uid}')" class="action-btn btn-approve" title="Aprobar Pago (Folio: ${s.pendingPayment.folio})">${tipoPago} ${folioInfo}</button>`; 
                 }
