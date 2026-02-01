@@ -151,7 +151,7 @@
         }
         .draggable-item:active { cursor: grabbing; transform: scale(0.95); background: #003366; }
 
-        /* --- NUEVOS ESTILOS V50 ULTRA (Opción Múltiple & Order Sentence) --- */
+        /* --- NUEVOS ESTILOS V50 ULTRA MEJORADOS (Opción Múltiple & Order Sentence) --- */
         .choice-btn {
             display: block; width: 100%; padding: 15px; margin: 8px 0;
             border: 2px solid #ddd; border-radius: 15px; background: white;
@@ -162,16 +162,43 @@
         .choice-btn.correct { background: #2ecc71; color: white; border-color: #27ae60; }
         .choice-btn.wrong { background: #e74c3c; color: white; border-color: #c0392b; animation: shake 0.5s; }
         
+        /* DISEÑO MEJORADO PARA "ORDENAR FRASE" */
         .sentence-drop-zone {
-            min-height: 60px; border-bottom: 3px solid var(--primary);
-            margin: 20px 0; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; padding: 10px;
+            min-height: 80px; 
+            border: 2px dashed var(--primary); /* Marco punteado para que se vea donde poner */
+            background-color: #f8fafd;
+            border-radius: 15px;
+            margin: 20px 0; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            justify-content: center; 
+            align-items: center;
+            padding: 15px;
         }
+        
         .word-btn {
-            background: var(--primary); color: white; padding: 8px 15px;
-            border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px;
-            border: none; box-shadow: 0 3px 0 #003366; transition: 0.1s;
+            background: white; 
+            color: var(--primary); 
+            padding: 10px 18px;
+            border: 2px solid var(--primary);
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: 800; 
+            font-size: 18px;
+            box-shadow: 0 4px 0 #b3cfe2; 
+            transition: all 0.1s;
+            user-select: none;
         }
-        .word-btn:active { transform: translateY(3px); box-shadow: none; }
+        .word-btn:active { transform: translateY(4px); box-shadow: none; }
+        
+        /* Estilo cuando la palabra ya está en la frase (arriba) */
+        .word-in-sentence {
+            background: var(--primary);
+            color: white;
+            border: 2px solid var(--primary);
+            box-shadow: 0 4px 0 #002a50;
+        }
         
         @keyframes shake { 0%{transform:translateX(0)} 25%{transform:translateX(-5px)} 50%{transform:translateX(5px)} 75%{transform:translateX(-5px)} 100%{transform:translateX(0)} }
     </style>
@@ -301,9 +328,10 @@
             </div>
 
             <div id="orderSentenceArea" style="display:none;">
+                <p style="font-size:12px; color:#666; margin-bottom:5px;">Toca las palabras para ordenar:</p>
                 <div id="builtSentence" class="sentence-drop-zone"></div>
-                <div id="wordBank" class="options-container"></div>
-                <button onclick="resetSentence()" class="btn btn-secondary" style="margin-top:5px; font-size:12px; padding:8px;">♻️ Reset</button>
+                <div id="wordBank" class="options-container" style="gap:8px;"></div>
+                <button onclick="resetSentence()" class="btn btn-secondary" style="margin-top:10px; font-size:12px; padding:8px; width:auto;">♻️ Reiniciar Frase</button>
             </div>
 
             <div id="standardControls">
@@ -871,7 +899,7 @@
                 });
 
             } else if (preguntaActual.type === 'order_sentence') {
-                // --- MODO ORDENAR FRASE (NUEVO V50) ---
+                // --- MODO ORDENAR FRASE (NUEVO V50 ULTRA MEJORADO) ---
                 orderSentenceArea.style.display = "block";
                 standardControls.style.display = "block"; // Usamos el botón CHECK del standard
                 document.getElementById("standardControls").querySelector("input").style.display = "none"; // Ocultamos input texto
@@ -879,9 +907,9 @@
                 
                 qt.textContent = preguntaActual.q; // Ej: "Ordena la frase"
 
-                // Preparar frase
-                const sentence = preguntaActual.a;
-                correctSentenceArray = sentence.split(" ");
+                // Preparar frase (split por espacio)
+                const sentence = preguntaActual.a.trim();
+                correctSentenceArray = sentence.split(/\s+/);
                 let shuffledWords = [...correctSentenceArray];
                 shuffledWords.sort(() => 0.5 - Math.random());
 
@@ -984,56 +1012,83 @@
             procesarResultado(isCorrect);
         }
 
-        // 3. Lógica Order Sentence
-        function renderOrderSentence(words) {
+        // 3. Lógica Order Sentence (MEJORADA V50 ULTRA)
+        function renderOrderSentence(shuffledWords) {
             const bank = document.getElementById("wordBank");
             const zone = document.getElementById("builtSentence");
-            bank.innerHTML = "";
-            zone.innerHTML = ""; // Clear zone initially or on reset
-
-            // Renderizar palabras en el banco
-            words.forEach((word, index) => {
-                const btn = document.createElement("button");
-                btn.className = "word-btn";
-                btn.textContent = word;
-                btn.onclick = () => addWordToSentence(word, btn);
-                bank.appendChild(btn);
-            });
             
-            // Renderizar frase construida
-            userBuiltSentence.forEach((word) => {
-                const span = document.createElement("span");
-                span.className = "word-btn";
-                span.style.background = "#fff"; 
-                span.style.color = "#333";
-                span.style.border = "1px solid #ccc";
-                span.textContent = word;
-                zone.appendChild(span);
-            });
+            // Limpiar si es la primera carga (no si es update)
+            if(bank.innerHTML === "" && zone.innerHTML === "") {
+                shuffledWords.forEach((word, index) => {
+                    // Creamos botones en el banco
+                    const btn = document.createElement("div");
+                    btn.className = "word-btn";
+                    btn.textContent = word;
+                    btn.id = "word_" + index; // ID único para rastrear
+                    btn.onclick = () => addWordToSentence(word, btn.id);
+                    bank.appendChild(btn);
+                });
+            }
         }
 
-        function addWordToSentence(word, btnElement) {
-            userBuiltSentence.push(word);
-            btnElement.style.display = "none"; // Hide used word
+        function addWordToSentence(word, originalBtnId) {
+            userBuiltSentence.push({word: word, sourceId: originalBtnId});
             
-            // Re-render built sentence
+            // Ocultar botón original en el banco
+            document.getElementById(originalBtnId).style.visibility = "hidden";
+            document.getElementById(originalBtnId).style.opacity = "0";
+            
+            // Renderizar frase construida
+            renderBuiltSentence();
+        }
+        
+        function removeWordFromSentence(index) {
+            const removedItem = userBuiltSentence.splice(index, 1)[0];
+            
+            // Mostrar botón original en el banco
+            if(removedItem && removedItem.sourceId) {
+                const sourceBtn = document.getElementById(removedItem.sourceId);
+                if(sourceBtn) {
+                    sourceBtn.style.visibility = "visible";
+                    sourceBtn.style.opacity = "1";
+                }
+            }
+            
+            renderBuiltSentence();
+        }
+        
+        function renderBuiltSentence() {
             const zone = document.getElementById("builtSentence");
-            const span = document.createElement("span");
-            span.className = "word-btn";
-            span.style.background = "#fff"; 
-            span.style.color = "#333";
-            span.style.border = "1px solid #ccc";
-            span.textContent = word;
-            zone.appendChild(span);
+            zone.innerHTML = ""; // Limpiar zona
+            
+            if(userBuiltSentence.length === 0) {
+                zone.innerHTML = "<span style='color:#ccc; font-style:italic;'>Toca las palabras abajo...</span>";
+                return;
+            }
+
+            userBuiltSentence.forEach((item, index) => {
+                const btn = document.createElement("div");
+                btn.className = "word-btn word-in-sentence"; // Estilo diferente
+                btn.textContent = item.word;
+                btn.onclick = () => removeWordFromSentence(index); // Clic para quitar
+                zone.appendChild(btn);
+            });
         }
 
         function resetSentence() {
-            // Reiniciar lógica
-            const sentence = preguntaActual.a;
-            correctSentenceArray = sentence.split(" ");
+            // Reiniciar lógica completa
+            const sentence = preguntaActual.a.trim();
+            correctSentenceArray = sentence.split(/\s+/);
             let shuffledWords = [...correctSentenceArray];
             shuffledWords.sort(() => 0.5 - Math.random());
+            
             userBuiltSentence = [];
+            
+            // Limpiar DOM
+            document.getElementById("wordBank").innerHTML = "";
+            document.getElementById("builtSentence").innerHTML = "";
+            
+            // Volver a renderizar
             renderOrderSentence(shuffledWords);
         }
 
@@ -1042,14 +1097,23 @@
 
             // CASO ORDENAR FRASE
             if(preguntaActual.type === 'order_sentence') {
-                const userString = userBuiltSentence.join(" ");
-                const correctString = preguntaActual.a;
-                const isCorrect = userString === correctString;
+                const userString = userBuiltSentence.map(i => i.word).join(" ");
+                const correctString = preguntaActual.a.trim();
+                
+                // Normalizar espacios y mayúsculas para comparación flexible
+                const isCorrect = userString.toLowerCase() === correctString.toLowerCase();
                 
                 const zone = document.getElementById("builtSentence");
                 if(!isCorrect) {
-                    zone.style.borderBottomColor = "red";
-                    setTimeout(() => zone.style.borderBottomColor = "#004e92", 1000);
+                    zone.style.borderColor = "red";
+                    zone.style.backgroundColor = "#fdedec";
+                    setTimeout(() => {
+                        zone.style.borderColor = "#004e92";
+                        zone.style.backgroundColor = "#f8fafd";
+                    }, 1000);
+                } else {
+                    zone.style.borderColor = "#2ecc71";
+                    zone.style.backgroundColor = "#eafaf1";
                 }
                 procesarResultado(isCorrect);
                 return;
