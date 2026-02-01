@@ -99,21 +99,23 @@
         <h3>⚡ Preguntas del Juego</h3>
         <div class="section-box">
             <label>Tipo:</label>
-            <select id="inputType">
+            <select id="inputType" onchange="actualizarPlaceholder()">
                 <option value="translation">Traducción (Texto)</option>
                 <option value="dictation">Dictado (Audio)</option>
                 <option value="drag_drop">Arrastrar (Drag & Drop) 🖼️</option>
+                <option value="multiple_choice">Opción Múltiple (3 Opciones) 🔘</option>
+                <option value="order_sentence">Ordenar Frase (Scramble) 🧩</option>
             </select>
 
-            <label>Pregunta / Texto (o Instrucción Drag&Drop):</label>
-            <input type="text" id="inputQ" placeholder="Ej: Arrastra el nombre correcto">
+            <label id="lblPregunta">Pregunta / Texto (o Instrucción):</label>
+            <input type="text" id="inputQ" placeholder="Ej: ¿Cómo se dice Gato?">
 
-            <label>Respuesta Correcta (Inglés):</label>
+            <label id="lblRespuesta">Respuesta Correcta (Inglés):</label>
             <input type="text" id="inputA" placeholder="Ej: cat">
             
             <label>Link de Imagen (Solo para Drag & Drop):</label>
             <input type="text" id="inputImg" placeholder="https://cdn-icons-png.flaticon.com/512/616/616430.png">
-            <div class="helper-text">Pega aquí la URL de la imagen.</div>
+            <div class="helper-text">Pega aquí la URL de la imagen (solo si aplica).</div>
 
             <button onclick="agregarPreguntaLista()" class="btn-save" style="background:#3498db; margin-top:10px; font-size:14px; padding: 10px;">➕ Agregar Pregunta</button>
         </div>
@@ -153,16 +155,33 @@
 
         let preguntasTemporales = [];
 
+        function actualizarPlaceholder() {
+            const type = document.getElementById('inputType').value;
+            const q = document.getElementById('inputQ');
+            const a = document.getElementById('inputA');
+            
+            if(type === 'order_sentence') {
+                q.placeholder = "Instrucción (Ej: Ordena la frase)";
+                a.placeholder = "Frase COMPLETA (Ej: My name is Pepe)";
+            } else if (type === 'multiple_choice') {
+                q.placeholder = "Pregunta (Ej: What color is the sun?)";
+                a.placeholder = "Respuesta Correcta (Ej: Yellow)";
+            } else {
+                q.placeholder = "Ej: Arrastra el nombre correcto";
+                a.placeholder = "Ej: cat";
+            }
+        }
+
         function agregarPreguntaLista() {
             const q = document.getElementById('inputQ').value.trim();
-            const a = document.getElementById('inputA').value.trim().toLowerCase();
+            const a = document.getElementById('inputA').value.trim(); // No lowercase for sentences
             const img = document.getElementById('inputImg').value.trim();
             const type = document.getElementById('inputType').value;
             
             if(!q || !a) return Swal.fire("Faltan datos", "Llena pregunta y respuesta", "warning");
             
-            // Creamos el objeto de pregunta con el campo de imagen
-            const nuevaPregunta = { type, q, a };
+            // Creamos el objeto de pregunta
+            const nuevaPregunta = { type, q, a }; // a se mantiene con mayúsculas si es frase
             if(type === 'drag_drop' && img) nuevaPregunta.img = img;
             
             preguntasTemporales.push(nuevaPregunta);
@@ -183,8 +202,10 @@
                 let icono = '📝';
                 if(p.type === 'dictation') icono = '🎧';
                 if(p.type === 'drag_drop') icono = '🖼️';
+                if(p.type === 'multiple_choice') icono = '🔘';
+                if(p.type === 'order_sentence') icono = '🧩';
                 
-                li.innerHTML = `${icono} ${p.q} -> ${p.a} ${p.img ? '(Con Imagen)' : ''} <span style='color:red; cursor:pointer; margin-left:10px;' onclick='borrarPregunta(${index})'>[X]</span>`;
+                li.innerHTML = `${icono} ${p.q} -> <b>${p.a}</b> ${p.img ? '(Con Imagen)' : ''} <span style='color:red; cursor:pointer; margin-left:10px;' onclick='borrarPregunta(${index})'>[X]</span>`;
                 ul.appendChild(li);
             });
         }
