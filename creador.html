@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Creador - MASTER V61 (AI DEBUGGING)</title>
+    <title>Panel de Creador - MASTER V61 (AI CONNECTED)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -162,9 +162,8 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // --- ⚠️ PEGA TU API KEY AQUÍ ABAJO (MANTÉN LAS COMILLAS) ⚠️ ---
-        // El sistema limpiará los espacios automáticamente.
-        const GEMINI_API_KEY = "AIzaSyA9kMQqnv9RP_awEKpI3KMG1MDCt-KXJ3E"; 
+        // --- ⚠️ PEGA TU API KEY AQUÍ ABAJO (DENTRO DE LAS COMILLAS) ⚠️ ---
+        const GEMINI_API_KEY = "PEGAR_AQUI_TU_API_KEY"; 
         // -------------------------------------------------------------
 
         auth.onAuthStateChanged(user => {
@@ -193,7 +192,7 @@
             const topic = document.getElementById('aiTopic').value.trim();
             const count = document.getElementById('aiCount').value;
             
-            // Limpieza de seguridad de la clave (trim quita espacios)
+            // Limpieza de seguridad de la clave
             const cleanKey = GEMINI_API_KEY.trim();
 
             if(!topic) return Swal.fire("Atención", "Escribe un tema para que la IA trabaje.", "warning");
@@ -231,7 +230,6 @@
 
                 const data = await response.json();
                 
-                // DETECCIÓN DE ERRORES REAL
                 if(data.error) {
                     console.error("Error detallado de Google:", data.error);
                     throw new Error(`Google dice: ${data.error.message} (Código: ${data.error.code})`);
@@ -264,7 +262,6 @@
                 console.error(error);
                 status.textContent = "Error: " + error.message;
                 status.style.color = "red";
-                // AHORA EL ERROR TE DIRÁ EXACTAMENTE QUÉ PASA
                 Swal.fire("Error Detallado", error.message, "error");
             } finally {
                 btn.disabled = false;
