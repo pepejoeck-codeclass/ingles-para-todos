@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Creador - MASTER V60 (AI POWERED 🧠)</title>
+    <title>Panel de Creador - MASTER V61 (AI DEBUGGING)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -39,7 +39,7 @@
         .search-container { display: flex; gap: 5px; align-items: flex-end; }
         .btn-load { background: #3498db; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; padding: 10px; }
 
-        /* ESTILOS DEL CEREBRO IA (FASE 3) */
+        /* ESTILOS DEL CEREBRO IA */
         .ai-box { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 2px solid #2196f3; animation: glow 3s infinite alternate; }
         @keyframes glow { from { box-shadow: 0 0 10px #2196f3; } to { box-shadow: 0 0 20px #2196f3; } }
         .btn-ai { background: linear-gradient(45deg, #2196f3, #9c27b0); color: white; width:100%; padding:15px; border-radius:50px; font-weight:800; border:none; cursor:pointer; font-size:16px; margin-top:10px; transition:0.3s; }
@@ -65,12 +65,12 @@
             <button onclick="cerrarSesionCreador()" style="background:#c0392b; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Cerrar Sesión</button>
         </div>
         
-        <h2>🛠️ Panel de Creador V60</h2>
+        <h2>🛠️ Panel de Creador V61</h2>
         <p style="text-align: center; font-size: 14px; color: #666; margin-bottom: 20px;">Conectado como: <span id="userDisplay" style="color:green; font-weight:bold;">...</span></p>
         
         <div class="section-box ai-box">
             <label style="color:#0d47a1;">🧠 Generador de Lecciones con IA (Gemini Pro)</label>
-            <p style="font-size:12px; color:#555; margin-top:0;">Escribe un tema y la IA creará preguntas variadas (Traducción, Dictado, Ordenar, Sopa de Letras, etc.).</p>
+            <p style="font-size:12px; color:#555; margin-top:0;">Escribe un tema y la IA creará preguntas variadas.</p>
             
             <input type="text" id="aiTopic" placeholder="Ej: Animales de la Granja, Verbos en Pasado, Colores...">
             <div style="display:flex; gap:10px;">
@@ -163,7 +163,8 @@
         const db = firebase.firestore();
 
         // --- ⚠️ PEGA TU API KEY AQUÍ ABAJO (MANTÉN LAS COMILLAS) ⚠️ ---
-        const GEMINI_API_KEY = "AIzaSyA9kMQqnv9RP_awEKpI3KMG1MDCt-KXJ3E"; 
+        // El sistema limpiará los espacios automáticamente.
+        const GEMINI_API_KEY = "PEGAR_AQUI_TU_API_KEY"; 
         // -------------------------------------------------------------
 
         auth.onAuthStateChanged(user => {
@@ -187,13 +188,16 @@
 
         let preguntasTemporales = [];
 
-        // --- LÓGICA IA GENERATIVA (FASE 3) ---
+        // --- LÓGICA IA GENERATIVA (V61 BLINDADA) ---
         async function generarConIA() {
             const topic = document.getElementById('aiTopic').value.trim();
             const count = document.getElementById('aiCount').value;
+            
+            // Limpieza de seguridad de la clave (trim quita espacios)
+            const cleanKey = GEMINI_API_KEY.trim();
 
             if(!topic) return Swal.fire("Atención", "Escribe un tema para que la IA trabaje.", "warning");
-            if(GEMINI_API_KEY === "PEGAR_AQUI_TU_API_KEY") return Swal.fire("Error API", "No has configurado tu API KEY en el código.", "error");
+            if(cleanKey === "PEGAR_AQUI_TU_API_KEY" || cleanKey === "") return Swal.fire("Error API", "Tu API Key no está configurada o está vacía. Revisa el código.", "error");
 
             // UI Loading
             const btn = document.querySelector('.btn-ai');
@@ -202,47 +206,22 @@
             btn.disabled = true;
             btn.style.opacity = "0.7";
             spinner.style.display = "inline-block";
-            status.textContent = "Conectando con Google Gemini Brain... Creando Pedagogía...";
+            status.textContent = "Conectando con Google... Por favor espera...";
 
-            // PROMPT ENGINEERING (INGENIERÍA DE PROMPTS)
             const prompt = `
                 Act as an expert English teacher developer. I need a JSON response with ${count} questions about "${topic}" for an English learning app.
-                
                 STRICT JSON FORMAT ONLY. No markdown, no text before/after.
-                
                 The structure of objects must be:
-                {
-                    "type": "string", // Options: 'translation', 'dictation', 'multiple_choice', 'order_sentence', 'word_search', 'drag_drop'
-                    "q": "string", // Question or Instruction (in Spanish mostly, or English for dictation)
-                    "a": "string", // Correct answer (English). For 'order_sentence' full sentence. For 'word_search' comma separated words.
-                    "img": "string" // Only for 'drag_drop'. Use a generic placeholder URL like 'https://via.placeholder.com/150?text=Image' or leave empty.
-                }
-
-                Requirements:
-                1. Mix different types of questions intelligenty.
-                2. For 'translation': 'q' is in Spanish, 'a' in English.
-                3. For 'dictation': 'q' is English text, 'a' is same English text.
-                4. For 'multiple_choice': 'q' is a question, 'a' is the CORRECT answer.
-                5. For 'order_sentence': 'q' is "Ordena la frase", 'a' is a full English sentence (min 4 words).
-                6. For 'word_search': 'q' is "Encuentra palabras relacionadas", 'a' is 5 English words separated by commas (e.g. "Cat,Dog,Fish").
-                7. For 'drag_drop': 'q' is instruction, 'a' is the word, 'img' is optional.
-                
-                Also generate educational content in a separate object called "content":
-                {
-                    "vocab": "List of 5-10 words related to topic with spanish translation",
-                    "help": "A brief tip about the topic in Spanish",
-                    "grammar": "A brief grammar explanation if applicable"
-                }
-
-                Final Output Structure:
-                {
-                    "questions": [...array of questions...],
-                    "content": { ...content object... }
-                }
+                { "type": "string", "q": "string", "a": "string", "img": "string" }
+                Use types: translation, dictation, multiple_choice, order_sentence, word_search, drag_drop.
+                For 'multiple_choice', 'a' must be the correct answer.
+                Also generate "content": { "vocab": "...", "help": "...", "grammar": "..." }
+                Final Output Structure: { "questions": [...], "content": { ... } }
             `;
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                // Usamos gemini-1.5-flash que es rápido y gratis
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -252,37 +231,41 @@
 
                 const data = await response.json();
                 
-                if(data.error) throw new Error(data.error.message);
+                // DETECCIÓN DE ERRORES REAL
+                if(data.error) {
+                    console.error("Error detallado de Google:", data.error);
+                    throw new Error(`Google dice: ${data.error.message} (Código: ${data.error.code})`);
+                }
+
+                if(!data.candidates || !data.candidates[0].content) {
+                     throw new Error("La IA no devolvió resultados válidos. Intenta otro tema.");
+                }
 
                 let rawText = data.candidates[0].content.parts[0].text;
-                // Limpieza de Markdown (```json ... ```)
                 rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-                
                 const aiResult = JSON.parse(rawText);
 
-                // Inyectar Preguntas
-                if(aiResult.questions && Array.isArray(aiResult.questions)) {
+                // Inyectar
+                if(aiResult.questions) {
                     preguntasTemporales = preguntasTemporales.concat(aiResult.questions);
                     renderizarListaPreguntas();
                 }
-
-                // Inyectar Contenido Educativo
                 if(aiResult.content) {
                     document.getElementById('inputVocab').value = aiResult.content.vocab || "";
                     document.getElementById('inputHelp').value = aiResult.content.help || "";
                     document.getElementById('inputGrammar').value = aiResult.content.grammar || "";
                 }
 
-                // UI Reset
-                status.textContent = "¡Éxito! La IA ha generado el contenido.";
+                status.textContent = "¡Éxito! Contenido generado.";
                 status.style.color = "green";
-                Swal.fire("¡Magia IA! ✨", `Se generaron ${aiResult.questions.length} actividades sobre "${topic}".`, "success");
+                Swal.fire("¡Magia IA! ✨", `Se generaron ${aiResult.questions.length} actividades.`, "success");
 
             } catch (error) {
                 console.error(error);
-                status.textContent = "Error al conectar con la IA.";
+                status.textContent = "Error: " + error.message;
                 status.style.color = "red";
-                Swal.fire("Error IA", "Hubo un problema. Revisa tu API Key o intenta de nuevo.", "error");
+                // AHORA EL ERROR TE DIRÁ EXACTAMENTE QUÉ PASA
+                Swal.fire("Error Detallado", error.message, "error");
             } finally {
                 btn.disabled = false;
                 btn.style.opacity = "1";
@@ -290,26 +273,14 @@
             }
         }
 
-        // --- FIN LÓGICA IA ---
-
         function actualizarPlaceholder() {
             const type = document.getElementById('inputType').value;
             const q = document.getElementById('inputQ');
             const a = document.getElementById('inputA');
-            
-            if(type === 'order_sentence') {
-                q.placeholder = "Instrucción (Ej: Ordena la frase)";
-                a.placeholder = "Frase COMPLETA (Ej: My name is Pepe)";
-            } else if (type === 'multiple_choice') {
-                q.placeholder = "Pregunta (Ej: What color is the sun?)";
-                a.placeholder = "Respuesta Correcta (Ej: Yellow)";
-            } else if (type === 'word_search') {
-                q.placeholder = "Instrucción (Ej: Encuentra los colores)";
-                a.placeholder = "Palabras separadas por coma (Ej: Red,Blue,Green)";
-            } else {
-                q.placeholder = "Ej: Arrastra el nombre correcto";
-                a.placeholder = "Ej: cat";
-            }
+            if(type === 'order_sentence') { q.placeholder = "Instrucción"; a.placeholder = "Frase COMPLETA"; } 
+            else if (type === 'multiple_choice') { q.placeholder = "Pregunta"; a.placeholder = "Respuesta Correcta"; } 
+            else if (type === 'word_search') { q.placeholder = "Instrucción"; a.placeholder = "Palabras separadas por coma"; } 
+            else { q.placeholder = "Pregunta"; a.placeholder = "Respuesta"; }
         }
 
         function agregarPreguntaLista() {
@@ -317,19 +288,12 @@
             const a = document.getElementById('inputA').value.trim(); 
             const img = document.getElementById('inputImg').value.trim();
             const type = document.getElementById('inputType').value;
-            
             if(!q || !a) return Swal.fire("Faltan datos", "Llena pregunta y respuesta", "warning");
-            
             const nuevaPregunta = { type, q, a }; 
             if(type === 'drag_drop' && img) nuevaPregunta.img = img;
-            
             preguntasTemporales.push(nuevaPregunta);
             renderizarListaPreguntas();
-            
-            document.getElementById('inputQ').value = '';
-            document.getElementById('inputA').value = '';
-            document.getElementById('inputImg').value = '';
-            document.getElementById('inputQ').focus();
+            document.getElementById('inputQ').value = ''; document.getElementById('inputA').value = ''; document.getElementById('inputImg').value = '';
         }
 
         function renderizarListaPreguntas() {
@@ -338,112 +302,56 @@
             preguntasTemporales.forEach((p, index) => {
                 const li = document.createElement('li');
                 let icono = '📝';
-                if(p.type === 'dictation') icono = '🎧';
-                if(p.type === 'drag_drop') icono = '🖼️';
-                if(p.type === 'multiple_choice') icono = '🔘';
-                if(p.type === 'order_sentence') icono = '🧩';
-                if(p.type === 'word_search') icono = '🔎';
-                
-                li.innerHTML = `${icono} ${p.q} -> <b>${p.a}</b> ${p.img ? '(Con Imagen)' : ''} <span style='color:red; cursor:pointer; margin-left:10px;' onclick='borrarPregunta(${index})'>[X]</span>`;
+                if(p.type === 'dictation') icono = '🎧'; if(p.type === 'drag_drop') icono = '🖼️'; if(p.type === 'multiple_choice') icono = '🔘'; if(p.type === 'order_sentence') icono = '🧩'; if(p.type === 'word_search') icono = '🔎';
+                li.innerHTML = `${icono} ${p.q} -> <b>${p.a}</b> <span style='color:red; cursor:pointer; margin-left:10px;' onclick='borrarPregunta(${index})'>[X]</span>`;
                 ul.appendChild(li);
             });
         }
 
-        function borrarPregunta(index) {
-            preguntasTemporales.splice(index, 1);
-            renderizarListaPreguntas();
-        }
+        function borrarPregunta(index) { preguntasTemporales.splice(index, 1); renderizarListaPreguntas(); }
 
         function agregarSiguienteNivel() {
             const select = document.getElementById('inputLevel');
             let maxVal = 0;
-            for(let i=0; i<select.options.length; i++) {
-                const val = parseInt(select.options[i].value);
-                if(val > maxVal) maxVal = val;
-            }
+            for(let i=0; i<select.options.length; i++) { const val = parseInt(select.options[i].value); if(val > maxVal) maxVal = val; }
             const nextLevel = maxVal + 1;
-            const opt = document.createElement('option');
-            opt.value = nextLevel;
-            opt.text = "Nivel " + nextLevel;
-            select.add(opt);
-            select.value = nextLevel;
-            Swal.fire("Nivel Creado", `Ahora estás editando para el <b>Nivel ${nextLevel}</b>`, "info");
+            const opt = document.createElement('option'); opt.value = nextLevel; opt.text = "Nivel " + nextLevel; select.add(opt); select.value = nextLevel;
+            Swal.fire("Nivel Creado", `Editando Nivel ${nextLevel}`, "info");
         }
 
         async function cargarLeccionExistente() {
             const nivel = document.getElementById('inputLevel').value;
             let rawId = document.getElementById('inputLessonId').value.trim();
             const lessonId = rawId.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
-
-            if (!lessonId) return Swal.fire("Error", "Escribe el ID de la lección para buscarla.", "warning");
-
+            if (!lessonId) return Swal.fire("Error", "Escribe el ID", "warning");
             try {
                 const doc = await db.collection('contenido_curso').doc(`nivel_${nivel}`).get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data && data[lessonId]) {
-                        const leccion = data[lessonId];
-                        document.getElementById('inputLessonTitle').value = leccion.title || "";
-                        if (leccion.content) {
-                            document.getElementById('inputVocab').value = leccion.content.vocab || "";
-                            document.getElementById('inputHelp').value = leccion.content.help || "";
-                            document.getElementById('inputGrammar').value = leccion.content.grammar || "";
-                        }
-                        if (leccion.questions && Array.isArray(leccion.questions)) {
-                            preguntasTemporales = leccion.questions;
-                            renderizarListaPreguntas();
-                        }
-                        Swal.fire("Cargado", "Datos listos para editar.", "success");
-                    } else {
-                        Swal.fire("No encontrado", `No existe lección con ID "${lessonId}".`, "info");
-                    }
-                } else {
-                    Swal.fire("Vacío", `Aún no hay nada creado en el Nivel ${nivel}.`, "info");
-                }
-            } catch (error) {
-                console.error(error);
-                Swal.fire("Error", "No se pudo conectar a la base de datos.", "error");
-            }
+                if (doc.exists && doc.data()[lessonId]) {
+                    const leccion = doc.data()[lessonId];
+                    document.getElementById('inputLessonTitle').value = leccion.title || "";
+                    if (leccion.content) { document.getElementById('inputVocab').value = leccion.content.vocab || ""; document.getElementById('inputHelp').value = leccion.content.help || ""; document.getElementById('inputGrammar').value = leccion.content.grammar || ""; }
+                    if (leccion.questions) { preguntasTemporales = leccion.questions; renderizarListaPreguntas(); }
+                    Swal.fire("Cargado", "Datos listos.", "success");
+                } else { Swal.fire("No encontrado", "No existe esa lección.", "info"); }
+            } catch (error) { Swal.fire("Error", "Problema de conexión.", "error"); }
         }
 
         function guardarEnNube() {
             const user = auth.currentUser;
             if (!user) return Swal.fire("Seguridad", "Debes iniciar sesión.", "error");
-
             const nivel = document.getElementById('inputLevel').value;
             let rawId = document.getElementById('inputLessonId').value.trim();
             const lessonId = rawId.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
             const lessonTitle = document.getElementById('inputLessonTitle').value.trim();
-            
-            const vocabContent = document.getElementById('inputVocab').value;
-            const helpContent = document.getElementById('inputHelp').value;
-            const grammarContent = document.getElementById('inputGrammar').value;
-
-            if(!lessonId || !lessonTitle || preguntasTemporales.length === 0) {
-                return Swal.fire("Incompleto", "Faltan datos básicos o preguntas.", "error");
-            }
-
-            const docRef = db.collection('contenido_curso').doc(`nivel_${nivel}`);
+            if(!lessonId || !lessonTitle || preguntasTemporales.length === 0) return Swal.fire("Incompleto", "Faltan datos.", "error");
             
             const nuevaLeccion = {
-                id: lessonId,
-                title: lessonTitle,
-                questions: preguntasTemporales,
-                content: {
-                    vocab: vocabContent || "No content.",
-                    help: helpContent || "Complete the activity.",
-                    grammar: grammarContent || "No notes."
-                }
+                id: lessonId, title: lessonTitle, questions: preguntasTemporales,
+                content: { vocab: document.getElementById('inputVocab').value, help: document.getElementById('inputHelp').value, grammar: document.getElementById('inputGrammar').value }
             };
-
-            const updateData = {};
-            updateData[lessonId] = nuevaLeccion;
-
-            docRef.set(updateData, { merge: true }).then(() => {
-                Swal.fire({ title: '¡Guardado!', text: `Se actualizó "${lessonTitle}" en el Nivel ${nivel}.`, icon: 'success' });
-            }).catch((error) => {
-                Swal.fire("Error", "Problema de permisos o conexión.", "error");
-            });
+            db.collection('contenido_curso').doc(`nivel_${nivel}`).set({ [lessonId]: nuevaLeccion }, { merge: true })
+                .then(() => Swal.fire({ title: '¡Guardado!', icon: 'success' }))
+                .catch(() => Swal.fire("Error", "Problema al guardar.", "error"));
         }
     </script>
 </body>
