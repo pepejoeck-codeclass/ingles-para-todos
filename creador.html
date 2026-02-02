@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Creador - MASTER V63 (FINAL AI)</title>
+    <title>Panel de Creador - MASTER V64 (UNIVERSAL FIX)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -65,11 +65,11 @@
             <button onclick="cerrarSesionCreador()" style="background:#c0392b; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Cerrar Sesión</button>
         </div>
         
-        <h2>🛠️ Panel de Creador V63</h2>
+        <h2>🛠️ Panel de Creador V64</h2>
         <p style="text-align: center; font-size: 14px; color: #666; margin-bottom: 20px;">Conectado como: <span id="userDisplay" style="color:green; font-weight:bold;">...</span></p>
         
         <div class="section-box ai-box">
-            <label style="color:#0d47a1;">🧠 Generador de Lecciones con IA (Gemini 1.5)</label>
+            <label style="color:#0d47a1;">🧠 Generador de Lecciones con IA (Universal Fix)</label>
             <p style="font-size:12px; color:#555; margin-top:0;">Escribe un tema y la IA creará preguntas variadas.</p>
             
             <input type="text" id="aiTopic" placeholder="Ej: Animales de la Granja, Verbos en Pasado, Colores...">
@@ -162,7 +162,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // --- ⚠️ PEGA TU NUEVA API KEY AQUÍ ABAJO (DENTRO DE LAS COMILLAS) ⚠️ ---
+        // --- ⚠️ PEGA TU API KEY AQUÍ ABAJO (USA CUENTA PERSONAL) ⚠️ ---
         const GEMINI_API_KEY = "AIzaSyAE_39Vj1RumUvkzDyii1yGKpH3sWBI4Og"; 
         // -------------------------------------------------------------
 
@@ -187,14 +187,14 @@
 
         let preguntasTemporales = [];
 
-        // --- LÓGICA IA GENERATIVA (V63 FINAL - MODELO 1.5 FLASH) ---
+        // --- LÓGICA IA GENERATIVA (V64 FIX) ---
         async function generarConIA() {
             const topic = document.getElementById('aiTopic').value.trim();
             const count = document.getElementById('aiCount').value;
             const cleanKey = GEMINI_API_KEY.trim();
 
-            if(!topic) return Swal.fire("Atención", "Escribe un tema para que la IA trabaje.", "warning");
-            if(cleanKey === "PEGAR_AQUI_TU_API_KEY" || cleanKey === "") return Swal.fire("Error API", "Tu API Key no está configurada o está vacía. Revisa el código.", "error");
+            if(!topic) return Swal.fire("Atención", "Escribe un tema.", "warning");
+            if(cleanKey === "PEGAR_AQUI_TU_API_KEY" || cleanKey === "") return Swal.fire("Error API", "Falta tu API Key personal en el código.", "error");
 
             const btn = document.querySelector('.btn-ai');
             const spinner = document.getElementById('aiSpinner');
@@ -202,20 +202,20 @@
             btn.disabled = true;
             btn.style.opacity = "0.7";
             spinner.style.display = "inline-block";
-            status.textContent = "Conectando con Google... Por favor espera...";
+            status.textContent = "Generando contenido (Modelo Universal)...";
 
             const prompt = `
                 Act as an expert English teacher developer. I need a JSON response with ${count} questions about "${topic}" for an English learning app.
-                STRICT JSON FORMAT ONLY. No markdown, no text before/after.
+                STRICT JSON FORMAT ONLY. No markdown.
                 Structure: { "type": "string", "q": "string", "a": "string", "img": "string" }
                 Use types: translation, dictation, multiple_choice, order_sentence, word_search, drag_drop.
-                Also generate "content": { "vocab": "...", "help": "...", "grammar": "..." }
+                Also "content": { "vocab": "...", "help": "...", "grammar": "..." }
                 Final Output: { "questions": [...], "content": { ... } }
             `;
 
             try {
-                // USAMOS GEMINI-1.5-FLASH (Estándar Actual)
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanKey}`, {
+                // CAMBIO MAESTRO: Endpoint 'v1' con 'gemini-pro' (Máxima compatibilidad)
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${cleanKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -226,12 +226,11 @@
                 const data = await response.json();
                 
                 if(data.error) {
-                    console.error("Error detallado de Google:", data.error);
-                    throw new Error(`Google dice: ${data.error.message} (Código: ${data.error.code})`);
+                    throw new Error(`Google Error: ${data.error.message}`);
                 }
 
                 if(!data.candidates || !data.candidates[0].content) {
-                     throw new Error("La IA no devolvió resultados válidos. Intenta otro tema.");
+                     throw new Error("La IA no respondió. Intenta con un tema diferente.");
                 }
 
                 let rawText = data.candidates[0].content.parts[0].text;
@@ -248,7 +247,7 @@
                     document.getElementById('inputGrammar').value = aiResult.content.grammar || "";
                 }
 
-                status.textContent = "¡Éxito! Contenido generado.";
+                status.textContent = "¡Éxito! Contenido listo.";
                 status.style.color = "green";
                 Swal.fire("¡Magia IA! ✨", `Se generaron ${aiResult.questions.length} actividades.`, "success");
 
@@ -256,7 +255,7 @@
                 console.error(error);
                 status.textContent = "Error: " + error.message;
                 status.style.color = "red";
-                Swal.fire("Error Detallado", error.message, "error");
+                Swal.fire("Error IA", error.message, "error");
             } finally {
                 btn.disabled = false;
                 btn.style.opacity = "1";
