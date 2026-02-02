@@ -105,7 +105,7 @@
                 <option value="drag_drop">Arrastrar (Drag & Drop) 🖼️</option>
                 <option value="multiple_choice">Opción Múltiple (3 Opciones) 🔘</option>
                 <option value="order_sentence">Ordenar Frase (Scramble) 🧩</option>
-                <option value="word_search" disabled>Sopa de Letras (Próximamente) 🧩</option>
+                <option value="word_search">Sopa de Letras 🔎 (NUEVO)</option>
             </select>
 
             <label id="lblPregunta">Pregunta / Texto (o Instrucción):</label>
@@ -167,6 +167,9 @@
             } else if (type === 'multiple_choice') {
                 q.placeholder = "Pregunta (Ej: What color is the sun?)";
                 a.placeholder = "Respuesta Correcta (Ej: Yellow)";
+            } else if (type === 'word_search') {
+                q.placeholder = "Instrucción (Ej: Encuentra los colores)";
+                a.placeholder = "Palabras separadas por coma (Ej: Red,Blue,Green)";
             } else {
                 q.placeholder = "Ej: Arrastra el nombre correcto";
                 a.placeholder = "Ej: cat";
@@ -203,6 +206,7 @@
                 if(p.type === 'drag_drop') icono = '🖼️';
                 if(p.type === 'multiple_choice') icono = '🔘';
                 if(p.type === 'order_sentence') icono = '🧩';
+                if(p.type === 'word_search') icono = '🔎';
                 
                 li.innerHTML = `${icono} ${p.q} -> <b>${p.a}</b> ${p.img ? '(Con Imagen)' : ''} <span style='color:red; cursor:pointer; margin-left:10px;' onclick='borrarPregunta(${index})'>[X]</span>`;
                 ul.appendChild(li);
