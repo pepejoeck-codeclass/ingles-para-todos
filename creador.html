@@ -309,6 +309,12 @@
     <option value="manual">Yo decido (control general)</option>
   </select>
 </div>
+<div id="aiManualBox" style="display:none; margin-top:10px; padding:10px; border:1px dashed #9c27b0; border-radius:10px;">
+  <p style="font-size:12px; color:#555; margin:0;">
+    🔧 Modo manual activado.  
+    En el siguiente paso podrás definir cómo se distribuyen los tipos de preguntas.
+  </p>
+</div>
              
                 <button id="btnGenerarIA" class="btn-ai">
                     <div id="aiSpinner" class="loading-spinner"></div>
@@ -620,6 +626,20 @@
                 .then(()=>Swal.fire("¡Guardado!","","success"))
                 .catch(()=>Swal.fire("Error","","error"));
         }
+        // === PASO 5: Mostrar / Ocultar modo manual ===
+const aiStrategySelect = document.getElementById('aiStrategy');
+const aiManualBox = document.getElementById('aiManualBox');
+
+if (aiStrategySelect && aiManualBox) {
+  aiStrategySelect.addEventListener('change', () => {
+    if (aiStrategySelect.value === 'manual') {
+      aiManualBox.style.display = 'block';
+    } else {
+      aiManualBox.style.display = 'none';
+    }
+  });
+}
+
     </script>
 </body>
 </html>
