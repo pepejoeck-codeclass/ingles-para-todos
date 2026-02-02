@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Creador - MASTER V50 (IMAGES & DRAG DROP)</title>
+    <title>Panel de Creador - MASTER V60 (ALL FEATURES)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -57,7 +57,7 @@
             <button onclick="cerrarSesionCreador()" style="background:#c0392b; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Cerrar Sesión</button>
         </div>
         
-        <h2>🛠️ Panel de Creador V50</h2>
+        <h2>🛠️ Panel de Creador V60</h2>
         <p style="text-align: center; font-size: 14px; color: #666; margin-bottom: 20px;">Conectado como: <span id="userDisplay" style="color:green; font-weight:bold;">...</span></p>
         
         <div class="section-box">
@@ -105,6 +105,7 @@
                 <option value="drag_drop">Arrastrar (Drag & Drop) 🖼️</option>
                 <option value="multiple_choice">Opción Múltiple (3 Opciones) 🔘</option>
                 <option value="order_sentence">Ordenar Frase (Scramble) 🧩</option>
+                <option value="word_search" disabled>Sopa de Letras (Próximamente) 🧩</option>
             </select>
 
             <label id="lblPregunta">Pregunta / Texto (o Instrucción):</label>
@@ -174,20 +175,18 @@
 
         function agregarPreguntaLista() {
             const q = document.getElementById('inputQ').value.trim();
-            const a = document.getElementById('inputA').value.trim(); // No lowercase for sentences
+            const a = document.getElementById('inputA').value.trim(); 
             const img = document.getElementById('inputImg').value.trim();
             const type = document.getElementById('inputType').value;
             
             if(!q || !a) return Swal.fire("Faltan datos", "Llena pregunta y respuesta", "warning");
             
-            // Creamos el objeto de pregunta
-            const nuevaPregunta = { type, q, a }; // a se mantiene con mayúsculas si es frase
+            const nuevaPregunta = { type, q, a }; 
             if(type === 'drag_drop' && img) nuevaPregunta.img = img;
             
             preguntasTemporales.push(nuevaPregunta);
             renderizarListaPreguntas();
             
-            // Limpiar campos
             document.getElementById('inputQ').value = '';
             document.getElementById('inputA').value = '';
             document.getElementById('inputImg').value = '';
