@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Creador - MASTER V99 (FULL ORIGINAL CODE)</title>
+    <title>Panel de Creador - MASTER V100 (ULTIMATE SDK)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -266,12 +266,12 @@
             <button onclick="cerrarSesionCreador()" style="background:#c0392b; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Cerrar Sesión</button>
         </div>
         
-        <h2>🛠️ Panel de Creador V99</h2>
+        <h2>🛠️ Panel de Creador V100</h2>
         <p style="text-align: center; font-size: 14px; color: #666; margin-bottom: 20px;">Conectado como: <span id="userDisplay" style="color:green; font-weight:bold;">...</span></p>
         
         <div class="section-box ai-box">
-            <label style="color:#0d47a1;">🧠 Generador IA (SDK Oficial)</label>
-            <p style="font-size:12px; color:#555; margin-top:0;">1. Pega tu API Key personal aquí. 2. Escribe tema. 3. Generar.</p>
+            <label style="color:#0d47a1;">🧠 Generador IA (Google SDK Oficial)</label>
+            <p style="font-size:12px; color:#555; margin-top:0;">1. Pega tu API Key de Google AI Studio. 2. Tema. 3. Generar.</p>
             
             <input type="password" id="apiKeyInput" class="api-input" placeholder="🔑 PEGA TU API KEY AQUÍ">
             
@@ -283,6 +283,7 @@
                     <option value="10" selected>10 Preguntas</option>
                     <option value="15">15 Preguntas</option>
                 </select>
+                
                 <button id="btnGenerarIA" class="btn-ai">
                     <div id="aiSpinner" class="loading-spinner"></div>
                     ✨ GENERAR LECCIÓN
@@ -363,9 +364,10 @@
     <script type="module">
         import { GoogleGenerativeAI } from "@google/generative-ai";
 
-        // Exponemos las variables para que el resto del sistema las vea
+        // Inicializamos las preguntas si no existen, para compartir con el otro script
         window.preguntasTemporales = window.preguntasTemporales || [];
 
+        // Función Maestra de IA con SDK Oficial
         window.generarConIA = async function() {
             const topic = document.getElementById('aiTopic').value.trim();
             const count = document.getElementById('aiCount').value;
@@ -373,11 +375,12 @@
 
             // Validaciones
             if(!topic) return Swal.fire("Atención", "Escribe un tema.", "warning");
-            if(!apiKey) return Swal.fire("Falta Llave", "Pega tu API Key.", "error");
+            if(!apiKey) return Swal.fire("Falta Llave", "Pega tu API Key en la caja punteada.", "error");
 
-            // Guardar para comodidad
+            // Guardamos la llave para comodidad futura
             localStorage.setItem("geminiApiKey", apiKey);
 
+            // UI Loading
             const btn = document.getElementById('btnGenerarIA');
             const spinner = document.getElementById('aiSpinner');
             const status = document.getElementById('aiStatus');
@@ -385,7 +388,7 @@
             btn.disabled = true; 
             btn.style.opacity = "0.7"; 
             spinner.style.display = "inline-block";
-            status.textContent = "Analizando solicitud con Google Gemini...";
+            status.textContent = "Conectando con Google Gemini SDK...";
 
             const prompt = `
                 Act as an expert English teacher developer. I need a JSON response with ${count} questions about "${topic}" for an English learning app.
@@ -398,7 +401,7 @@
             `;
 
             try {
-                // INICIALIZACIÓN SDK
+                // INICIALIZACIÓN SDK (La clave del éxito para evitar bloqueos)
                 const genAI = new GoogleGenerativeAI(apiKey);
                 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 
@@ -412,6 +415,7 @@
 
                 // Inyección segura de datos
                 if(aiResult.questions) { 
+                    // Usamos variable global window
                     window.preguntasTemporales = window.preguntasTemporales.concat(aiResult.questions); 
                     window.renderizarListaPreguntas(); 
                 }
@@ -423,7 +427,7 @@
 
                 status.textContent = "¡Éxito!"; 
                 status.style.color = "green";
-                Swal.fire("¡Listo!", "Contenido generado con SDK V99.", "success");
+                Swal.fire("¡Listo!", "Contenido generado con SDK Oficial.", "success");
 
             } catch (error) {
                 console.error("Error SDK:", error);
