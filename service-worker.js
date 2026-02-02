@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ingles-master-v60';
+const CACHE_NAME = 'ingles-master-v61';
 const urlsToCache = [
   './',
   './index.html',
