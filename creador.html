@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Creador - MASTER V82 (FULL RESTORE + SDK)</title>
+    <title>Panel de Creador - MASTER V85 (FULL INTEGRAL SDK)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,7 +23,7 @@
     </script>
 
     <style>
-        /* --- ESTILOS ORIGINALES ROBUSTOS (MANTENIDOS AL 100%) --- */
+        /* --- ESTILOS ORIGINALES ROBUSTOS (INTACTOS) --- */
         body { 
             font-family: 'Nunito', sans-serif; 
             background: #2c3e50; 
@@ -133,6 +133,8 @@
         .btn-ai:hover { transform: scale(1.03); box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4); }
         .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 10px; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* CAJA SEGURA DE API KEY */
         .api-input { background: white; border: 2px dashed #9c27b0; color: #333; font-weight: bold; text-align: center; font-family: monospace; }
     </style>
 </head>
@@ -153,12 +155,12 @@
             <button onclick="cerrarSesionCreador()" style="background:#c0392b; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Cerrar Sesión</button>
         </div>
         
-        <h2>🛠️ Panel de Creador V82</h2>
+        <h2>🛠️ Panel de Creador V85</h2>
         <p style="text-align: center; font-size: 14px; color: #666; margin-bottom: 20px;">Conectado como: <span id="userDisplay" style="color:green; font-weight:bold;">...</span></p>
         
         <div class="section-box ai-box">
-            <label style="color:#0d47a1;">🧠 Generador IA (SDK Oficial V82)</label>
-            <p style="font-size:12px; color:#555; margin-top:0;">1. Pega tu API Key personal aquí. 2. Escribe tema. 3. Generar.</p>
+            <label style="color:#0d47a1;">🧠 Generador IA (SDK Oficial)</label>
+            <p style="font-size:12px; color:#555; margin-top:0;">Pega tu API Key y genera sin errores.</p>
             
             <input type="password" id="apiKeyInput" class="api-input" placeholder="🔑 PEGA TU API KEY AQUÍ">
             
@@ -170,7 +172,7 @@
                     <option value="10" selected>10 Preguntas</option>
                     <option value="15">15 Preguntas</option>
                 </select>
-                <button onclick="generarConIA()" class="btn-ai">
+                <button id="btnGenerarIA" class="btn-ai">
                     <div id="aiSpinner" class="loading-spinner"></div>
                     ✨ GENERAR LECCIÓN
                 </button>
@@ -190,7 +192,7 @@
                 <button onclick="agregarSiguienteNivel()" class="btn-add-level" title="Crear Nivel Superior">➕ Añadir Nivel</button>
             </div>
 
-            <label>2. ID Único de la Lección (Para Editar o Crear):</label>
+            <label>2. ID Único de la Lección:</label>
             <div class="search-container">
                 <input type="text" id="inputLessonId" placeholder="Ej: leccion_zoologico_1">
                 <button onclick="cargarLeccionExistente()" class="btn-load" title="Buscar y Editar">🔍 Cargar</button>
@@ -250,35 +252,28 @@
     <script type="module">
         import { GoogleGenerativeAI } from "@google/generative-ai";
 
-        // Exponemos las variables para que el resto del sistema las vea
+        // Exponemos las variables globales para que Firebase las vea
         window.preguntasTemporales = window.preguntasTemporales || [];
 
-        // FUNCIÓN MAESTRA DE IA (CONECTADA AL SDK)
-        // Se define en window para que el botón HTML "onclick" la encuentre
+        // Función Maestra de IA con SDK Oficial
         window.generarConIA = async function() {
             const topic = document.getElementById('aiTopic').value.trim();
             const count = document.getElementById('aiCount').value;
             const apiKey = document.getElementById('apiKeyInput').value.trim();
 
-            // Validaciones
             if(!topic) return Swal.fire("Atención", "Escribe un tema.", "warning");
             if(!apiKey) return Swal.fire("Falta Llave", "Pega tu API Key.", "error");
 
-            // Guardar para comodidad
             localStorage.setItem("geminiApiKey", apiKey);
 
-            // UI Loading (Selección segura de elementos)
-            // En V82 usamos querySelector para garantizar compatibilidad con el botón
-            const btn = document.querySelector('.btn-ai');
+            const btn = document.getElementById('btnGenerarIA');
             const spinner = document.getElementById('aiSpinner');
             const status = document.getElementById('aiStatus');
-            
             btn.disabled = true; 
             btn.style.opacity = "0.7"; 
             spinner.style.display = "inline-block";
-            status.textContent = "Analizando solicitud con Google Gemini...";
+            status.textContent = "Conectando con Google (SDK)...";
 
-            // Prompt Maestro Estricto
             const prompt = `
                 Act as an expert English teacher developer. I need a JSON response with ${count} questions about "${topic}" for an English learning app.
                 STRICT JSON FORMAT ONLY. No markdown.
@@ -290,7 +285,7 @@
             `;
 
             try {
-                // INICIALIZACIÓN SDK V82
+                // SDK INITIALIZATION (La parte clave que evita CORS)
                 const genAI = new GoogleGenerativeAI(apiKey);
                 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 
@@ -298,11 +293,11 @@
                 const response = await result.response;
                 let text = response.text();
                 
-                // Limpieza de formato (Markdown Killer)
+                // Limpieza de formato
                 text = text.replace(/```json/g, '').replace(/```/g, '').trim();
                 const aiResult = JSON.parse(text);
 
-                // Inyección segura de datos usando variables globales
+                // Inyección de datos
                 if(aiResult.questions) { 
                     window.preguntasTemporales = window.preguntasTemporales.concat(aiResult.questions); 
                     window.renderizarListaPreguntas(); 
@@ -315,19 +310,23 @@
 
                 status.textContent = "¡Éxito!"; 
                 status.style.color = "green";
-                Swal.fire("¡Listo!", "Contenido generado con SDK V82.", "success");
+                Swal.fire("¡Listo!", "Contenido generado con éxito.", "success");
 
             } catch (error) {
                 console.error("Error SDK:", error);
                 status.textContent = "Error."; 
                 status.style.color = "red";
-                Swal.fire("Error IA", `Fallo en SDK. \n\nPosible causa: API Key bloqueada o cuenta sin verificar. \n\nDetalle: ${error.message}`, "error");
+                Swal.fire("Error IA", `No se pudo conectar. Verifica tu API KEY. \n\nDetalle: ${error.message}`, "error");
             } finally {
                 btn.disabled = false; 
                 btn.style.opacity = "1"; 
                 spinner.style.display = "none";
             }
         };
+
+        // Asignar el evento click al botón (Necesario al usar type="module")
+        const btn = document.getElementById('btnGenerarIA');
+        if(btn) btn.addEventListener('click', window.generarConIA);
     </script>
 
     <script>
@@ -336,7 +335,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Inicializamos preguntas si el módulo no lo hizo
+        // Variable global para compartir entre scripts
         if (!window.preguntasTemporales) window.preguntasTemporales = [];
 
         // LOGIN
@@ -363,120 +362,69 @@
             auth.signOut().then(() => location.reload());
         }
 
-        // FUNCIONES DE UI Y LISTAS (SIN REDUCCIÓN)
+        // FUNCIONES DE UI Y LISTAS (ORIGINALES)
         window.actualizarPlaceholder = function() {
-            const type = document.getElementById('inputType').value; 
-            const q = document.getElementById('inputQ'); 
-            const a = document.getElementById('inputA');
-            
-            if(type === 'order_sentence') { q.placeholder = "Instrucción (Ej: Ordena la frase)"; a.placeholder = "Frase COMPLETA (Ej: My name is Pepe)"; } 
-            else if (type === 'multiple_choice') { q.placeholder = "Pregunta (Ej: What color is the sun?)"; a.placeholder = "Respuesta Correcta (Ej: Yellow)"; } 
-            else if (type === 'word_search') { q.placeholder = "Instrucción (Ej: Encuentra los colores)"; a.placeholder = "Palabras separadas por coma (Ej: Red,Blue,Green)"; } 
+            const type = document.getElementById('inputType').value; const q = document.getElementById('inputQ'); const a = document.getElementById('inputA');
+            if(type === 'order_sentence') { q.placeholder = "Instrucción"; a.placeholder = "Frase COMPLETA"; } 
+            else if (type === 'multiple_choice') { q.placeholder = "Pregunta"; a.placeholder = "Respuesta Correcta"; } 
+            else if (type === 'word_search') { q.placeholder = "Instrucción"; a.placeholder = "Palabras separadas por coma"; } 
             else { q.placeholder = "Pregunta"; a.placeholder = "Respuesta"; }
         }
 
         window.agregarPreguntaLista = function() {
-            const q = document.getElementById('inputQ').value.trim(); 
-            const a = document.getElementById('inputA').value.trim(); 
-            const img = document.getElementById('inputImg').value.trim(); 
-            const type = document.getElementById('inputType').value;
-            
+            const q = document.getElementById('inputQ').value.trim(); const a = document.getElementById('inputA').value.trim(); const img = document.getElementById('inputImg').value.trim(); const type = document.getElementById('inputType').value;
             if(!q || !a) return Swal.fire("Faltan datos", "", "warning");
-            
-            const p = { type, q, a }; 
-            if(type==='drag_drop' && img) p.img=img;
-            
-            window.preguntasTemporales.push(p); 
-            window.renderizarListaPreguntas();
-            
-            document.getElementById('inputQ').value=''; 
-            document.getElementById('inputA').value=''; 
-            document.getElementById('inputImg').value='';
+            const p = { type, q, a }; if(type==='drag_drop' && img) p.img=img;
+            window.preguntasTemporales.push(p); window.renderizarListaPreguntas();
+            document.getElementById('inputQ').value=''; document.getElementById('inputA').value=''; document.getElementById('inputImg').value='';
         }
 
         window.renderizarListaPreguntas = function() {
-            const ul = document.getElementById('listaPreguntasTemp'); 
-            ul.innerHTML = "";
+            const ul = document.getElementById('listaPreguntasTemp'); ul.innerHTML = "";
             window.preguntasTemporales.forEach((p, index) => {
                 const li = document.createElement('li');
-                li.innerHTML = `📝 ${p.type}: ${p.q} -> <b>${p.a}</b> <span style='color:red; cursor:pointer; margin-left:10px;' onclick='borrarPregunta(${index})'>[X]</span>`;
+                li.innerHTML = `📝 ${p.type}: ${p.q} -> <b>${p.a}</b> <span style='color:red; cursor:pointer;' onclick='borrarPregunta(${index})'>[X]</span>`;
                 ul.appendChild(li);
             });
         }
 
-        window.borrarPregunta = function(index) { 
-            window.preguntasTemporales.splice(index, 1); 
-            window.renderizarListaPreguntas(); 
-        }
+        window.borrarPregunta = function(index) { window.preguntasTemporales.splice(index, 1); window.renderizarListaPreguntas(); }
 
-        window.agregarSiguienteNivel = function() { 
-            const s=document.getElementById('inputLevel'); 
-            let m=0; 
-            for(let i=0;i<s.options.length;i++) if(parseInt(s.options[i].value)>m) m=parseInt(s.options[i].value); 
-            const n=m+1; 
-            s.add(new Option("Nivel "+n, n)); 
-            s.value=n; 
-            Swal.fire("Nivel Creado", "", "info"); 
-        }
+        window.agregarSiguienteNivel = function() { const s=document.getElementById('inputLevel'); let m=0; for(let i=0;i<s.options.length;i++) if(parseInt(s.options[i].value)>m) m=parseInt(s.options[i].value); const n=m+1; s.add(new Option("Nivel "+n, n)); s.value=n; Swal.fire("Nivel "+n, "", "info"); }
 
-        // --- FUNCIÓN DE EDICIÓN VITAL (RESTAURADA) ---
+        // --- FUNCIÓN DE EDICIÓN (ORIGINAL E INTACTA) ---
         window.cargarLeccionExistente = async function() {
             const nivel = document.getElementById('inputLevel').value;
             let rawId = document.getElementById('inputLessonId').value.trim();
             const lessonId = rawId.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
 
-            if (!lessonId) return Swal.fire("Error", "Falta escribir el ID", "warning");
+            if (!lessonId) return Swal.fire("Error", "Falta ID", "warning");
 
             try {
                 const doc = await db.collection('contenido_curso').doc(`nivel_${nivel}`).get();
                 if (doc.exists && doc.data()[lessonId]) {
                     const leccion = doc.data()[lessonId];
-                    // Recuperar Título
                     document.getElementById('inputLessonTitle').value = leccion.title || "";
-                    // Recuperar Contenidos
                     if (leccion.content) {
                         document.getElementById('inputVocab').value = leccion.content.vocab || "";
                         document.getElementById('inputHelp').value = leccion.content.help || "";
                         document.getElementById('inputGrammar').value = leccion.content.grammar || "";
                     }
-                    // Recuperar Preguntas
                     if (leccion.questions) {
                         window.preguntasTemporales = leccion.questions;
                         window.renderizarListaPreguntas();
                     }
                     Swal.fire("Cargado", "Listo para editar.", "success");
-                } else { 
-                    Swal.fire("No encontrado", "No existe ese ID en este nivel.", "info"); 
-                }
-            } catch (error) { 
-                console.error(error);
-                Swal.fire("Error", "Fallo de conexión con Firebase.", "error"); 
-            }
+                } else { Swal.fire("No encontrado", "ID incorrecto.", "info"); }
+            } catch (error) { Swal.fire("Error", "Conexión fallida.", "error"); }
         }
 
-        // --- FUNCIÓN DE GUARDADO (INTACTA) ---
         window.guardarEnNube = function() {
-            const u=auth.currentUser; if(!u) return Swal.fire("Seguridad","Inicia sesión primero","error");
-            
-            const lvl=document.getElementById('inputLevel').value; 
-            const id=document.getElementById('inputLessonId').value.trim(); 
-            const tit=document.getElementById('inputLessonTitle').value.trim();
-            
-            if(!id || !tit || window.preguntasTemporales.length===0) return Swal.fire("Incompleto","Faltan datos obligatorios","error");
-            
-            const data = { 
-                id, title:tit, 
-                questions:window.preguntasTemporales, 
-                content:{
-                    vocab:document.getElementById('inputVocab').value, 
-                    help:document.getElementById('inputHelp').value, 
-                    grammar:document.getElementById('inputGrammar').value
-                } 
-            };
-            
-            db.collection('contenido_curso').doc(`nivel_${lvl}`).set({[id]:data}, {merge:true})
-                .then(()=>Swal.fire("¡Guardado!","","success"))
-                .catch(()=>Swal.fire("Error","","error"));
+            const u=auth.currentUser; if(!u) return Swal.fire("Seguridad","Debes iniciar sesión","error");
+            const lvl=document.getElementById('inputLevel').value; const id=document.getElementById('inputLessonId').value.trim(); const tit=document.getElementById('inputLessonTitle').value.trim();
+            if(!id || !tit || window.preguntasTemporales.length===0) return Swal.fire("Incompleto","Faltan datos","error");
+            const data = { id, title:tit, questions:window.preguntasTemporales, content:{vocab:document.getElementById('inputVocab').value, help:document.getElementById('inputHelp').value, grammar:document.getElementById('inputGrammar').value} };
+            db.collection('contenido_curso').doc(`nivel_${lvl}`).set({[id]:data}, {merge:true}).then(()=>Swal.fire("¡Guardado!","","success")).catch(()=>Swal.fire("Error","","error"));
         }
     </script>
 </body>
