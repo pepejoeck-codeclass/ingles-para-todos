@@ -1,0 +1,21 @@
+{
+  "name": "Inglés Para Todos",
+  "short_name": "Inglés Pro",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#004e92",
+  "theme_color": "#004e92",
+  "description": "Aprende inglés jugando. Niveles, audio y práctica.",
+  "icons": [
+    {
+      "src": "assets/images/logo_main.png.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "assets/images/logo_main.png.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
