@@ -320,6 +320,49 @@
     color: #333;
 }
 /* === MEJORA C: JERARQUÍA VISUAL PROFESIONAL === */
+        /* === MEJORA H: COLORES POR TIPO DE PREGUNTA === */
+/* === MEJORA G: ACCIONES DE TARJETA === */
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.question-actions span {
+    margin-left: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    opacity: 0.75;
+}
+
+.question-actions span:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+.question-card[data-type="translation"] {
+    border-left-color: #2196f3;
+}
+
+.question-card[data-type="dictation"] {
+    border-left-color: #9c27b0;
+}
+
+.question-card[data-type="drag_drop"] {
+    border-left-color: #2ecc71;
+}
+
+.question-card[data-type="order_sentence"] {
+    border-left-color: #f39c12;
+}
+
+.question-card[data-type="multiple_choice"] {
+    border-left-color: #7f8c8d;
+}
+
+.question-card[data-type="word_search"] {
+    border-left-color: #16a085;
+}
 /* === MEJORA G: ACCIONES RÁPIDAS === */
 
 .question-header {
@@ -675,18 +718,17 @@
         li.style.listStyle = "none";
 
        li.innerHTML = `
-   <div class="question-card">
+ <div class="question-card" data-type="${p.type}">
 
     <div class="question-header">
         <div class="question-type">
-            Pregunta ${index + 1} · ${p.type.replace('_',' ').toUpperCase()}
+            ${index + 1}. ${p.type.toUpperCase()}
         </div>
 
         <div class="question-actions">
             <span onclick="moverPregunta(${index}, -1)">⬆</span>
             <span onclick="moverPregunta(${index}, 1)">⬇</span>
             <span onclick="duplicarPregunta(${index})">📄</span>
-            <span onclick="borrarPregunta(${index})">🗑</span>
         </div>
     </div>
 
