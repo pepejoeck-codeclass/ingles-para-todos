@@ -294,6 +294,19 @@
 .preview-box li {
     color: #333;
 }
+/* === MEJORA B: COLAPSAR RESPUESTA === */
+.question-a {
+    display: none;
+    margin-top: 6px;
+}
+
+.question-toggle {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #2980b9;
+    cursor: pointer;
+    font-weight: bold;
+}
     </style>
 </head>
 <body>
@@ -598,11 +611,13 @@
         li.style.listStyle = "none";
 
         li.innerHTML = `
-            <div class="question-card">
-                <div class="question-type">
-                    ${index + 1}. ${p.type.toUpperCase()}
-                </div>
+            <div class="question-toggle" onclick="toggleRespuesta(this)">
+    👁️ Ver respuesta
+</div>
 
+<div class="question-a">
+    ✅ ${p.a}
+</div>
                 <div class="question-q">
                     📝 ${p.q}
                 </div>
@@ -708,7 +723,17 @@ if (aiStrategySelect && aiManualBox) {
     }
   });
 }
+window.toggleRespuesta = function(el) {
+    const answer = el.nextElementSibling;
 
+    if (answer.style.display === "none" || answer.style.display === "") {
+        answer.style.display = "block";
+        el.textContent = "🙈 Ocultar respuesta";
+    } else {
+        answer.style.display = "none";
+        el.textContent = "👁️ Ver respuesta";
+    }
+}
     </script>
 </body>
 </html>
