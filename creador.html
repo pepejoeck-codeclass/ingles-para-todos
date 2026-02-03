@@ -590,14 +590,36 @@
         }
 
         window.renderizarListaPreguntas = function() {
-        const ul = document.getElementById('listaPreguntasTemp'); 
-            ul.innerHTML = "";
-            window.preguntasTemporales.forEach((p, index) => {
-                const li = document.createElement('li');
-                li.innerHTML = `📝 ${p.type}: ${p.q} -> <b>${p.a}</b> <span style='color:red; cursor:pointer;' onclick='borrarPregunta(${index})'>[X]</span>`;
-                ul.appendChild(li);
-            });
-        }
+    const ul = document.getElementById('listaPreguntasTemp');
+    ul.innerHTML = "";
+
+    window.preguntasTemporales.forEach((p, index) => {
+        const li = document.createElement('li');
+        li.style.listStyle = "none";
+
+        li.innerHTML = `
+            <div class="question-card">
+                <div class="question-type">
+                    ${index + 1}. ${p.type.toUpperCase()}
+                </div>
+
+                <div class="question-q">
+                    📝 ${p.q}
+                </div>
+
+                <div class="question-a">
+                    ✅ ${p.a}
+                </div>
+
+                <div class="question-delete" onclick="borrarPregunta(${index})">
+                    🗑️ Eliminar pregunta
+                </div>
+            </div>
+        `;
+
+        ul.appendChild(li);
+    });
+}
 
         window.borrarPregunta = function(index) { 
             window.preguntasTemporales.splice(index, 1); 
