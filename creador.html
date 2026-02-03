@@ -330,13 +330,14 @@
 }
 
 .question-actions span {
-    .question-actions span:last-child {
-    color: #c0392b;
-}
     margin-left: 6px;
     cursor: pointer;
     font-size: 13px;
     opacity: 0.75;
+}
+
+.question-actions span:last-child {
+    color: #c0392b;
 }
 
 .question-actions span:hover {
@@ -793,27 +794,6 @@ window.duplicarPregunta = function(index) {
             s.value=n; 
             Swal.fire("Nivel Creado", "", "info"); 
         }
-// === MEJORA G: MOVER Y DUPLICAR PREGUNTAS ===
-
-window.moverPregunta = function(index, direccion) {
-    const nuevoIndex = index + direccion;
-
-    if (nuevoIndex < 0 || nuevoIndex >= window.preguntasTemporales.length) return;
-
-    const temp = window.preguntasTemporales[index];
-    window.preguntasTemporales[index] = window.preguntasTemporales[nuevoIndex];
-    window.preguntasTemporales[nuevoIndex] = temp;
-
-    window.renderizarListaPreguntas();
-}
-
-window.duplicarPregunta = function(index) {
-    const original = window.preguntasTemporales[index];
-    const copia = JSON.parse(JSON.stringify(original));
-
-    window.preguntasTemporales.splice(index + 1, 0, copia);
-    window.renderizarListaPreguntas();
-}
 
         // --- FUNCIÓN DE EDICIÓN VITAL (RESTAURADA E INTACTA) ---
         window.cargarLeccionExistente = async function() {
