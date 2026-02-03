@@ -320,7 +320,26 @@
     color: #333;
 }
 /* === MEJORA C: JERARQUÍA VISUAL PROFESIONAL === */
+/* === MEJORA G: ACCIONES RÁPIDAS === */
 
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.question-actions span {
+    cursor: pointer;
+    margin-left: 8px;
+    font-size: 14px;
+    opacity: 0.7;
+    transition: 0.2s;
+}
+
+.question-actions span:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
 .question-card {
     background: #ffffff;
     border-radius: 14px;
@@ -656,30 +675,52 @@
         li.style.listStyle = "none";
 
        li.innerHTML = `
-    <div class="question-card">
+   <div class="question-card">
 
+    <div class="question-header">
         <div class="question-type">
-    Pregunta ${index + 1} · ${p.type.replace('_',' ').toUpperCase()}
-</div>
-        <div class="question-q">
-            📝 ${p.q}
+            Pregunta ${index + 1} · ${p.type.replace('_',' ').toUpperCase()}
         </div>
 
-        <div class="question-a">
-            ✅ ${p.a}
+        <div class="question-actions">
+            <span onclick="moverPregunta(${index}, -1)">⬆</span>
+            <span onclick="moverPregunta(${index}, 1)">⬇</span>
+            <span onclick="duplicarPregunta(${index})">📄</span>
+            <span onclick="borrarPregunta(${index})">🗑</span>
         </div>
-
-        <div class="question-delete" onclick="borrarPregunta(${index})">
-            🗑️ Eliminar pregunta
-        </div>
-
     </div>
+
+    <div class="question-q">
+        📝 ${p.q}
+    </div>
+
+    <div class="question-a">
+        ✅ ${p.a}
+    </div>
+
+</div>
 `;
         ul.appendChild(li);
     });
 }
 
         window.borrarPregunta = function(index) { 
+            window.moverPregunta = function(index, direccion) {
+    const nuevaPos = index + direccion;
+    if (nuevaPos < 0 || nuevaPos >= window.preguntasTemporales.length) return;
+
+    const temp = window.preguntasTemporales[index];
+    window.preguntasTemporales[index] = window.preguntasTemporales[nuevaPos];
+    window.preguntasTemporales[nuevaPos] = temp;
+
+    window.renderizarListaPreguntas();
+};
+
+window.duplicarPregunta = function(index) {
+    const copia = JSON.parse(JSON.stringify(window.preguntasTemporales[index]));
+    window.preguntasTemporales.splice(index + 1, 0, copia);
+    window.renderizarListaPreguntas();
+};
             window.preguntasTemporales.splice(index, 1); 
             window.renderizarListaPreguntas(); 
         }
