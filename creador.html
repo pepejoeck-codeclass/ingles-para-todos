@@ -745,15 +745,15 @@ window.moverPregunta = function(index, direccion) {
 
     window.renderizarListaPreguntas();
 };
+        window.borrarPregunta = function(index) {
+    window.preguntasTemporales.splice(index, 1);
+    window.renderizarListaPreguntas();
+};
 window.duplicarPregunta = function(index) {
     const copia = JSON.parse(JSON.stringify(window.preguntasTemporales[index]));
     window.preguntasTemporales.splice(index + 1, 0, copia);
     window.renderizarListaPreguntas();
 };
-            window.preguntasTemporales.splice(index, 1); 
-            window.renderizarListaPreguntas(); 
-        }
-
         window.agregarSiguienteNivel = function() { 
             const s=document.getElementById('inputLevel'); 
             let m=0; 
