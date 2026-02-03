@@ -257,7 +257,32 @@
     border-left: 6px solid #2196f3;
     font-size: 13px;
 }
+/* === MEJORA F: SCROLL INTERNO PROFESIONAL === */
 
+.preview-box {
+    max-height: 320px;        /* Altura controlada */
+    overflow-y: auto;         /* Scroll vertical */
+    padding-right: 6px;       /* Espacio para scrollbar */
+}
+
+/* Scroll elegante (Chrome, Edge, Brave) */
+.preview-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.preview-box::-webkit-scrollbar-track {
+    background: #eef3f7;
+    border-radius: 10px;
+}
+
+.preview-box::-webkit-scrollbar-thumb {
+    background: #b0c4de;
+    border-radius: 10px;
+}
+
+.preview-box::-webkit-scrollbar-thumb:hover {
+    background: #8aaad6;
+}
 .question-type {
     display: inline-block;
     background: #2196f3;
