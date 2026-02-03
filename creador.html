@@ -330,6 +330,9 @@
 }
 
 .question-actions span {
+    .question-actions span:last-child {
+    color: #c0392b;
+}
     margin-left: 6px;
     cursor: pointer;
     font-size: 13px;
@@ -729,6 +732,7 @@
             <span onclick="moverPregunta(${index}, -1)">⬆</span>
             <span onclick="moverPregunta(${index}, 1)">⬇</span>
             <span onclick="duplicarPregunta(${index})">📄</span>
+            <span onclick="borrarPregunta(${index})">🗑️</span>
         </div>
     </div>
 
@@ -746,15 +750,28 @@
     });
 }
 
-        window.borrarPregunta = function(index) { 
-            window.moverPregunta = function(index, direccion) {
-    const nuevaPos = index + direccion;
-    if (nuevaPos < 0 || nuevaPos >= window.preguntasTemporales.length) return;
+      // === MEJORA G: MOVER, DUPLICAR Y BORRAR PREGUNTAS ===
+
+window.moverPregunta = function(index, direccion) {
+    const nuevoIndex = index + direccion;
+
+    if (nuevoIndex < 0 || nuevoIndex >= window.preguntasTemporales.length) return;
 
     const temp = window.preguntasTemporales[index];
-    window.preguntasTemporales[index] = window.preguntasTemporales[nuevaPos];
-    window.preguntasTemporales[nuevaPos] = temp;
+    window.preguntasTemporales[index] = window.preguntasTemporales[nuevoIndex];
+    window.preguntasTemporales[nuevoIndex] = temp;
 
+    window.renderizarListaPreguntas();
+};
+
+window.duplicarPregunta = function(index) {
+    const copia = JSON.parse(JSON.stringify(window.preguntasTemporales[index]));
+    window.preguntasTemporales.splice(index + 1, 0, copia);
+    window.renderizarListaPreguntas();
+};
+
+window.borrarPregunta = function(index) {
+    window.preguntasTemporales.splice(index, 1);
     window.renderizarListaPreguntas();
 };
 
