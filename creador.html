@@ -699,6 +699,13 @@ if (type === 'reading_comprehension') {
         }
 
         window.agregarPreguntaLista = function() {
+                const type = document.getElementById('inputType').value;
+
+    // === MODO READING ===
+    if (type === 'reading_comprehension') {
+        window.guardarReading();
+        return; // ⛔ cortamos aquí, no sigue la lógica normal
+    }
             const q = document.getElementById('inputQ').value.trim(); 
             const a = document.getElementById('inputA').value.trim(); 
             const img = document.getElementById('inputImg').value.trim(); 
@@ -774,38 +781,37 @@ window.guardarReading = function() {
     window.preguntasTemporales.forEach((p, index) => {
         const li = document.createElement('li');
         li.style.listStyle = "none";
-
-       li.innerHTML = `
- <div class="question-card" data-type="${p.type}">
+if (p.type === 'reading_comprehension') {
+li.innerHTML = `
+  <div class="question-card" data-type="reading_comprehension">
 
     <div class="question-header">
-        <div class="question-type">
-            ${index + 1}. ${p.type.toUpperCase()}
-        </div>
-
-        <div class="question-actions">
-            <span onclick="moverPregunta(${index}, -1)">⬆</span>
-            <span onclick="moverPregunta(${index}, 1)">⬇</span>
-            <span onclick="editarPregunta(${index})">✏️</span>
-            <span onclick="duplicarPregunta(${index})">📄</span>
-            <span onclick="borrarPregunta(${index})">🗑️</span>
-        </div>
+    <div class="question-type">
+  📖 ${index + 1}. READING
+</div>
+      <div class="question-actions">
+        <span onclick="moverPregunta(${index}, -1)">⬆</span>
+        <span onclick="moverPregunta(${index}, 1)">⬇</span>
+        <span onclick="editarReading(${index})">✏️</span>
+        <span onclick="duplicarPregunta(${index})">📄</span>
+        <span onclick="borrarPregunta(${index})">🗑️</span>
+      </div>
     </div>
 
     <div class="question-q">
-        📝 ${p.q}
+      📄 <strong>Lectura:</strong><br>
+      ${(p.readingText || '').substring(0, 200)}...
     </div>
 
     <div class="question-a">
-        ✅ ${p.a}
+      ❓ Preguntas de comprensión: ${p.count}
     </div>
 
-</div>
+  </div>
 `;
-        ul.appendChild(li);
-    });
+     ul.appendChild(li);
+return;
 }
-
       // === MEJORA G: MOVER, DUPLICAR Y BORRAR PREGUNTAS ===
 
 window.moverPregunta = function(index, direccion) {
@@ -861,6 +867,32 @@ window.editarPregunta = function(index) {
     Swal.fire(
         'Modo edición',
         'Edita la pregunta y pulsa "Agregar Pregunta" para guardar cambios.',
+        'info'
+    );
+};
+        // === PASO 9: EDITAR READING EXISTENTE ===
+window.editarReading = function(index) {
+    const p = window.preguntasTemporales[index];
+
+    // Seguridad: solo si es reading
+    if (p.type !== 'reading_comprehension') return;
+
+    // Guardamos índice de edición
+    window.readingEditandoIndex = index;
+    window.preguntaEditandoIndex = null;
+
+    // Forzamos selector a Reading
+    document.getElementById('inputType').value = 'reading_comprehension';
+    window.actualizarPlaceholder(); // muestra el bloque reading
+
+    // Cargamos datos al formulario
+    document.getElementById('inputReadingText').value = p.readingText || '';
+    document.getElementById('inputReadingCount').value = p.count || 5;
+
+    // Feedback visual claro
+    Swal.fire(
+        'Editando Reading',
+        'Modifica la lectura y guarda para aplicar cambios.',
         'info'
     );
 };
