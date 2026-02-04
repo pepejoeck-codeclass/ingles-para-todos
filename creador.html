@@ -824,10 +824,18 @@ ${p.questions && p.questions.length ? `
     </div>
     <ul style="margin:0; padding-left:16px;">
       ${p.questions.map((qChild, i) => `
-        <li style="font-size:12px; color:#444; margin-bottom:3px;">
-          ${i + 1}. ${qChild.q}
-        </li>
-      `).join('')}
+  <li style="font-size:12px; color:#444; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+    
+    <span>
+      ${i + 1}. ${qChild.q}
+    </span>
+
+    <span style="font-size:11px;">
+      ✏️ 🗑️
+    </span>
+
+  </li>
+`).join('')}
     </ul>
   </div>
 ` : `
