@@ -681,7 +681,14 @@ window.preguntaEditandoIndex = null;
 
         // FUNCIONES DE UI Y LISTAS (SIN REDUCCIÓN)
         window.actualizarPlaceholder = function() {
-            const type = document.getElementById('inputType').value; 
+            const type = document.getElementById('inputType').value;
+            // === MOSTRAR / OCULTAR BLOQUE READING ===
+const readingBlock = document.getElementById('readingBlock');
+if (type === 'reading_comprehension') {
+    readingBlock.style.display = 'block';
+} else {
+    readingBlock.style.display = 'none';
+}
             const q = document.getElementById('inputQ'); 
             const a = document.getElementById('inputA');
             
