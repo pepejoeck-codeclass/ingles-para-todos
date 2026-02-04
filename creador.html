@@ -64,7 +64,7 @@
             padding: 30px; 
             border-radius: 20px; 
             width: 100%; 
-            max-width: 700px; 
+            max-width: 1200px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
             display: none; 
         }
@@ -248,15 +248,6 @@
             font-family: monospace; 
         }
     /* === DASHBOARD DE PREGUNTAS (PANEL CREADOR) === */
-.question-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    border-left: 6px solid #2196f3;
-    font-size: 13px;
-}
 /* === MEJORA F: SCROLL INTERNO PROFESIONAL === */
 
 .preview-box {
@@ -501,7 +492,7 @@
 
         <h3>📚 Contenido Educativo (Botones Index)</h3>
         <p style="font-size:12px; color:#555;">Esto llenará los botones Vocabulary, Ayuda y Grammar del index.</p>
-        <div class="section-box" style="background: #e8f6f3;">
+        <div class="section-box wide-section" style="background: #e8f6f3;">
             <label>📖 Contenido para "Vocabulary":</label>
             <textarea id="inputVocab" placeholder="Ej:&#10;Cat - Gato&#10;Dog - Perro"></textarea>
             
@@ -513,7 +504,7 @@
         </div>
 
         <h3>⚡ Preguntas del Juego (Manual)</h3>
-        <div class="section-box">
+        <div class="section-box wide-section">
             <label>Tipo:</label>
             <select id="inputType" onchange="actualizarPlaceholder()">
                 <option value="translation">Traducción (Texto)</option>
@@ -537,7 +528,7 @@
             <button onclick="agregarPreguntaLista()" class="btn-save" style="background:#3498db; margin-top:10px; font-size:14px; padding: 10px;">➕ Agregar Pregunta</button>
         </div>
 
-        <div class="preview-box">
+        <div class="preview-box wide-section">
             <strong>Preguntas agregadas (Manuales + IA):</strong>
             <ul id="listaPreguntasTemp" style="padding-left: 20px;"></ul>
         </div>
@@ -745,9 +736,23 @@ window.moverPregunta = function(index, direccion) {
 
     window.renderizarListaPreguntas();
 };
-        window.borrarPregunta = function(index) {
-    window.preguntasTemporales.splice(index, 1);
-    window.renderizarListaPreguntas();
+       window.borrarPregunta = function(index) {
+    Swal.fire({
+        title: '¿Eliminar pregunta?',
+        text: 'Esta acción no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#c0392b',
+        cancelButtonColor: '#7f8c8d',
+        confirmButtonText: 'Sí, borrar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.preguntasTemporales.splice(index, 1);
+            window.renderizarListaPreguntas();
+            Swal.fire('Eliminada', 'La pregunta fue eliminada.', 'success');
+        }
+    });
 };
 window.duplicarPregunta = function(index) {
     const copia = JSON.parse(JSON.stringify(window.preguntasTemporales[index]));
