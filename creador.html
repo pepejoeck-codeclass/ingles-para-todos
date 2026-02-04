@@ -515,7 +515,31 @@
                 <option value="word_search">Sopa de Letras 🔎</option>
                 <option value="reading_comprehension">📖 Reading + Questions</option>
             </select>
+            <!-- === BLOQUE READING + QUESTIONS (PASO 2) === -->
+<div id="readingBlock" style="display:none; margin-top:20px;">
 
+  <hr style="margin:20px 0;">
+
+  <label>📖 Texto de la Lectura:</label>
+  <textarea id="inputReadingText" placeholder="Escribe aquí la lectura completa..."></textarea>
+
+  <button type="button" class="btn-save" style="background:#8e44ad; margin-top:10px;">
+    🔊 Generar / Escuchar Audio de la Lectura
+  </button>
+
+  <label style="margin-top:20px;">❓ Cantidad de preguntas de comprensión:</label>
+  <select id="inputReadingCount">
+    <option value="5">5 preguntas</option>
+    <option value="10">10 preguntas</option>
+    <option value="15">15 preguntas</option>
+  </select>
+
+  <div class="helper-text">
+    Estas preguntas podrán ser creadas manualmente o por IA.
+  </div>
+
+</div>
+<!-- === FIN BLOQUE READING === -->
             <label id="lblPregunta">Pregunta / Texto (o Instrucción):</label>
             <input type="text" id="inputQ" placeholder="Ej: ¿Cómo se dice Gato?">
 
