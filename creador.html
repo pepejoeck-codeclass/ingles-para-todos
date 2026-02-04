@@ -709,8 +709,7 @@ if (type === 'reading_comprehension') {
             const q = document.getElementById('inputQ').value.trim(); 
             const a = document.getElementById('inputA').value.trim(); 
             const img = document.getElementById('inputImg').value.trim(); 
-            const type = document.getElementById('inputType').value;
-            
+                        
             if(!q || !a) return Swal.fire("Faltan datos", "", "warning");
             
             const p = { type, q, a }; 
@@ -721,9 +720,22 @@ if (type === 'reading_comprehension') {
     window.preguntasTemporales[window.preguntaEditandoIndex] = p;
     window.preguntaEditandoIndex = null;
     window.readingEditandoIndex = null;
+    window.readingActivoIndex = null;
 } else {
-    // Modo agregar
-    window.preguntasTemporales.push(p);
+
+   // ¿Estamos dentro de un Reading?
+   if (window.readingActivoIndex !== null) {
+       const reading = window.preguntasTemporales[window.readingActivoIndex];
+
+       // Seguridad profesional
+       if (!reading.questions) reading.questions = [];
+
+       reading.questions.push(p);
+   } else {
+       // Pregunta normal (no reading)
+       window.preguntasTemporales.push(p);
+   }
+
 }
 
 window.renderizarListaPreguntas();         
@@ -766,7 +778,7 @@ window.guardarReading = function() {
 
     // Limpieza visual
     document.getElementById('inputReadingText').value = "";
-
+window.readingActivoIndex = null;
     Swal.fire(
         "Reading guardado",
         "La lectura fue guardada correctamente.",
@@ -812,6 +824,28 @@ li.innerHTML = `
      ul.appendChild(li);
 return;
 }
+li.innerHTML = `
+  <div class="question-card" data-type="${p.type}">
+    <div class="question-header">
+      <div class="question-type">
+        ${index + 1}. ${p.type.toUpperCase()}
+      </div>
+      <div class="question-actions">
+        <span onclick="moverPregunta(${index}, -1)">⬆</span>
+        <span onclick="moverPregunta(${index}, 1)">⬇</span>
+        <span onclick="editarPregunta(${index})">✏️</span>
+        <span onclick="duplicarPregunta(${index})">📄</span>
+        <span onclick="borrarPregunta(${index})">🗑️</span>
+      </div>
+    </div>
+
+    <div class="question-q">📝 ${p.q}</div>
+    <div class="question-a">✅ ${p.a}</div>
+  </div>
+`;
+ul.appendChild(li);
+            });
+};
       // === MEJORA G: MOVER, DUPLICAR Y BORRAR PREGUNTAS ===
 
 window.moverPregunta = function(index, direccion) {
@@ -880,6 +914,7 @@ window.editarReading = function(index) {
     // Guardamos índice de edición
     window.readingEditandoIndex = index;
     window.preguntaEditandoIndex = null;
+    window.readingActivoIndex = index;
 
     // Forzamos selector a Reading
     document.getElementById('inputType').value = 'reading_comprehension';
