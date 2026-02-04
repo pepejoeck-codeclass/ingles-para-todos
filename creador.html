@@ -817,6 +817,24 @@ li.innerHTML = `
 
     <div class="question-a">
       ❓ Preguntas de comprensión: ${p.count}
+${p.questions && p.questions.length ? `
+  <div style="margin-top:8px; padding-left:12px; border-left:3px solid #ddd;">
+    <div style="font-size:11px; font-weight:bold; color:#555; margin-bottom:4px;">
+      📌 Preguntas hijas:
+    </div>
+    <ul style="margin:0; padding-left:16px;">
+      ${p.questions.map((qChild, i) => `
+        <li style="font-size:12px; color:#444; margin-bottom:3px;">
+          ${i + 1}. ${qChild.q}
+        </li>
+      `).join('')}
+    </ul>
+  </div>
+` : `
+  <div style="margin-top:8px; font-size:11px; color:#999; font-style:italic;">
+    (Aún no se han agregado preguntas a esta lectura)
+  </div>
+`}
     </div>
 
   </div>
