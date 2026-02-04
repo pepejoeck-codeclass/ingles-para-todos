@@ -713,6 +713,7 @@ if (type === 'reading_comprehension') {
     // Modo edición
     window.preguntasTemporales[window.preguntaEditandoIndex] = p;
     window.preguntaEditandoIndex = null;
+    window.readingEditandoIndex = null;
 } else {
     // Modo agregar
     window.preguntasTemporales.push(p);
@@ -723,6 +724,48 @@ window.renderizarListaPreguntas();
             document.getElementById('inputA').value=''; 
             document.getElementById('inputImg').value='';
         }
+// === PASO 6: GUARDAR READING + QUESTIONS ===
+window.guardarReading = function() {
+
+    const readingText = document.getElementById('inputReadingText').value.trim();
+    const count = document.getElementById('inputReadingCount').value;
+
+    if (!readingText) {
+        return Swal.fire(
+            "Falta la lectura",
+            "Escribe el texto de la lectura antes de continuar.",
+            "warning"
+        );
+    }
+
+    const readingObj = {
+        type: "reading_comprehension",
+        readingText: readingText,
+        audio: null,          // aquí luego conectamos tu audio
+        questions: [],        // aquí irán las preguntas
+        count: parseInt(count)
+    };
+
+    if (window.readingEditandoIndex !== null) {
+        // Modo edición
+        window.preguntasTemporales[window.readingEditandoIndex] = readingObj;
+        window.readingEditandoIndex = null;
+    } else {
+        // Modo creación
+        window.preguntasTemporales.push(readingObj);
+    }
+
+    window.renderizarListaPreguntas();
+
+    // Limpieza visual
+    document.getElementById('inputReadingText').value = "";
+
+    Swal.fire(
+        "Reading guardado",
+        "La lectura fue guardada correctamente.",
+        "success"
+    );
+};
 
         window.renderizarListaPreguntas = function() {
     const ul = document.getElementById('listaPreguntasTemp');
