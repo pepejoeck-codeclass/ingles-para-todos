@@ -31,7 +31,7 @@
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
-            align-items: center; 
+            align-items: stretch;
             min-height: 100vh; 
         }
         
@@ -629,7 +629,7 @@
 
         // Inicializamos preguntas si el módulo no lo hizo
         if (!window.preguntasTemporales) window.preguntasTemporales = [];
-
+window.preguntaEditandoIndex = null;
         // LOGIN
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -677,9 +677,16 @@
             const p = { type, q, a }; 
             if(type==='drag_drop' && img) p.img=img;
             
-            window.preguntasTemporales.push(p); 
-            window.renderizarListaPreguntas();
-            
+           if (window.preguntaEditandoIndex !== null) {
+    // Modo edición
+    window.preguntasTemporales[window.preguntaEditandoIndex] = p;
+    window.preguntaEditandoIndex = null;
+} else {
+    // Modo agregar
+    window.preguntasTemporales.push(p);
+}
+
+window.renderizarListaPreguntas();         
             document.getElementById('inputQ').value=''; 
             document.getElementById('inputA').value=''; 
             document.getElementById('inputImg').value='';
@@ -704,6 +711,7 @@
         <div class="question-actions">
             <span onclick="moverPregunta(${index}, -1)">⬆</span>
             <span onclick="moverPregunta(${index}, 1)">⬇</span>
+            <span onclick="editarPregunta(${index})">✏️</span>
             <span onclick="duplicarPregunta(${index})">📄</span>
             <span onclick="borrarPregunta(${index})">🗑️</span>
         </div>
@@ -758,6 +766,28 @@ window.duplicarPregunta = function(index) {
     const copia = JSON.parse(JSON.stringify(window.preguntasTemporales[index]));
     window.preguntasTemporales.splice(index + 1, 0, copia);
     window.renderizarListaPreguntas();
+};
+window.editarPregunta = function(index) {
+    const p = window.preguntasTemporales[index];
+
+    // Guardamos qué pregunta se está editando
+    window.preguntaEditandoIndex = index;
+
+    // Cargamos datos al formulario
+    document.getElementById('inputType').value = p.type;
+    document.getElementById('inputQ').value = p.q;
+    document.getElementById('inputA').value = p.a;
+    document.getElementById('inputImg').value = p.img || "";
+
+    // Ajustamos placeholders según tipo
+    window.actualizarPlaceholder();
+
+    // Feedback visual
+    Swal.fire(
+        'Modo edición',
+        'Edita la pregunta y pulsa "Agregar Pregunta" para guardar cambios.',
+        'info'
+    );
 };
         window.agregarSiguienteNivel = function() { 
             const s=document.getElementById('inputLevel'); 
