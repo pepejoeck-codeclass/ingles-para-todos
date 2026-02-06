@@ -655,6 +655,8 @@
         // Inicializamos preguntas si el módulo no lo hizo
         if (!window.preguntasTemporales) window.preguntasTemporales = [];
 window.preguntaEditandoIndex = null;
+window.readingChildEditIndex = null; 
+window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
         // LOGIN
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -730,7 +732,22 @@ if (type === 'reading_comprehension') {
        // Seguridad profesional
        if (!reading.questions) reading.questions = [];
 
-       reading.questions.push(p);
+       if (
+    window.readingChildEditIndex !== null &&
+    window.readingChildParentIndex === window.readingActivoIndex
+) {
+    // ✏️ Estamos EDITANDO una pregunta hija existente
+    reading.questions[window.readingChildEditIndex] = p;
+
+    // Limpiamos banderas
+    window.readingChildEditIndex = null;
+    window.readingChildParentIndex = null;
+
+    Swal.fire("Actualizado", "Pregunta de comprensión modificada.", "success");
+} else {
+    // ➕ Estamos CREANDO una nueva pregunta hija
+    reading.questions.push(p);
+}
    } else {
        // Pregunta normal (no reading)
        window.preguntasTemporales.push(p);
@@ -831,8 +848,11 @@ ${p.questions && p.questions.length ? `
     </span>
 
     <span style="font-size:11px;">
-      ✏️ 🗑️
-    </span>
+  <span onclick="editarPreguntaHija(${index}, ${i})" style="cursor:pointer;">✏️</span>
+  <span onclick="borrarPreguntaHija(${index}, ${i})" style="cursor:pointer; margin-left:6px;">🗑️</span>
+  <span onclick="moverPreguntaHija(${index}, ${i}, -1)" style="cursor:pointer; margin-left:6px;">⬆</span>
+  <span onclick="moverPreguntaHija(${index}, ${i}, 1)" style="cursor:pointer;">⬇</span>
+</span>
 
   </li>
 `).join('')}
@@ -956,6 +976,58 @@ window.editarReading = function(index) {
         'Modifica la lectura y guarda para aplicar cambios.',
         'info'
     );
+};
+// === FUNCIONES PARA PREGUNTAS HIJAS (PASO 11.4) ===
+
+window.editarPreguntaHija = function(parentIndex, childIndex) {
+    const reading = window.preguntasTemporales[parentIndex];
+    const child = reading.questions[childIndex];
+
+    window.readingActivoIndex = parentIndex;
+    window.readingChildEditIndex = childIndex;
+    window.readingChildParentIndex = parentIndex;
+
+    document.getElementById('inputType').value = child.type || 'translation';
+    window.actualizarPlaceholder();
+
+    document.getElementById('inputQ').value = child.q;
+    document.getElementById('inputA').value = child.a;
+
+    Swal.fire(
+        'Editando pregunta hija',
+        'Modifica y pulsa "Agregar Pregunta" para guardar.',
+        'info'
+    );
+};
+
+window.borrarPreguntaHija = function(parentIndex, childIndex) {
+    const reading = window.preguntasTemporales[parentIndex];
+
+    Swal.fire({
+        title: '¿Eliminar pregunta?',
+        text: 'Solo se borrará esta pregunta de la lectura.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, borrar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            reading.questions.splice(childIndex, 1);
+            window.renderizarListaPreguntas();
+        }
+    });
+};
+
+window.moverPreguntaHija = function(parentIndex, childIndex, direction) {
+    const questions = window.preguntasTemporales[parentIndex].questions;
+    const newIndex = childIndex + direction;
+
+    if (newIndex < 0 || newIndex >= questions.length) return;
+
+    const temp = questions[childIndex];
+    questions[childIndex] = questions[newIndex];
+    questions[newIndex] = temp;
+
+    window.renderizarListaPreguntas();
 };
         window.agregarSiguienteNivel = function() { 
             const s=document.getElementById('inputLevel'); 
