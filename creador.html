@@ -587,8 +587,12 @@
 
         <button onclick="guardarEnNube()" class="btn-save">💾 GUARDAR CAMBIOS EN LA NUBE</button>
     </div>  
-    
-    <script>
+   <script type="importmap">...</script>
+
+<script type="module">
+  import { GoogleGenerativeAI } from "@google/generative-ai";
+  window.GoogleGenerativeAI = GoogleGenerativeAI;
+</script>
        
         // Inicializamos preguntas si el módulo no lo hizo
         if (!window.preguntasTemporales) window.preguntasTemporales = [];
