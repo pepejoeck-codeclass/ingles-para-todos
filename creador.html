@@ -587,12 +587,7 @@
 
         <button onclick="guardarEnNube()" class="btn-save">💾 GUARDAR CAMBIOS EN LA NUBE</button>
     </div>  
-   
-<script type="module">
-  import { GoogleGenerativeAI } from "@google/generative-ai";
-  window.GoogleGenerativeAI = GoogleGenerativeAI;
-</script>
-       
+         
     <script>
   // Inicializamos preguntas si el módulo no lo hizo
   if (!window.preguntasTemporales) window.preguntasTemporales = [];
@@ -603,8 +598,7 @@
   window.readingActivoIndex = null;
 
   // LOGIN
-  <script>
-(function() {
+ (function() {
   window.autenticarCreador = function() {
     const email = document.getElementById('adminEmail').value;
     const pass = document.getElementById('adminPass').value;
