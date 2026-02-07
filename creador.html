@@ -603,6 +603,17 @@
   window.readingActivoIndex = null;
 
   // LOGIN
+  <script>
+(function() {
+  window.autenticarCreador = function() {
+    const email = document.getElementById('adminEmail').value;
+    const pass = document.getElementById('adminPass').value;
+    if(!email || !pass) { Swal.fire("Faltan datos","","warning"); return; }
+    
+    auth.signInWithEmailAndPassword(email, pass)
+      .catch(() => Swal.fire("Error", "Revisa correo/contraseña", "error"));
+  };
+
   auth.onAuthStateChanged(user => {
     if (user) {
       document.getElementById('loginOverlay').style.display = 'none';
@@ -610,10 +621,11 @@
       document.getElementById('userDisplay').innerText = user.email;
 
       const savedKey = localStorage.getItem("geminiApiKey");
-      const keyInput = document.getElementById('apiKeyInput');
-      if (savedKey && keyInput) keyInput.value = savedKey;
+      if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
     }
   });
+})();
+</script>
         
         window.cerrarSesionCreador = function() {
             auth.signOut().then(() => location.reload());
@@ -637,7 +649,7 @@ if (type === 'reading_comprehension') {
             else { q.placeholder = "Pregunta"; a.placeholder = "Respuesta"; }
         }
 window.generarPreguntasReadingIA = async function () {
-
+await window.cargarGeminiSDK();
   if (window.readingActivoIndex === null) {
     return Swal.fire(
       "Selecciona una lectura",
@@ -1240,10 +1252,22 @@ window.guardarEnNube = function() {
         }
     </script>
 
-    <script type="module">
-        import { GoogleGenerativeAI } from "@google/generative-ai";
-        window.GoogleGenerativeAI = GoogleGenerativeAI;
-    </script>
+   <script>
+  // Carga diferida segura del SDK (SIN módulos)
+  window.cargarGeminiSDK = async function () {
+    if (window.GoogleGenerativeAI) return;
+
+    const script = document.createElement("script");
+    script.src = "https://esm.run/@google/generative-ai";
+    script.type = "module";
+
+    script.onload = () => {
+      console.log("Gemini SDK cargado");
+    };
+
+    document.body.appendChild(script);
+  };
+</script>
 
     <script>
         (function() {
