@@ -682,31 +682,10 @@ window.readingActivoIndex = null;
                 if(savedKey && keyInput) keyInput.value = savedKey;
             }
         });
-
-        window.autenticarCreador = function() {
-            const e = document.getElementById('adminEmail').value;
-            const p = document.getElementById('adminPass').value;
-            if(!e || !p) return Swal.fire("Ups", "Faltan datos", "warning");
-            auth.signInWithEmailAndPassword(e, p).catch(error => Swal.fire("Error", "Revisa datos", "error"));
-        }
         
         window.cerrarSesionCreador = function() {
             auth.signOut().then(() => location.reload());
         }
-window.autenticarCreador = function () {
-    const email = document.getElementById('adminEmail').value;
-    const pass = document.getElementById('adminPass').value;
-
-    if (!email || !pass) {
-        Swal.fire("Ups", "Faltan datos", "warning");
-        return;
-    }
-
-    auth.signInWithEmailAndPassword(email, pass)
-        .catch(() => {
-            Swal.fire("Error", "Revisa tu correo o contraseña", "error");
-        });
-};
         // FUNCIONES DE UI Y LISTAS (SIN REDUCCIÓN)
         window.actualizarPlaceholder = function() {
             const type = document.getElementById('inputType').value;
