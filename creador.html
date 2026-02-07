@@ -587,32 +587,34 @@
 
         <button onclick="guardarEnNube()" class="btn-save">💾 GUARDAR CAMBIOS EN LA NUBE</button>
     </div>  
-   <script type="importmap">...</script>
-
+   
 <script type="module">
   import { GoogleGenerativeAI } from "@google/generative-ai";
   window.GoogleGenerativeAI = GoogleGenerativeAI;
 </script>
        
-        // Inicializamos preguntas si el módulo no lo hizo
-        if (!window.preguntasTemporales) window.preguntasTemporales = [];
-window.preguntaEditandoIndex = null;
-window.readingChildEditIndex = null; 
-window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
-window.readingExpandedIndex = null; // controla qué reading está expandido
-window.readingActivoIndex = null;
-        // LOGIN
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('mainPanel').style.display = 'block';
-                document.getElementById('userDisplay').innerText = user.email;
-                
-                const savedKey = localStorage.getItem("geminiApiKey");
-                const keyInput = document.getElementById('apiKeyInput');
-                if(savedKey && keyInput) keyInput.value = savedKey;
-            }
-        });
+    <script>
+  // Inicializamos preguntas si el módulo no lo hizo
+  if (!window.preguntasTemporales) window.preguntasTemporales = [];
+  window.preguntaEditandoIndex = null;
+  window.readingChildEditIndex = null;
+  window.readingChildParentIndex = null;
+  window.readingExpandedIndex = null;
+  window.readingActivoIndex = null;
+
+  // LOGIN
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('mainPanel').style.display = 'block';
+      document.getElementById('userDisplay').innerText = user.email;
+
+      const savedKey = localStorage.getItem("geminiApiKey");
+      const keyInput = document.getElementById('apiKeyInput');
+      if (savedKey && keyInput) keyInput.value = savedKey;
+    }
+  });
+</script>
         
         window.cerrarSesionCreador = function() {
             auth.signOut().then(() => location.reload());
