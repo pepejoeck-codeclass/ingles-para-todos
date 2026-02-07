@@ -598,6 +598,10 @@
   window.readingActivoIndex = null;
 
   // LOGIN
+ window.cerrarSesionCreador = function() {
+            auth.signOut().then(() => location.reload());
+        }
+       
  (function() {
   window.autenticarCreador = function() {
     const email = document.getElementById('adminEmail').value;
@@ -621,9 +625,6 @@
 })();
 </script>
         
-        window.cerrarSesionCreador = function() {
-            auth.signOut().then(() => location.reload());
-        }
         // FUNCIONES DE UI Y LISTAS (SIN REDUCCIÓN)
         window.actualizarPlaceholder = function() {
             const type = document.getElementById('inputType').value;
@@ -1262,31 +1263,5 @@ window.guardarEnNube = function() {
     document.body.appendChild(script);
   };
 </script>
-
-    <script>
-        (function() {
-            // 1. Activar botón ENTRAR
-            window.autenticarCreador = function() {
-                const email = document.getElementById('adminEmail').value;
-                const pass = document.getElementById('adminPass').value;
-                if(!email || !pass) { Swal.fire("Faltan datos","","warning"); return; }
-                
-                auth.signInWithEmailAndPassword(email, pass)
-                    .catch(() => Swal.fire("Error", "Revisa correo/contraseña", "error"));
-            };
-
-            // 2. Detectar cuando entra el usuario y quitar la pantalla negra
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    document.getElementById('loginOverlay').style.display = 'none';
-                    document.getElementById('mainPanel').style.display = 'block';
-                    document.getElementById('userDisplay').innerText = user.email;
-                    
-                    const savedKey = localStorage.getItem("geminiApiKey");
-                    if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
-                }
-            });
-        })();
-    </script>
 </body>
 </html>
