@@ -13,7 +13,23 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+<script>
+    // 1. INICIALIZACIÓN BLINDADA DE FIREBASE
+    const firebaseConfig = { 
+        apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s", 
+        authDomain: "ingles-pepejoeck.firebaseapp.com", 
+        databaseURL: "https://ingles-pepejoeck-default-rtdb.firebaseio.com", 
+        projectId: "ingles-pepejoeck", 
+        storageBucket: "ingles-pepejoeck.firebasestorage.app", 
+        messagingSenderId: "519995763844", 
+        appId: "1:519995763844:web:350df130a6673b4002a6d1", 
+        measurementId: "G-5MEQGW13ZE" 
+    };
+    // Esto asegura que 'auth' exista SIEMPRE, aunque el resto falle
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+</script>
     <script type="importmap">
       {
         "imports": {
