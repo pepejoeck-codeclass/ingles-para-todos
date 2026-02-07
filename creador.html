@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <script type="importmap">
+  {
+    "imports": {
+      "@google/generative-ai": "https://esm.run/@google/generative-ai"
+    }
+  }
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Creador - MASTER V100 (ULTIMATE SDK)</title>
@@ -30,14 +37,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 </script>
-    <script type="importmap">
-      {
-        "imports": {
-          "@google/generative-ai": "https://esm.run/@google/generative-ai"
-        }
-      }
-    </script>
-
+    
     <style>
         /* --- ESTILOS ORIGINALES COMPLETOS (SIN REDUCCIÓN) --- */
         body { 
