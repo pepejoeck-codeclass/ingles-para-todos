@@ -669,6 +669,7 @@ window.preguntaEditandoIndex = null;
 window.readingChildEditIndex = null; 
 window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
 window.readingExpandedIndex = null; // controla qué reading está expandido
+window.readingActivoIndex = null;
         // LOGIN
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -814,11 +815,12 @@ Each item must be:
     // Limpiamos banderas
     window.readingChildEditIndex = null;
     window.readingChildParentIndex = null;
-
+    window.readingActivoIndex = null;
     Swal.fire("Actualizado", "Pregunta de comprensión modificada.", "success");
 } else {
     // ➕ Estamos CREANDO una nueva pregunta hija
     reading.questions.push(p);
+           Swal.fire("Agregada", "Pregunta añadida al Reading activo.", "success");
 }
    } else {
        // Pregunta normal (no reading)
@@ -906,15 +908,24 @@ li.innerHTML = `
     </div>
 
     <div class="question-a">
-      ❓ Preguntas de comprensión: ${p.count}
-      </div>
+  ❓ Progreso: ${p.questions?.length || 0} / ${p.count}
+</div>
     <div style="font-size:11px; cursor:pointer; color:#2980b9; margin-top:6px;"
      onclick="window.readingExpandedIndex = window.readingExpandedIndex === ${index} ? null : ${index}; window.renderizarListaPreguntas();">
   ${isExpanded ? '🔼 Ocultar preguntas' : '🔽 Ver preguntas'} (${p.questions?.length || 0}/${p.count})
 </div>
 ${window.readingActivoIndex === index ? `
-  <div style="margin-top:6px; font-size:11px; color:green; font-weight:bold;">
-    🟢 Estás creando preguntas para esta lectura
+  <div style="
+    margin-top:8px;
+    padding:6px 10px;
+    background:#e8f8f5;
+    border-left:4px solid #27ae60;
+    font-size:12px;
+    font-weight:bold;
+    color:#145a32;
+    border-radius:6px;
+  ">
+    🟢 Modo activo: las preguntas que agregues se guardarán aquí
   </div>
 ` : ``}
 ${isExpanded ? `
