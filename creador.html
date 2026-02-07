@@ -1263,5 +1263,30 @@ window.guardarEnNube = function() {
     document.body.appendChild(script);
   };
 </script>
+    <script>
+/* LOGIN */
+window.autenticarCreador = function () {
+  const email = document.getElementById('adminEmail').value;
+  const pass = document.getElementById('adminPass').value;
+  if (!email || !pass) {
+    alert("Faltan datos");
+    return;
+  }
+  auth.signInWithEmailAndPassword(email, pass)
+    .catch(() => alert("Error de acceso"));
+};
+
+window.cerrarSesionCreador = function () {
+  auth.signOut();
+};
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('mainPanel').style.display = 'block';
+    document.getElementById('userDisplay').innerText = user.email;
+  }
+});
+</script>
 </body>
 </html>
