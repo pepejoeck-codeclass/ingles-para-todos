@@ -400,7 +400,7 @@
             <p style="font-size:12px;">Ingresa con una cuenta registrada.</p>
             <input type="email" id="adminEmail" placeholder="Correo">
             <input type="password" id="adminPass" placeholder="Contraseña">
-            <button onclick="alert('EL BOTÓN SÍ FUNCIONA')" class="btn-login">ENTRAR</button>
+            <button onclick="autenticarCreador()" class="btn-login">ENTRAR</button>
         </div>
     </div>
 
@@ -1329,5 +1329,25 @@ if (aiStrategySelect && aiManualBox) {
   });
 }
     </script>
+<script>
+/* 🔐 LOGIN AISLADO Y SEGURO — NO DEPENDE DEL RESTO DEL CÓDIGO */
+(function () {
+  window.autenticarCreador = function () {
+    const email = document.getElementById('adminEmail').value;
+    const pass  = document.getElementById('adminPass').value;
+
+    if (!email || !pass) {
+      Swal.fire("Ups", "Faltan datos", "warning");
+      return;
+    }
+
+  auth
+  .signInWithEmailAndPassword(email, pass)
+      .catch(() => {
+        Swal.fire("Error", "Revisa tu correo o contraseña", "error");
+      });
+  };
+})();
+</script>
 </body>
 </html>
