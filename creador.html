@@ -723,11 +723,51 @@ window.generarPreguntasReadingIA = async function () {
   }
 
   const reading = window.preguntasTemporales[window.readingActivoIndex];
+// 🔒 PASO 12.4 — detectar si ya existen preguntas
+let overwriteMode = "replace"; // valor por defecto
 
+if (reading.questions && reading.questions.length > 0) {
+      const decision = await Swal.fire({
+    title: "Este Reading ya tiene preguntas",
+    text: "¿Qué deseas hacer con las preguntas existentes?",
+    icon: "warning",
+    showCancelButton: true,
+    showDenyButton: true,
+    confirmButtonText: "➕ Agregar nuevas",
+    denyButtonText: "🔁 Reemplazar todas",
+    cancelButtonText: "Cancelar"
+  });
+
+  // Si cancela → salimos sin tocar nada
+  if (decision.isDismissed) {
+    return;
+  }
+
+  // Si elige AGREGAR
+  if (decision.isConfirmed) {
+    overwriteMode = "append";
+  }
+
+  // Si elige REEMPLAZAR
+  if (decision.isDenied) {
+    overwriteMode = "replace";
+  }
+}
   if (!reading || !reading.readingText) {
     return Swal.fire("Error", "No se encontró el texto de la lectura.", "error");
   }
+// 🔄 PASO 12.5 — cálculo de preguntas faltantes
+const existentesCount = reading.questions ? reading.questions.length : 0;
+const totalDeseadas = reading.count;
+const faltantes = totalDeseadas - existentesCount;
 
+if (faltantes <= 0) {
+  return Swal.fire(
+    "Completado",
+    "Este Reading ya tiene todas las preguntas necesarias.",
+    "info"
+  );
+}
   const apiKey = document.getElementById('apiKeyInput').value.trim();
   if (!apiKey) {
     return Swal.fire("Falta API Key", "Pega tu API Key primero.", "warning");
@@ -740,7 +780,7 @@ const prompt = `
 You are an expert English teacher creating comprehension questions for an educational app.
 
 TASK:
-Generate EXACTLY ${reading.count} comprehension questions based ONLY on the reading text provided.
+Generate EXACTLY ${faltantes} comprehension questions based ONLY on the reading text provided.
 
 RULES (VERY IMPORTANT):
 - Return ONLY valid JSON.
@@ -764,7 +804,6 @@ ${reading.readingText}
 """
 
 REMEMBER:
-- Output EXACTLY ${reading.count} items.
 - JSON ONLY.
 `;
 
@@ -803,12 +842,45 @@ if (validQuestions.length === 0) {
   throw new Error("La IA no generó preguntas válidas.");
 }
 
-// Asignamos solo preguntas válidas
-reading.questions = validQuestions;
+// --- PASO 12.3: CONTROL DE CANTIDAD ---
+
+const expectedCount = faltantes;
+
+// Si la IA devolvió más preguntas de las pedidas → recortamos
+let finalQuestions = validQuestions.slice(0, expectedCount);
+
+// Si devolvió menos → avisamos (pero NO bloqueamos)
+if (finalQuestions.length < expectedCount) {
+  Swal.fire(
+    "Atención",
+    `La IA generó ${finalQuestions.length} de ${expectedCount} preguntas solicitadas.`,
+    "warning"
+  );
+}
+
+// Asignación segura
+// 🔒 PASO 12.4 — aplicar decisión del creador
+if (overwriteMode === "replace") {
+  reading.questions = finalQuestions;
+} else {
+  // ➕ Agregar sin duplicar preguntas existentes
+  const existentes = new Set(
+    reading.questions.map(q => q.q.trim().toLowerCase())
+  );
+
+  const nuevasFiltradas = finalQuestions.filter(
+    q => !existentes.has(q.q.trim().toLowerCase())
+  );
+
+  reading.questions = reading.questions.concat(nuevasFiltradas);
+}
 window.renderizarListaPreguntas();
 
-Swal.fire("Listo", "Las preguntas fueron generadas correctamente.", "success");
-
+Swal.fire(
+  "Listo",
+  `Preguntas generadas: ${finalQuestions.length}/${expectedCount}`,
+  "success"
+);    
   } catch (e) {
     console.error(e);
     Swal.fire("Error IA", "No se pudieron generar las preguntas.", "error");
