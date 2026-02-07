@@ -736,34 +736,78 @@ window.generarPreguntasReadingIA = async function () {
   const status = document.getElementById('readingIAStatus');
   status.style.display = 'block';
 
-  const prompt = `
-Act as an expert English teacher.
-From the following reading, generate ${reading.count} comprehension questions.
+const prompt = `
+You are an expert English teacher creating comprehension questions for an educational app.
 
-Reading:
+TASK:
+Generate EXACTLY ${reading.count} comprehension questions based ONLY on the reading text provided.
+
+RULES (VERY IMPORTANT):
+- Return ONLY valid JSON.
+- Do NOT include explanations, titles, or extra text.
+- Do NOT use markdown.
+- Do NOT include numbering outside the JSON.
+- Each question must be clear, simple, and appropriate for language learners.
+
+FORMAT:
+Return a JSON array.
+Each item MUST have this structure:
+{
+  "type": "translation",
+  "q": "comprehension question in English",
+  "a": "correct short answer in English"
+}
+
+READING TEXT:
 """
 ${reading.readingText}
 """
 
-Return STRICT JSON ONLY.
-Each item must be:
-{ "type": "translation", "q": "question", "a": "answer" }
+REMEMBER:
+- Output EXACTLY ${reading.count} items.
+- JSON ONLY.
 `;
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const result = await model.generateContent(prompt);
-    let text = await result.response.text();
+   const result = await model.generateContent(prompt);
+let text = await result.response.text();
 
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    const questions = JSON.parse(text);
+// Limpieza básica de formato
+text = text.replace(/```json/g, '').replace(/```/g, '').trim();
 
-    reading.questions = questions;
-    window.renderizarListaPreguntas();
+// Intentamos convertir a JSON
+let parsed;
+try {
+  parsed = JSON.parse(text);
+} catch (e) {
+  throw new Error("La IA no devolvió JSON válido.");
+}
 
-    Swal.fire("Listo", "Las preguntas fueron generadas.", "success");
+// Validación 1: debe ser un array
+if (!Array.isArray(parsed)) {
+  throw new Error("La respuesta IA no es una lista de preguntas.");
+}
+
+// Validación 2: estructura correcta
+const validQuestions = parsed.filter(item =>
+  item &&
+  typeof item.q === "string" &&
+  typeof item.a === "string"
+);
+
+// Validación 3: mínimo una pregunta válida
+if (validQuestions.length === 0) {
+  throw new Error("La IA no generó preguntas válidas.");
+}
+
+// Asignamos solo preguntas válidas
+reading.questions = validQuestions;
+window.renderizarListaPreguntas();
+
+Swal.fire("Listo", "Las preguntas fueron generadas correctamente.", "success");
 
   } catch (e) {
     console.error(e);
