@@ -598,9 +598,9 @@
   window.readingActivoIndex = null;
 
   // LOGIN
- window.cerrarSesionCreador = function() {
-            auth.signOut().then(() => location.reload());
-        }
+window.cerrarSesionCreador = function() {
+    auth.signOut();
+}
        
  (function() {
   window.autenticarCreador = function() {
