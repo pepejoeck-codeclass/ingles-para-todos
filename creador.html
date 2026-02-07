@@ -529,10 +529,21 @@
 
   <label style="margin-top:20px;">❓ Cantidad de preguntas de comprensión:</label>
   <select id="inputReadingCount">
-    <option value="5">5 preguntas</option>
+        <option value="5">5 preguntas</option>
     <option value="10">10 preguntas</option>
     <option value="15">15 preguntas</option>
   </select>
+  <button type="button"
+        onclick="generarPreguntasReadingIA()"
+        style="margin-top:10px; background:#6c5ce7;"
+        class="btn-save">
+  🤖 Generar preguntas con IA
+</button>
+
+    <div id="readingIAStatus"
+     style="font-size:11px; margin-top:6px; color:#555; display:none;">
+  Generando preguntas de comprensión…
+</div>
 
   <div class="helper-text">
     Estas preguntas podrán ser creadas manualmente o por IA.
@@ -657,6 +668,7 @@
 window.preguntaEditandoIndex = null;
 window.readingChildEditIndex = null; 
 window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
+window.readingExpandedIndex = null; // controla qué reading está expandido
         // LOGIN
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -699,8 +711,68 @@ if (type === 'reading_comprehension') {
             else if (type === 'word_search') { q.placeholder = "Instrucción (Ej: Encuentra los colores)"; a.placeholder = "Palabras separadas por coma (Ej: Red,Blue,Green)"; } 
             else { q.placeholder = "Pregunta"; a.placeholder = "Respuesta"; }
         }
+window.generarPreguntasReadingIA = async function () {
 
+  if (window.readingActivoIndex === null) {
+    return Swal.fire(
+      "Selecciona una lectura",
+      "Haz clic en ✏️ del Reading donde quieres generar preguntas.",
+      "info"
+    );
+  }
+
+  const reading = window.preguntasTemporales[window.readingActivoIndex];
+
+  if (!reading || !reading.readingText) {
+    return Swal.fire("Error", "No se encontró el texto de la lectura.", "error");
+  }
+
+  const apiKey = document.getElementById('apiKeyInput').value.trim();
+  if (!apiKey) {
+    return Swal.fire("Falta API Key", "Pega tu API Key primero.", "warning");
+  }
+
+  const status = document.getElementById('readingIAStatus');
+  status.style.display = 'block';
+
+  const prompt = `
+Act as an expert English teacher.
+From the following reading, generate ${reading.count} comprehension questions.
+
+Reading:
+"""
+${reading.readingText}
+"""
+
+Return STRICT JSON ONLY.
+Each item must be:
+{ "type": "translation", "q": "question", "a": "answer" }
+`;
+
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const result = await model.generateContent(prompt);
+    let text = await result.response.text();
+
+    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    const questions = JSON.parse(text);
+
+    reading.questions = questions;
+    window.renderizarListaPreguntas();
+
+    Swal.fire("Listo", "Las preguntas fueron generadas.", "success");
+
+  } catch (e) {
+    console.error(e);
+    Swal.fire("Error IA", "No se pudieron generar las preguntas.", "error");
+  } finally {
+    status.style.display = 'none';
+  }
+};
         window.agregarPreguntaLista = function() {
+   
                 const type = document.getElementById('inputType').value;
 
     // === MODO READING ===
@@ -811,6 +883,7 @@ window.readingActivoIndex = null;
         const li = document.createElement('li');
         li.style.listStyle = "none";
 if (p.type === 'reading_comprehension') {
+const isExpanded = window.readingExpandedIndex === index;
 li.innerHTML = `
   <div class="question-card" data-type="reading_comprehension">
 
@@ -834,36 +907,40 @@ li.innerHTML = `
 
     <div class="question-a">
       ❓ Preguntas de comprensión: ${p.count}
-${p.questions && p.questions.length ? `
-  <div style="margin-top:8px; padding-left:12px; border-left:3px solid #ddd;">
-    <div style="font-size:11px; font-weight:bold; color:#555; margin-bottom:4px;">
-      📌 Preguntas hijas:
-    </div>
-    <ul style="margin:0; padding-left:16px;">
-      ${p.questions.map((qChild, i) => `
-  <li style="font-size:12px; color:#444; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-    
-    <span>
-      ${i + 1}. ${qChild.q}
-    </span>
-
-    <span style="font-size:11px;">
-  <span onclick="editarPreguntaHija(${index}, ${i})" style="cursor:pointer;">✏️</span>
-  <span onclick="borrarPreguntaHija(${index}, ${i})" style="cursor:pointer; margin-left:6px;">🗑️</span>
-  <span onclick="moverPreguntaHija(${index}, ${i}, -1)" style="cursor:pointer; margin-left:6px;">⬆</span>
-  <span onclick="moverPreguntaHija(${index}, ${i}, 1)" style="cursor:pointer;">⬇</span>
-</span>
-
-  </li>
-`).join('')}
-    </ul>
+      </div>
+    <div style="font-size:11px; cursor:pointer; color:#2980b9; margin-top:6px;"
+     onclick="window.readingExpandedIndex = window.readingExpandedIndex === ${index} ? null : ${index}; window.renderizarListaPreguntas();">
+  ${isExpanded ? '🔼 Ocultar preguntas' : '🔽 Ver preguntas'} (${p.questions?.length || 0}/${p.count})
+</div>
+${window.readingActivoIndex === index ? `
+  <div style="margin-top:6px; font-size:11px; color:green; font-weight:bold;">
+    🟢 Estás creando preguntas para esta lectura
   </div>
-` : `
-  <div style="margin-top:8px; font-size:11px; color:#999; font-style:italic;">
-    (Aún no se han agregado preguntas a esta lectura)
-  </div>
-`}
+` : ``}
+${isExpanded ? `
+  ${p.questions && p.questions.length ? `
+    <div style="margin-top:8px; padding-left:12px; border-left:3px solid #ddd;">
+      <div style="font-size:11px; font-weight:bold; color:#555; margin-bottom:4px;">
+        📌 Preguntas hijas:
+      </div>
+      <ul style="margin:0; padding-left:16px;">
+        ${p.questions.map((qChild, i) => `
+          <li style="font-size:12px; color:#444; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+            <span>
+              ${i + 1}. ${qChild.q}
+            </span>
+            <span style="font-size:11px;">
+              <span onclick="editarPreguntaHija(${index}, ${i})" style="cursor:pointer;">✏️</span>
+              <span onclick="borrarPreguntaHija(${index}, ${i})" style="cursor:pointer; margin-left:6px;">🗑️</span>
+              <span onclick="moverPreguntaHija(${index}, ${i}, -1)" style="cursor:pointer; margin-left:6px;">⬆</span>
+              <span onclick="moverPreguntaHija(${index}, ${i}, 1)" style="cursor:pointer;">⬇</span>
+            </span>
+          </li>
+        `).join('')}
+      </ul>
     </div>
+` : ``}
+      </div>
 
   </div>
 `;
