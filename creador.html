@@ -927,85 +927,37 @@ window.readingActivoIndex = null;
     );
 };
 
-        window.renderizarListaPreguntas = function() {
-    const ul = document.getElementById('listaPreguntasTemp');
-    ul.innerHTML = "";
+        <script>
+window.renderizarListaPreguntas = function () {
+  const ul = document.getElementById('listaPreguntasTemp');
+  ul.innerHTML = "";
 
-    window.preguntasTemporales.forEach((p, index) => {
-        const li = document.createElement('li');
-        li.style.listStyle = "none";
-if (p.type === 'reading_comprehension') {
-const isExpanded = window.readingExpandedIndex === index;
-li.innerHTML = `
-  <div class="question-card" data-type="reading_comprehension">
+  window.preguntasTemporales.forEach((p, index) => {
+    const li = document.createElement('li');
+    li.style.listStyle = "none";
 
-    <div class="question-header">
-    <div class="question-type">
-  📖 ${index + 1}. READING
-</div>
-      <div class="question-actions">
-        <span onclick="moverPregunta(${index}, -1)">⬆</span>
-        <span onclick="moverPregunta(${index}, 1)">⬇</span>
-        <span onclick="editarReading(${index})">✏️</span>
-        <span onclick="duplicarPregunta(${index})">📄</span>
-        <span onclick="borrarPregunta(${index})">🗑️</span>
-      </div>
-    </div>
+    if (p.type === 'reading_comprehension') {
+      li.innerHTML =
+        "<div class='question-card'>" +
+        "<strong>📖 Reading " + (index + 1) + "</strong><br>" +
+        "<small>" + (p.readingText || '').substring(0, 150) + "...</small><br>" +
+        "<em>Preguntas: " + (p.questions ? p.questions.length : 0) + " / " + p.count + "</em>" +
+        "</div>";
+      ul.appendChild(li);
+      return;
+    }
 
-    <div class="question-q">
-      📄 <strong>Lectura:</strong><br>
-      ${(p.readingText || '').substring(0, 200)}...
-    </div>
+    li.innerHTML =
+      "<div class='question-card'>" +
+      "<strong>" + (index + 1) + ". " + p.type + "</strong><br>" +
+      "<div>📝 " + p.q + "</div>" +
+      "<div>✅ " + p.a + "</div>" +
+      "</div>";
 
-    <div class="question-a">
-  ❓ Progreso: ${p.questions?.length || 0} / ${p.count}
-</div>
-    <div style="font-size:11px; cursor:pointer; color:#2980b9; margin-top:6px;"
-     onclick="window.readingExpandedIndex = window.readingExpandedIndex === ${index} ? null : ${index}; window.renderizarListaPreguntas();">
-  ${isExpanded ? '🔼 Ocultar preguntas' : '🔽 Ver preguntas'} (${p.questions?.length || 0}/${p.count})
-</div>
-${window.readingActivoIndex === index ? `
-  <div style="
-    margin-top:8px;
-    padding:6px 10px;
-    background:#e8f8f5;
-    border-left:4px solid #27ae60;
-    font-size:12px;
-    font-weight:bold;
-    color:#145a32;
-    border-radius:6px;
-  ">
-    🟢 Modo activo: las preguntas que agregues se guardarán aquí
-  </div>
-` : ``}
-${isExpanded ? `
-  ${p.questions && p.questions.length ? `
-    <div style="margin-top:8px; padding-left:12px; border-left:3px solid #ddd;">
-      <div style="font-size:11px; font-weight:bold; color:#555; margin-bottom:4px;">
-        📌 Preguntas hijas:
-      </div>
-      <ul style="margin:0; padding-left:16px;">
-        ${p.questions.map((qChild, i) => `
-          <li style="font-size:12px; color:#444; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-            <span>
-              ${i + 1}. ${qChild.q}
-            </span>
-            <span style="font-size:11px;">
-              <span onclick="editarPreguntaHija(${index}, ${i})" style="cursor:pointer;">✏️</span>
-              <span onclick="borrarPreguntaHija(${index}, ${i})" style="cursor:pointer; margin-left:6px;">🗑️</span>
-              <span onclick="moverPreguntaHija(${index}, ${i}, -1)" style="cursor:pointer; margin-left:6px;">⬆</span>
-              <span onclick="moverPreguntaHija(${index}, ${i}, 1)" style="cursor:pointer;">⬇</span>
-            </span>
-          </li>
-        `).join('')}
-      </ul>
-    </div>
-` : ``}
-       </div>
-  </div>
-  `;
-ul.appendChild(li);
-}
+    ul.appendChild(li);
+  });
+};
+</script>
 li.innerHTML = `
   <div class="question-card" data-type="${p.type}">
     <div class="question-header">
