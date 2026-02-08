@@ -13,24 +13,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    // 1. INICIALIZACIÓN BLINDADA DE FIREBASE
-    const firebaseConfig = { 
-        apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s", 
-        authDomain: "ingles-pepejoeck.firebaseapp.com", 
-        databaseURL: "https://ingles-pepejoeck-default-rtdb.firebaseio.com", 
-        projectId: "ingles-pepejoeck", 
-        storageBucket: "ingles-pepejoeck.firebasestorage.app", 
-        messagingSenderId: "519995763844", 
-        appId: "1:519995763844:web:350df130a6673b4002a6d1", 
-        measurementId: "G-5MEQGW13ZE" 
-    };
-    // Esto asegura que 'auth' exista SIEMPRE, aunque el resto falle
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-</script>
-    
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+
     <style>
         /* --- ESTILOS ORIGINALES COMPLETOS (SIN REDUCCIÓN) --- */
         body { 
@@ -538,21 +529,10 @@
 
   <label style="margin-top:20px;">❓ Cantidad de preguntas de comprensión:</label>
   <select id="inputReadingCount">
-        <option value="5">5 preguntas</option>
+    <option value="5">5 preguntas</option>
     <option value="10">10 preguntas</option>
     <option value="15">15 preguntas</option>
   </select>
-  <button type="button"
-        onclick="generarPreguntasReadingIA()"
-        style="margin-top:10px; background:#6c5ce7;"
-        class="btn-save">
-  🤖 Generar preguntas con IA
-</button>
-
-    <div id="readingIAStatus"
-     style="font-size:11px; margin-top:6px; color:#555; display:none;">
-  Generando preguntas de comprensión…
-</div>
 
   <div class="helper-text">
     Estas preguntas podrán ser creadas manualmente o por IA.
@@ -579,54 +559,126 @@
         </div>
 
         <button onclick="guardarEnNube()" class="btn-save">💾 GUARDAR CAMBIOS EN LA NUBE</button>
-    </div>  
-         
-   <script>
-  // Inicializamos preguntas si el módulo no lo hizo
-  if (!window.preguntasTemporales) window.preguntasTemporales = [];
-  window.preguntaEditandoIndex = null;
-  window.readingChildEditIndex = null;
-  window.readingChildParentIndex = null;
-  window.readingExpandedIndex = null;
-  window.readingActivoIndex = null;
-</script>
-<script>
-/* === LOGIN DEFINITIVO Y ESTABLE === */
-document.addEventListener("DOMContentLoaded", function () {
+    </div>
 
-  window.autenticarCreador = function () {
-    const email = document.getElementById('adminEmail').value;
-    const pass  = document.getElementById('adminPass').value;
+    <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
 
-    if (!email || !pass) {
-      Swal.fire("Faltan datos", "", "warning");
-      return;
-    }
+        // Inicializamos las preguntas si no existen, para compartir con el otro script
+        window.preguntasTemporales = window.preguntasTemporales || [];
 
-    auth.signInWithEmailAndPassword(email, pass)
-      .catch(() => {
-        Swal.fire("Error", "Correo o contraseña incorrectos", "error");
-      });
-  };
+        // Función Maestra de IA con SDK Oficial
+        window.generarConIA = async function() {
+            const topic = document.getElementById('aiTopic').value.trim();
+            const count = document.getElementById('aiCount').value;
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
 
-  window.cerrarSesionCreador = function () {
-    auth.signOut();
-  };
+            // Validaciones
+            if(!topic) return Swal.fire("Atención", "Escribe un tema.", "warning");
+            if(!apiKey) return Swal.fire("Falta Llave", "Pega tu API Key en la caja punteada.", "error");
 
-  auth.onAuthStateChanged(function(user) {
-    if (user) {
-      document.getElementById('loginOverlay').style.display = 'none';
-      document.getElementById('mainPanel').style.display = 'block';
-      document.getElementById('userDisplay').innerText = user.email;
-    } else {
-      document.getElementById('loginOverlay').style.display = 'flex';
-      document.getElementById('mainPanel').style.display = 'none';
-    }
-  });
+            // Guardamos la llave para comodidad futura
+            localStorage.setItem("geminiApiKey", apiKey);
 
-});
-</script>
-<script>
+            // UI Loading
+            const btn = document.getElementById('btnGenerarIA');
+            const spinner = document.getElementById('aiSpinner');
+            const status = document.getElementById('aiStatus');
+            
+            btn.disabled = true; 
+            btn.style.opacity = "0.7"; 
+            spinner.style.display = "inline-block";
+            status.textContent = "Conectando con Google Gemini SDK...";
+
+            const prompt = `
+                Act as an expert English teacher developer. I need a JSON response with ${count} questions about "${topic}" for an English learning app.
+                STRICT JSON FORMAT ONLY. No markdown.
+                Structure: { "type": "string", "q": "string", "a": "string", "img": "string" }
+                Use types: translation, dictation, multiple_choice, order_sentence, word_search, drag_drop.
+                For 'multiple_choice', 'a' must be the correct answer.
+                Also generate "content": { "vocab": "...", "help": "...", "grammar": "..." }
+                Final Output Structure: { "questions": [...], "content": { ... } }
+            `;
+
+            try {
+                // INICIALIZACIÓN SDK (La clave del éxito para evitar bloqueos)
+                const genAI = new GoogleGenerativeAI(apiKey);
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                let text = response.text();
+                
+                // Limpieza de formato
+                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const aiResult = JSON.parse(text);
+
+                // Inyección segura de datos
+                if(aiResult.questions) { 
+                    // Usamos variable global window
+                    window.preguntasTemporales = window.preguntasTemporales.concat(aiResult.questions); 
+                    window.renderizarListaPreguntas(); 
+                }
+                if(aiResult.content) {
+                    document.getElementById('inputVocab').value = aiResult.content.vocab || "";
+                    document.getElementById('inputHelp').value = aiResult.content.help || "";
+                    document.getElementById('inputGrammar').value = aiResult.content.grammar || "";
+                }
+
+                status.textContent = "¡Éxito!"; 
+                status.style.color = "green";
+                Swal.fire("¡Listo!", "Contenido generado con SDK Oficial.", "success");
+
+            } catch (error) {
+                console.error("Error SDK:", error);
+                status.textContent = "Error."; 
+                status.style.color = "red";
+                Swal.fire("Error IA", `Fallo en SDK. \n\nPosible causa: API Key bloqueada, región no soportada o cuenta sin verificar. \n\nDetalle: ${error.message}`, "error");
+            } finally {
+                btn.disabled = false; 
+                btn.style.opacity = "1"; 
+                spinner.style.display = "none";
+            }
+        };
+
+        // Asignar el evento click al botón manualmente
+        const btn = document.getElementById('btnGenerarIA');
+        if(btn) btn.addEventListener('click', window.generarConIA);
+    </script>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s", authDomain: "ingles-pepejoeck.firebaseapp.com", databaseURL: "https://ingles-pepejoeck-default-rtdb.firebaseio.com", projectId: "ingles-pepejoeck", storageBucket: "ingles-pepejoeck.firebasestorage.app", messagingSenderId: "519995763844", appId: "1:519995763844:web:350df130a6673b4002a6d1", measurementId: "G-5MEQGW13ZE" };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Inicializamos preguntas si el módulo no lo hizo
+        if (!window.preguntasTemporales) window.preguntasTemporales = [];
+window.preguntaEditandoIndex = null;
+        // LOGIN
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainPanel').style.display = 'block';
+                document.getElementById('userDisplay').innerText = user.email;
+                
+                const savedKey = localStorage.getItem("geminiApiKey");
+                const keyInput = document.getElementById('apiKeyInput');
+                if(savedKey && keyInput) keyInput.value = savedKey;
+            }
+        });
+
+        window.autenticarCreador = function() {
+            const e = document.getElementById('adminEmail').value;
+            const p = document.getElementById('adminPass').value;
+            if(!e || !p) return Swal.fire("Ups", "Faltan datos", "warning");
+            auth.signInWithEmailAndPassword(e, p).catch(error => Swal.fire("Error", "Revisa datos", "error"));
+        }
+        
+        window.cerrarSesionCreador = function() {
+            auth.signOut().then(() => location.reload());
+        }
+
         // FUNCIONES DE UI Y LISTAS (SIN REDUCCIÓN)
         window.actualizarPlaceholder = function() {
             const type = document.getElementById('inputType').value;
@@ -645,184 +697,1057 @@ if (type === 'reading_comprehension') {
             else if (type === 'word_search') { q.placeholder = "Instrucción (Ej: Encuentra los colores)"; a.placeholder = "Palabras separadas por coma (Ej: Red,Blue,Green)"; } 
             else { q.placeholder = "Pregunta"; a.placeholder = "Respuesta"; }
         }
-window.generarPreguntasReadingIA = async function () {
-await window.cargarGeminiSDK();
-  if (window.readingActivoIndex === null) {
-    return Swal.fire(
-      "Selecciona una lectura",
-      "Haz clic en ✏️ del Reading donde quieres generar preguntas.",
-      "info"
-    );
-  }
 
-  const reading = window.preguntasTemporales[window.readingActivoIndex];
-// 🔒 PASO 12.4 — detectar si ya existen preguntas
-let overwriteMode = "replace"; // valor por defecto
-
-if (reading.questions && reading.questions.length > 0) {
-      const decision = await Swal.fire({
-    title: "Este Reading ya tiene preguntas",
-    text: "¿Qué deseas hacer con las preguntas existentes?",
-    icon: "warning",
-    showCancelButton: true,
-    showDenyButton: true,
-    confirmButtonText: "➕ Agregar nuevas",
-    denyButtonText: "🔁 Reemplazar todas",
-    cancelButtonText: "Cancelar"
-  });
-
-  // Si cancela → salimos sin tocar nada
-  if (decision.isDismissed) {
-    return;
-  }
-
-  // Si elige AGREGAR
-  if (decision.isConfirmed) {
-    overwriteMode = "append";
-  }
-
-  // Si elige REEMPLAZAR
-  if (decision.isDenied) {
-    overwriteMode = "replace";
-  }
-}
-  if (!reading || !reading.readingText) {
-    return Swal.fire("Error", "No se encontró el texto de la lectura.", "error");
-  }
-// 🔄 PASO 12.5 — cálculo de preguntas faltantes
-const existentesCount = reading.questions ? reading.questions.length : 0;
-const totalDeseadas = reading.count;
-const faltantes = totalDeseadas - existentesCount;
-
-if (faltantes <= 0) {
-  return Swal.fire(
-    "Completado",
-    "Este Reading ya tiene todas las preguntas necesarias.",
-    "info"
-  );
-}
-  const apiKey = document.getElementById('apiKeyInput').value.trim();
-  if (!apiKey) {
-    return Swal.fire("Falta API Key", "Pega tu API Key primero.", "warning");
-  }
-
-  const status = document.getElementById('readingIAStatus');
-  status.style.display = 'block';
-
-const prompt = `
-You are an expert English teacher creating comprehension questions for an educational app.
-
-TASK:
-Generate EXACTLY ${faltantes} comprehension questions based ONLY on the reading text provided.
-
-RULES (VERY IMPORTANT):
-- Return ONLY valid JSON.
-- Do NOT include explanations, titles, or extra text.
-- Do NOT use markdown.
-- Do NOT include numbering outside the JSON.
-- Each question must be clear, simple, and appropriate for language learners.
-
-FORMAT:
-Return a JSON array.
-Each item MUST have this structure:
-{
-  "type": "translation",
-  "q": "comprehension question in English",
-  "a": "correct short answer in English"
-}
-
-READING TEXT:
-"""
-${reading.readingText}
-"""
-
-REMEMBER:
-- JSON ONLY.
-`;
-
-  try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-   const result = await model.generateContent(prompt);
-let text = await result.response.text();
-
-// Limpieza básica de formato
-text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-
-// Intentamos convertir a JSON
-let parsed;
-try {
-  parsed = JSON.parse(text);
-} catch (e) {
-  throw new Error("La IA no devolvió JSON válido.");
-}
-
-// Validación 1: debe ser un array
-if (!Array.isArray(parsed)) {
-  throw new Error("La respuesta IA no es una lista de preguntas.");
-}
-
-// Validación 2: estructura correcta
-const validQuestions = parsed.filter(item =>
-  item &&
-  typeof item.q === "string" &&
-  typeof item.a === "string"
-);
-
-// Validación 3: mínimo una pregunta válida
-if (validQuestions.length === 0) {
-  throw new Error("La IA no generó preguntas válidas.");
-}
-
-// --- PASO 12.3: CONTROL DE CANTIDAD ---
-
-const expectedCount = faltantes;
-
-// Si la IA devolvió más preguntas de las pedidas → recortamos
-let finalQuestions = validQuestions.slice(0, expectedCount);
-
-// Si devolvió menos → avisamos (pero NO bloqueamos)
-if (finalQuestions.length < expectedCount) {
-  Swal.fire(
-    "Atención",
-    `La IA generó ${finalQuestions.length} de ${expectedCount} preguntas solicitadas.`,
-    "warning"
-  );
-}
-
-// Asignación segura
-// 🔒 PASO 12.4 — aplicar decisión del creador
-if (overwriteMode === "replace") {
-  reading.questions = finalQuestions;
-} else {
-  // ➕ Agregar sin duplicar preguntas existentes
-  const existentes = new Set(
-    reading.questions.map(q => q.q.trim().toLowerCase())
-  );
-
-  const nuevasFiltradas = finalQuestions.filter(
-    q => !existentes.has(q.q.trim().toLowerCase())
-  );
-
-  reading.questions = reading.questions.concat(nuevasFiltradas);
-}
-window.renderizarListaPreguntas();
-
-Swal.fire(
-  "Listo",
-  `Preguntas generadas: ${finalQuestions.length}/${expectedCount}`,
-  "success"
-);    
-  } catch (e) {
-    console.error(e);
-    Swal.fire("Error IA", "No se pudieron generar las preguntas.", "error");
-  } finally {
-    status.style.display = 'none';
-  }
-};
         window.agregarPreguntaLista = function() {
-   
+                const type = document.getElementById('inputType').value;
+
+    // === MODO READING ===
+    if (type === 'reading_comprehension') {
+        window.guardarReading();
+        return; // ⛔ cortamos aquí, no sigue la lógica normal
+    }
+            const q = document.getElementById('inputQ').value.trim(); 
+            const a = document.getElementById('inputA').value.trim(); 
+            const img = document.getElementById('inputImg').value.trim(); 
+                        
+            if(!q || !a) return Swal.fire("Faltan datos", "", "warning");
+            
+            const p = { type, q, a }; 
+            if(type==='drag_drop' && img) p.img=img;
+            
+           if (window.preguntaEditandoIndex !== null) {
+    // Modo edición
+    window.preguntasTemporales[window.preguntaEditandoIndex] = p;
+    window.preguntaEditandoIndex = null;
+    window.readingEditandoIndex = null;
+    window.readingActivoIndex = null;
+} else {
+
+   // ¿Estamos dentro de un Reading?
+   if (window.readingActivoIndex !== null) {
+       const reading = window.preguntasTemporales[window.readingActivoIndex];
+
+       // Seguridad profesional
+       if (!reading.questions) reading.questions = [];
+
+       reading.questions.push(p);
+   } else {
+       // Pregunta normal (no reading)
+       window.preguntasTemporales.push(p);
+   }
+
+}
+
+window.renderizarListaPreguntas();         
+            document.getElementById('inputQ').value=''; 
+            document.getElementById('inputA').value=''; 
+            document.getElementById('inputImg').value='';
+        }
+// === PASO 6: GUARDAR READING + QUESTIONS ===
+window.guardarReading = function() {
+
+    const readingText = document.getElementById('inputReadingText').value.trim();
+    const count = document.getElementById('inputReadingCount').value;
+
+    if (!readingText) {
+        return Swal.fire(
+            "Falta la lectura",
+            "Escribe el texto de la lectura antes de continuar.",
+            "warning"
+        );
+    }
+
+    const readingObj = {
+        type: "reading_comprehension",
+        readingText: readingText,
+        audio: null,          // aquí luego conectamos tu audio
+        questions: [],        // aquí irán las preguntas
+        count: parseInt(count)
+    };
+
+    if (window.readingEditandoIndex !== null) {
+        // Modo edición
+        window.preguntasTemporales[window.readingEditandoIndex] = readingObj;
+        window.readingEditandoIndex = null;
+    } else {
+        // Modo creación
+        window.preguntasTemporales.push(readingObj);
+    }
+
+    window.renderizarListaPreguntas();
+
+    // Limpieza visual
+    document.getElementById('inputReadingText').value = "";
+window.readingActivoIndex = null;
+    Swal.fire(
+        "Reading guardado",
+        "La lectura fue guardada correctamente.",
+        "success"
+    );
+};
+
+        window.renderizarListaPreguntas = function() {
+    const ul = document.getElementById('listaPreguntasTemp');
+    ul.innerHTML = "";
+
+    window.preguntasTemporales.forEach((p, index) => {
+        const li = document.createElement('li');
+        li.style.listStyle = "none";
+if (p.type === 'reading_comprehension') {
+li.innerHTML = `
+  <div class="question-card" data-type="reading_comprehension">
+
+    <div class="question-header">
+    <div class="question-type">
+  📖 ${index + 1}. READING
+</div>
+      <div class="question-actions">
+        <span onclick="moverPregunta(${index}, -1)">⬆</span>
+        <span onclick="moverPregunta(${index}, 1)">⬇</span>
+        <span onclick="editarReading(${index})">✏️</span>
+        <span onclick="duplicarPregunta(${index})">📄</span>
+        <span onclick="borrarPregunta(${index})">🗑️</span>
+      </div>
+    </div>
+
+    <div class="question-q">
+      📄 <strong>Lectura:</strong><br>
+      ${(p.readingText || '').substring(0, 200)}...
+    </div>
+
+    <div class="question-a">
+      ❓ Preguntas de comprensión: ${p.count}
+${p.questions && p.questions.length ? `
+  <div style="margin-top:8px; padding-left:12px; border-left:3px solid #ddd;">
+    <div style="font-size:11px; font-weight:bold; color:#555; margin-bottom:4px;">
+      📌 Preguntas hijas:
+    </div>
+    <ul style="margin:0; padding-left:16px;">
+      ${p.questions.map((qChild, i) => `
+  <li style="font-size:12px; color:#444; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+    
+    <span>
+      ${i + 1}. ${qChild.q}
+    </span>
+
+    <span style="font-size:11px;">
+      ✏️ 🗑️
+    </span>
+
+  </li>
+`).join('')}
+    </ul>
+  </div>
+` : `
+  <div style="margin-top:8px; font-size:11px; color:#999; font-style:italic;">
+    (Aún no se han agregado preguntas a esta lectura)
+  </div>
+`}
+    </div>
+
+  </div>
+`;
+     ul.appendChild(li);
+return;
+}
+li.innerHTML = `
+  <div class="question-card" data-type="${p.type}">
+    <div class="question-header">
+      <div class="question-type">
+        ${index + 1}. ${p.type.toUpperCase()}
+      </div>
+      <div class="question-actions">
+        <span onclick="moverPregunta(${index}, -1)">⬆</span>
+        <span onclick="moverPregunta(${index}, 1)">⬇</span>
+        <span onclick="editarPregunta(${index})">✏️</span>
+        <span onclick="duplicarPregunta(${index})">📄</span>
+        <span onclick="borrarPregunta(${index})">🗑️</span>
+      </div>
+    </div>
+
+    <div class="question-q">📝 ${p.q}</div>
+    <div class="question-a">✅ ${p.a}</div>
+  </div>
+`;
+ul.appendChild(li);
+            });
+};
+      // === MEJORA G: MOVER, DUPLICAR Y BORRAR PREGUNTAS ===
+
+window.moverPregunta = function(index, direccion) {
+    const nuevoIndex = index + direccion;
+
+    if (nuevoIndex < 0 || nuevoIndex >= window.preguntasTemporales.length) return;
+
+    const temp = window.preguntasTemporales[index];
+    window.preguntasTemporales[index] = window.preguntasTemporales[nuevoIndex];
+    window.preguntasTemporales[nuevoIndex] = temp;
+
+    window.renderizarListaPreguntas();
+};
+       window.borrarPregunta = function(index) {
+    Swal.fire({
+        title: '¿Eliminar pregunta?',
+        text: 'Esta acción no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#c0392b',
+        cancelButtonColor: '#7f8c8d',
+        confirmButtonText: 'Sí, borrar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.preguntasTemporales.splice(index, 1);
+            window.renderizarListaPreguntas();
+            Swal.fire('Eliminada', 'La pregunta fue eliminada.', 'success');
+        }
+    });
+};
+window.duplicarPregunta = function(index) {
+    const copia = JSON.parse(JSON.stringify(window.preguntasTemporales[index]));
+    window.preguntasTemporales.splice(index + 1, 0, copia);
+    window.renderizarListaPreguntas();
+};
+window.editarPregunta = function(index) {
+    const p = window.preguntasTemporales[index];
+
+    // Guardamos qué pregunta se está editando
+    window.preguntaEditandoIndex = index;
+
+    // Cargamos datos al formulario
+    document.getElementById('inputType').value = p.type;
+    document.getElementById('inputQ').value = p.q;
+    document.getElementById('inputA').value = p.a;
+    document.getElementById('inputImg').value = p.img || "";
+
+    // Ajustamos placeholders según tipo
+    window.actualizarPlaceholder();
+
+    // Feedback visual
+    Swal.fire(
+        'Modo edición',
+        'Edita la pregunta y pulsa "Agregar Pregunta" para guardar cambios.',
+        'info'
+    );
+};
+        // === PASO 9: EDITAR READING EXISTENTE ===
+window.editarReading = function(index) {
+    const p = window.preguntasTemporales[index];
+
+    // Seguridad: solo si es reading
+    if (p.type !== 'reading_comprehension') return;
+
+    // Guardamos índice de edición
+    window.readingEditandoIndex = index;
+    window.preguntaEditandoIndex = null;
+    window.readingActivoIndex = index;
+
+    // Forzamos selector a Reading
+    document.getElementById('inputType').value = 'reading_comprehension';
+    window.actualizarPlaceholder(); // muestra el bloque reading
+
+    // Cargamos datos al formulario
+    document.getElementById('inputReadingText').value = p.readingText || '';
+    document.getElementById('inputReadingCount').value = p.count || 5;
+
+    // Feedback visual claro
+    Swal.fire(
+        'Editando Reading',
+        'Modifica la lectura y guarda para aplicar cambios.',
+        'info'
+    );
+};
+        window.agregarSiguienteNivel = function() { 
+            const s=document.getElementById('inputLevel'); 
+            let m=0; 
+            for(let i=0;i<s.options.length;i++) if(parseInt(s.options[i].value)>m) m=parseInt(s.options[i].value); 
+            const n=m+1; 
+            s.add(new Option("Nivel "+n, n)); 
+            s.value=n; 
+            Swal.fire("Nivel Creado", "", "info"); 
+        }
+
+        // --- FUNCIÓN DE EDICIÓN VITAL (RESTAURADA E INTACTA) ---
+        window.cargarLeccionExistente = async function() {
+            const nivel = document.getElementById('inputLevel').value;
+            let rawId = document.getElementById('inputLessonId').value.trim();
+            const lessonId = rawId.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
+
+            if (!lessonId) return Swal.fire("Error", "Falta escribir el ID", "warning");
+
+            try {
+                const doc = await db.collection('contenido_curso').doc(`nivel_${nivel}`).get();
+                if (doc.exists && doc.data()[lessonId]) {
+                    const leccion = doc.data()[lessonId];
+                    // Recuperar Título
+                    document.getElementById('inputLessonTitle').value = leccion.title || "";
+                    // Recuperar Contenidos
+                    if (leccion.content) {
+                        document.getElementById('inputVocab').value = leccion.content.vocab || "";
+                        document.getElementById('inputHelp').value = leccion.content.help || "";
+                        document.getElementById('inputGrammar').value = leccion.content.grammar || "";
+                    }
+                    // Recuperar Preguntas
+                    if (leccion.questions) {
+                        window.preguntasTemporales = leccion.questions;
+                        window.renderizarListaPreguntas();
+                    }
+                    Swal.fire("Cargado", "Listo para editar.", "success");
+                } else { 
+                    Swal.fire("No encontrado", "No existe ese ID en este nivel.", "info"); 
+                }
+            } catch (error) { 
+                console.error(error);
+                Swal.fire("Error", "Fallo de conexión con Firebase.", "error"); 
+            }
+        }
+
+        // --- FUNCIÓN DE GUARDADO (INTACTA) ---
+        window.guardarEnNube = function() {
+            const u=auth.currentUser; if(!u) return Swal.fire("Seguridad","Inicia sesión primero","error");
+            
+            const lvl=document.getElementById('inputLevel').value; 
+            const id=document.getElementById('inputLessonId').value.trim(); 
+            const tit=document.getElementById('inputLessonTitle').value.trim();
+            
+            if(!id || !tit || window.preguntasTemporales.length===0) return Swal.fire("Incompleto","Faltan datos obligatorios","error");
+            
+            const data = { 
+                id, title:tit, 
+                questions:window.preguntasTemporales, 
+                content:{
+                    vocab:document.getElementById('inputVocab').value, 
+                    help:document.getElementById('inputHelp').value, 
+                    grammar:document.getElementById('inputGrammar').value
+                } 
+            };
+            
+            db.collection('contenido_curso').doc(`nivel_${lvl}`).set({[id]:data}, {merge:true})
+                .then(()=>Swal.fire("¡Guardado!","","success"))
+                .catch(()=>Swal.fire("Error","","error"));
+        }
+        // === PASO 5: Mostrar / Ocultar modo manual ===
+const aiStrategySelect = document.getElementById('aiStrategy');
+const aiManualBox = document.getElementById('aiManualBox');
+
+if (aiStrategySelect && aiManualBox) {
+  aiStrategySelect.addEventListener('change', () => {
+    if (aiStrategySelect.value === 'manual') {
+      aiManualBox.style.display = 'block';
+    } else {
+      aiManualBox.style.display = 'none';
+    }
+  });
+}
+    </script>
+</body>
+</html>
+
+MODO CREADOR FUNCIONANDO SIN PASO 11 COMPLETO SE BORRO EL PUTO CHAT 2/5/2026 10:45PM 
+ 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Creador - MASTER V100 (ULTIMATE SDK)</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+
+    <style>
+        /* --- ESTILOS ORIGINALES COMPLETOS (SIN REDUCCIÓN) --- */
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            background: #2c3e50; 
+            color: white; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: stretch;
+            min-height: 100vh; 
+        }
+        
+        #loginOverlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.9); 
+            z-index: 999; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column; 
+        }
+        
+        .login-box { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            text-align: center; 
+            color: #333; 
+            width: 300px; 
+        }
+        
+        .creator-card { 
+            background: white; 
+            color: #333; 
+            padding: 30px; 
+            border-radius: 20px; 
+            width: 100%; 
+            max-width: 1200px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
+            display: none; 
+        }
+        
+        h2 { 
+            color: #004e92; 
+            text-align: center; 
+            margin-top: 0; 
+        }
+        
+        h3 { 
+            color: #e67e22; 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 10px; 
+            margin-top: 30px; 
+        }
+        
+        label { 
+            font-weight: bold; 
+            display: block; 
+            margin-top: 15px; 
+            color: #004e92; 
+        }
+        
+        input, select, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            margin-top: 5px; 
+            border: 2px solid #ddd; 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            font-family: 'Nunito'; 
+        }
+        
+        textarea { 
+            resize: vertical; 
+            min-height: 80px; 
+        }
+        
+        .btn-save { 
+            background: #27ae60; 
+            color: white; 
+            width: 100%; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 50px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 30px; 
+            transition: 0.3s; 
+        }
+        
+        .btn-save:hover { 
+            background: #2ecc71; 
+            transform: scale(1.02); 
+        }
+        
+        .preview-box { 
+            background: #f0f8ff; 
+            padding: 10px; 
+            border-radius: 10px; 
+            margin-top: 20px; 
+            border: 1px dashed #004e92; 
+            font-size: 12px; 
+        }
+        
+        .btn-login { 
+            background: #004e92; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-weight: bold; 
+            margin-top: 10px; 
+        }
+        
+        .helper-text { 
+            font-size: 11px; 
+            color: #777; 
+            margin-top: 2px; 
+        }
+        
+        .section-box { 
+            background: #f9f9f9; 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin-top: 10px; 
+            border: 1px solid #eee; 
+        }
+        
+        .level-control { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+        }
+        
+        .btn-add-level { 
+            background: #8e44ad; 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            padding: 10px; 
+            white-space: nowrap; 
+        }
+        
+        .search-container { 
+            display: flex; 
+            gap: 5px; 
+            align-items: flex-end; 
+        }
+        
+        .btn-load { 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            padding: 10px; 
+        }
+        
+        /* ESTILOS DEL CEREBRO IA (BRILLANTE) */
+        .ai-box { 
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb); 
+            border: 2px solid #2196f3; 
+            animation: glow 3s infinite alternate; 
+        }
+        
+        @keyframes glow { 
+            from { box-shadow: 0 0 10px #2196f3; } 
+            to { box-shadow: 0 0 20px #2196f3; } 
+        }
+        
+        .btn-ai { 
+            background: linear-gradient(45deg, #2196f3, #9c27b0); 
+            color: white; 
+            width: 100%; 
+            padding: 15px; 
+            border-radius: 50px; 
+            font-weight: 800; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin-top: 10px; 
+            transition: 0.3s; 
+        }
+        
+        .btn-ai:hover { 
+            transform: scale(1.03); 
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4); 
+        }
+        
+        .loading-spinner { 
+            display: inline-block; 
+            width: 20px; 
+            height: 20px; 
+            border: 3px solid rgba(255,255,255,.3); 
+            border-radius: 50%; 
+            border-top-color: #fff; 
+            animation: spin 1s ease-in-out infinite; 
+            margin-right: 10px; 
+            display: none; 
+        }
+        
+        @keyframes spin { 
+            to { transform: rotate(360deg); } 
+        }
+        
+        /* CAJA SEGURA PARA API KEY */
+        .api-input { 
+            background: white; 
+            border: 2px dashed #9c27b0; 
+            color: #333; 
+            font-weight: bold; 
+            text-align: center; 
+            font-family: monospace; 
+        }
+    /* === DASHBOARD DE PREGUNTAS (PANEL CREADOR) === */
+/* === MEJORA F: SCROLL INTERNO PROFESIONAL === */
+
+.preview-box {
+    max-height: 320px;        /* Altura controlada */
+    overflow-y: auto;         /* Scroll vertical */
+    padding-right: 6px;       /* Espacio para scrollbar */
+}
+
+/* Scroll elegante (Chrome, Edge, Brave) */
+.preview-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.preview-box::-webkit-scrollbar-track {
+    background: #eef3f7;
+    border-radius: 10px;
+}
+
+.preview-box::-webkit-scrollbar-thumb {
+    background: #b0c4de;
+    border-radius: 10px;
+}
+
+.preview-box::-webkit-scrollbar-thumb:hover {
+    background: #8aaad6;
+}
+.question-type {
+    display: inline-block;
+    background: #2c7be5;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+}
+.question-q {
+    font-weight: bold;
+    color: #333;
+    margin: 6px 0;
+}
+
+.question-a {
+    color: #555;
+    font-size: 12px;
+}
+
+.question-delete {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #c0392b;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+    /* === CORRECCIÓN VISUAL DE LISTA DE PREGUNTAS === */
+.preview-box,
+.preview-box ul,
+.preview-box li {
+    color: #333;
+}
+/* === MEJORA C: JERARQUÍA VISUAL PROFESIONAL === */
+        /* === MEJORA H: COLORES POR TIPO DE PREGUNTA === */
+/* === MEJORA G: ACCIONES DE TARJETA === */
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.question-actions span {
+    margin-left: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    opacity: 0.75;
+}
+
+.question-actions span:last-child {
+    color: #c0392b;
+}
+
+.question-actions span:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+.question-card[data-type="translation"] {
+    border-left-color: #2196f3;
+}
+
+.question-card[data-type="dictation"] {
+    border-left-color: #9c27b0;
+}
+
+.question-card[data-type="drag_drop"] {
+    border-left-color: #2ecc71;
+}
+
+.question-card[data-type="order_sentence"] {
+    border-left-color: #f39c12;
+}
+
+.question-card[data-type="multiple_choice"] {
+    border-left-color: #7f8c8d;
+}
+
+.question-card[data-type="word_search"] {
+    border-left-color: #16a085;
+}
+/* === MEJORA G: ACCIONES RÁPIDAS === */
+.question-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+    border-left: 6px solid #2c7be5;
+}
+
+.question-q {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2933;
+    margin-bottom: 6px;
+}
+
+.question-a {
+    font-size: 13px;
+    color: #2e7d32;
+    background: #f1f8f4;
+    padding: 6px 10px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 6px;
+}
+
+.question-delete {
+    font-size: 11px;
+    color: #c0392b;
+    margin-top: 6px;
+}
+    </style>
+</head>
+<body>
+
+    <div id="loginOverlay">
+        <div class="login-box">
+            <h3 style="color:#004e92;">🔐 Acceso Creador</h3>
+            <p style="font-size:12px;">Ingresa con una cuenta registrada.</p>
+            <input type="email" id="adminEmail" placeholder="Correo">
+            <input type="password" id="adminPass" placeholder="Contraseña">
+            <button onclick="autenticarCreador()" class="btn-login">ENTRAR</button>
+        </div>
+    </div>
+
+    <div id="mainPanel" class="creator-card">
+        <div style="display:flex; justify-content:flex-end;">
+            <button onclick="cerrarSesionCreador()" style="background:#c0392b; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Cerrar Sesión</button>
+        </div>
+        
+        <h2>🛠️ Panel de Creador V100</h2>
+        <p style="text-align: center; font-size: 14px; color: #666; margin-bottom: 20px;">Conectado como: <span id="userDisplay" style="color:green; font-weight:bold;">...</span></p>
+        
+        <div class="section-box ai-box">
+            <label style="color:#0d47a1;">🧠 Generador IA (Google SDK Oficial)</label>
+            <p style="font-size:12px; color:#555; margin-top:0;">1. Pega tu API Key de Google AI Studio. 2. Tema. 3. Generar.</p>
+            
+            <input type="password" id="apiKeyInput" class="api-input" placeholder="🔑 PEGA TU API KEY AQUÍ">
+            
+            <input type="text" id="aiTopic" placeholder="Tema (Ej: Animales, Colores, Verbos...)">
+            
+           <div style="display:flex; gap:10px;">
+  <select id="aiCount" style="width:120px;">
+    <option value="10" selected>10 Preguntas</option>
+    <option value="20">20 Preguntas</option>
+    <option value="30">30 Preguntas</option>
+    <option value="40">40 Preguntas</option>
+    <option value="50">50 Preguntas</option>
+    <option value="60">60 Preguntas</option>
+    <option value="70">70 Preguntas</option>
+    <option value="80">80 Preguntas</option>
+    <option value="90">90 Preguntas</option>
+    <option value="100">100 Preguntas</option>
+  </select>
+</div>
+   <div style="margin-top:10px;">
+  <label style="font-size:12px; color:#0d47a1;">
+    Tipo de generación:
+  </label>
+  <select id="aiMode" style="width:100%; margin-top:5px;">
+    <option value="lesson" selected>Lección normal</option>
+    <option value="exam">Examen final de nivel</option>
+  </select>
+</div>
+<div style="margin-top:10px;">
+  <label style="font-size:12px; color:#0d47a1;">
+    Modo de generación:
+  </label>
+  <select id="aiStrategy" style="width:100%; margin-top:5px;">
+    <option value="ai" selected>IA decide (mezcla automática)</option>
+    <option value="manual">Yo decido (control general)</option>
+  </select>
+</div>
+<div id="aiManualBox" style="display:none; margin-top:10px; padding:10px; border:1px dashed #9c27b0; border-radius:10px;">
+  <p style="font-size:12px; color:#555; margin:0;">
+    🔧 Modo manual activado.  
+    En el siguiente paso podrás definir cómo se distribuyen los tipos de preguntas.
+  </p>
+</div>
+             
+                <button id="btnGenerarIA" type="button" class="btn-ai">
+                    <div id="aiSpinner" class="loading-spinner"></div>
+                    ✨ GENERAR LECCIÓN
+                </button>
+            </div>
+            <div id="aiStatus" style="font-size:11px; color:#0d47a1; margin-top:5px; text-align:center; font-weight:bold;"></div>
+        </div>
+
+        <div class="section-box">
+            <label>1. Nivel (Selecciona o Añade):</label>
+            <div class="level-control">
+                <select id="inputLevel">
+                    <option value="1">Nivel 1</option>
+                    <option value="2">Nivel 2</option>
+                    <option value="3">Nivel 3</option>
+                    <option value="4">Nivel 4</option>
+                </select>
+                <button onclick="agregarSiguienteNivel()" class="btn-add-level" title="Crear Nivel Superior">➕ Añadir Nivel</button>
+            </div>
+
+            <label>2. ID Único de la Lección (Para Editar o Crear):</label>
+            <div class="search-container">
+                <input type="text" id="inputLessonId" placeholder="Ej: leccion_zoologico_1">
+                <button onclick="cargarLeccionExistente()" class="btn-load" title="Buscar y Editar">🔍 Cargar</button>
+            </div>
+            <div class="helper-text">Escribe el ID y dale a la lupa para EDITAR una lección existente.</div>
+            
+            <label>3. Título de la Lección:</label>
+            <input type="text" id="inputLessonTitle" placeholder="Ej: Lesson 5: The Zoo 🦁">
+        </div>
+
+        <h3>📚 Contenido Educativo (Botones Index)</h3>
+        <p style="font-size:12px; color:#555;">Esto llenará los botones Vocabulary, Ayuda y Grammar del index.</p>
+        <div class="section-box wide-section" style="background: #e8f6f3;">
+            <label>📖 Contenido para "Vocabulary":</label>
+            <textarea id="inputVocab" placeholder="Ej:&#10;Cat - Gato&#10;Dog - Perro"></textarea>
+            
+            <label>📝 Contenido para "Ayuda/Help" (Instrucción):</label>
+            <textarea id="inputHelp" placeholder="Ej: En esta lección aprenderás animales. Escucha con atención."></textarea>
+            
+            <label>✒️ Contenido para "Grammar":</label>
+            <textarea id="inputGrammar" placeholder="Ej: Usamos 'It is a...' para animales singulares."></textarea>
+        </div>
+
+        <h3>⚡ Preguntas del Juego (Manual)</h3>
+        <div class="section-box wide-section">
+            <label>Tipo:</label>
+            <select id="inputType" onchange="actualizarPlaceholder()">
+                <option value="translation">Traducción (Texto)</option>
+                <option value="dictation">Dictado (Audio)</option>
+                <option value="drag_drop">Arrastrar (Drag & Drop) 🖼️</option>
+                <option value="multiple_choice">Opción Múltiple (3 Opciones) 🔘</option>
+                <option value="order_sentence">Ordenar Frase (Scramble) 🧩</option>
+                <option value="word_search">Sopa de Letras 🔎</option>
+                <option value="reading_comprehension">📖 Reading + Questions</option>
+            </select>
+            <!-- === BLOQUE READING + QUESTIONS (PASO 2) === -->
+<div id="readingBlock" style="display:none; margin-top:20px;">
+
+  <hr style="margin:20px 0;">
+
+  <label>📖 Texto de la Lectura:</label>
+  <textarea id="inputReadingText" placeholder="Escribe aquí la lectura completa..."></textarea>
+
+  <button type="button" class="btn-save" style="background:#8e44ad; margin-top:10px;">
+    🔊 Generar / Escuchar Audio de la Lectura
+  </button>
+
+  <label style="margin-top:20px;">❓ Cantidad de preguntas de comprensión:</label>
+  <select id="inputReadingCount">
+    <option value="5">5 preguntas</option>
+    <option value="10">10 preguntas</option>
+    <option value="15">15 preguntas</option>
+  </select>
+
+  <div class="helper-text">
+    Estas preguntas podrán ser creadas manualmente o por IA.
+  </div>
+
+</div>
+<!-- === FIN BLOQUE READING === -->
+            <label id="lblPregunta">Pregunta / Texto (o Instrucción):</label>
+            <input type="text" id="inputQ" placeholder="Ej: ¿Cómo se dice Gato?">
+
+            <label id="lblRespuesta">Respuesta Correcta (Inglés):</label>
+            <input type="text" id="inputA" placeholder="Ej: cat">
+            
+            <label>Link de Imagen (Solo para Drag & Drop):</label>
+            <input type="text" id="inputImg" placeholder="https://cdn-icons-png.flaticon.com/512/616/616430.png">
+            <div class="helper-text">Pega aquí la URL de la imagen (solo si aplica).</div>
+
+            <button onclick="agregarPreguntaLista()" class="btn-save" style="background:#3498db; margin-top:10px; font-size:14px; padding: 10px;">➕ Agregar Pregunta</button>
+        </div>
+
+        <div class="preview-box wide-section">
+            <strong>Preguntas agregadas (Manuales + IA):</strong>
+            <ul id="listaPreguntasTemp" style="padding-left: 20px;"></ul>
+        </div>
+
+        <button onclick="guardarEnNube()" class="btn-save">💾 GUARDAR CAMBIOS EN LA NUBE</button>
+    </div>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
+
+        // Inicializamos las preguntas si no existen, para compartir con el otro script
+        window.preguntasTemporales = window.preguntasTemporales || [];
+
+        // Función Maestra de IA con SDK Oficial
+        window.generarConIA = async function() {
+            const topic = document.getElementById('aiTopic').value.trim();
+            const count = document.getElementById('aiCount').value;
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+
+            // Validaciones
+            if(!topic) return Swal.fire("Atención", "Escribe un tema.", "warning");
+            if(!apiKey) return Swal.fire("Falta Llave", "Pega tu API Key en la caja punteada.", "error");
+
+            // Guardamos la llave para comodidad futura
+            localStorage.setItem("geminiApiKey", apiKey);
+
+            // UI Loading
+            const btn = document.getElementById('btnGenerarIA');
+            const spinner = document.getElementById('aiSpinner');
+            const status = document.getElementById('aiStatus');
+            
+            btn.disabled = true; 
+            btn.style.opacity = "0.7"; 
+            spinner.style.display = "inline-block";
+            status.textContent = "Conectando con Google Gemini SDK...";
+
+            const prompt = `
+                Act as an expert English teacher developer. I need a JSON response with ${count} questions about "${topic}" for an English learning app.
+                STRICT JSON FORMAT ONLY. No markdown.
+                Structure: { "type": "string", "q": "string", "a": "string", "img": "string" }
+                Use types: translation, dictation, multiple_choice, order_sentence, word_search, drag_drop.
+                For 'multiple_choice', 'a' must be the correct answer.
+                Also generate "content": { "vocab": "...", "help": "...", "grammar": "..." }
+                Final Output Structure: { "questions": [...], "content": { ... } }
+            `;
+
+            try {
+                // INICIALIZACIÓN SDK (La clave del éxito para evitar bloqueos)
+                const genAI = new GoogleGenerativeAI(apiKey);
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                let text = response.text();
+                
+                // Limpieza de formato
+                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const aiResult = JSON.parse(text);
+
+                // Inyección segura de datos
+                if(aiResult.questions) { 
+                    // Usamos variable global window
+                    window.preguntasTemporales = window.preguntasTemporales.concat(aiResult.questions); 
+                    window.renderizarListaPreguntas(); 
+                }
+                if(aiResult.content) {
+                    document.getElementById('inputVocab').value = aiResult.content.vocab || "";
+                    document.getElementById('inputHelp').value = aiResult.content.help || "";
+                    document.getElementById('inputGrammar').value = aiResult.content.grammar || "";
+                }
+
+                status.textContent = "¡Éxito!"; 
+                status.style.color = "green";
+                Swal.fire("¡Listo!", "Contenido generado con SDK Oficial.", "success");
+
+            } catch (error) {
+                console.error("Error SDK:", error);
+                status.textContent = "Error."; 
+                status.style.color = "red";
+                Swal.fire("Error IA", `Fallo en SDK. \n\nPosible causa: API Key bloqueada, región no soportada o cuenta sin verificar. \n\nDetalle: ${error.message}`, "error");
+            } finally {
+                btn.disabled = false; 
+                btn.style.opacity = "1"; 
+                spinner.style.display = "none";
+            }
+        };
+
+        // Asignar el evento click al botón manualmente
+        const btn = document.getElementById('btnGenerarIA');
+        if(btn) btn.addEventListener('click', window.generarConIA);
+    </script>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s", authDomain: "ingles-pepejoeck.firebaseapp.com", databaseURL: "https://ingles-pepejoeck-default-rtdb.firebaseio.com", projectId: "ingles-pepejoeck", storageBucket: "ingles-pepejoeck.firebasestorage.app", messagingSenderId: "519995763844", appId: "1:519995763844:web:350df130a6673b4002a6d1", measurementId: "G-5MEQGW13ZE" };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Inicializamos preguntas si el módulo no lo hizo
+        if (!window.preguntasTemporales) window.preguntasTemporales = [];
+window.preguntaEditandoIndex = null;
+window.readingChildEditIndex = null; 
+window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
+        // LOGIN
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainPanel').style.display = 'block';
+                document.getElementById('userDisplay').innerText = user.email;
+                
+                const savedKey = localStorage.getItem("geminiApiKey");
+                const keyInput = document.getElementById('apiKeyInput');
+                if(savedKey && keyInput) keyInput.value = savedKey;
+            }
+        });
+
+        window.autenticarCreador = function() {
+            const e = document.getElementById('adminEmail').value;
+            const p = document.getElementById('adminPass').value;
+            if(!e || !p) return Swal.fire("Ups", "Faltan datos", "warning");
+            auth.signInWithEmailAndPassword(e, p).catch(error => Swal.fire("Error", "Revisa datos", "error"));
+        }
+        
+        window.cerrarSesionCreador = function() {
+            auth.signOut().then(() => location.reload());
+        }
+
+        // FUNCIONES DE UI Y LISTAS (SIN REDUCCIÓN)
+        window.actualizarPlaceholder = function() {
+            const type = document.getElementById('inputType').value;
+            // === MOSTRAR / OCULTAR BLOQUE READING ===
+const readingBlock = document.getElementById('readingBlock');
+if (type === 'reading_comprehension') {
+    readingBlock.style.display = 'block';
+} else {
+    readingBlock.style.display = 'none';
+}
+            const q = document.getElementById('inputQ'); 
+            const a = document.getElementById('inputA');
+            
+            if(type === 'order_sentence') { q.placeholder = "Instrucción (Ej: Ordena la frase)"; a.placeholder = "Frase COMPLETA (Ej: My name is Pepe)"; } 
+            else if (type === 'multiple_choice') { q.placeholder = "Pregunta (Ej: What color is the sun?)"; a.placeholder = "Respuesta Correcta (Ej: Yellow)"; } 
+            else if (type === 'word_search') { q.placeholder = "Instrucción (Ej: Encuentra los colores)"; a.placeholder = "Palabras separadas por coma (Ej: Red,Blue,Green)"; } 
+            else { q.placeholder = "Pregunta"; a.placeholder = "Respuesta"; }
+        }
+
+        window.agregarPreguntaLista = function() {
                 const type = document.getElementById('inputType').value;
 
     // === MODO READING ===
@@ -864,12 +1789,11 @@ Swal.fire(
     // Limpiamos banderas
     window.readingChildEditIndex = null;
     window.readingChildParentIndex = null;
-    window.readingActivoIndex = null;
+
     Swal.fire("Actualizado", "Pregunta de comprensión modificada.", "success");
 } else {
     // ➕ Estamos CREANDO una nueva pregunta hija
     reading.questions.push(p);
-           Swal.fire("Agregada", "Pregunta añadida al Reading activo.", "success");
 }
    } else {
        // Pregunta normal (no reading)
@@ -926,36 +1850,73 @@ window.readingActivoIndex = null;
     );
 };
 
-window.renderizarListaPreguntas = function () {
-  const ul = document.getElementById('listaPreguntasTemp');
-  ul.innerHTML = "";
+        window.renderizarListaPreguntas = function() {
+    const ul = document.getElementById('listaPreguntasTemp');
+    ul.innerHTML = "";
 
-  window.preguntasTemporales.forEach((p, index) => {
-    const li = document.createElement('li');
-    li.style.listStyle = "none";
+    window.preguntasTemporales.forEach((p, index) => {
+        const li = document.createElement('li');
+        li.style.listStyle = "none";
+if (p.type === 'reading_comprehension') {
+li.innerHTML = `
+  <div class="question-card" data-type="reading_comprehension">
 
-    if (p.type === 'reading_comprehension') {
-      li.innerHTML =
-        "<div class='question-card'>" +
-        "<strong>📖 Reading " + (index + 1) + "</strong><br>" +
-        "<small>" + (p.readingText || '').substring(0, 150) + "...</small><br>" +
-        "<em>Preguntas: " + (p.questions ? p.questions.length : 0) + " / " + p.count + "</em>" +
-        "</div>";
-      ul.appendChild(li);
-      return;
-    }
+    <div class="question-header">
+    <div class="question-type">
+  📖 ${index + 1}. READING
+</div>
+      <div class="question-actions">
+        <span onclick="moverPregunta(${index}, -1)">⬆</span>
+        <span onclick="moverPregunta(${index}, 1)">⬇</span>
+        <span onclick="editarReading(${index})">✏️</span>
+        <span onclick="duplicarPregunta(${index})">📄</span>
+        <span onclick="borrarPregunta(${index})">🗑️</span>
+      </div>
+    </div>
 
-    li.innerHTML =
-      "<div class='question-card'>" +
-      "<strong>" + (index + 1) + ". " + p.type + "</strong><br>" +
-      "<div>📝 " + p.q + "</div>" +
-      "<div>✅ " + p.a + "</div>" +
-      "</div>";
+    <div class="question-q">
+      📄 <strong>Lectura:</strong><br>
+      ${(p.readingText || '').substring(0, 200)}...
+    </div>
 
-    ul.appendChild(li);
-  });
-};
-</script>
+    <div class="question-a">
+      ❓ Preguntas de comprensión: ${p.count}
+${p.questions && p.questions.length ? `
+  <div style="margin-top:8px; padding-left:12px; border-left:3px solid #ddd;">
+    <div style="font-size:11px; font-weight:bold; color:#555; margin-bottom:4px;">
+      📌 Preguntas hijas:
+    </div>
+    <ul style="margin:0; padding-left:16px;">
+      ${p.questions.map((qChild, i) => `
+  <li style="font-size:12px; color:#444; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+    
+    <span>
+      ${i + 1}. ${qChild.q}
+    </span>
+
+    <span style="font-size:11px;">
+  <span onclick="editarPreguntaHija(${index}, ${i})" style="cursor:pointer;">✏️</span>
+  <span onclick="borrarPreguntaHija(${index}, ${i})" style="cursor:pointer; margin-left:6px;">🗑️</span>
+  <span onclick="moverPreguntaHija(${index}, ${i}, -1)" style="cursor:pointer; margin-left:6px;">⬆</span>
+  <span onclick="moverPreguntaHija(${index}, ${i}, 1)" style="cursor:pointer;">⬇</span>
+</span>
+
+  </li>
+`).join('')}
+    </ul>
+  </div>
+` : `
+  <div style="margin-top:8px; font-size:11px; color:#999; font-style:italic;">
+    (Aún no se han agregado preguntas a esta lectura)
+  </div>
+`}
+    </div>
+
+  </div>
+`;
+     ul.appendChild(li);
+return;
+}
 li.innerHTML = `
   <div class="question-card" data-type="${p.type}">
     <div class="question-header">
@@ -1161,58 +2122,42 @@ window.moverPreguntaHija = function(parentIndex, childIndex, direction) {
         }
 
         // --- FUNCIÓN DE GUARDADO (INTACTA) ---
-window.guardarEnNube = function() {
-            const u = auth.currentUser;
-            if (!u) { Swal.fire("Seguridad", "Inicia sesión primero", "error"); return; }
+        window.guardarEnNube = function() {
+            const u=auth.currentUser; if(!u) return Swal.fire("Seguridad","Inicia sesión primero","error");
             
-            const lvl = document.getElementById('inputLevel').value;
-            const id = document.getElementById('inputLessonId').value.trim();
-            const tit = document.getElementById('inputLessonTitle').value.trim();
+            const lvl=document.getElementById('inputLevel').value; 
+            const id=document.getElementById('inputLessonId').value.trim(); 
+            const tit=document.getElementById('inputLessonTitle').value.trim();
             
-            if (!id || !tit || window.preguntasTemporales.length === 0) {
-                Swal.fire("Incompleto", "Faltan datos (ID, Título o Preguntas)", "error");
-                return;
-            }
+            if(!id || !tit || window.preguntasTemporales.length===0) return Swal.fire("Incompleto","Faltan datos obligatorios","error");
             
-            const data = {
-                id: id, title: tit, questions: window.preguntasTemporales,
-                content: {
-                    vocab: document.getElementById('inputVocab').value,
-                    help: document.getElementById('inputHelp').value,
-                    grammar: document.getElementById('inputGrammar').value
-                }
+            const data = { 
+                id, title:tit, 
+                questions:window.preguntasTemporales, 
+                content:{
+                    vocab:document.getElementById('inputVocab').value, 
+                    help:document.getElementById('inputHelp').value, 
+                    grammar:document.getElementById('inputGrammar').value
+                } 
             };
             
-            db.collection('contenido_curso').doc(`nivel_${lvl}`).set({[id]: data}, {merge: true})
-                .then(() => Swal.fire("¡Guardado!", "Lección guardada correctamente", "success"))
-                .catch(e => { console.error(e); Swal.fire("Error", "No se guardó", "error"); });
-        };
-
-        // Evento para el modo manual
-        const aiStrategySelect = document.getElementById('aiStrategy');
-        const aiManualBox = document.getElementById('aiManualBox');
-        if (aiStrategySelect && aiManualBox) {
-            aiStrategySelect.addEventListener('change', () => {
-                aiManualBox.style.display = (aiStrategySelect.value === 'manual') ? 'block' : 'none';
-            });
+            db.collection('contenido_curso').doc(`nivel_${lvl}`).set({[id]:data}, {merge:true})
+                .then(()=>Swal.fire("¡Guardado!","","success"))
+                .catch(()=>Swal.fire("Error","","error"));
         }
-    </script>
+        // === PASO 5: Mostrar / Ocultar modo manual ===
+const aiStrategySelect = document.getElementById('aiStrategy');
+const aiManualBox = document.getElementById('aiManualBox');
 
-  <script>
-window.cargarGeminiSDK = async function () {
-  if (window._geminiLoaded) return;
-
-  return new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/@google/generative-ai/dist/browser.bundle.min.js";
-    script.onload = () => {
-      window._geminiLoaded = true;
-      resolve();
-    };
-    script.onerror = reject;
-    document.body.appendChild(script);
+if (aiStrategySelect && aiManualBox) {
+  aiStrategySelect.addEventListener('change', () => {
+    if (aiStrategySelect.value === 'manual') {
+      aiManualBox.style.display = 'block';
+    } else {
+      aiManualBox.style.display = 'none';
+    }
   });
-};
-</script>
- </body>
+}
+    </script>
+</body>
 </html>
