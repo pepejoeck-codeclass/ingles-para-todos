@@ -597,32 +597,41 @@
   window.readingExpandedIndex = null;
   window.readingActivoIndex = null;
 
-  // LOGIN
-window.cerrarSesionCreador = function() {
-    auth.signOut();
-}
-       
- (function() {
-  window.autenticarCreador = function() {
+ <script>
+/* === LOGIN DEFINITIVO Y ESTABLE === */
+document.addEventListener("DOMContentLoaded", function () {
+
+  window.autenticarCreador = function () {
     const email = document.getElementById('adminEmail').value;
-    const pass = document.getElementById('adminPass').value;
-    if(!email || !pass) { Swal.fire("Faltan datos","","warning"); return; }
-    
+    const pass  = document.getElementById('adminPass').value;
+
+    if (!email || !pass) {
+      Swal.fire("Faltan datos", "", "warning");
+      return;
+    }
+
     auth.signInWithEmailAndPassword(email, pass)
-      .catch(() => Swal.fire("Error", "Revisa correo/contraseña", "error"));
+      .catch(() => {
+        Swal.fire("Error", "Correo o contraseña incorrectos", "error");
+      });
   };
 
-  auth.onAuthStateChanged(user => {
+  window.cerrarSesionCreador = function () {
+    auth.signOut();
+  };
+
+  auth.onAuthStateChanged(function(user) {
     if (user) {
       document.getElementById('loginOverlay').style.display = 'none';
       document.getElementById('mainPanel').style.display = 'block';
       document.getElementById('userDisplay').innerText = user.email;
-
-      const savedKey = localStorage.getItem("geminiApiKey");
-      if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
+    } else {
+      document.getElementById('loginOverlay').style.display = 'flex';
+      document.getElementById('mainPanel').style.display = 'none';
     }
   });
-})();
+
+});
 </script>
 <script>
         // FUNCIONES DE UI Y LISTAS (SIN REDUCCIÓN)
