@@ -780,6 +780,9 @@ document.getElementById('contadorReadingMax').textContent = max;
 } else {
     // ➕ Estamos CREANDO una nueva pregunta hija
     reading.questions.push(p);
+           // 🔢 Actualizar contador visual
+document.getElementById('contadorReadingActual').textContent =
+  reading.questions.length;
 }
    } else {
        // Pregunta normal (no reading)
