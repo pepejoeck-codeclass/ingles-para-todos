@@ -715,8 +715,14 @@ window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
 const readingBlock = document.getElementById('readingBlock');
 if (type === 'reading_comprehension') {
     readingBlock.style.display = 'block';
+    document.getElementById('blindajeReading').style.display = 'block';
+document.getElementById('contadorReadingActual').textContent = '0';
+
+const max = document.getElementById('inputReadingCount').value;
+document.getElementById('contadorReadingMax').textContent = max;
 } else {
     readingBlock.style.display = 'none';
+    document.getElementById('blindajeReading').style.display = 'none';
 }
             const q = document.getElementById('inputQ'); 
             const a = document.getElementById('inputA');
