@@ -531,6 +531,20 @@
 
 </div>
 <!-- === FIN BLINDAJE VISUAL === -->
+    <!-- === PASO 11.3 CONFIRMACIÓN DE LECTURA COMPLETA === -->
+<div id="readingCompletoMsg" style="
+  display:none;
+  background:#eafaf1;
+  border:2px solid #2ecc71;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:15px;
+  font-size:13px;
+  color:#145a32;
+">
+  ✅ Ya completaste todas las preguntas de esta lectura.
+</div>
+<!-- === FIN CONFIRMACIÓN === -->
         <div class="section-box wide-section">
             <label>Tipo:</label>
             <select id="inputType" onchange="actualizarPlaceholder()">
@@ -779,10 +793,18 @@ document.getElementById('contadorReadingMax').textContent = max;
     Swal.fire("Actualizado", "Pregunta de comprensión modificada.", "success");
 } else {
     // ➕ Estamos CREANDO una nueva pregunta hija
+           if (reading.questions.length >= reading.count) {
+    Swal.fire(
+        "Lectura completa",
+        "Esta lectura ya tiene todas sus preguntas. Si continúas, se excederá el límite.",
+        "info"
+    );
+}
     reading.questions.push(p);
            // 🔢 Actualizar contador visual
 document.getElementById('contadorReadingActual').textContent =
   reading.questions.length;
+ window.verificarLecturaCompleta();
 }
    } else {
        // Pregunta normal (no reading)
@@ -839,7 +861,7 @@ window.readingActivoIndex = null;
     );
 };
 
-        window.renderizarListaPreguntas = function() {
+        window.renderizarListaPreguntas = function() {   
     const ul = document.getElementById('listaPreguntasTemp');
     ul.innerHTML = "";
 
@@ -927,6 +949,25 @@ li.innerHTML = `
 `;
 ul.appendChild(li);
             });
+};
+        // === PASO 11.3: VERIFICAR LECTURA COMPLETA ===
+window.verificarLecturaCompleta = function() {
+    if (window.readingActivoIndex === null) return;
+
+    const reading = window.preguntasTemporales[window.readingActivoIndex];
+    if (!reading || !reading.questions) return;
+
+    const actual = reading.questions.length;
+    const max = reading.count;
+
+    const msg = document.getElementById('readingCompletoMsg');
+    if (!msg) return;
+
+    if (actual >= max) {
+        msg.style.display = 'block';
+    } else {
+        msg.style.display = 'none';
+    }
 };
       // === MEJORA G: MOVER, DUPLICAR Y BORRAR PREGUNTAS ===
 
