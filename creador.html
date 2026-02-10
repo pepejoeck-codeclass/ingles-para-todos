@@ -723,29 +723,46 @@ window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
         }
 
         // FUNCIONES DE UI Y LISTAS (SIN REDUCCIÓN)
-        window.actualizarPlaceholder = function() {
-            const type = document.getElementById('inputType').value;
-            // === MOSTRAR / OCULTAR BLOQUE READING ===
-const readingBlock = document.getElementById('readingBlock');
-if (type === 'reading_comprehension') {
-    readingBlock.style.display = 'block';
-    document.getElementById('blindajeReading').style.display = 'block';
-document.getElementById('contadorReadingActual').textContent = '0';
+        // === FUNCIÓN VISUAL CORREGIDA (Mantiene el Panel Azul visible) ===
+window.actualizarPlaceholder = function() {
+    const type = document.getElementById('inputType').value;
+    const readingBlock = document.getElementById('readingBlock');
+    const blindaje = document.getElementById('blindajeReading');
 
-const max = document.getElementById('inputReadingCount').value;
-document.getElementById('contadorReadingMax').textContent = max;
-} else {
-    readingBlock.style.display = 'none';
-    document.getElementById('blindajeReading').style.display = 'none';
-}
-            const q = document.getElementById('inputQ'); 
-            const a = document.getElementById('inputA');
-            
-            if(type === 'order_sentence') { q.placeholder = "Instrucción (Ej: Ordena la frase)"; a.placeholder = "Frase COMPLETA (Ej: My name is Pepe)"; } 
-            else if (type === 'multiple_choice') { q.placeholder = "Pregunta (Ej: What color is the sun?)"; a.placeholder = "Respuesta Correcta (Ej: Yellow)"; } 
-            else if (type === 'word_search') { q.placeholder = "Instrucción (Ej: Encuentra los colores)"; a.placeholder = "Palabras separadas por coma (Ej: Red,Blue,Green)"; } 
-            else { q.placeholder = "Pregunta"; a.placeholder = "Respuesta"; }
+    // 1. La caja de texto grande solo se ve en modo 'reading_comprehension'
+    if (type === 'reading_comprehension') {
+        readingBlock.style.display = 'block';
+    } else {
+        readingBlock.style.display = 'none';
+    }
+
+    // 2. LÓGICA EXPERTA: El Panel Azul se ve si es Reading O SI HAY UNA LECTURA ACTIVA
+    // Esta es la línea que arregla que no desaparezca el contador
+    if (type === 'reading_comprehension' || window.readingActivoIndex !== null) {
+        blindaje.style.display = 'block';
+        
+        // Refrescamos los números visuales
+        if (window.readingActivoIndex !== null) {
+             const r = window.preguntasTemporales[window.readingActivoIndex];
+             // Seguridad extra por si r no existe aún
+             if (r) {
+                 document.getElementById('contadorReadingActual').textContent = r.questions.length;
+                 document.getElementById('contadorReadingMax').textContent = r.count;
+             }
         }
+    } else {
+        blindaje.style.display = 'none';
+    }
+
+    // 3. Textos de ayuda (Placeholders)
+    const q = document.getElementById('inputQ');
+    const a = document.getElementById('inputA');
+    
+    if(type === 'order_sentence') { q.placeholder = "Instrucción (Ej: Ordena la frase)"; a.placeholder = "Frase COMPLETA (Ej: My name is Pepe)"; } 
+    else if (type === 'multiple_choice') { q.placeholder = "Pregunta (Ej: What color is the sun?)"; a.placeholder = "Respuesta Correcta (Ej: Yellow)"; } 
+    else if (type === 'word_search') { q.placeholder = "Instrucción (Ej: Encuentra los colores)"; a.placeholder = "Palabras separadas por coma (Ej: Red,Blue,Green)"; } 
+    else { q.placeholder = "Pregunta"; a.placeholder = "Respuesta"; }
+};
 
         window.agregarPreguntaLista = function() {
                 const type = document.getElementById('inputType').value;
