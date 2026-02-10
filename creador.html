@@ -818,16 +818,18 @@ window.renderizarListaPreguntas();
             document.getElementById('inputA').value=''; 
             document.getElementById('inputImg').value='';
         }
-// === PASO 6: GUARDAR READING + QUESTIONS (CORREGIDO FINAL) ===
+// === PASO 6: GUARDAR READING + QUESTIONS (VERSIÓN CORREGIDA FINAL) ===
 window.guardarReading = function() {
 
     const readingText = document.getElementById('inputReadingText').value.trim();
     const count = document.getElementById('inputReadingCount').value;
 
+    // 1. Validación básica
     if (!readingText) {
         return Swal.fire("Falta la lectura", "Escribe el texto antes de continuar.", "warning");
     }
 
+    // 2. Crear objeto Reading
     const readingObj = {
         type: "reading_comprehension",
         readingText: readingText,
@@ -836,33 +838,39 @@ window.guardarReading = function() {
         count: parseInt(count)
     };
 
-    // --- AQUÍ ESTÁ LA CLAVE QUE FALTABA EN TU FOTO ---
+    // 3. Lógica de Guardado y ACTIVACIÓN
     if (window.readingEditandoIndex !== null) {
+        // MODO EDICIÓN
         window.preguntasTemporales[window.readingEditandoIndex] = readingObj;
-        // 1. Mantenemos activa la lectura que editamos
-        window.readingActivoIndex = window.readingEditandoIndex; 
+        window.readingActivoIndex = window.readingEditandoIndex; // Mantiene el foco
         window.readingEditandoIndex = null;
     } else {
+        // MODO CREACIÓN
         window.preguntasTemporales.push(readingObj);
-        // 2. ¡ACTIVAMOS LA NUEVA LECTURA! (Esto faltaba en tu línea 849)
+        
+        // 👇 ESTA ES LA LÍNEA QUE FALTABA EN TU FOTO 👇
+        // Activa la lectura nueva (la última de la lista)
         window.readingActivoIndex = window.preguntasTemporales.length - 1;
     }
 
+    // 4. Actualizar lista visual
     window.renderizarListaPreguntas();
 
-    // --- TRANSICIÓN VISUAL OBLIGATORIA ---
-    document.getElementById('inputReadingText').value = "";
-
-    // 3. CAMBIAMOS EL SELECTOR AUTOMÁTICAMENTE (Esto faltaba en tu línea 855)
-    // Esto evita el error "Falta la lectura" al agregar preguntas después
+    // 5. Transición Visual Automática (Magia UX)
+    document.getElementById('inputReadingText').value = ""; // Limpia texto
+    
+    // 👇 ESTA LÍNEA TAMBIÉN FALTABA 👇
+    // Cambia el selector a preguntas normales para que no te pida lectura de nuevo
     document.getElementById('inputType').value = 'translation';
-    window.actualizarPlaceholder();
+    
+    window.actualizarPlaceholder(); // Oculta la caja grande
 
+    // 6. Confirmación
     Swal.fire({
-        title: "Lectura Activa",
-        text: "El sistema ya espera las preguntas. Mira el contador arriba.",
+        title: "¡Lectura Activa! 🟢", 
+        text: "Mira el contador azul (0/" + count + "). Agrega las preguntas ahora.",
         icon: "success",
-        timer: 2000
+        timer: 3000
     });
 };
 
