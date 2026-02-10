@@ -764,77 +764,78 @@ window.actualizarPlaceholder = function() {
     else { q.placeholder = "Pregunta"; a.placeholder = "Respuesta"; }
 };
 
-        window.agregarPreguntaLista = function() {
-                const type = document.getElementById('inputType').value;
+        // === FUNCIÓN CORREGIDA: AGREGAR PREGUNTA (FLUJO DE UN SOLO CLICK) ===
+window.agregarPreguntaLista = function() {
+    // 1. Usamos 'let' para poder cambiar el tipo dinámicamente si es necesario
+    let type = document.getElementById('inputType').value;
 
-    // === MODO READING ===
+    // === MODO READING DETECTADO ===
     if (type === 'reading_comprehension') {
+        // A. Guardamos la estructura del Reading (Texto grande)
+        // El sistema guardará y activará la lectura internamente
         window.guardarReading();
-        return; // ⛔ cortamos aquí, no sigue la lógica normal
+        
+        // B. TRUCO DE EXPERTA: NO hacemos 'return'. 
+        // Cambiamos el tipo a 'translation' virtualmente para que el código
+        // siga bajando y guarde la pregunta pequeña AHORA MISMO.
+        type = 'translation'; 
     }
-            const q = document.getElementById('inputQ').value.trim(); 
-            const a = document.getElementById('inputA').value.trim(); 
-            const img = document.getElementById('inputImg').value.trim(); 
-                        
-            if(!q || !a) return Swal.fire("Faltan datos", "", "warning");
+
+    // 2. Recogemos los datos de la pregunta pequeña
+    const q = document.getElementById('inputQ').value.trim(); 
+    const a = document.getElementById('inputA').value.trim(); 
+    const img = document.getElementById('inputImg').value.trim(); 
             
-            const p = { type, q, a }; 
-            if(type==='drag_drop' && img) p.img=img;
-            
-           if (window.preguntaEditandoIndex !== null) {
-    // Modo edición
-    window.preguntasTemporales[window.preguntaEditandoIndex] = p;
-    window.preguntaEditandoIndex = null;
-    window.readingEditandoIndex = null;
-    window.readingActivoIndex = null;
-} else {
+    // Validación de seguridad
+    if(!q || !a) return Swal.fire("Faltan datos", "Escribe la pregunta y respuesta", "warning");
+    
+    const p = { type, q, a }; 
+    if(type === 'drag_drop' && img) p.img = img;
+    
+    // 3. Lógica de Inserción (Intacta)
+    if (window.preguntaEditandoIndex !== null) {
+        // Modo edición de pregunta suelta
+        window.preguntasTemporales[window.preguntaEditandoIndex] = p;
+        window.preguntaEditandoIndex = null;
+        window.readingEditandoIndex = null;
+        window.readingActivoIndex = null;
+    } else {
+        // ¿Estamos dentro de un Reading activo?
+        if (window.readingActivoIndex !== null) {
+            const reading = window.preguntasTemporales[window.readingActivoIndex];
 
-   // ¿Estamos dentro de un Reading?
-   if (window.readingActivoIndex !== null) {
-       const reading = window.preguntasTemporales[window.readingActivoIndex];
+            // Aseguramos que el array de preguntas exista
+            if (!reading.questions) reading.questions = [];
 
-       // Seguridad profesional
-       if (!reading.questions) reading.questions = [];
-
-       if (
-    window.readingChildEditIndex !== null &&
-    window.readingChildParentIndex === window.readingActivoIndex
-) {
-    // ✏️ Estamos EDITANDO una pregunta hija existente
-    reading.questions[window.readingChildEditIndex] = p;
-
-    // Limpiamos banderas
-    window.readingChildEditIndex = null;
-    window.readingChildParentIndex = null;
-
-    Swal.fire("Actualizado", "Pregunta de comprensión modificada.", "success");
-} else {
-    // ➕ Estamos CREANDO una nueva pregunta hija
-           if (reading.questions.length >= reading.count) {
-    Swal.fire(
-        "Lectura completa",
-        "Esta lectura ya tiene todas sus preguntas. Si continúas, se excederá el límite.",
-        "info"
-    );
-}
-    reading.questions.push(p);
-           // 🔢 Actualizar contador visual
-document.getElementById('contadorReadingActual').textContent =
-  reading.questions.length;
- window.verificarLecturaCompleta();
-}
-   } else {
-       // Pregunta normal (no reading)
-       window.preguntasTemporales.push(p);
-   }
-
-}
-
-window.renderizarListaPreguntas();         
-            document.getElementById('inputQ').value=''; 
-            document.getElementById('inputA').value=''; 
-            document.getElementById('inputImg').value='';
+            if (window.readingChildEditIndex !== null && window.readingChildParentIndex === window.readingActivoIndex) {
+                // Editando una pregunta hija existente
+                reading.questions[window.readingChildEditIndex] = p;
+                window.readingChildEditIndex = null;
+                window.readingChildParentIndex = null;
+                Swal.fire("Actualizado", "Pregunta modificada.", "success");
+            } else {
+                // Creando hija nueva (AQUÍ ENTRA AUTOMÁTICAMENTE AHORA)
+                if (reading.questions.length >= reading.count) {
+                    return Swal.fire("Límite alcanzado", "Ya completaste las preguntas de esta lectura.", "info");
+                }
+                reading.questions.push(p);
+                
+                // Actualizar contadores visuales inmediatamente
+                window.actualizarPlaceholder(); 
+            }
+        } else {
+            // Pregunta normal suelta (no reading)
+            window.preguntasTemporales.push(p);
         }
+    }
+
+    // 4. Finalizar: Renderizar y limpiar inputs pequeños
+    window.renderizarListaPreguntas();          
+    document.getElementById('inputQ').value = ''; 
+    document.getElementById('inputA').value = ''; 
+    document.getElementById('inputImg').value = '';
+};
+
 // === PASO 6: GUARDAR READING + QUESTIONS (VERSIÓN CORREGIDA FINAL) ===
 window.guardarReading = function() {
 
