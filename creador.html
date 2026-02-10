@@ -767,80 +767,71 @@ window.actualizarPlaceholder = function() {
 
        // === FUNCIÓN CORREGIDA: AGREGAR PREGUNTA (FLUJO INTELIGENTE DE UN SOLO CLICK) ===
 window.agregarPreguntaLista = function() {
-    // 1. Capturamos el tipo actual
+    // 1. Usamos 'let' para cambiar el tipo dinámicamente
     let type = document.getElementById('inputType').value;
 
-    // === SOLUCIÓN MAESTRA (ONE-CLICK FLOW) ===
+    // === SOLUCIÓN MAESTRA: DETECCIÓN INTELIGENTE ===
     if (type === 'reading_comprehension') {
-        // A. Guardamos la lectura madre. Si falla (ej: campo vacío), frenamos todo.
+        // A. Guardamos la lectura. Si falla (vacío), nos detenemos.
         if (window.guardarReading() === false) return; 
 
-        // B. DETECCIÓN INTELIGENTE:
-        // Verificamos si las cajas de pregunta pequeña (Q y A) tienen texto.
-        const tienePregunta = document.getElementById('inputQ').value.trim() !== "" && 
-                              document.getElementById('inputA').value.trim() !== "";
+        // B. PREGUNTA AL SISTEMA: ¿Hay texto en las cajas de pregunta?
+        const qCheck = document.getElementById('inputQ').value.trim();
+        const aCheck = document.getElementById('inputA').value.trim();
 
-        if (tienePregunta) {
-            // ✅ SI HAY PREGUNTA: NO FRENAMOS.
-            // Cambiamos virtualmente el tipo a 'translation' para engañar al sistema
-            // y permitir que el código siga bajando y guarde la pregunta AHORA MISMO.
+        if (qCheck !== "" && aCheck !== "") {
+            // ¡SÍ HAY PREGUNTA! -> NO FRENAMOS.
+            // Cambiamos el tipo a 'translation' para que el código siga bajando
+            // y guarde la pregunta hija AHORA MISMO.
             type = 'translation'; 
         } else {
-            // ❌ NO HAY PREGUNTA: Entonces sí terminamos aquí.
+            // NO HAY PREGUNTA -> Entonces sí terminamos aquí.
             return; 
         }
     }
-    // ==========================================
-    
-    // 2. Recogemos los datos de la pregunta pequeña (El código sigue fluyendo...)
+    // ===============================================
+
+    // 2. Recogemos los datos (El código fluye...)
     const q = document.getElementById('inputQ').value.trim(); 
     const a = document.getElementById('inputA').value.trim(); 
     const img = document.getElementById('inputImg').value.trim(); 
             
-    // Validación de seguridad (Por si acaso llegó aquí vacío)
+    // Validación: Si llegamos aquí y está vacío, avisamos.
     if(!q || !a) return Swal.fire("Faltan datos", "Escribe la pregunta y respuesta", "warning");
     
     const p = { type, q, a }; 
     if(type === 'drag_drop' && img) p.img = img;
     
-    // 3. Lógica de Inserción (Intacta - Respetando tu arquitectura)
+    // 3. Lógica de Inserción (Intacta)
     if (window.preguntaEditandoIndex !== null) {
-        // Modo edición de pregunta suelta
         window.preguntasTemporales[window.preguntaEditandoIndex] = p;
         window.preguntaEditandoIndex = null;
         window.readingEditandoIndex = null;
         window.readingActivoIndex = null;
     } else {
-        // ¿Estamos dentro de un Reading activo? (SÍ, PORQUE guardarReading() LO ACTIVÓ ARRIBA)
+        // ¿Estamos dentro de un Reading activo? (SÍ, porque guardarReading lo activó arriba)
         if (window.readingActivoIndex !== null) {
             const reading = window.preguntasTemporales[window.readingActivoIndex];
-
-            // Aseguramos que el array de preguntas exista
             if (!reading.questions) reading.questions = [];
 
             if (window.readingChildEditIndex !== null && window.readingChildParentIndex === window.readingActivoIndex) {
-                // Editando una pregunta hija existente
                 reading.questions[window.readingChildEditIndex] = p;
                 window.readingChildEditIndex = null;
                 window.readingChildParentIndex = null;
                 Swal.fire("Actualizado", "Pregunta modificada.", "success");
             } else {
-                // Creando hija nueva
                 if (reading.questions.length >= reading.count) {
                     return Swal.fire("Límite alcanzado", "Ya completaste las preguntas de esta lectura.", "info");
                 }
                 reading.questions.push(p);
-                
-                // Actualizar contadores visuales inmediatamente
                 window.actualizarPlaceholder(); 
             }
         } else {
-            // Pregunta normal suelta (no reading)
             window.preguntasTemporales.push(p);
         }
     }
 
-    // 4. Finalizar: Renderizar y limpiar inputs pequeños
+    // 4. Finalizar
     window.renderizarListaPreguntas();          
     document.getElementById('inputQ').value = ''; 
     document.getElementById('inputA').value = ''; 
