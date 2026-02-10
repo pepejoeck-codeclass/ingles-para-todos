@@ -725,7 +725,7 @@ window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
         // FUNCIONES DE UI Y LISTAS (SIN REDUCCIÓN)
         // === FUNCIÓN VISUAL CORREGIDA (Mantiene el Panel Azul visible) ===
 window.actualizarPlaceholder = function() {
-    const type = document.getElementById('inputType').value;
+    let type = document.getElementById('inputType').value;
     const readingBlock = document.getElementById('readingBlock');
     const blindaje = document.getElementById('blindajeReading');
 
