@@ -775,9 +775,7 @@ window.agregarPreguntaLista = function() {
         // 1. Ejecutamos guardado. Si falla (semáforo rojo), nos detenemos.
         if (window.guardarReading() === false) return; 
 
-        // 2. OBLIGAMOS al sistema a cambiar a modo 'traducción'
-        // Esto hace que, sin dar otro clic, guarde la pregunta hija abajo.
-        type = 'translation'; 
+       return; // 🔴 CORTA el flujo aquí: este clic SOLO guarda la lectura
     }
     
     // 2. Recogemos los datos de la pregunta pequeña
