@@ -771,16 +771,24 @@ window.agregarPreguntaLista = function() {
     let type = document.getElementById('inputType').value;
 
    // === CORRECCIÓN QUIRÚRGICA AQUÍ ===
-    if (type === 'reading_comprehension') {
+   if (type === 'reading_comprehension') {
 
-    const ok = window.guardarReading();
-    if (!ok) return;
+    // ✅ SOLO crear lectura si NO existe una activa
+    if (window.readingActivoIndex === null || window.readingEditandoIndex !== null) {
+        const ok = window.guardarReading();
+        if (!ok) return;
+    }
 
     const q = document.getElementById('inputQ').value.trim();
     const a = document.getElementById('inputA').value.trim();
 
     if (q && a && window.readingActivoIndex !== null) {
         const reading = window.preguntasTemporales[window.readingActivoIndex];
+
+        if (reading.questions.length >= reading.count) {
+            Swal.fire("Límite alcanzado", "Ya completaste esta lectura.", "info");
+            return;
+        }
 
         reading.questions.push({
             type: 'translation',
