@@ -770,15 +770,13 @@ window.agregarPreguntaLista = function() {
     // 1. Usamos 'let' para poder cambiar el tipo dinámicamente si es necesario
     let type = document.getElementById('inputType').value;
 
-    // === MODO READING DETECTADO ===
+   // === MODO READING DETECTADO (SOLUCIÓN FINAL) ===
     if (type === 'reading_comprehension') {
-        // A. Intentamos guardar y preguntamos al semáforo
-        const guardadoCorrecto = window.guardarReading(); 
-        
-        // 🛑 SI EL SEMÁFORO ES ROJO (Falso), PARAMOS TODO AQUÍ.
-        if (guardadoCorrecto === false) return;
+        // 1. Ejecutamos guardado. Si falla (semáforo rojo), nos detenemos.
+        if (window.guardarReading() === false) return; 
 
-        // B. SI ES VERDE, seguimos bajando para guardar la pregunta hija
+        // 2. OBLIGAMOS al sistema a cambiar a modo 'traducción'
+        // Esto hace que, sin dar otro clic, guarde la pregunta hija abajo.
         type = 'translation'; 
     }
     
