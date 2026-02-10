@@ -771,40 +771,13 @@ window.agregarPreguntaLista = function() {
     let type = document.getElementById('inputType').value;
 
    // === CORRECCIÓN QUIRÚRGICA AQUÍ ===
-   if (type === 'reading_comprehension') {
-
-    // ✅ SOLO crear lectura si NO existe una activa
-    if (window.readingActivoIndex === null || window.readingEditandoIndex !== null) {
-        const ok = window.guardarReading();
-        if (!ok) return;
+    if (type === 'reading_comprehension') {
+        // Ejecutamos guardado.
+        // Si retorna false (falló), el return detiene todo.
+        // Si retorna true (éxito), el return TAMBIÉN detiene todo para que veas tu lectura creada.
+        window.guardarReading(); 
+        return; 
     }
-
-    const q = document.getElementById('inputQ').value.trim();
-    const a = document.getElementById('inputA').value.trim();
-
-    if (q && a && window.readingActivoIndex !== null) {
-        const reading = window.preguntasTemporales[window.readingActivoIndex];
-
-        if (reading.questions.length >= reading.count) {
-            Swal.fire("Límite alcanzado", "Ya completaste esta lectura.", "info");
-            return;
-        }
-
-        reading.questions.push({
-            type: 'translation',
-            q,
-            a
-        });
-
-        document.getElementById('inputQ').value = '';
-        document.getElementById('inputA').value = '';
-        document.getElementById('inputImg').value = '';
-    }
-
-    window.renderizarListaPreguntas();
-    window.actualizarPlaceholder();
-    return;
-}
     // ==================================
     
     // 2. Recogemos los datos de la pregunta pequeña
