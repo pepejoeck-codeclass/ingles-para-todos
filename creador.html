@@ -818,12 +818,13 @@ window.renderizarListaPreguntas();
             document.getElementById('inputA').value=''; 
             document.getElementById('inputImg').value='';
         }
-// === PASO 6: GUARDAR READING + QUESTIONS ===
+    // === PASO 6: GUARDAR READING + QUESTIONS (CORREGIDO) ===
 window.guardarReading = function() {
 
     const readingText = document.getElementById('inputReadingText').value.trim();
     const count = document.getElementById('inputReadingCount').value;
 
+    // 1. Validación básica
     if (!readingText) {
         return Swal.fire(
             "Falta la lectura",
@@ -832,37 +833,52 @@ window.guardarReading = function() {
         );
     }
 
+    // 2. Crear objeto Reading
     const readingObj = {
         type: "reading_comprehension",
         readingText: readingText,
-        audio: null,          // aquí luego conectamos tu audio
-        questions: [],        // aquí irán las preguntas
+        audio: null,
+        questions: [],
         count: parseInt(count)
     };
 
+    // 3. Lógica de Guardado y ACTIVACIÓN (Aquí estaba el fallo)
     if (window.readingEditandoIndex !== null) {
-        // Modo edición
+        // MODO EDICIÓN
         window.preguntasTemporales[window.readingEditandoIndex] = readingObj;
-        window.readingEditandoIndex = null;
+        
+        // ¡MANTENER ACTIVA LA LECTURA!
+        window.readingActivoIndex = window.readingEditandoIndex;
+        window.readingEditandoIndex = null; 
     } else {
-        // Modo creación
+        // MODO CREACIÓN
         window.preguntasTemporales.push(readingObj);
+        
+        // ¡ACTIVAR LA NUEVA LECTURA! (Esto faltaba)
+        // Le decimos al sistema: "La lectura activa es la última de la lista"
+        window.readingActivoIndex = window.preguntasTemporales.length - 1;
     }
 
+    // 4. Actualizar lista visual
     window.renderizarListaPreguntas();
 
-    // Limpieza visual
-document.getElementById('inputReadingText').value = "";
+    // 5. Transición Visual Automática (Magia UX)
+    // Limpiamos la caja de texto grande
+    document.getElementById('inputReadingText').value = "";
+    
+    // Cambiamos el selector a preguntas normales automáticamente
+    document.getElementById('inputType').value = 'translation';
+    
+    // Esto oculta el bloque de lectura y muestra los inputs de preguntas
+    window.actualizarPlaceholder(); 
 
-// ❗ NO apagar la lectura al guardar
-// La lectura debe seguir activa para agregar preguntas
-// window.readingActivoIndex = null;
-
-Swal.fire(
-    "Reading guardado",
-    "La lectura quedó activa. Ya puedes agregar las preguntas.",
-    "success"
-);
+    // 6. Confirmación
+    Swal.fire({
+        title: "Lectura Guardada y Activa",
+        text: "Observa el contador arriba (0/" + count + "). Ya puedes agregar las preguntas.",
+        icon: "success",
+        timer: 3000
+    });
 };
 
         window.renderizarListaPreguntas = function() {   
