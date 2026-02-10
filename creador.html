@@ -873,7 +873,8 @@ window.guardarReading = function() {
 
     // 4. Actualizar lista visual
     window.renderizarListaPreguntas();
-
+    window.actualizarPlaceholder();
+    
     // 5. Transición Visual Automática (Magia UX)
     document.getElementById('inputReadingText').value = ""; // Limpia texto
     
