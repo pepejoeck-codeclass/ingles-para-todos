@@ -767,59 +767,86 @@ window.actualizarPlaceholder = function() {
 
        // === FUNCIÓN CORREGIDA: AGREGAR PREGUNTA (FLUJO INTELIGENTE DE UN SOLO CLICK) ===
 window.agregarPreguntaLista = function() {
-    // 1. Usamos 'let' para cambiar el tipo dinámicamente
-    let type = document.getElementById('inputType').value;
+    // Capturamos los valores al inicio
+    const type = document.getElementById('inputType').value;
+    const q = document.getElementById('inputQ').value.trim();
+    const a = document.getElementById('inputA').value.trim();
+    const img = document.getElementById('inputImg').value.trim();
 
-    // === SOLUCIÓN MAESTRA: DETECCIÓN INTELIGENTE ===
+    // ==========================================================
+    // CASO ESPECIAL: READING + PREGUNTA (La solución definitiva)
+    // ==========================================================
     if (type === 'reading_comprehension') {
-        // A. Guardamos la lectura. Si falla (vacío), nos detenemos.
-        if (window.guardarReading() === false) return; 
+        
+        // PASO 1: Obligamos a guardar la lectura (Caja Grande)
+        // (La función guardarReading ya hace las validaciones de la lectura)
+        window.guardarReading(); 
 
-        // B. PREGUNTA AL SISTEMA: ¿Hay texto en las cajas de pregunta?
-        const qCheck = document.getElementById('inputQ').value.trim();
-        const aCheck = document.getElementById('inputA').value.trim();
-
-        if (qCheck !== "" && aCheck !== "") {
-            // ¡SÍ HAY PREGUNTA! -> NO FRENAMOS.
-            // Cambiamos el tipo a 'translation' para que el código siga bajando
-            // y guarde la pregunta hija AHORA MISMO.
-            type = 'translation'; 
-        } else {
-            // NO HAY PREGUNTA -> Entonces sí terminamos aquí.
-            return; 
-        }
-    }
-    // ===============================================
-
-    // 2. Recogemos los datos (El código fluye...)
-    const q = document.getElementById('inputQ').value.trim(); 
-    const a = document.getElementById('inputA').value.trim(); 
-    const img = document.getElementById('inputImg').value.trim(); 
+        // PASO 2: Verificación Inmediata
+        // Si hay texto en las cajas pequeñas (Pregunta y Respuesta)...
+        if (q !== "" && a !== "") {
             
-    // Validación: Si llegamos aquí y está vacío, avisamos.
+            // Buscamos la lectura que acabamos de crear (siempre es la última)
+            const ultimoIndex = window.preguntasTemporales.length - 1;
+            
+            if (ultimoIndex >= 0) {
+                const readingGuardado = window.preguntasTemporales[ultimoIndex];
+
+                // Aseguramos que tenga su array de preguntas
+                if (!readingGuardado.questions) readingGuardado.questions = [];
+
+                // INSERCIÓN MANUAL Y FORZADA DE LA PREGUNTA
+                // No dependemos de otras funciones, lo metemos directo al array.
+                readingGuardado.questions.push({
+                    type: 'translation', // Por defecto las preguntas hijas son tipo traducción
+                    q: q,
+                    a: a
+                });
+
+                // Limpiamos los inputs pequeños manualmente
+                document.getElementById('inputQ').value = '';
+                document.getElementById('inputA').value = '';
+                document.getElementById('inputImg').value = '';
+
+                // Volvemos a pintar la lista para que aparezca todo junto
+                window.renderizarListaPreguntas();
+            }
+        }
+        
+        // PASO 3: FRENADO TOTAL
+        // Detenemos la función aquí para que no intente guardar nada más abajo.
+        return; 
+    }
+    // ================= FIN DEL CASO ESPECIAL =================
+
+    // --- LÓGICA ESTÁNDAR PARA EL RESTO DE PREGUNTAS (INTACTA) ---
+    // Si llegamos aquí, NO es un reading nuevo, es una pregunta normal o hija.
+
     if(!q || !a) return Swal.fire("Faltan datos", "Escribe la pregunta y respuesta", "warning");
     
     const p = { type, q, a }; 
     if(type === 'drag_drop' && img) p.img = img;
     
-    // 3. Lógica de Inserción (Intacta)
     if (window.preguntaEditandoIndex !== null) {
+        // Edición de pregunta suelta
         window.preguntasTemporales[window.preguntaEditandoIndex] = p;
         window.preguntaEditandoIndex = null;
         window.readingEditandoIndex = null;
         window.readingActivoIndex = null;
     } else {
-        // ¿Estamos dentro de un Reading activo? (SÍ, porque guardarReading lo activó arriba)
+        // ¿Estamos DENTRO de un Reading ya activo?
         if (window.readingActivoIndex !== null) {
             const reading = window.preguntasTemporales[window.readingActivoIndex];
             if (!reading.questions) reading.questions = [];
 
             if (window.readingChildEditIndex !== null && window.readingChildParentIndex === window.readingActivoIndex) {
+                // Editando hija
                 reading.questions[window.readingChildEditIndex] = p;
                 window.readingChildEditIndex = null;
                 window.readingChildParentIndex = null;
                 Swal.fire("Actualizado", "Pregunta modificada.", "success");
             } else {
+                // Agregando hija (caso normal)
                 if (reading.questions.length >= reading.count) {
                     return Swal.fire("Límite alcanzado", "Ya completaste las preguntas de esta lectura.", "info");
                 }
@@ -827,11 +854,12 @@ window.agregarPreguntaLista = function() {
                 window.actualizarPlaceholder(); 
             }
         } else {
+            // Pregunta suelta totalmente nueva
             window.preguntasTemporales.push(p);
         }
     }
 
-    // 4. Finalizar
+    // Renderizado final y limpieza
     window.renderizarListaPreguntas();          
     document.getElementById('inputQ').value = ''; 
     document.getElementById('inputA').value = ''; 
