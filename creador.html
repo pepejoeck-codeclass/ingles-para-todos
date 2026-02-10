@@ -818,7 +818,7 @@ window.renderizarListaPreguntas();
             document.getElementById('inputA').value=''; 
             document.getElementById('inputImg').value='';
         }
-    // === PASO 6: GUARDAR READING + QUESTIONS (CORREGIDO) ===
+// === PASO 6: GUARDAR READING + QUESTIONS (VERSIÓN CORREGIDA FINAL) ===
 window.guardarReading = function() {
 
     const readingText = document.getElementById('inputReadingText').value.trim();
@@ -826,11 +826,7 @@ window.guardarReading = function() {
 
     // 1. Validación básica
     if (!readingText) {
-        return Swal.fire(
-            "Falta la lectura",
-            "Escribe el texto de la lectura antes de continuar.",
-            "warning"
-        );
+        return Swal.fire("Falta la lectura", "Escribe el texto antes de continuar.", "warning");
     }
 
     // 2. Crear objeto Reading
@@ -842,20 +838,18 @@ window.guardarReading = function() {
         count: parseInt(count)
     };
 
-    // 3. Lógica de Guardado y ACTIVACIÓN (Aquí estaba el fallo)
+    // 3. Lógica de Guardado y ACTIVACIÓN
     if (window.readingEditandoIndex !== null) {
         // MODO EDICIÓN
         window.preguntasTemporales[window.readingEditandoIndex] = readingObj;
-        
-        // ¡MANTENER ACTIVA LA LECTURA!
-        window.readingActivoIndex = window.readingEditandoIndex;
-        window.readingEditandoIndex = null; 
+        window.readingActivoIndex = window.readingEditandoIndex; // Mantiene el foco
+        window.readingEditandoIndex = null;
     } else {
         // MODO CREACIÓN
         window.preguntasTemporales.push(readingObj);
         
-        // ¡ACTIVAR LA NUEVA LECTURA! (Esto faltaba)
-        // Le decimos al sistema: "La lectura activa es la última de la lista"
+        // 👇 ESTA ES LA LÍNEA QUE FALTABA EN TU FOTO 👇
+        // Activa la lectura nueva (la última de la lista)
         window.readingActivoIndex = window.preguntasTemporales.length - 1;
     }
 
@@ -863,19 +857,18 @@ window.guardarReading = function() {
     window.renderizarListaPreguntas();
 
     // 5. Transición Visual Automática (Magia UX)
-    // Limpiamos la caja de texto grande
-    document.getElementById('inputReadingText').value = "";
+    document.getElementById('inputReadingText').value = ""; // Limpia texto
     
-    // Cambiamos el selector a preguntas normales automáticamente
+    // 👇 ESTA LÍNEA TAMBIÉN FALTABA 👇
+    // Cambia el selector a preguntas normales para que no te pida lectura de nuevo
     document.getElementById('inputType').value = 'translation';
     
-    // Esto oculta el bloque de lectura y muestra los inputs de preguntas
-    window.actualizarPlaceholder(); 
+    window.actualizarPlaceholder(); // Oculta la caja grande
 
     // 6. Confirmación
     Swal.fire({
-        title: "Lectura Guardada y Activa",
-        text: "Observa el contador arriba (0/" + count + "). Ya puedes agregar las preguntas.",
+        title: "¡Lectura Activa! 🟢", 
+        text: "Mira el contador azul (0/" + count + "). Agrega las preguntas ahora.",
         icon: "success",
         timer: 3000
     });
