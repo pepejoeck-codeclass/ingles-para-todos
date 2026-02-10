@@ -698,6 +698,7 @@
 window.preguntaEditandoIndex = null;
 window.readingChildEditIndex = null; 
 window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
+window.readingActivoIndex = null;
         // LOGIN
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -771,16 +772,16 @@ window.agregarPreguntaLista = function() {
 
     // === MODO READING DETECTADO ===
     if (type === 'reading_comprehension') {
-        // A. Guardamos la estructura del Reading (Texto grande)
-        // El sistema guardará y activará la lectura internamente
-        window.guardarReading();
+        // A. Intentamos guardar y preguntamos al semáforo
+        const guardadoCorrecto = window.guardarReading(); 
         
-        // B. TRUCO DE EXPERTA: NO hacemos 'return'. 
-        // Cambiamos el tipo a 'translation' virtualmente para que el código
-        // siga bajando y guarde la pregunta pequeña AHORA MISMO.
+        // 🛑 SI EL SEMÁFORO ES ROJO (Falso), PARAMOS TODO AQUÍ.
+        if (guardadoCorrecto === false) return;
+
+        // B. SI ES VERDE, seguimos bajando para guardar la pregunta hija
         type = 'translation'; 
     }
-
+    
     // 2. Recogemos los datos de la pregunta pequeña
     const q = document.getElementById('inputQ').value.trim(); 
     const a = document.getElementById('inputA').value.trim(); 
@@ -842,9 +843,10 @@ window.guardarReading = function() {
     const readingText = document.getElementById('inputReadingText').value.trim();
     const count = document.getElementById('inputReadingCount').value;
 
-    // 1. Validación básica
+    /// 1. Validación básica
     if (!readingText) {
-        return Swal.fire("Falta la lectura", "Escribe el texto antes de continuar.", "warning");
+        Swal.fire("Falta la lectura", "Escribe el texto antes de continuar.", "warning");
+        return false; // 🛑 SEMÁFORO ROJO: Si falla, devuelve FALSO.
     }
 
     // 2. Crear objeto Reading
@@ -890,8 +892,9 @@ window.guardarReading = function() {
         icon: "success",
         timer: 3000
     });
+    return true; // 🟢 SEMÁFORO VERDE: Todo salió bien.
 };
-
+        
         window.renderizarListaPreguntas = function() {   
     const ul = document.getElementById('listaPreguntasTemp');
     ul.innerHTML = "";
