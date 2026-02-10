@@ -699,6 +699,7 @@ window.preguntaEditandoIndex = null;
 window.readingChildEditIndex = null; 
 window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
 window.readingActivoIndex = null;
+window.readingCreado = false;  // ← ESTA LÍNEA NUEVA
         // LOGIN
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -787,7 +788,22 @@ window.agregarPreguntaLista = function() {
             
     // Validación de seguridad
     if(!q || !a) return Swal.fire("Faltan datos", "Escribe la pregunta y respuesta", "warning");
-    
+        if (window.readingCreado && window.readingActivoIndex !== null) {
+        const reading = window.preguntasTemporales[window.readingActivoIndex];
+        if (!reading.questions) reading.questions = [];
+        if (reading.questions.length >= reading.count) {
+            return Swal.fire("Límite alcanzado", "Ya completaste las preguntas de esta lectura.", "info");
+        }
+        const p = { type, q, a }; 
+        if(type === 'drag_drop' && img) p.img = img;
+        reading.questions.push(p);
+        window.renderizarListaPreguntas();
+        window.actualizarPlaceholder();
+        document.getElementById('inputQ').value = ''; 
+        document.getElementById('inputA').value = ''; 
+        document.getElementById('inputImg').value = '';
+        return;
+    }
     const p = { type, q, a }; 
     if(type === 'drag_drop' && img) p.img = img;
     
@@ -891,6 +907,8 @@ window.guardarReading = function() {
         icon: "success",
         timer: 3000
     });
+    
+    window.readingCreado = true;  // ← ESTA LÍNEA NUEVA
     return true; // 🟢 SEMÁFORO VERDE: Todo salió bien.
 };
         
