@@ -770,15 +770,15 @@ window.agregarPreguntaLista = function() {
     // 1. Usamos 'let' para poder cambiar el tipo dinámicamente si es necesario
     let type = document.getElementById('inputType').value;
 
-   // === MODO READING DETECTADO (SOLUCIÓN FINAL) ===
+   // === CORRECCIÓN QUIRÚRGICA AQUÍ ===
     if (type === 'reading_comprehension') {
-        // 1. Ejecutamos guardado. Si falla (semáforo rojo), nos detenemos.
-        if (window.guardarReading() === false) return; 
-
-        // 2. OBLIGAMOS al sistema a cambiar a modo 'traducción'
-        // Esto hace que, sin dar otro clic, guarde la pregunta hija abajo.
-        type = 'translation'; 
+        // Ejecutamos guardado.
+        // Si retorna false (falló), el return detiene todo.
+        // Si retorna true (éxito), el return TAMBIÉN detiene todo para que veas tu lectura creada.
+        window.guardarReading(); 
+        return; 
     }
+    // ==================================
     
     // 2. Recogemos los datos de la pregunta pequeña
     const q = document.getElementById('inputQ').value.trim(); 
@@ -813,7 +813,7 @@ window.agregarPreguntaLista = function() {
                 window.readingChildParentIndex = null;
                 Swal.fire("Actualizado", "Pregunta modificada.", "success");
             } else {
-                // Creando hija nueva (AQUÍ ENTRA AUTOMÁTICAMENTE AHORA)
+                // Creando hija nueva
                 if (reading.questions.length >= reading.count) {
                     return Swal.fire("Límite alcanzado", "Ya completaste las preguntas de esta lectura.", "info");
                 }
