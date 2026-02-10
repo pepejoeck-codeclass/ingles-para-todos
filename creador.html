@@ -816,8 +816,8 @@ window.agregarPreguntaLista = function() {
         
         // Actualizar UI
         window.renderizarListaPreguntas();
+        window.verificarLecturaCompleta();
         window.actualizarPlaceholder();
-        
         // FIN: Salir de aquí
         return;
     }
@@ -880,6 +880,7 @@ window.guardarReading = function() {
 
     // 4. Actualizar lista visual
     window.renderizarListaPreguntas();
+    window.verificarLecturaCompleta();
     window.actualizarPlaceholder();
     
     // 5. Transición Visual Automática (Magia UX)
