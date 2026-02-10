@@ -772,12 +772,31 @@ window.agregarPreguntaLista = function() {
 
    // === CORRECCIÓN QUIRÚRGICA AQUÍ ===
     if (type === 'reading_comprehension') {
-        // Ejecutamos guardado.
-        // Si retorna false (falló), el return detiene todo.
-        // Si retorna true (éxito), el return TAMBIÉN detiene todo para que veas tu lectura creada.
-        window.guardarReading(); 
-        return; 
+
+    const ok = window.guardarReading();
+    if (!ok) return;
+
+    const q = document.getElementById('inputQ').value.trim();
+    const a = document.getElementById('inputA').value.trim();
+
+    if (q && a && window.readingActivoIndex !== null) {
+        const reading = window.preguntasTemporales[window.readingActivoIndex];
+
+        reading.questions.push({
+            type: 'translation',
+            q,
+            a
+        });
+
+        document.getElementById('inputQ').value = '';
+        document.getElementById('inputA').value = '';
+        document.getElementById('inputImg').value = '';
     }
+
+    window.renderizarListaPreguntas();
+    window.actualizarPlaceholder();
+    return;
+}
     // ==================================
     
     // 2. Recogemos los datos de la pregunta pequeña
