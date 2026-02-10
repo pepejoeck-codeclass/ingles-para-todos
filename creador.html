@@ -765,160 +765,133 @@ window.actualizarPlaceholder = function() {
     else { q.placeholder = "Pregunta"; a.placeholder = "Respuesta"; }
 };
 
-       // === FUNCIÓN INTELIGENTE DE UN SOLO CLIC (SOLUCIÓN DEFINITIVA) ===
+        // === FUNCIÓN CORREGIDA: AGREGAR PREGUNTA (FLUJO DE UN SOLO CLICK) ===
 window.agregarPreguntaLista = function() {
-    // 1. Capturar Valores Iniciales
-    let type = document.getElementById('inputType').value; // Usamos let para poder cambiarlo si es necesario
-    const q = document.getElementById('inputQ').value.trim();
-    const a = document.getElementById('inputA').value.trim();
-    const img = document.getElementById('inputImg').value.trim();
-    const readingText = document.getElementById('inputReadingText').value.trim();
+    // 1. Usamos 'let' para poder cambiar el tipo dinámicamente si es necesario
+    let type = document.getElementById('inputType').value;
 
-    // ==========================================================
-    // FASE 1: DETECCIÓN Y MANEJO DE READING (El arreglo del Bug)
-    // ==========================================================
+   // === CORRECCIÓN QUIRÚRGICA AQUÍ ===
     if (type === 'reading_comprehension') {
-        
-        // CASO A: El usuario escribió una lectura nueva.
-        if (readingText !== "") {
-            // Intentamos guardar la lectura primero
-            const guardadoExitoso = window.guardarReading(); 
-            
-            // Si guardarReading devolvió false (error), nos detenemos.
-            if (!guardadoExitoso) return; 
-            
-            // SI FUE ÉXITO: El código sigue corriendo hacia abajo.
-            // TRUCO MAESTRO: Cambiamos el tipo a 'translation' internamente
-            // para que la pregunta que escribiste se guarde como hija DE INMEDIATO.
-            type = 'translation'; 
-        } 
-        
-        // CASO B: El selector sigue en "Reading" pero la caja está vacía
-        // Y ya tenemos una lectura activa (el usuario solo quiere agregar preguntas).
-        else if (window.readingActivoIndex !== null) {
-            type = 'translation'; // Lo tratamos como pregunta normal
-        }
-        
-        // CASO C: Error (Selector en Reading, caja vacía, sin lectura activa).
-        else {
-            return Swal.fire("Atención", "Escribe el texto de la lectura primero.", "warning");
-        }
+        // Ejecutamos guardado.
+        // Si retorna false (falló), el return detiene todo.
+        // Si retorna true (éxito), el return TAMBIÉN detiene todo para que veas tu lectura creada.
+        window.guardarReading(); 
+        return; 
     }
-
-    // ==========================================================
-    // FASE 2: GUARDADO DE LA PREGUNTA
-    // ==========================================================
+    // ==================================
     
-    // Si no hay pregunta ni respuesta escrita, terminamos aquí (solo guardó lectura).
-    if (q === "" || a === "") return; 
-
-    const p = { type, q, a };
-    if (type === 'drag_drop' && img) p.img = img;
-
-    // A) MODO EDICIÓN DE PREGUNTA SUELTA
+    // 2. Recogemos los datos de la pregunta pequeña
+    const q = document.getElementById('inputQ').value.trim(); 
+    const a = document.getElementById('inputA').value.trim(); 
+    const img = document.getElementById('inputImg').value.trim(); 
+            
+    // Validación de seguridad
+    if(!q || !a) return Swal.fire("Faltan datos", "Escribe la pregunta y respuesta", "warning");
+    
+    const p = { type, q, a }; 
+    if(type === 'drag_drop' && img) p.img = img;
+    
+    // 3. Lógica de Inserción (Intacta)
     if (window.preguntaEditandoIndex !== null) {
+        // Modo edición de pregunta suelta
         window.preguntasTemporales[window.preguntaEditandoIndex] = p;
         window.preguntaEditandoIndex = null;
         window.readingEditandoIndex = null;
-        window.readingActivoIndex = null; 
-        Swal.fire("Editado", "Pregunta actualizada", "success");
-    } 
-    // B) ESTAMOS DENTRO DE UN READING (Agregando hijas)
-    else if (window.readingActivoIndex !== null) {
-        const reading = window.preguntasTemporales[window.readingActivoIndex];
-        if (!reading.questions) reading.questions = [];
+        window.readingActivoIndex = null;
+    } else {
+        // ¿Estamos dentro de un Reading activo?
+        if (window.readingActivoIndex !== null) {
+            const reading = window.preguntasTemporales[window.readingActivoIndex];
 
-        // ¿Estamos editando una hija específica?
-        if (window.readingChildEditIndex !== null && window.readingChildParentIndex === window.readingActivoIndex) {
-            reading.questions[window.readingChildEditIndex] = p;
-            window.readingChildEditIndex = null;
-            window.readingChildParentIndex = null;
-            Swal.fire("Actualizado", "Pregunta corregida.", "success");
-        } 
-        // ¿Agregando nueva hija?
-        else {
-            // Verificamos límite
-            if (reading.questions.length >= reading.count) {
-                return Swal.fire("Límite alcanzado", "Ya completaste las preguntas de esta lectura.", "info");
+            // Aseguramos que el array de preguntas exista
+            if (!reading.questions) reading.questions = [];
+
+            if (window.readingChildEditIndex !== null && window.readingChildParentIndex === window.readingActivoIndex) {
+                // Editando una pregunta hija existente
+                reading.questions[window.readingChildEditIndex] = p;
+                window.readingChildEditIndex = null;
+                window.readingChildParentIndex = null;
+                Swal.fire("Actualizado", "Pregunta modificada.", "success");
+            } else {
+                // Creando hija nueva
+                if (reading.questions.length >= reading.count) {
+                    return Swal.fire("Límite alcanzado", "Ya completaste las preguntas de esta lectura.", "info");
+                }
+                reading.questions.push(p);
+                
+                // Actualizar contadores visuales inmediatamente
+                window.actualizarPlaceholder(); 
             }
-            reading.questions.push(p);
+        } else {
+            // Pregunta normal suelta (no reading)
+            window.preguntasTemporales.push(p);
         }
-    } 
-    // C) PREGUNTA SUELTA (Normal fuera de reading)
-    else {
-        window.preguntasTemporales.push(p);
     }
 
-    // ==========================================================
-    // FASE 3: LIMPIEZA Y RENDERIZADO FINAL
-    // ==========================================================
-    window.renderizarListaPreguntas();
-    
-    // Limpiamos los inputs pequeños (la lectura ya se limpió arriba si fue necesario)
-    document.getElementById('inputQ').value = '';
-    document.getElementById('inputA').value = '';
+    // 4. Finalizar: Renderizar y limpiar inputs pequeños
+    window.renderizarListaPreguntas();          
+    document.getElementById('inputQ').value = ''; 
+    document.getElementById('inputA').value = ''; 
     document.getElementById('inputImg').value = '';
-    
-    // Verificamos si ya completamos las preguntas para mostrar el aviso verde
-    if(window.verificarLecturaCompleta) window.verificarLecturaCompleta(); 
 };
 
-// === FUNCIÓN DE GUARDADO BLINDADA (Devuelve Confirmación) ===
+// === PASO 6: GUARDAR READING + QUESTIONS (VERSIÓN CORREGIDA FINAL) ===
 window.guardarReading = function() {
+
     const readingText = document.getElementById('inputReadingText').value.trim();
     const count = document.getElementById('inputReadingCount').value;
 
-    // 1. Si estamos editando y el texto está vacío, permitimos (para no borrarlo por error), 
-    // pero si es nuevo, exigimos texto.
-    if (!readingText && window.readingEditandoIndex === null) {
-        // PERO: Si ya hay una lectura activa y el usuario solo se equivocó de selector, 
-        // retornamos 'false' silencioso para que la otra función maneje el error o el cambio de flujo.
-        if (window.readingActivoIndex !== null) return false; 
-        
+    /// 1. Validación básica
+    if (!readingText) {
         Swal.fire("Falta la lectura", "Escribe el texto antes de continuar.", "warning");
-        return false; // 🛑 ROJO: Hubo error
+        return false; // 🛑 SEMÁFORO ROJO: Si falla, devuelve FALSO.
     }
 
     // 2. Crear objeto Reading
     const readingObj = {
         type: "reading_comprehension",
-        readingText: readingText, // Si está vacío en edición, se mantiene el anterior luego
+        readingText: readingText,
         audio: null,
         questions: [],
         count: parseInt(count)
     };
 
-    // 3. Lógica de Guardado
+    // 3. Lógica de Guardado y ACTIVACIÓN
     if (window.readingEditandoIndex !== null) {
-        // MODO EDICIÓN: Solo actualizamos texto y conteo, conservamos preguntas
-        const lecturaVieja = window.preguntasTemporales[window.readingEditandoIndex];
-        readingObj.questions = lecturaVieja.questions || []; // No perder preguntas
-        if(readingText === "") readingObj.readingText = lecturaVieja.readingText; // Mantener texto si no se tocó
-
+        // MODO EDICIÓN
         window.preguntasTemporales[window.readingEditandoIndex] = readingObj;
-        window.readingActivoIndex = window.readingEditandoIndex;
+        window.readingActivoIndex = window.readingEditandoIndex; // Mantiene el foco
         window.readingEditandoIndex = null;
     } else {
-        // MODO CREACIÓN NUEVA
+        // MODO CREACIÓN
         window.preguntasTemporales.push(readingObj);
-        window.readingActivoIndex = window.preguntasTemporales.length - 1; // Activa la última
+        
+        // 👇 ESTA ES LA LÍNEA QUE FALTABA EN TU FOTO 👇
+        // Activa la lectura nueva (la última de la lista)
+        window.readingActivoIndex = window.preguntasTemporales.length - 1;
     }
 
-    // 4. Actualizar visuales
+    // 4. Actualizar lista visual
     window.renderizarListaPreguntas();
+    window.actualizarPlaceholder();
     
-    // 5. Limpieza inteligente
-    document.getElementById('inputReadingText').value = ""; 
-    document.getElementById('inputType').value = 'translation'; // Cambia el selector automáticamente
-    window.actualizarPlaceholder(); 
+    // 5. Transición Visual Automática (Magia UX)
+    document.getElementById('inputReadingText').value = ""; // Limpia texto
+    
+    // 👇 ESTA LÍNEA TAMBIÉN FALTABA 👇
+    // Cambia el selector a preguntas normales para que no te pida lectura de nuevo
+    document.getElementById('inputType').value = 'translation';
+    
+    window.actualizarPlaceholder(); // Oculta la caja grande
 
-    // 6. Notificación sutil (Toast)
-    const Toast = Swal.mixin({
-      toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true
+    // 6. Confirmación
+    Swal.fire({
+        title: "¡Lectura Activa! 🟢", 
+        text: "Mira el contador azul (0/" + count + "). Agrega las preguntas ahora.",
+        icon: "success",
+        timer: 3000
     });
-    Toast.fire({ icon: 'success', title: 'Lectura guardada. Agrega las preguntas.' });
-
-    return true; // 🟢 VERDE: Todo salió bien
+    return true; // 🟢 SEMÁFORO VERDE: Todo salió bien.
 };
         
         window.renderizarListaPreguntas = function() {   
