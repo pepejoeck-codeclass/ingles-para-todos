@@ -765,33 +765,45 @@ window.actualizarPlaceholder = function() {
     else { q.placeholder = "Pregunta"; a.placeholder = "Respuesta"; }
 };
 
-        // === FUNCIÓN CORREGIDA: AGREGAR PREGUNTA (FLUJO DE UN SOLO CLICK) ===
+       // === FUNCIÓN CORREGIDA: AGREGAR PREGUNTA (FLUJO INTELIGENTE DE UN SOLO CLICK) ===
 window.agregarPreguntaLista = function() {
-    // 1. Usamos 'let' para poder cambiar el tipo dinámicamente si es necesario
+    // 1. Capturamos el tipo actual
     let type = document.getElementById('inputType').value;
 
-   // === CORRECCIÓN QUIRÚRGICA AQUÍ ===
+    // === SOLUCIÓN MAESTRA (ONE-CLICK FLOW) ===
     if (type === 'reading_comprehension') {
-        // Ejecutamos guardado.
-        // Si retorna false (falló), el return detiene todo.
-        // Si retorna true (éxito), el return TAMBIÉN detiene todo para que veas tu lectura creada.
-        window.guardarReading(); 
-        return; 
+        // A. Guardamos la lectura madre. Si falla (ej: campo vacío), frenamos todo.
+        if (window.guardarReading() === false) return; 
+
+        // B. DETECCIÓN INTELIGENTE:
+        // Verificamos si las cajas de pregunta pequeña (Q y A) tienen texto.
+        const tienePregunta = document.getElementById('inputQ').value.trim() !== "" && 
+                              document.getElementById('inputA').value.trim() !== "";
+
+        if (tienePregunta) {
+            // ✅ SI HAY PREGUNTA: NO FRENAMOS.
+            // Cambiamos virtualmente el tipo a 'translation' para engañar al sistema
+            // y permitir que el código siga bajando y guarde la pregunta AHORA MISMO.
+            type = 'translation'; 
+        } else {
+            // ❌ NO HAY PREGUNTA: Entonces sí terminamos aquí.
+            return; 
+        }
     }
-    // ==================================
+    // ==========================================
     
-    // 2. Recogemos los datos de la pregunta pequeña
+    // 2. Recogemos los datos de la pregunta pequeña (El código sigue fluyendo...)
     const q = document.getElementById('inputQ').value.trim(); 
     const a = document.getElementById('inputA').value.trim(); 
     const img = document.getElementById('inputImg').value.trim(); 
             
-    // Validación de seguridad
+    // Validación de seguridad (Por si acaso llegó aquí vacío)
     if(!q || !a) return Swal.fire("Faltan datos", "Escribe la pregunta y respuesta", "warning");
     
     const p = { type, q, a }; 
     if(type === 'drag_drop' && img) p.img = img;
     
-    // 3. Lógica de Inserción (Intacta)
+    // 3. Lógica de Inserción (Intacta - Respetando tu arquitectura)
     if (window.preguntaEditandoIndex !== null) {
         // Modo edición de pregunta suelta
         window.preguntasTemporales[window.preguntaEditandoIndex] = p;
@@ -799,7 +811,7 @@ window.agregarPreguntaLista = function() {
         window.readingEditandoIndex = null;
         window.readingActivoIndex = null;
     } else {
-        // ¿Estamos dentro de un Reading activo?
+        // ¿Estamos dentro de un Reading activo? (SÍ, PORQUE guardarReading() LO ACTIVÓ ARRIBA)
         if (window.readingActivoIndex !== null) {
             const reading = window.preguntasTemporales[window.readingActivoIndex];
 
