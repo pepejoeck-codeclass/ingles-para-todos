@@ -852,13 +852,17 @@ window.guardarReading = function() {
     window.renderizarListaPreguntas();
 
     // Limpieza visual
-    document.getElementById('inputReadingText').value = "";
-window.readingActivoIndex = null;
-    Swal.fire(
-        "Reading guardado",
-        "La lectura fue guardada correctamente.",
-        "success"
-    );
+document.getElementById('inputReadingText').value = "";
+
+// ❗ NO apagar la lectura al guardar
+// La lectura debe seguir activa para agregar preguntas
+// window.readingActivoIndex = null;
+
+Swal.fire(
+    "Reading guardado",
+    "La lectura quedó activa. Ya puedes agregar las preguntas.",
+    "success"
+);
 };
 
         window.renderizarListaPreguntas = function() {   
