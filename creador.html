@@ -768,83 +768,74 @@ window.actualizarPlaceholder = function() {
 
         // === FUNCIÓN CORREGIDA: AGREGAR PREGUNTA (FLUJO DE UN SOLO CLICK) ===
 window.agregarPreguntaLista = function() {
-    // 1. Usamos 'let' para poder cambiar el tipo dinámicamente si es necesario
     let type = document.getElementById('inputType').value;
 
-   // === CORRECCIÓN QUIRÚRGICA AQUÍ ===
+    // PASO 1: Si selecciona READING, no procesa pregunta. Solo guarda la lectura.
     if (type === 'reading_comprehension') {
-        // Ejecutamos guardado.
-        // Si retorna false (falló), el return detiene todo.
-        // Si retorna true (éxito), el return TAMBIÉN detiene todo para que veas tu lectura creada.
         window.guardarReading(); 
         return; 
     }
-    // ==================================
     
-    // 2. Recogemos los datos de la pregunta pequeña
+    // PASO 2: Recoger datos
     const q = document.getElementById('inputQ').value.trim(); 
     const a = document.getElementById('inputA').value.trim(); 
     const img = document.getElementById('inputImg').value.trim(); 
             
-    // Validación de seguridad
-    if(!q || !a) return Swal.fire("Faltan datos", "Escribe la pregunta y respuesta", "warning");
-        if (window.readingCreado && window.readingActivoIndex !== null) {
+    // Validación básica
+    if(!q || !a) {
+        return Swal.fire("Faltan datos", "Escribe la pregunta y respuesta", "warning");
+    }
+
+    // PASO 3: Crear objeto pregunta
+    const p = { type, q, a }; 
+    if(type === 'drag_drop' && img) p.img = img;
+
+    // PASO 4: ¿DÓNDE GUARDAR?
+    // Caso A: Si hay una LECTURA ACTIVA y hemos marcado readingCreado = true
+    if (window.readingCreado === true && window.readingActivoIndex !== null) {
         const reading = window.preguntasTemporales[window.readingActivoIndex];
-        if (!reading.questions) reading.questions = [];
-        if (reading.questions.length >= reading.count) {
-            return Swal.fire("Límite alcanzado", "Ya completaste las preguntas de esta lectura.", "info");
+        
+        // Seguridad: asegurar que el array existe
+        if (!reading.questions) {
+            reading.questions = [];
         }
-        const p = { type, q, a }; 
-        if(type === 'drag_drop' && img) p.img = img;
+        
+        // Verificar si ya completó el límite
+        if (reading.questions.length >= reading.count) {
+            Swal.fire("Límite alcanzado", "Ya completaste todas las preguntas de esta lectura.", "info");
+            return;
+        }
+        
+        // Agregar pregunta a la lectura
         reading.questions.push(p);
-        window.renderizarListaPreguntas();
-        window.actualizarPlaceholder();
+        
+        // Limpiar inputs
         document.getElementById('inputQ').value = ''; 
         document.getElementById('inputA').value = ''; 
         document.getElementById('inputImg').value = '';
+        
+        // Actualizar UI
+        window.renderizarListaPreguntas();
+        window.actualizarPlaceholder();
+        
+        // FIN: Salir de aquí
         return;
     }
-    const p = { type, q, a }; 
-    if(type === 'drag_drop' && img) p.img = img;
-    
-    // 3. Lógica de Inserción (Intacta)
+
+    // PASO 5: Caso B - Lógica normal (sin reading activo)
     if (window.preguntaEditandoIndex !== null) {
-        // Modo edición de pregunta suelta
+        // Modo EDICIÓN de pregunta suelta
         window.preguntasTemporales[window.preguntaEditandoIndex] = p;
         window.preguntaEditandoIndex = null;
         window.readingEditandoIndex = null;
         window.readingActivoIndex = null;
+        window.readingCreado = false;
     } else {
-        // ¿Estamos dentro de un Reading activo?
-        if (window.readingActivoIndex !== null) {
-            const reading = window.preguntasTemporales[window.readingActivoIndex];
-
-            // Aseguramos que el array de preguntas exista
-            if (!reading.questions) reading.questions = [];
-
-            if (window.readingChildEditIndex !== null && window.readingChildParentIndex === window.readingActivoIndex) {
-                // Editando una pregunta hija existente
-                reading.questions[window.readingChildEditIndex] = p;
-                window.readingChildEditIndex = null;
-                window.readingChildParentIndex = null;
-                Swal.fire("Actualizado", "Pregunta modificada.", "success");
-            } else {
-                // Creando hija nueva
-                if (reading.questions.length >= reading.count) {
-                    return Swal.fire("Límite alcanzado", "Ya completaste las preguntas de esta lectura.", "info");
-                }
-                reading.questions.push(p);
-                
-                // Actualizar contadores visuales inmediatamente
-                window.actualizarPlaceholder(); 
-            }
-        } else {
-            // Pregunta normal suelta (no reading)
-            window.preguntasTemporales.push(p);
-        }
+        // Modo CREACIÓN - pregunta normal suelta
+        window.preguntasTemporales.push(p);
     }
 
-    // 4. Finalizar: Renderizar y limpiar inputs pequeños
+    // PASO 6: Finalizar - Renderizar y limpiar
     window.renderizarListaPreguntas();          
     document.getElementById('inputQ').value = ''; 
     document.getElementById('inputA').value = ''; 
