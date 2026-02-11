@@ -702,7 +702,7 @@ window.readingActivoIndex = null;
 window.readingCreado = false;  // ← ESTA LÍNEA NUEVA
 
 // DEBUG MODE
-window.debugMode = false; // Set to true to enable debug logging
+window.debugMode = true; // Set to true to enable debug logging
 window.debugLog = function(message, data) {
     if (window.debugMode) {
         console.log(`[DEBUG] ${message}`, data || '');
@@ -926,34 +926,27 @@ window.guardarReading = function() {
         const p = { type: questionType, q, a };
         if (img) p.img = img;
         
-        // Agregar a la lectura activa (con validación de seguridad)
-        const reading = window.preguntasTemporales[window.readingActivoIndex];
-        window.debugLog("Intentando agregar pregunta a reading", {
-            reading: reading,
-            readingActivoIndex: window.readingActivoIndex,
-            hasQuestions: reading && reading.questions
-        });
+        // Agregar DIRECTAMENTE al array para asegurar que la referencia es correcta
+        window.debugLog("Intentando agregar pregunta a reading en index:", window.readingActivoIndex);
         
-        if (reading) {
+        if (window.preguntasTemporales[window.readingActivoIndex]) {
             // Asegurar que el array questions existe (defensivo)
-            if (!reading.questions) {
-                reading.questions = [];
+            if (!window.preguntasTemporales[window.readingActivoIndex].questions) {
+                window.preguntasTemporales[window.readingActivoIndex].questions = [];
             }
             
-            reading.questions.push(p);
-            window.debugLog("Pregunta agregada, total ahora:", reading.questions.length);
+            // Agregar pregunta DIRECTAMENTE al array (sin variable intermedia)
+            window.preguntasTemporales[window.readingActivoIndex].questions.push(p);
+            window.debugLog("Pregunta agregada, total ahora:", window.preguntasTemporales[window.readingActivoIndex].questions.length);
             
             // Limpiar inputs
             document.getElementById('inputQ').value = '';
             document.getElementById('inputA').value = '';
             document.getElementById('inputImg').value = '';
             
-            // NO renderizar aquí - esperar hasta el final
-            // window.debugLog("Llamando a renderizarListaPreguntas() desde guardarReading");
-            // window.renderizarListaPreguntas();
             window.verificarLecturaCompleta();
         } else {
-            window.debugLog("ERROR: reading no existe!");
+            window.debugLog("ERROR: reading no existe en index:", window.readingActivoIndex);
         }
     }
     
@@ -968,7 +961,16 @@ window.guardarReading = function() {
     
     // BUGFIX: Render only once at the end after all state changes are complete
     // This ensures the UI reflects the final state including any child questions added
-    window.debugLog("Renderizando estado final con todas las preguntas");
+    window.debugLog("=== ANTES DE RENDERIZAR ===");
+    window.debugLog("readingActivoIndex:", window.readingActivoIndex);
+    if (window.readingActivoIndex !== null) {
+        const reading = window.preguntasTemporales[window.readingActivoIndex];
+        window.debugLog("Reading object:", reading);
+        window.debugLog("Questions count:", reading ? reading.questions.length : "N/A");
+        window.debugLog("Questions array:", reading ? reading.questions : "N/A");
+    }
+    window.debugLog("Total preguntas en array:", window.preguntasTemporales.length);
+    window.debugLog("=========================");
     window.renderizarListaPreguntas();
 
     // 7. Confirmación
@@ -987,12 +989,17 @@ window.guardarReading = function() {
         window.renderizarListaPreguntas = function() {   
     window.debugLog("=== renderizarListaPreguntas() INICIANDO ===");
     window.debugLog("preguntasTemporales", window.preguntasTemporales);
+    window.debugLog("preguntasTemporales (stringified)", JSON.stringify(window.preguntasTemporales, null, 2));
     
     const ul = document.getElementById('listaPreguntasTemp');
     ul.innerHTML = "";
 
     window.preguntasTemporales.forEach((p, index) => {
         window.debugLog(`Procesando pregunta ${index}`, { type: p.type, questionsCount: p.questions ? p.questions.length : 'N/A' });
+        
+        if (p.type === 'reading_comprehension') {
+            window.debugLog(`Es lectura, tiene ${p.questions ? p.questions.length : 0} preguntas hijas`, p.questions);
+        }
         
         const li = document.createElement('li');
         li.style.listStyle = "none";
