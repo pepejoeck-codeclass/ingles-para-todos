@@ -700,6 +700,15 @@ window.readingChildEditIndex = null;
 window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
 window.readingActivoIndex = null;
 window.readingCreado = false;  // ← ESTA LÍNEA NUEVA
+
+// DEBUG MODE
+window.DEBUG_MODE = false; // Set to true to enable debug logging
+window.debugLog = function(message, data) {
+    if (window.DEBUG_MODE) {
+        console.log(`[DEBUG] ${message}`, data || '');
+    }
+};
+
         // LOGIN
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -768,10 +777,14 @@ window.actualizarPlaceholder = function() {
 
         // === FUNCIÓN CORREGIDA: AGREGAR PREGUNTA (FLUJO DE UN SOLO CLICK) ===
 window.agregarPreguntaLista = function() {
+    window.debugLog("=== agregarPreguntaLista() INICIANDO ===");
+    
     let type = document.getElementById('inputType').value;
+    window.debugLog("Tipo seleccionado:", type);
 
     // PASO 1: Si selecciona READING, no procesa pregunta. Solo guarda la lectura.
     if (type === 'reading_comprehension') {
+        window.debugLog("Es reading_comprehension, llamando a guardarReading()");
         window.guardarReading(); 
         return; 
     }
@@ -844,7 +857,8 @@ window.agregarPreguntaLista = function() {
 
 // === PASO 6: GUARDAR READING + QUESTIONS (VERSIÓN CORREGIDA FINAL) ===
 window.guardarReading = function() {
-
+    window.debugLog("=== guardarReading() INICIANDO ===");
+    
     const readingText = document.getElementById('inputReadingText').value.trim();
     const count = document.getElementById('inputReadingCount').value;
 
@@ -880,6 +894,11 @@ window.guardarReading = function() {
 
     // Marcar lectura como creada ANTES de procesar pregunta inicial
     window.readingCreado = true;
+    window.debugLog("Estado después de guardar reading", {
+        readingActivoIndex: window.readingActivoIndex,
+        readingCreado: window.readingCreado,
+        readingObj: readingObj
+    });
 
     // 4. Actualizar lista visual
     window.renderizarListaPreguntas();
@@ -889,6 +908,8 @@ window.guardarReading = function() {
     // 5. Procesar pregunta inicial si existe
     const q = document.getElementById('inputQ').value.trim();
     const a = document.getElementById('inputA').value.trim();
+    
+    window.debugLog("Valores de Q y A", { q, a });
     
     if (q && a) {
         // Determinar tipo de pregunta para la primera pregunta hija
@@ -907,8 +928,20 @@ window.guardarReading = function() {
         
         // Agregar a la lectura activa (con validación de seguridad)
         const reading = window.preguntasTemporales[window.readingActivoIndex];
+        window.debugLog("Intentando agregar pregunta a reading", {
+            reading: reading,
+            readingActivoIndex: window.readingActivoIndex,
+            hasQuestions: reading && reading.questions
+        });
+        
+        // Asegurar que el array questions existe (defensivo)
+        if (reading && !reading.questions) {
+            reading.questions = [];
+        }
+        
         if (reading && reading.questions) {
             reading.questions.push(p);
+            window.debugLog("Pregunta agregada, total ahora:", reading.questions.length);
             
             // Limpiar inputs
             document.getElementById('inputQ').value = '';
@@ -916,8 +949,11 @@ window.guardarReading = function() {
             document.getElementById('inputImg').value = '';
             
             // Actualizar UI inmediatamente
+            window.debugLog("Llamando a renderizarListaPreguntas() desde guardarReading");
             window.renderizarListaPreguntas();
             window.verificarLecturaCompleta();
+        } else {
+            window.debugLog("ERROR: reading o reading.questions no existen!");
         }
     }
     
@@ -929,6 +965,9 @@ window.guardarReading = function() {
     document.getElementById('inputType').value = 'translation';
     
     window.actualizarPlaceholder(); // Oculta la caja grande
+    
+    // 🔴 BUGFIX: Forzar re-renderizado para asegurar que la primera pregunta aparezca
+    window.renderizarListaPreguntas();
 
     // 7. Confirmación
     const currentReading = window.preguntasTemporales[window.readingActivoIndex];
@@ -944,10 +983,15 @@ window.guardarReading = function() {
 };
         
         window.renderizarListaPreguntas = function() {   
+    window.debugLog("=== renderizarListaPreguntas() INICIANDO ===");
+    window.debugLog("preguntasTemporales", window.preguntasTemporales);
+    
     const ul = document.getElementById('listaPreguntasTemp');
     ul.innerHTML = "";
 
     window.preguntasTemporales.forEach((p, index) => {
+        window.debugLog(`Procesando pregunta ${index}`, { type: p.type, questionsCount: p.questions ? p.questions.length : 'N/A' });
+        
         const li = document.createElement('li');
         li.style.listStyle = "none";
 if (p.type === 'reading_comprehension') {
