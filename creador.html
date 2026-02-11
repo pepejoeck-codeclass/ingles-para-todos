@@ -810,8 +810,8 @@ window.agregarPreguntaLista = function() {
     });
 
     // PASO 4: ¿DÓNDE GUARDAR?
-    // Caso A: Si hay una LECTURA ACTIVA y hemos marcado readingCreado = true
-    if (window.readingCreado === true && window.readingActivoIndex !== null) {
+    // Caso A: Si hay una LECTURA ACTIVA (ya creada O en modo edición de pregunta hija)
+    if ((window.readingCreado === true || window.readingChildEditIndex !== null) && window.readingActivoIndex !== null) {
         const reading = window.preguntasTemporales[window.readingActivoIndex];
         window.debugLog('🔍 [agregarPreguntaLista] Lectura activa encontrada:', {
             index: window.readingActivoIndex,
@@ -1179,6 +1179,7 @@ window.editarPreguntaHija = function(parentIndex, childIndex) {
     window.readingActivoIndex = parentIndex;
     window.readingChildEditIndex = childIndex;
     window.readingChildParentIndex = parentIndex;
+    window.readingCreado = true; // Asegurar que el modo reading está activo
 
     document.getElementById('inputType').value = child.type || 'translation';
     window.actualizarPlaceholder();
