@@ -878,12 +878,39 @@ window.guardarReading = function() {
         window.readingActivoIndex = window.preguntasTemporales.length - 1;
     }
 
+    // Marcar lectura como creada ANTES de procesar pregunta inicial
+    window.readingCreado = true;
+
     // 4. Actualizar lista visual
     window.renderizarListaPreguntas();
     window.verificarLecturaCompleta();
     window.actualizarPlaceholder();
     
-    // 5. Transición Visual Automática (Magia UX)
+    // 5. Procesar pregunta inicial si existe
+    const q = document.getElementById('inputQ').value.trim();
+    const a = document.getElementById('inputA').value.trim();
+    
+    if (q && a) {
+        // Crear objeto pregunta
+        const img = document.getElementById('inputImg').value.trim();
+        const p = { type: 'translation', q, a };
+        if (img) p.img = img;
+        
+        // Agregar a la lectura activa
+        const reading = window.preguntasTemporales[window.readingActivoIndex];
+        reading.questions.push(p);
+        
+        // Limpiar inputs
+        document.getElementById('inputQ').value = '';
+        document.getElementById('inputA').value = '';
+        document.getElementById('inputImg').value = '';
+        
+        // Actualizar UI inmediatamente
+        window.renderizarListaPreguntas();
+        window.verificarLecturaCompleta();
+    }
+    
+    // 6. Transición Visual Automática (Magia UX)
     document.getElementById('inputReadingText').value = ""; // Limpia texto
     
     // 👇 ESTA LÍNEA TAMBIÉN FALTABA 👇
@@ -892,15 +919,15 @@ window.guardarReading = function() {
     
     window.actualizarPlaceholder(); // Oculta la caja grande
 
-    // 6. Confirmación
+    // 7. Confirmación
+    const questionCount = window.preguntasTemporales[window.readingActivoIndex].questions.length;
     Swal.fire({
         title: "¡Lectura Activa! 🟢", 
-        text: "Mira el contador azul (0/" + count + "). Agrega las preguntas ahora.",
+        text: "Mira el contador azul (" + questionCount + "/" + count + "). Agrega las preguntas ahora.",
         icon: "success",
         timer: 3000
     });
     
-    window.readingCreado = true;  // ← ESTA LÍNEA NUEVA
     return true; // 🟢 SEMÁFORO VERDE: Todo salió bien.
 };
         
