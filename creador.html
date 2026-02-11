@@ -790,10 +790,23 @@ window.agregarPreguntaLista = function() {
     const p = { type, q, a }; 
     if(type === 'drag_drop' && img) p.img = img;
 
+    console.log('🔍 [agregarPreguntaLista] Pregunta creada:', p);
+    console.log('🔍 [agregarPreguntaLista] Estado:', {
+        readingCreado: window.readingCreado,
+        readingActivoIndex: window.readingActivoIndex,
+        readingChildEditIndex: window.readingChildEditIndex,
+        preguntaEditandoIndex: window.preguntaEditandoIndex
+    });
+
     // PASO 4: ¿DÓNDE GUARDAR?
     // Caso A: Si hay una LECTURA ACTIVA y hemos marcado readingCreado = true
     if (window.readingCreado === true && window.readingActivoIndex !== null) {
         const reading = window.preguntasTemporales[window.readingActivoIndex];
+        console.log('🔍 [agregarPreguntaLista] Lectura activa encontrada:', {
+            index: window.readingActivoIndex,
+            questionsCount: reading.questions ? reading.questions.length : 0,
+            maxCount: reading.count
+        });
         
         // Seguridad: asegurar que el array existe
         if (!reading.questions) {
@@ -802,6 +815,7 @@ window.agregarPreguntaLista = function() {
         
         // CASO ESPECIAL: Editando una pregunta hija existente
         if (window.readingChildEditIndex !== null) {
+            console.log('✏️ [agregarPreguntaLista] Modo EDICIÓN de pregunta hija:', window.readingChildEditIndex);
             // Actualizar pregunta existente en lugar de agregar nueva
             reading.questions[window.readingChildEditIndex] = p;
             
@@ -829,7 +843,10 @@ window.agregarPreguntaLista = function() {
         }
         
         // Agregar pregunta a la lectura
+        console.log('➕ [agregarPreguntaLista] Agregando nueva pregunta a lectura');
         reading.questions.push(p);
+        console.log('✅ [agregarPreguntaLista] Pregunta agregada. Total ahora:', reading.questions.length);
+        console.log('📋 [agregarPreguntaLista] Array preguntasTemporales:', window.preguntasTemporales);
         
         // Limpiar inputs
         document.getElementById('inputQ').value = ''; 
@@ -867,6 +884,8 @@ window.agregarPreguntaLista = function() {
 // === PASO 6: GUARDAR READING + QUESTIONS (VERSIÓN CORREGIDA FINAL) ===
 window.guardarReading = function() {
 
+    console.log('💾 [guardarReading] Iniciando guardado de lectura');
+    
     const readingText = document.getElementById('inputReadingText').value.trim();
     const count = document.getElementById('inputReadingCount').value;
 
@@ -893,12 +912,20 @@ window.guardarReading = function() {
         window.readingEditandoIndex = null;
     } else {
         // MODO CREACIÓN
+        console.log('➕ [guardarReading] Modo CREACIÓN - agregando nueva lectura');
         window.preguntasTemporales.push(readingObj);
         
         // 👇 ESTA ES LA LÍNEA QUE FALTABA EN TU FOTO 👇
         // Activa la lectura nueva (la última de la lista)
         window.readingActivoIndex = window.preguntasTemporales.length - 1;
+        console.log('✅ [guardarReading] Lectura creada en índice:', window.readingActivoIndex);
     }
+
+    console.log('📊 [guardarReading] Estado después del guardado:', {
+        readingActivoIndex: window.readingActivoIndex,
+        readingCreado: window.readingCreado,
+        totalPreguntas: window.preguntasTemporales.length
+    });
 
     // 4. Actualizar lista visual
     window.renderizarListaPreguntas();
@@ -927,6 +954,9 @@ window.guardarReading = function() {
 };
         
         window.renderizarListaPreguntas = function() {   
+    console.log('🎨 [renderizarListaPreguntas] Iniciando renderizado');
+    console.log('🎨 [renderizarListaPreguntas] preguntasTemporales:', window.preguntasTemporales);
+    
     const ul = document.getElementById('listaPreguntasTemp');
     ul.innerHTML = "";
 
@@ -934,6 +964,7 @@ window.guardarReading = function() {
         const li = document.createElement('li');
         li.style.listStyle = "none";
 if (p.type === 'reading_comprehension') {
+console.log('📖 [renderizarListaPreguntas] Renderizando READING en índice', index, 'con', p.questions?.length || 0, 'preguntas');
 li.innerHTML = `
   <div class="question-card" data-type="reading_comprehension">
 
