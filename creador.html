@@ -928,11 +928,7 @@ window.guardarReading = function() {
         
         // Agregar a la lectura activa (con validación de seguridad)
         const reading = window.preguntasTemporales[window.readingActivoIndex];
-        window.debugLog("Intentando agregar pregunta a reading", {
-            reading: reading,
-            readingActivoIndex: window.readingActivoIndex,
-            hasQuestions: reading && reading.questions
-        });
+        window.debugLog("Intentando agregar pregunta a reading en index:", window.readingActivoIndex);
         
         if (reading) {
             // Asegurar que el array questions existe (defensivo)
@@ -940,6 +936,7 @@ window.guardarReading = function() {
                 reading.questions = [];
             }
             
+            // Agregar pregunta al array
             reading.questions.push(p);
             window.debugLog("Pregunta agregada, total ahora:", reading.questions.length);
             
@@ -948,12 +945,14 @@ window.guardarReading = function() {
             document.getElementById('inputA').value = '';
             document.getElementById('inputImg').value = '';
             
-            // NO renderizar aquí - esperar hasta el final
-            // window.debugLog("Llamando a renderizarListaPreguntas() desde guardarReading");
-            // window.renderizarListaPreguntas();
+            // BUGFIX CRÍTICO: Renderizar INMEDIATAMENTE después de agregar la pregunta
+            // Esto asegura que la primera pregunta hija aparezca en el panel sin necesidad de clic adicional
+            window.debugLog("Renderizando inmediatamente después de agregar pregunta hija");
+            window.renderizarListaPreguntas();
+            
             window.verificarLecturaCompleta();
         } else {
-            window.debugLog("ERROR: reading no existe!");
+            window.debugLog("ERROR: reading no existe en index:", window.readingActivoIndex);
         }
     }
     
@@ -968,7 +967,13 @@ window.guardarReading = function() {
     
     // BUGFIX: Render only once at the end after all state changes are complete
     // This ensures the UI reflects the final state including any child questions added
-    window.debugLog("Renderizando estado final con todas las preguntas");
+    window.debugLog("Renderizando estado final", {
+        readingActivoIndex: window.readingActivoIndex,
+        totalPreguntas: window.preguntasTemporales.length,
+        questionsInReading: (window.readingActivoIndex !== null && window.preguntasTemporales[window.readingActivoIndex]) 
+            ? window.preguntasTemporales[window.readingActivoIndex].questions.length 
+            : "N/A"
+    });
     window.renderizarListaPreguntas();
 
     // 7. Confirmación
@@ -993,6 +998,10 @@ window.guardarReading = function() {
 
     window.preguntasTemporales.forEach((p, index) => {
         window.debugLog(`Procesando pregunta ${index}`, { type: p.type, questionsCount: p.questions ? p.questions.length : 'N/A' });
+        
+        if (p.type === 'reading_comprehension') {
+            window.debugLog(`Es lectura, tiene ${p.questions ? p.questions.length : 0} preguntas hijas`, p.questions);
+        }
         
         const li = document.createElement('li');
         li.style.listStyle = "none";
