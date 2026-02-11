@@ -891,23 +891,31 @@ window.guardarReading = function() {
     const a = document.getElementById('inputA').value.trim();
     
     if (q && a) {
+        // Determinar tipo de pregunta (usar 'translation' como default si es reading_comprehension)
+        let questionType = document.getElementById('inputType').value;
+        if (questionType === 'reading_comprehension') {
+            questionType = 'translation';
+        }
+        
         // Crear objeto pregunta
         const img = document.getElementById('inputImg').value.trim();
-        const p = { type: 'translation', q, a };
+        const p = { type: questionType, q, a };
         if (img) p.img = img;
         
-        // Agregar a la lectura activa
+        // Agregar a la lectura activa (con validación de seguridad)
         const reading = window.preguntasTemporales[window.readingActivoIndex];
-        reading.questions.push(p);
-        
-        // Limpiar inputs
-        document.getElementById('inputQ').value = '';
-        document.getElementById('inputA').value = '';
-        document.getElementById('inputImg').value = '';
-        
-        // Actualizar UI inmediatamente
-        window.renderizarListaPreguntas();
-        window.verificarLecturaCompleta();
+        if (reading && reading.questions) {
+            reading.questions.push(p);
+            
+            // Limpiar inputs
+            document.getElementById('inputQ').value = '';
+            document.getElementById('inputA').value = '';
+            document.getElementById('inputImg').value = '';
+            
+            // Actualizar UI inmediatamente
+            window.renderizarListaPreguntas();
+            window.verificarLecturaCompleta();
+        }
     }
     
     // 6. Transición Visual Automática (Magia UX)
@@ -920,7 +928,8 @@ window.guardarReading = function() {
     window.actualizarPlaceholder(); // Oculta la caja grande
 
     // 7. Confirmación
-    const questionCount = window.preguntasTemporales[window.readingActivoIndex].questions.length;
+    const reading = window.preguntasTemporales[window.readingActivoIndex];
+    const questionCount = (reading && reading.questions) ? reading.questions.length : 0;
     Swal.fire({
         title: "¡Lectura Activa! 🟢", 
         text: "Mira el contador azul (" + questionCount + "/" + count + "). Agrega las preguntas ahora.",
