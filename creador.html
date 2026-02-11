@@ -700,17 +700,6 @@ window.readingChildEditIndex = null;
 window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
 window.readingActivoIndex = null;
 window.readingCreado = false;  // ← ESTA LÍNEA NUEVA
-
-// 🔍 DEBUG FLAG: Cambiar a true para habilitar logs de depuración
-window.DEBUG_MODE = false;
-
-// Función helper para logging condicional
-window.debugLog = function(...args) {
-    if (window.DEBUG_MODE) {
-        console.log(...args);
-    }
-};
-
         // LOGIN
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -801,59 +790,14 @@ window.agregarPreguntaLista = function() {
     const p = { type, q, a }; 
     if(type === 'drag_drop' && img) p.img = img;
 
-    window.debugLog('🔍 [agregarPreguntaLista] Pregunta creada:', p);
-    window.debugLog('🔍 [agregarPreguntaLista] Estado:', {
-        readingCreado: window.readingCreado,
-        readingActivoIndex: window.readingActivoIndex,
-        readingChildEditIndex: window.readingChildEditIndex,
-        preguntaEditandoIndex: window.preguntaEditandoIndex
-    });
-
     // PASO 4: ¿DÓNDE GUARDAR?
-    // Caso A: Si hay una LECTURA ACTIVA (ya creada O en modo edición de pregunta hija)
-    if ((window.readingCreado === true || window.readingChildEditIndex !== null) && window.readingActivoIndex !== null) {
+    // Caso A: Si hay una LECTURA ACTIVA y hemos marcado readingCreado = true
+    if (window.readingCreado === true && window.readingActivoIndex !== null) {
         const reading = window.preguntasTemporales[window.readingActivoIndex];
-        window.debugLog('🔍 [agregarPreguntaLista] Lectura activa encontrada:', {
-            index: window.readingActivoIndex,
-            questionsCount: reading.questions ? reading.questions.length : 0,
-            maxCount: reading.count
-        });
         
         // Seguridad: asegurar que el array existe
         if (!reading.questions) {
             reading.questions = [];
-        }
-        
-        // CASO ESPECIAL: Editando una pregunta hija existente
-        if (window.readingChildEditIndex !== null) {
-            window.debugLog('✏️ [agregarPreguntaLista] Modo EDICIÓN de pregunta hija:', window.readingChildEditIndex);
-            
-            // Validación: verificar que el índice está dentro de los límites
-            if (window.readingChildEditIndex >= 0 && window.readingChildEditIndex < reading.questions.length) {
-                // Actualizar pregunta existente en lugar de agregar nueva
-                reading.questions[window.readingChildEditIndex] = p;
-                
-                // Limpiar flags de edición
-                window.readingChildEditIndex = null;
-                window.readingChildParentIndex = null;
-                
-                // Limpiar inputs
-                document.getElementById('inputQ').value = ''; 
-                document.getElementById('inputA').value = ''; 
-                document.getElementById('inputImg').value = '';
-                
-                // Actualizar UI
-                window.renderizarListaPreguntas();
-                window.verificarLecturaCompleta();
-                window.actualizarPlaceholder();
-                
-                return;
-            } else {
-                // Índice fuera de límites - resetear y continuar como nueva pregunta
-                window.debugLog('⚠️ [agregarPreguntaLista] Índice fuera de límites, reseteando modo edición');
-                window.readingChildEditIndex = null;
-                window.readingChildParentIndex = null;
-            }
         }
         
         // Verificar si ya completó el límite
@@ -863,10 +807,7 @@ window.agregarPreguntaLista = function() {
         }
         
         // Agregar pregunta a la lectura
-        window.debugLog('➕ [agregarPreguntaLista] Agregando nueva pregunta a lectura');
         reading.questions.push(p);
-        window.debugLog('✅ [agregarPreguntaLista] Pregunta agregada. Total ahora:', reading.questions.length);
-        window.debugLog('📋 [agregarPreguntaLista] Array preguntasTemporales:', window.preguntasTemporales);
         
         // Limpiar inputs
         document.getElementById('inputQ').value = ''; 
@@ -904,8 +845,6 @@ window.agregarPreguntaLista = function() {
 // === PASO 6: GUARDAR READING + QUESTIONS (VERSIÓN CORREGIDA FINAL) ===
 window.guardarReading = function() {
 
-    window.debugLog('💾 [guardarReading] Iniciando guardado de lectura');
-    
     const readingText = document.getElementById('inputReadingText').value.trim();
     const count = document.getElementById('inputReadingCount').value;
 
@@ -932,20 +871,12 @@ window.guardarReading = function() {
         window.readingEditandoIndex = null;
     } else {
         // MODO CREACIÓN
-        window.debugLog('➕ [guardarReading] Modo CREACIÓN - agregando nueva lectura');
         window.preguntasTemporales.push(readingObj);
         
         // 👇 ESTA ES LA LÍNEA QUE FALTABA EN TU FOTO 👇
         // Activa la lectura nueva (la última de la lista)
         window.readingActivoIndex = window.preguntasTemporales.length - 1;
-        window.debugLog('✅ [guardarReading] Lectura creada en índice:', window.readingActivoIndex);
     }
-
-    window.debugLog('📊 [guardarReading] Estado después del guardado:', {
-        readingActivoIndex: window.readingActivoIndex,
-        readingCreado: window.readingCreado,
-        totalPreguntas: window.preguntasTemporales.length
-    });
 
     // 4. Actualizar lista visual
     window.renderizarListaPreguntas();
@@ -974,9 +905,6 @@ window.guardarReading = function() {
 };
         
         window.renderizarListaPreguntas = function() {   
-    window.debugLog('🎨 [renderizarListaPreguntas] Iniciando renderizado');
-    window.debugLog('🎨 [renderizarListaPreguntas] preguntasTemporales:', window.preguntasTemporales);
-    
     const ul = document.getElementById('listaPreguntasTemp');
     ul.innerHTML = "";
 
@@ -984,7 +912,6 @@ window.guardarReading = function() {
         const li = document.createElement('li');
         li.style.listStyle = "none";
 if (p.type === 'reading_comprehension') {
-window.debugLog('📖 [renderizarListaPreguntas] Renderizando READING en índice', index, 'con', p.questions?.length || 0, 'preguntas');
 li.innerHTML = `
   <div class="question-card" data-type="reading_comprehension">
 
@@ -1179,7 +1106,6 @@ window.editarPreguntaHija = function(parentIndex, childIndex) {
     window.readingActivoIndex = parentIndex;
     window.readingChildEditIndex = childIndex;
     window.readingChildParentIndex = parentIndex;
-    window.readingCreado = true; // Asegurar que el modo reading está activo
 
     document.getElementById('inputType').value = child.type || 'translation';
     window.actualizarPlaceholder();
