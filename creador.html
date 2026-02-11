@@ -944,6 +944,11 @@ window.guardarReading = function() {
             document.getElementById('inputA').value = '';
             document.getElementById('inputImg').value = '';
             
+            // BUGFIX: Renderizar INMEDIATAMENTE después de agregar la pregunta
+            // Esto asegura que la UI se actualice antes de cualquier otra operación
+            window.debugLog("Renderizando inmediatamente después de agregar pregunta hija");
+            window.renderizarListaPreguntas();
+            
             window.verificarLecturaCompleta();
         } else {
             window.debugLog("ERROR: reading no existe en index:", window.readingActivoIndex);
