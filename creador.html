@@ -800,6 +800,28 @@ window.agregarPreguntaLista = function() {
             reading.questions = [];
         }
         
+        // CASO ESPECIAL: Editando una pregunta hija existente
+        if (window.readingChildEditIndex !== null) {
+            // Actualizar pregunta existente en lugar de agregar nueva
+            reading.questions[window.readingChildEditIndex] = p;
+            
+            // Limpiar flags de edición
+            window.readingChildEditIndex = null;
+            window.readingChildParentIndex = null;
+            
+            // Limpiar inputs
+            document.getElementById('inputQ').value = ''; 
+            document.getElementById('inputA').value = ''; 
+            document.getElementById('inputImg').value = '';
+            
+            // Actualizar UI
+            window.renderizarListaPreguntas();
+            window.verificarLecturaCompleta();
+            window.actualizarPlaceholder();
+            
+            return;
+        }
+        
         // Verificar si ya completó el límite
         if (reading.questions.length >= reading.count) {
             Swal.fire("Límite alcanzado", "Ya completaste todas las preguntas de esta lectura.", "info");
