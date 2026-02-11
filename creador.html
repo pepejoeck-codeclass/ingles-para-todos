@@ -702,7 +702,7 @@ window.readingActivoIndex = null;
 window.readingCreado = false;  // ← ESTA LÍNEA NUEVA
 
 // DEBUG MODE
-window.debugMode = true; // Set to true to enable debug logging
+window.debugMode = false; // Set to true to enable debug logging
 window.debugLog = function(message, data) {
     if (window.debugMode) {
         console.log(`[DEBUG] ${message}`, data || '');
@@ -994,7 +994,6 @@ window.guardarReading = function() {
         window.renderizarListaPreguntas = function() {   
     window.debugLog("=== renderizarListaPreguntas() INICIANDO ===");
     window.debugLog("preguntasTemporales", window.preguntasTemporales);
-    window.debugLog("preguntasTemporales (stringified)", JSON.stringify(window.preguntasTemporales, null, 2));
     
     const ul = document.getElementById('listaPreguntasTemp');
     ul.innerHTML = "";
