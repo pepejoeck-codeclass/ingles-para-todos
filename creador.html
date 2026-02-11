@@ -926,26 +926,27 @@ window.guardarReading = function() {
         const p = { type: questionType, q, a };
         if (img) p.img = img;
         
-        // Agregar DIRECTAMENTE al array para asegurar que la referencia es correcta
+        // Agregar a la lectura activa (con validación de seguridad)
+        const reading = window.preguntasTemporales[window.readingActivoIndex];
         window.debugLog("Intentando agregar pregunta a reading en index:", window.readingActivoIndex);
         
-        if (window.preguntasTemporales[window.readingActivoIndex]) {
+        if (reading) {
             // Asegurar que el array questions existe (defensivo)
-            if (!window.preguntasTemporales[window.readingActivoIndex].questions) {
-                window.preguntasTemporales[window.readingActivoIndex].questions = [];
+            if (!reading.questions) {
+                reading.questions = [];
             }
             
-            // Agregar pregunta DIRECTAMENTE al array (sin variable intermedia)
-            window.preguntasTemporales[window.readingActivoIndex].questions.push(p);
-            window.debugLog("Pregunta agregada, total ahora:", window.preguntasTemporales[window.readingActivoIndex].questions.length);
+            // Agregar pregunta al array
+            reading.questions.push(p);
+            window.debugLog("Pregunta agregada, total ahora:", reading.questions.length);
             
             // Limpiar inputs
             document.getElementById('inputQ').value = '';
             document.getElementById('inputA').value = '';
             document.getElementById('inputImg').value = '';
             
-            // BUGFIX: Renderizar INMEDIATAMENTE después de agregar la pregunta
-            // Esto asegura que la UI se actualice antes de cualquier otra operación
+            // BUGFIX CRÍTICO: Renderizar INMEDIATAMENTE después de agregar la pregunta
+            // Esto asegura que la primera pregunta hija aparezca en el panel sin necesidad de clic adicional
             window.debugLog("Renderizando inmediatamente después de agregar pregunta hija");
             window.renderizarListaPreguntas();
             
@@ -966,16 +967,13 @@ window.guardarReading = function() {
     
     // BUGFIX: Render only once at the end after all state changes are complete
     // This ensures the UI reflects the final state including any child questions added
-    window.debugLog("=== ANTES DE RENDERIZAR ===");
-    window.debugLog("readingActivoIndex:", window.readingActivoIndex);
-    if (window.readingActivoIndex !== null) {
-        const reading = window.preguntasTemporales[window.readingActivoIndex];
-        window.debugLog("Reading object:", reading);
-        window.debugLog("Questions count:", reading ? reading.questions.length : "N/A");
-        window.debugLog("Questions array:", reading ? reading.questions : "N/A");
-    }
-    window.debugLog("Total preguntas en array:", window.preguntasTemporales.length);
-    window.debugLog("=========================");
+    window.debugLog("Renderizando estado final", {
+        readingActivoIndex: window.readingActivoIndex,
+        totalPreguntas: window.preguntasTemporales.length,
+        questionsInReading: (window.readingActivoIndex !== null && window.preguntasTemporales[window.readingActivoIndex]) 
+            ? window.preguntasTemporales[window.readingActivoIndex].questions.length 
+            : "N/A"
+    });
     window.renderizarListaPreguntas();
 
     // 7. Confirmación
