@@ -891,9 +891,10 @@ window.guardarReading = function() {
     const a = document.getElementById('inputA').value.trim();
     
     if (q && a) {
-        // Determinar tipo de pregunta
-        // Si aún está en 'reading_comprehension', usar 'translation' como default
-        // para evitar recursión al llamar agregarPreguntaLista indirectamente
+        // Determinar tipo de pregunta para la primera pregunta hija
+        // Las preguntas hijas de una lectura deben ser preguntas normales (translation, dictation, etc.),
+        // no pueden ser 'reading_comprehension' porque eso crearía otra lectura (recursión).
+        // Si el selector aún está en 'reading_comprehension', usar 'translation' como tipo seguro por defecto.
         let questionType = document.getElementById('inputType').value;
         if (questionType === 'reading_comprehension') {
             questionType = 'translation';
@@ -934,7 +935,7 @@ window.guardarReading = function() {
     const questionCount = (currentReading && currentReading.questions) ? currentReading.questions.length : 0;
     Swal.fire({
         title: "¡Lectura Activa! 🟢", 
-        text: "Mira el contador azul (" + questionCount + "/" + count + "). Agrega las preguntas ahora.",
+        text: `Mira el contador azul (${questionCount}/${count}). Agrega las preguntas ahora.`,
         icon: "success",
         timer: 3000
     });
