@@ -701,8 +701,8 @@ window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
 window.readingActivoIndex = null;
 window.readingCreado = false;  // ← ESTA LÍNEA NUEVA
 
-// 🔍 DEBUG FLAG: Cambiar a false para deshabilitar logs de depuración
-window.DEBUG_MODE = true;
+// 🔍 DEBUG FLAG: Cambiar a true para habilitar logs de depuración
+window.DEBUG_MODE = false;
 
 // Función helper para logging condicional
 window.debugLog = function(...args) {
@@ -827,24 +827,33 @@ window.agregarPreguntaLista = function() {
         // CASO ESPECIAL: Editando una pregunta hija existente
         if (window.readingChildEditIndex !== null) {
             window.debugLog('✏️ [agregarPreguntaLista] Modo EDICIÓN de pregunta hija:', window.readingChildEditIndex);
-            // Actualizar pregunta existente en lugar de agregar nueva
-            reading.questions[window.readingChildEditIndex] = p;
             
-            // Limpiar flags de edición
-            window.readingChildEditIndex = null;
-            window.readingChildParentIndex = null;
-            
-            // Limpiar inputs
-            document.getElementById('inputQ').value = ''; 
-            document.getElementById('inputA').value = ''; 
-            document.getElementById('inputImg').value = '';
-            
-            // Actualizar UI
-            window.renderizarListaPreguntas();
-            window.verificarLecturaCompleta();
-            window.actualizarPlaceholder();
-            
-            return;
+            // Validación: verificar que el índice está dentro de los límites
+            if (window.readingChildEditIndex >= 0 && window.readingChildEditIndex < reading.questions.length) {
+                // Actualizar pregunta existente en lugar de agregar nueva
+                reading.questions[window.readingChildEditIndex] = p;
+                
+                // Limpiar flags de edición
+                window.readingChildEditIndex = null;
+                window.readingChildParentIndex = null;
+                
+                // Limpiar inputs
+                document.getElementById('inputQ').value = ''; 
+                document.getElementById('inputA').value = ''; 
+                document.getElementById('inputImg').value = '';
+                
+                // Actualizar UI
+                window.renderizarListaPreguntas();
+                window.verificarLecturaCompleta();
+                window.actualizarPlaceholder();
+                
+                return;
+            } else {
+                // Índice fuera de límites - resetear y continuar como nueva pregunta
+                window.debugLog('⚠️ [agregarPreguntaLista] Índice fuera de límites, reseteando modo edición');
+                window.readingChildEditIndex = null;
+                window.readingChildParentIndex = null;
+            }
         }
         
         // Verificar si ya completó el límite
