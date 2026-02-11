@@ -891,7 +891,9 @@ window.guardarReading = function() {
     const a = document.getElementById('inputA').value.trim();
     
     if (q && a) {
-        // Determinar tipo de pregunta (usar 'translation' como default si es reading_comprehension)
+        // Determinar tipo de pregunta
+        // Si aún está en 'reading_comprehension', usar 'translation' como default
+        // para evitar recursión al llamar agregarPreguntaLista indirectamente
         let questionType = document.getElementById('inputType').value;
         if (questionType === 'reading_comprehension') {
             questionType = 'translation';
@@ -928,8 +930,8 @@ window.guardarReading = function() {
     window.actualizarPlaceholder(); // Oculta la caja grande
 
     // 7. Confirmación
-    const reading = window.preguntasTemporales[window.readingActivoIndex];
-    const questionCount = (reading && reading.questions) ? reading.questions.length : 0;
+    const currentReading = window.preguntasTemporales[window.readingActivoIndex];
+    const questionCount = (currentReading && currentReading.questions) ? currentReading.questions.length : 0;
     Swal.fire({
         title: "¡Lectura Activa! 🟢", 
         text: "Mira el contador azul (" + questionCount + "/" + count + "). Agrega las preguntas ahora.",
