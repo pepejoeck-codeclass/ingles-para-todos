@@ -702,9 +702,9 @@ window.readingActivoIndex = null;
 window.readingCreado = false;  // ← ESTA LÍNEA NUEVA
 
 // DEBUG MODE
-window.DEBUG_MODE = false; // Set to true to enable debug logging
+window.debugMode = false; // Set to true to enable debug logging
 window.debugLog = function(message, data) {
-    if (window.DEBUG_MODE) {
+    if (window.debugMode) {
         console.log(`[DEBUG] ${message}`, data || '');
     }
 };
@@ -900,8 +900,8 @@ window.guardarReading = function() {
         readingObj: readingObj
     });
 
-    // 4. Actualizar lista visual
-    window.renderizarListaPreguntas();
+    // 4. NO renderizar aquí - esperar hasta el final para evitar renders redundantes
+    // window.renderizarListaPreguntas();
     window.verificarLecturaCompleta();
     window.actualizarPlaceholder();
     
@@ -934,12 +934,12 @@ window.guardarReading = function() {
             hasQuestions: reading && reading.questions
         });
         
-        // Asegurar que el array questions existe (defensivo)
-        if (reading && !reading.questions) {
-            reading.questions = [];
-        }
-        
-        if (reading && reading.questions) {
+        if (reading) {
+            // Asegurar que el array questions existe (defensivo)
+            if (!reading.questions) {
+                reading.questions = [];
+            }
+            
             reading.questions.push(p);
             window.debugLog("Pregunta agregada, total ahora:", reading.questions.length);
             
@@ -948,12 +948,12 @@ window.guardarReading = function() {
             document.getElementById('inputA').value = '';
             document.getElementById('inputImg').value = '';
             
-            // Actualizar UI inmediatamente
-            window.debugLog("Llamando a renderizarListaPreguntas() desde guardarReading");
-            window.renderizarListaPreguntas();
+            // NO renderizar aquí - esperar hasta el final
+            // window.debugLog("Llamando a renderizarListaPreguntas() desde guardarReading");
+            // window.renderizarListaPreguntas();
             window.verificarLecturaCompleta();
         } else {
-            window.debugLog("ERROR: reading o reading.questions no existen!");
+            window.debugLog("ERROR: reading no existe!");
         }
     }
     
@@ -966,7 +966,9 @@ window.guardarReading = function() {
     
     window.actualizarPlaceholder(); // Oculta la caja grande
     
-    // 🔴 BUGFIX: Forzar re-renderizado para asegurar que la primera pregunta aparezca
+    // BUGFIX: Render only once at the end after all state changes are complete
+    // This ensures the UI reflects the final state including any child questions added
+    window.debugLog("Renderizando estado final con todas las preguntas");
     window.renderizarListaPreguntas();
 
     // 7. Confirmación
