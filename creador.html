@@ -700,6 +700,17 @@ window.readingChildEditIndex = null;
 window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
 window.readingActivoIndex = null;
 window.readingCreado = false;  // ← ESTA LÍNEA NUEVA
+
+// 🔍 DEBUG FLAG: Cambiar a false para deshabilitar logs de depuración
+window.DEBUG_MODE = true;
+
+// Función helper para logging condicional
+window.debugLog = function(...args) {
+    if (window.DEBUG_MODE) {
+        console.log(...args);
+    }
+};
+
         // LOGIN
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -790,8 +801,8 @@ window.agregarPreguntaLista = function() {
     const p = { type, q, a }; 
     if(type === 'drag_drop' && img) p.img = img;
 
-    console.log('🔍 [agregarPreguntaLista] Pregunta creada:', p);
-    console.log('🔍 [agregarPreguntaLista] Estado:', {
+    window.debugLog('🔍 [agregarPreguntaLista] Pregunta creada:', p);
+    window.debugLog('🔍 [agregarPreguntaLista] Estado:', {
         readingCreado: window.readingCreado,
         readingActivoIndex: window.readingActivoIndex,
         readingChildEditIndex: window.readingChildEditIndex,
@@ -802,7 +813,7 @@ window.agregarPreguntaLista = function() {
     // Caso A: Si hay una LECTURA ACTIVA y hemos marcado readingCreado = true
     if (window.readingCreado === true && window.readingActivoIndex !== null) {
         const reading = window.preguntasTemporales[window.readingActivoIndex];
-        console.log('🔍 [agregarPreguntaLista] Lectura activa encontrada:', {
+        window.debugLog('🔍 [agregarPreguntaLista] Lectura activa encontrada:', {
             index: window.readingActivoIndex,
             questionsCount: reading.questions ? reading.questions.length : 0,
             maxCount: reading.count
@@ -815,7 +826,7 @@ window.agregarPreguntaLista = function() {
         
         // CASO ESPECIAL: Editando una pregunta hija existente
         if (window.readingChildEditIndex !== null) {
-            console.log('✏️ [agregarPreguntaLista] Modo EDICIÓN de pregunta hija:', window.readingChildEditIndex);
+            window.debugLog('✏️ [agregarPreguntaLista] Modo EDICIÓN de pregunta hija:', window.readingChildEditIndex);
             // Actualizar pregunta existente en lugar de agregar nueva
             reading.questions[window.readingChildEditIndex] = p;
             
@@ -843,10 +854,10 @@ window.agregarPreguntaLista = function() {
         }
         
         // Agregar pregunta a la lectura
-        console.log('➕ [agregarPreguntaLista] Agregando nueva pregunta a lectura');
+        window.debugLog('➕ [agregarPreguntaLista] Agregando nueva pregunta a lectura');
         reading.questions.push(p);
-        console.log('✅ [agregarPreguntaLista] Pregunta agregada. Total ahora:', reading.questions.length);
-        console.log('📋 [agregarPreguntaLista] Array preguntasTemporales:', window.preguntasTemporales);
+        window.debugLog('✅ [agregarPreguntaLista] Pregunta agregada. Total ahora:', reading.questions.length);
+        window.debugLog('📋 [agregarPreguntaLista] Array preguntasTemporales:', window.preguntasTemporales);
         
         // Limpiar inputs
         document.getElementById('inputQ').value = ''; 
@@ -884,7 +895,7 @@ window.agregarPreguntaLista = function() {
 // === PASO 6: GUARDAR READING + QUESTIONS (VERSIÓN CORREGIDA FINAL) ===
 window.guardarReading = function() {
 
-    console.log('💾 [guardarReading] Iniciando guardado de lectura');
+    window.debugLog('💾 [guardarReading] Iniciando guardado de lectura');
     
     const readingText = document.getElementById('inputReadingText').value.trim();
     const count = document.getElementById('inputReadingCount').value;
@@ -912,16 +923,16 @@ window.guardarReading = function() {
         window.readingEditandoIndex = null;
     } else {
         // MODO CREACIÓN
-        console.log('➕ [guardarReading] Modo CREACIÓN - agregando nueva lectura');
+        window.debugLog('➕ [guardarReading] Modo CREACIÓN - agregando nueva lectura');
         window.preguntasTemporales.push(readingObj);
         
         // 👇 ESTA ES LA LÍNEA QUE FALTABA EN TU FOTO 👇
         // Activa la lectura nueva (la última de la lista)
         window.readingActivoIndex = window.preguntasTemporales.length - 1;
-        console.log('✅ [guardarReading] Lectura creada en índice:', window.readingActivoIndex);
+        window.debugLog('✅ [guardarReading] Lectura creada en índice:', window.readingActivoIndex);
     }
 
-    console.log('📊 [guardarReading] Estado después del guardado:', {
+    window.debugLog('📊 [guardarReading] Estado después del guardado:', {
         readingActivoIndex: window.readingActivoIndex,
         readingCreado: window.readingCreado,
         totalPreguntas: window.preguntasTemporales.length
@@ -954,8 +965,8 @@ window.guardarReading = function() {
 };
         
         window.renderizarListaPreguntas = function() {   
-    console.log('🎨 [renderizarListaPreguntas] Iniciando renderizado');
-    console.log('🎨 [renderizarListaPreguntas] preguntasTemporales:', window.preguntasTemporales);
+    window.debugLog('🎨 [renderizarListaPreguntas] Iniciando renderizado');
+    window.debugLog('🎨 [renderizarListaPreguntas] preguntasTemporales:', window.preguntasTemporales);
     
     const ul = document.getElementById('listaPreguntasTemp');
     ul.innerHTML = "";
@@ -964,7 +975,7 @@ window.guardarReading = function() {
         const li = document.createElement('li');
         li.style.listStyle = "none";
 if (p.type === 'reading_comprehension') {
-console.log('📖 [renderizarListaPreguntas] Renderizando READING en índice', index, 'con', p.questions?.length || 0, 'preguntas');
+window.debugLog('📖 [renderizarListaPreguntas] Renderizando READING en índice', index, 'con', p.questions?.length || 0, 'preguntas');
 li.innerHTML = `
   <div class="question-card" data-type="reading_comprehension">
 
