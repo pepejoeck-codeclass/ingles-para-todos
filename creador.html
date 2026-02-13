@@ -716,6 +716,9 @@ window.readingChildParentIndex = null; // 🔴 NUEVO: padre activo
 window.readingActivoIndex = null;
 window.readingCreado = false;  // ← ESTA LÍNEA NUEVA
 
+// CONSTANTS
+const MAX_READING_TEXT_LENGTH = 5000; // Maximum characters for reading comprehension text
+
 // DEBUG MODE
 window.debugMode = false; // Set to true to enable debug logging
 window.debugLog = function(message, data) {
@@ -795,7 +798,7 @@ window.debugLog = function(message, data) {
             // Create speech utterance
             const utterance = new SpeechSynthesisUtterance(readingText);
             utterance.lang = 'en-US';
-            utterance.rate = 0.9; // Slightly slower for learning
+            utterance.rate = 0.9; // Slightly slower than normal (1.0) for better comprehension
             utterance.pitch = 1.0;
             
             utterance.onstart = function() {
@@ -886,10 +889,12 @@ window.agregarPreguntaLista = function() {
     if(type === 'drag_drop' && img) {
         try {
             new URL(img);
-            // Check if it's a valid image URL (basic check)
-            if (!img.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) && !img.includes('imgur') && !img.includes('cloudinary')) {
-                const result = confirm("La URL no parece ser una imagen válida. ¿Continuar de todos modos?");
-                if (!result) return;
+            // Check if it's a valid image URL (basic file extension check)
+            // Note: Some valid image URLs may not have extensions (e.g., dynamic URLs)
+            // This is just a warning, not a hard block
+            if (!img.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
+                // Show warning but allow continuation - user knows their URL better
+                console.warn("Image URL doesn't have a standard image extension:", img);
             }
         } catch (e) {
             return Swal.fire("URL inválida", "La URL de la imagen no es válida. Usa una URL completa (http:// o https://)", "error");
@@ -966,8 +971,8 @@ window.guardarReading = function() {
     }
     
     // Validate max length (reasonable limit for reading comprehension)
-    if (readingText.length > 5000) {
-        Swal.fire("Texto muy largo", "El texto de lectura no debe exceder 5000 caracteres. Longitud actual: " + readingText.length, "warning");
+    if (readingText.length > MAX_READING_TEXT_LENGTH) {
+        Swal.fire("Texto muy largo", "El texto de lectura no debe exceder " + MAX_READING_TEXT_LENGTH + " caracteres. Longitud actual: " + readingText.length, "warning");
         return false;
     }
 
