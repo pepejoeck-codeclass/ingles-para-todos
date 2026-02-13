@@ -564,7 +564,7 @@
   <label>📖 Texto de la Lectura:</label>
   <textarea id="inputReadingText" placeholder="Escribe aquí la lectura completa..."></textarea>
 
-  <button type="button" class="btn-save" style="background:#8e44ad; margin-top:10px;">
+  <button type="button" class="btn-save" style="background:#8e44ad; margin-top:10px;" onclick="generarAudioLectura()">
     🔊 Generar / Escuchar Audio de la Lectura
   </button>
 
@@ -617,6 +617,11 @@
             // Validaciones
             if(!topic) return Swal.fire("Atención", "Escribe un tema.", "warning");
             if(!apiKey) return Swal.fire("Falta Llave", "Pega tu API Key en la caja punteada.", "error");
+            
+            // Validate API key format (Google AI API keys start with "AIza")
+            if(!apiKey.startsWith('AIza')) {
+                return Swal.fire("API Key inválida", "La API Key de Google AI debe comenzar con 'AIza'. Verifica tu clave.", "error");
+            }
 
             // Guardamos la llave para comodidad futura
             localStorage.setItem("geminiApiKey", apiKey);
@@ -647,15 +652,23 @@
                 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 
                 const result = await model.generateContent(prompt);
-                const response = await result.response;
+                const response = result.response;
                 let text = response.text();
                 
                 // Limpieza de formato
                 text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-                const aiResult = JSON.parse(text);
+                
+                let aiResult;
+                try {
+                    aiResult = JSON.parse(text);
+                } catch (parseError) {
+                    console.error("Error parsing JSON:", parseError);
+                    console.error("Raw text received:", text);
+                    throw new Error("La IA no devolvió un formato JSON válido. Intenta de nuevo.");
+                }
 
                 // Inyección segura de datos
-                if(aiResult.questions) { 
+                if(aiResult.questions && Array.isArray(aiResult.questions)) { 
                     // Usamos variable global window
                     window.preguntasTemporales = window.preguntasTemporales.concat(aiResult.questions); 
                     window.renderizarListaPreguntas(); 
@@ -726,11 +739,79 @@ window.debugLog = function(message, data) {
             const e = document.getElementById('adminEmail').value;
             const p = document.getElementById('adminPass').value;
             if(!e || !p) return Swal.fire("Ups", "Faltan datos", "warning");
-            auth.signInWithEmailAndPassword(e, p).catch(error => Swal.fire("Error", "Revisa datos", "error"));
+            
+            auth.signInWithEmailAndPassword(e, p).catch(error => {
+                let errorMessage = "Revisa tus datos";
+                
+                // Specific error handling
+                switch(error.code) {
+                    case 'auth/invalid-email':
+                        errorMessage = "El correo electrónico no es válido.";
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = "Esta cuenta ha sido deshabilitada.";
+                        break;
+                    case 'auth/user-not-found':
+                        errorMessage = "No existe una cuenta con este correo.";
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = "Contraseña incorrecta.";
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = "Demasiados intentos fallidos. Intenta más tarde.";
+                        break;
+                    default:
+                        errorMessage = "Error de autenticación: " + error.message;
+                }
+                
+                Swal.fire("Error", errorMessage, "error");
+            });
         }
         
         window.cerrarSesionCreador = function() {
             auth.signOut().then(() => location.reload());
+        }
+
+        // Audio generation function for reading comprehension
+        window.generarAudioLectura = function() {
+            const readingText = document.getElementById('inputReadingText').value.trim();
+            
+            if (!readingText) {
+                Swal.fire("Sin texto", "Primero escribe el texto de la lectura.", "warning");
+                return;
+            }
+            
+            // Check if browser supports speech synthesis
+            if (!('speechSynthesis' in window)) {
+                Swal.fire("No soportado", "Tu navegador no soporta síntesis de voz.", "error");
+                return;
+            }
+            
+            // Cancel any ongoing speech
+            window.speechSynthesis.cancel();
+            
+            // Create speech utterance
+            const utterance = new SpeechSynthesisUtterance(readingText);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9; // Slightly slower for learning
+            utterance.pitch = 1.0;
+            
+            utterance.onstart = function() {
+                Swal.fire({
+                    title: '🔊 Reproduciendo...',
+                    text: 'Escucha el audio de la lectura',
+                    icon: 'info',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            };
+            
+            utterance.onerror = function(event) {
+                Swal.fire("Error", "No se pudo generar el audio: " + event.error, "error");
+            };
+            
+            // Speak the text
+            window.speechSynthesis.speak(utterance);
         }
 
         // FUNCIONES DE UI Y LISTAS (SIN REDUCCIÓN)
@@ -797,6 +878,20 @@ window.agregarPreguntaLista = function() {
     // Validación básica
     if(!q || !a) {
         return Swal.fire("Faltan datos", "Escribe la pregunta y respuesta", "warning");
+    }
+    
+    // Validate image URL format if provided for drag_drop type
+    if(type === 'drag_drop' && img) {
+        try {
+            new URL(img);
+            // Check if it's a valid image URL (basic check)
+            if (!img.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) && !img.includes('imgur') && !img.includes('cloudinary')) {
+                const result = confirm("La URL no parece ser una imagen válida. ¿Continuar de todos modos?");
+                if (!result) return;
+            }
+        } catch (e) {
+            return Swal.fire("URL inválida", "La URL de la imagen no es válida. Usa una URL completa (http:// o https://)", "error");
+        }
     }
 
     // PASO 3: Crear objeto pregunta
@@ -866,6 +961,12 @@ window.guardarReading = function() {
     if (!readingText) {
         Swal.fire("Falta la lectura", "Escribe el texto antes de continuar.", "warning");
         return false; // 🛑 SEMÁFORO ROJO: Si falla, devuelve FALSO.
+    }
+    
+    // Validate max length (reasonable limit for reading comprehension)
+    if (readingText.length > 5000) {
+        Swal.fire("Texto muy largo", "El texto de lectura no debe exceder 5000 caracteres. Longitud actual: " + readingText.length, "warning");
+        return false;
     }
 
     // 2. Crear objeto Reading
@@ -1296,7 +1397,24 @@ window.moverPreguntaHija = function(parentIndex, childIndex, direction) {
             const id=document.getElementById('inputLessonId').value.trim(); 
             const tit=document.getElementById('inputLessonTitle').value.trim();
             
-            if(!id || !tit || window.preguntasTemporales.length===0) return Swal.fire("Incompleto","Faltan datos obligatorios","error");
+            // Enhanced validation
+            if(!id) return Swal.fire("ID requerido","Ingresa un ID para la lección","warning");
+            if(!tit) return Swal.fire("Título requerido","Ingresa un título para la lección","warning");
+            if(window.preguntasTemporales.length===0) return Swal.fire("Sin preguntas","Debes agregar al menos una pregunta","warning");
+            
+            // Validate question quality
+            const invalidQuestions = window.preguntasTemporales.filter(q => {
+                if(q.type === 'reading_comprehension') {
+                    return !q.readingText || !q.questions || q.questions.length === 0;
+                }
+                return !q.q || !q.a;
+            });
+            
+            if(invalidQuestions.length > 0) {
+                return Swal.fire("Preguntas incompletas", 
+                    `Hay ${invalidQuestions.length} pregunta(s) sin completar. Verifica que todas tengan pregunta y respuesta.`, 
+                    "warning");
+            }
             
             const data = { 
                 id, title:tit, 
