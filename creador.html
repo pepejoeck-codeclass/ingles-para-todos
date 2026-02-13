@@ -1203,6 +1203,11 @@ window.verificarLecturaCompleta = function() {
 
     if (actual >= max) {
         msg.style.display = 'block';
+        // Auto-reset reading state when complete to allow new questions/readings
+        window.readingActivoIndex = null;
+        window.readingCreado = false;
+        // Update placeholder to reflect completion
+        window.actualizarPlaceholder();
     } else {
         msg.style.display = 'none';
     }
