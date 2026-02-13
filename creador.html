@@ -400,13 +400,13 @@
             <p style="font-size:12px;">Ingresa con una cuenta registrada.</p>
             <input type="email" id="adminEmail" placeholder="Correo">
             <input type="password" id="adminPass" placeholder="Contraseña">
-            <button onclick="autenticarCreador()" class="btn-login">ENTRAR</button>
+            <button type="button" onclick="autenticarCreador()" class="btn-login">ENTRAR</button>
         </div>
     </div>
 
     <div id="mainPanel" class="creator-card">
         <div style="display:flex; justify-content:flex-end;">
-            <button onclick="cerrarSesionCreador()" style="background:#c0392b; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Cerrar Sesión</button>
+            <button type="button" onclick="cerrarSesionCreador()" style="background:#c0392b; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Cerrar Sesión</button>
         </div>
         
         <h2>🛠️ Panel de Creador V100</h2>
@@ -476,13 +476,13 @@
                     <option value="3">Nivel 3</option>
                     <option value="4">Nivel 4</option>
                 </select>
-                <button onclick="agregarSiguienteNivel()" class="btn-add-level" title="Crear Nivel Superior">➕ Añadir Nivel</button>
+                <button type="button" onclick="agregarSiguienteNivel()" class="btn-add-level" title="Crear Nivel Superior">➕ Añadir Nivel</button>
             </div>
 
             <label>2. ID Único de la Lección (Para Editar o Crear):</label>
             <div class="search-container">
                 <input type="text" id="inputLessonId" placeholder="Ej: leccion_zoologico_1">
-                <button onclick="cargarLeccionExistente()" class="btn-load" title="Buscar y Editar">🔍 Cargar</button>
+                <button type="button" onclick="cargarLeccionExistente()" class="btn-load" title="Buscar y Editar">🔍 Cargar</button>
             </div>
             <div class="helper-text">Escribe el ID y dale a la lupa para EDITAR una lección existente.</div>
             
@@ -591,7 +591,7 @@
             <input type="text" id="inputImg" placeholder="https://cdn-icons-png.flaticon.com/512/616/616430.png">
             <div class="helper-text">Pega aquí la URL de la imagen (solo si aplica).</div>
 
-            <button onclick="agregarPreguntaLista()" class="btn-save" style="background:#3498db; margin-top:10px; font-size:14px; padding: 10px;">➕ Agregar Pregunta</button>
+            <button type="button" onclick="agregarPreguntaLista()" class="btn-save" style="background:#3498db; margin-top:10px; font-size:14px; padding: 10px;">➕ Agregar Pregunta</button>
         </div>
 
         <div class="preview-box wide-section">
@@ -599,7 +599,7 @@
             <ul id="listaPreguntasTemp" style="padding-left: 20px;"></ul>
         </div>
 
-        <button onclick="guardarEnNube()" class="btn-save">💾 GUARDAR CAMBIOS EN LA NUBE</button>
+        <button type="button" onclick="guardarEnNube()" class="btn-save">💾 GUARDAR CAMBIOS EN LA NUBE</button>
     </div>
 
     <script type="module">
@@ -701,6 +701,8 @@
     </script>
 
     <script>
+        // Firebase configuration (public keys - normal for client-side Firebase)
+        // Security is handled via Firebase Security Rules on the server
         const firebaseConfig = { apiKey: "AIzaSyCN3meUPPTmrN_4kgcMCTrpHJahQQzxU7s", authDomain: "ingles-pepejoeck.firebaseapp.com", databaseURL: "https://ingles-pepejoeck-default-rtdb.firebaseio.com", projectId: "ingles-pepejoeck", storageBucket: "ingles-pepejoeck.firebasestorage.app", messagingSenderId: "519995763844", appId: "1:519995763844:web:350df130a6673b4002a6d1", measurementId: "G-5MEQGW13ZE" };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
